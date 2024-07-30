@@ -2,6 +2,7 @@
 using ELFSharp.ELF.Sections;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
+using Mesen.Integration.Elf;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.Windows;
@@ -21,6 +22,9 @@ public class ElfImporter
 	{
 		try {
 			MemoryType memType = cpuType.ToMemoryType();
+
+			DwarfSymbolProvider dwarf = new DwarfSymbolProvider();
+			dwarf.LoadModule(path);
 
 			Dictionary<AddressInfo, CodeLabel> labels = new();
 			HashSet<string> usedLabels = new();
