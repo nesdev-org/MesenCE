@@ -23,60 +23,58 @@ public class ElfImporter
 		try {
 			MemoryType memType = cpuType.ToMemoryType();
 
-			DwarfSymbolProvider dwarf = new DwarfSymbolProvider();
-			dwarf.LoadModule(path);
+			DwarfSymbolProvider? dwarf = DwarfSymbolProvider.Load(path);
+			if(dwarf == null) {
+				return;
+			}
 
 			Dictionary<AddressInfo, CodeLabel> labels = new();
 			HashSet<string> usedLabels = new();
-			IELF elf = ELFReader.Load(path);
-			if(elf.TryGetSection(".symtab", out ISection section)) {
-				if(section is ISymbolTable symbols) {
-					foreach(SymbolEntry<uint> symbol in symbols.Entries) {
-						if(!string.IsNullOrWhiteSpace(symbol.Name) && symbol.Type != SymbolType.File && symbol.Type != SymbolType.Section && symbol.Type != SymbolType.Object && symbol.PointedSection != null) {
-							uint value = symbol.Value & ~(uint)0x01;
-							AddressInfo relAddr = new AddressInfo() { Address = (int)value, Type = memType };
-							AddressInfo absAddr = DebugApi.GetAbsoluteAddress(relAddr);
-							AddressInfo labelAddr = absAddr.Type != MemoryType.None ? absAddr : relAddr;
 
-							if(!ConfigManager.Config.Debug.Integration.IsMemoryTypeImportEnabled(labelAddr.Type)) {
-								continue;
-							}
+			foreach(SymbolEntry<uint> symbol in dwarf.Symbols) {
+				if(!string.IsNullOrWhiteSpace(symbol.Name) && symbol.Type != SymbolType.File && symbol.Type != SymbolType.Section && symbol.Type != SymbolType.Object && symbol.PointedSection != null) {
+					uint value = symbol.Value & ~(uint)0x01;
+					AddressInfo relAddr = new AddressInfo() { Address = (int)value, Type = memType };
+					AddressInfo absAddr = DebugApi.GetAbsoluteAddress(relAddr);
+					AddressInfo labelAddr = absAddr.Type != MemoryType.None ? absAddr : relAddr;
 
-							if(symbol.Name.StartsWith("$") && labels.ContainsKey(labelAddr)) {
-								continue;
-							}
-
-							string name = symbol.Name switch {
-								"$a" => "arm_" + relAddr.Address.ToString("X7"),
-								"$d" => "data_" + relAddr.Address.ToString("X7"),
-								"$t" => "thumb_" + relAddr.Address.ToString("X7"),
-								_ => symbol.Name
-							};
-
-							//Demangle and replace any invalid characters with underscores
-							name = LabelManager.InvalidLabelRegex.Replace(Demangle(name), "_");
-
-							if(labels.Remove(labelAddr, out CodeLabel? existingLabel)) {
-								usedLabels.Remove(existingLabel.Label);
-							}
-
-							int j = 0;
-							string orgLabel = name;
-							while(usedLabels.Contains(name)) {
-								j++;
-								name = orgLabel + j.ToString();
-							}
-
-							usedLabels.Add(name);
-
-							labels[labelAddr] = new CodeLabel() {
-								Label = name,
-								Address = (uint)labelAddr.Address,
-								MemoryType = labelAddr.Type,
-								Length = symbol.Type != SymbolType.Function && symbol.Size > 1 ? symbol.Size : 1
-							};
-						}
+					if(!ConfigManager.Config.Debug.Integration.IsMemoryTypeImportEnabled(labelAddr.Type)) {
+						continue;
 					}
+
+					if(symbol.Name.StartsWith("$") && labels.ContainsKey(labelAddr)) {
+						continue;
+					}
+
+					string name = symbol.Name switch {
+						"$a" => "arm_" + relAddr.Address.ToString("X7"),
+						"$d" => "data_" + relAddr.Address.ToString("X7"),
+						"$t" => "thumb_" + relAddr.Address.ToString("X7"),
+						_ => symbol.Name
+					};
+
+					//Demangle and replace any invalid characters with underscores
+					name = LabelManager.InvalidLabelRegex.Replace(Demangle(name), "_");
+
+					if(labels.Remove(labelAddr, out CodeLabel? existingLabel)) {
+						usedLabels.Remove(existingLabel.Label);
+					}
+
+					int j = 0;
+					string orgLabel = name;
+					while(usedLabels.Contains(name)) {
+						j++;
+						name = orgLabel + j.ToString();
+					}
+
+					usedLabels.Add(name);
+
+					labels[labelAddr] = new CodeLabel() {
+						Label = name,
+						Address = (uint)labelAddr.Address,
+						MemoryType = labelAddr.Type,
+						Length = symbol.Type != SymbolType.Function && symbol.Size > 1 ? symbol.Size : 1
+					};
 				}
 			}
 

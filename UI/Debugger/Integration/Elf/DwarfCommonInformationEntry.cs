@@ -177,7 +177,7 @@ internal struct DwarfExceptionHandlingFrameParsingInput
 	/// Initializes a new instance of the <see cref="DwarfExceptionHandlingFrameParsingInput"/> class.
 	/// </summary>
 	/// <param name="image">The dwarf image used to initialize input data.</param>
-	public DwarfExceptionHandlingFrameParsingInput(IDwarfImage image)
+	public DwarfExceptionHandlingFrameParsingInput(ElfImage image)
 		 : this()
 	{
 		DefaultAddressSize = (byte)(image.Is64bit ? 8 : 4);
