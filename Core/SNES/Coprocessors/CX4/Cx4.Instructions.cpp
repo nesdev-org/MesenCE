@@ -116,14 +116,14 @@ uint32_t Cx4::GetSourceValue(uint8_t src)
 		case 0x2E:
 			_state.Bus.Enabled = true;
 			_state.Bus.Reading = true;
-			_state.Bus.DelayCycles = 1 + _state.RomAccessDelay;
+			_state.Bus.DelayCycles = _state.RomAccessDelay;
 			_state.Bus.Address = _state.MemoryAddressReg;
 			return 0;
 
 		case 0x2F:
 			_state.Bus.Enabled = true;
 			_state.Bus.Reading = true;
-			_state.Bus.DelayCycles = 1 + _state.RamAccessDelay;
+			_state.Bus.DelayCycles = _state.RamAccessDelay;
 			_state.Bus.Address = _state.MemoryAddressReg;
 			return 0;
 
@@ -187,14 +187,14 @@ void Cx4::WriteRegister(uint8_t reg, uint32_t value)
 		case 0x2E:
 			_state.Bus.Enabled = true;
 			_state.Bus.Writing = true;
-			_state.Bus.DelayCycles = 1 + _state.RomAccessDelay;
+			_state.Bus.DelayCycles = _state.RomAccessDelay;
 			_state.Bus.Address = _state.MemoryAddressReg;
 			break;
 
 		case 0x2F:
 			_state.Bus.Enabled = true;
 			_state.Bus.Writing = true;
-			_state.Bus.DelayCycles = 1 + _state.RamAccessDelay;
+			_state.Bus.DelayCycles = _state.RamAccessDelay;
 			_state.Bus.Address = _state.MemoryAddressReg;
 			break;
 
