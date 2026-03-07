@@ -212,7 +212,12 @@ void Rainbow::SelectLowBank(uint16_t start, uint16_t size, uint8_t reg)
 
 void Rainbow::SelectChrBank(uint16_t start, uint16_t size, uint8_t reg)
 {
-	if(_chrSource >= 2) {
+	if (_chrSource == 3) {
+		SetPpuMemoryMapping(0x0000, 0x07FF, ChrMemoryType::NametableRam, 0, MemoryAccessType::ReadWrite);
+		SetPpuMemoryMapping(0x0800, 0x0FFF, ChrMemoryType::NametableRam, 0, MemoryAccessType::ReadWrite);
+		SetPpuMemoryMapping(0x1000, 0x17FF, ChrMemoryType::NametableRam, 0, MemoryAccessType::ReadWrite);
+		SetPpuMemoryMapping(0x1800, 0x1FFF, ChrMemoryType::NametableRam, 0, MemoryAccessType::ReadWrite);
+	} else if(_chrSource == 2) {
 		SetPpuMemoryMapping(0x0000, 0x0FFF, ChrMemoryType::MapperRam, 0, MemoryAccessType::ReadWrite);
 		SetPpuMemoryMapping(0x1000, 0x1FFF, ChrMemoryType::MapperRam, 0, MemoryAccessType::ReadWrite);
 	} else {
@@ -468,10 +473,8 @@ uint8_t Rainbow::ReadChr(uint32_t addr)
 		default:
 		case 0: return _chrRomSize ? _chrRom[addr & (_chrRomSize - 1)] : 0;
 		case 1: return _chrRamSize ? _chrRam[addr & (_chrRamSize - 1)] : 0;
-
-		case 2:
-		case 3:
-			return _mapperRam[addr & 0x1FFF];
+		case 2: return _mapperRam[addr & 0x1FFF];
+		case 3: return InternalReadVram(addr);
 	}
 }
 
@@ -828,7 +831,11 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 	entries.push_back(MapperStateEntry("$4120.0-2", "CHR Banking Mode", _chrMode, MapperStateValueType::Number16));
 	entries.push_back(MapperStateEntry("$4120.4", "Window Split Mode", _windowEnabled));
 	entries.push_back(MapperStateEntry("$4120.5", "Sprite Extended Mode", _spriteExtMode));
-	entries.push_back(MapperStateEntry("$4120.6-7", "CHR Source", string(_chrSource ? "RAM" : "ROM"), _chrSource));
+	entries.push_back(MapperStateEntry("$4120.6-7", "CHR Source", string(
+		_chrSource == 0 ? "CHR ROM" : 
+		_chrSource == 1 ? "CHR RAM" : 
+		_chrSource == 2 ? "FPGA RAM" : 
+		                  "Nametable RAM"), _chrSource));
 	entries.push_back(MapperStateEntry("$4121.0-5", "Extended BG CHR Bank", _bgExtModeOffset, MapperStateValueType::Number8));
 
 	entries.push_back(MapperStateEntry("", "Fill Mode"));
