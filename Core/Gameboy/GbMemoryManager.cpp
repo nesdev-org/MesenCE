@@ -85,8 +85,13 @@ void GbMemoryManager::ExecTimerDmaSerial()
 		_dmaController->Exec();
 	}
 
-	if(_state.SerialBitCount && (_cpu->GetState().CycleCount & 0x1FF) == 0) {
-		_state.SerialData = (_state.SerialData << 1) | 0x01;
+	if(_state.SerialBitCount && ((_state.SerialControl & 0x81) == 0x81) && (_cpu->GetState().CycleCount & 0x1FF) == 0) {
+		_state.MostRecentSerialBit = (_state.SerialData & 0x80) == 0x80;
+		if(_gameboy->GetLinkedConsole() != nullptr) {
+			_state.SerialData = (_state.SerialData << 1) | (_gameboy->GetLinkedConsole()->GetMemoryManager()->ExchangeSerialBits(_state.MostRecentSerialBit) ? 0x01 : 0x00);
+		} else {
+			_state.SerialData = (_state.SerialData << 1) | 0x01;
+		}
 		if(--_state.SerialBitCount == 0) {
 			//"It will be notified that the transfer is complete in two ways:
 			//SC's Bit 7 will be cleared"
@@ -454,7 +459,7 @@ void GbMemoryManager::WriteRegister(uint16_t addr, uint8_t value)
 				case 0xFF02: 
 					//FF02 - SC - Serial Transfer Control (R/W)
 					_state.SerialControl = value & (_gameboy->IsCgb() ? 0x83 : 0x81);
-					if((_state.SerialControl & 0x80) && (_state.SerialControl & 0x01)) {
+					if(_state.SerialControl & 0x80) {
 						_state.SerialBitCount = 8;
 					} else {
 						_state.SerialBitCount = 0;
@@ -577,11 +582,25 @@ uint64_t GbMemoryManager::GetApuCycleCount()
 	return _state.ApuCycleCount;
 }
 
+bool GbMemoryManager::ExchangeSerialBits(bool serialBit)
+{
+	if(_state.SerialBitCount && ((_state.SerialControl & 0x81) == 0x80)) {
+		_state.MostRecentSerialBit = _state.SerialData & 0x80;
+		_state.SerialData = (_state.SerialData << 1) | (serialBit ? 0x01 : 0x00);
+
+		if(--_state.SerialBitCount == 0) {
+			_state.SerialControl &= 0x7F;
+			RequestIrq(GbIrqSource::Serial);
+		}
+	}
+	return _state.MostRecentSerialBit;
+}
+
 void GbMemoryManager::Serialize(Serializer& s)
 {
 	SV(_state.DisableBootRom); SV(_state.IrqEnabled); SV(_state.IrqRequests);
 	SV(_state.ApuCycleCount); SV(_state.CgbHighSpeed); SV(_state.CgbSwitchSpeedRequest); SV(_state.CgbWorkRamBank);
-	SV(_state.SerialData); SV(_state.SerialControl); SV(_state.SerialBitCount);
+	SV(_state.SerialData); SV(_state.SerialControl); SV(_state.SerialBitCount); SV(_state.MostRecentSerialBit);
 	SV(_state.CgbRegFF72); SV(_state.CgbRegFF73); SV(_state.CgbRegFF74); SV(_state.CgbRegFF75);
 	SV(_state.CgbRegRpInfrared);
 

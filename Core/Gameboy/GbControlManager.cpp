@@ -35,7 +35,7 @@ shared_ptr<BaseControlDevice> GbControlManager::CreateControllerDevice(Controlle
 		default:
 		case ControllerType::None: break;
 
-		case ControllerType::GameboyController: device.reset(new GbController(_emu, port, cfg.Controller.Keys)); break;
+		case ControllerType::GameboyController: device.reset(new GbController(_emu, port, _console->IsPrimaryConsole() ? cfg.Controller.Keys : cfg.LinkedController.Keys)); break;
 	}
 
 	return device;

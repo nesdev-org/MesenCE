@@ -91,6 +91,7 @@ void EmuSettings::Serialize(Serializer& s)
 			SV(_gameboy.Controller.Type);
 			SV(_gameboy.Model);
 			SV(_gameboy.UseSgb2);
+			SV(_gameboy.UseLocalLinkCable);
 			break;
 
 		case ConsoleType::PcEngine:

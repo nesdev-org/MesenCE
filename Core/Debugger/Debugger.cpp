@@ -211,6 +211,9 @@ bool Debugger::ProcessStepBack(IDebugger* debugger)
 template<CpuType type>
 void Debugger::ProcessInstruction()
 {
+	if(_emu->IsDebuggerDisabled()) {
+		return;
+	}
 	IDebugger* debugger = _debuggers[(int)type].Debugger.get();
 	if(debugger->IsStepBack() && ProcessStepBack(debugger)) {
 		debugger->AllowChangeProgramCounter = true; //set to true temporarily to allow debugger to pause on break requests when rewinding/step back is active
@@ -251,6 +254,9 @@ void Debugger::ProcessInstruction()
 template<CpuType type, uint8_t accessWidth, MemoryAccessFlags flags, typename T>
 void Debugger::ProcessMemoryRead(uint32_t addr, T& value, MemoryOperationType opType)
 {
+	if(_emu->IsDebuggerDisabled()) {
+		return;
+	}
 	if(_debuggers[(int)type].Debugger->IsStepBack()) {
 		SleepOnBreakRequest<type>();
 		return;
@@ -284,6 +290,9 @@ void Debugger::ProcessMemoryRead(uint32_t addr, T& value, MemoryOperationType op
 template<CpuType type, uint8_t accessWidth, MemoryAccessFlags flags, typename T>
 bool Debugger::ProcessMemoryWrite(uint32_t addr, T& value, MemoryOperationType opType)
 {
+	if(_emu->IsDebuggerDisabled()) {
+		return true;
+	}
 	if(_debuggers[(int)type].Debugger->IsStepBack()) {
 		SleepOnBreakRequest<type>();
 		return !_debuggers[(int)type].Debugger->GetFrozenAddressManager().IsFrozenAddress(addr);
@@ -323,7 +332,7 @@ void Debugger::ProcessMemoryAccess(uint32_t addr, T& value)
 
 	constexpr int accessWidth = std::is_same<T, uint16_t>::value ? 2 : 1;
 
-	if(debugger->IsStepBack()) {
+	if(debugger->IsStepBack() || _emu->IsDebuggerDisabled()) {
 		return;
 	}
 
@@ -352,6 +361,9 @@ void Debugger::ProcessMemoryAccess(uint32_t addr, T& value)
 template<CpuType type>
 void Debugger::ProcessIdleCycle()
 {
+	if(_emu->IsDebuggerDisabled()) {
+		return;
+	}
 	if(_debuggers[(int)type].Debugger->IsStepBack()) {
 		SleepOnBreakRequest<type>();
 		return;
@@ -370,6 +382,9 @@ template<CpuType type>
 void Debugger::ProcessHaltedCpu()
 {
 	IDebugger* dbg = _debuggers[(int)type].Debugger.get();
+	if(_emu->IsDebuggerDisabled()) {
+		return;
+	}
 	if(dbg->IsStepBack() && ProcessStepBack(dbg)) {
 		dbg->AllowChangeProgramCounter = true; //set to true temporarily to allow debugger to pause on break requests when rewinding/step back is active
 		SleepOnBreakRequest<type>();
@@ -405,7 +420,7 @@ void Debugger::SleepOnBreakRequest()
 template<CpuType type, typename T>
 void Debugger::ProcessPpuRead(uint16_t addr, T& value, MemoryType memoryType, MemoryOperationType opType)
 {
-	if(_debuggers[(int)type].Debugger->IsStepBack()) {
+	if(_debuggers[(int)type].Debugger->IsStepBack() || _emu->IsDebuggerDisabled()) {
 		return;
 	}
 
@@ -426,7 +441,7 @@ void Debugger::ProcessPpuRead(uint16_t addr, T& value, MemoryType memoryType, Me
 template<CpuType type, typename T>
 void Debugger::ProcessPpuWrite(uint16_t addr, T& value, MemoryType memoryType)
 {
-	if(_debuggers[(int)type].Debugger->IsStepBack()) {
+	if(_debuggers[(int)type].Debugger->IsStepBack() || _emu->IsDebuggerDisabled()) {
 		return;
 	}
 
@@ -447,7 +462,7 @@ void Debugger::ProcessPpuWrite(uint16_t addr, T& value, MemoryType memoryType)
 template<CpuType type>
 void Debugger::ProcessPpuCycle()
 {
-	if(_debuggers[(int)type].Debugger->IsStepBack()) {
+	if(_debuggers[(int)type].Debugger->IsStepBack() || _emu->IsDebuggerDisabled()) {
 		return;
 	}
 
@@ -566,7 +581,7 @@ void Debugger::ProcessPredictiveBreakpoint(CpuType sourceCpu, BreakpointManager*
 template<CpuType type>
 void Debugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi)
 {
-	if(_debuggers[(int)type].Debugger->IsStepBack()) {
+	if(_debuggers[(int)type].Debugger->IsStepBack() || _emu->IsDebuggerDisabled()) {
 		return;
 	}
 
@@ -821,7 +836,7 @@ bool Debugger::IsBreakOptionEnabled(BreakSource src)
 
 void Debugger::BreakImmediately(CpuType sourceCpu, BreakSource source)
 {
-	if(_debuggers[(int)sourceCpu].Debugger->IsStepBack()) {
+	if(_debuggers[(int)sourceCpu].Debugger->IsStepBack() || _emu->IsDebuggerDisabled()) {
 		return;
 	}
 

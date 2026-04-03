@@ -36,6 +36,26 @@
 						<c:EnumComboBox SelectedItem="{Binding Config.Model}" MinWidth="200" />
 					</StackPanel>
 					<CheckBox IsChecked="{Binding Config.UseSgb2}" Content="{l:Translate chkUseSgb2}" />
+
+					<c:OptionSection Header="{l:Translate lblLocalLinkCable}">
+						<CheckBox IsChecked="{Binding Config.UseLocalLinkCable}" Content="{l:Translate chkLocalLinkCable}" />
+						<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto">
+							<TextBlock Text="{l:Translate lblLocalLinkCablePlayAudio}" />
+							<c:EnumComboBox
+								Grid.Column="1"
+								Width="130"
+								SelectedItem="{Binding Config.LocalLinkCableAudioOutput}"
+							/>
+
+							<TextBlock Grid.Row="1" Text="{l:Translate lblLocalLinkCableShowVideo}" />
+							<c:EnumComboBox
+								Grid.Row="1"
+								Grid.Column="1"
+								Width="130"
+								SelectedItem="{Binding Config.LocalLinkCableVideoOutput}"
+							/>
+						</Grid>
+					</c:OptionSection>
 				</StackPanel>
 			</ScrollViewer>
 		</TabItem>
@@ -76,16 +96,27 @@
 			<ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Auto" Padding="0 0 2 0">
 				<StackPanel>
 					<c:OptionSection Header="{l:Translate grpControllers}" Margin="0">
-						<StackPanel Orientation="Horizontal">
+						<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,5,Auto,Auto">
 							<TextBlock Text="{l:Translate lblPlayer1}" />
 							<Button
+								Grid.Column="1"
 								Margin="10 0 0 0"
 								Command="{Binding SetupPlayer}"
 								CommandParameter="{Binding $self}"
 								Content="{l:Translate btnSetup}"
 							/>
-						</StackPanel>
+							<TextBlock Text="{l:Translate lblPlayer2}" Grid.Row="2" />
+							<Button
+								Margin="10 0 0 0"
+								Grid.Row="2"
+								Grid.Column="1"
+								Command="{Binding SetupPlayer2}"
+								CommandParameter="{Binding $self}"
+								Content="{l:Translate btnSetup}"
+							/>
+						</Grid>
 					</c:OptionSection>
+					<TextBlock Text="{l:Translate lblPlayer2UsedForLink}"/>
 					<c:OptionSection Header="{l:Translate grpGeneral}">
 						<c:CheckBoxWarning IsChecked="{Binding Config.AllowInvalidInput}" Text="{l:Translate chkAllowInvalidInput}" />
 					</c:OptionSection>

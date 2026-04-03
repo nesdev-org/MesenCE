@@ -1115,6 +1115,9 @@ void Emulator::SetStopCode(int32_t stopCode)
 
 void Emulator::RegisterMemory(MemoryType type, void* memory, uint32_t size)
 {
+	if(_isDebuggerDisabled) {
+		return;
+	}
 	_consoleMemory[(int)type] = { memory, size };
 }
 
@@ -1167,6 +1170,16 @@ void Emulator::BreakIfDebugging(CpuType sourceCpu, BreakSource source)
 	if(_debugger) {
 		_debugger->BreakImmediately(sourceCpu, source);
 	}
+}
+
+bool Emulator::IsDebuggerDisabled()
+{
+	return _isDebuggerDisabled;
+}
+
+void Emulator::SetDebuggerDisabled(bool value)
+{
+	_isDebuggerDisabled = value;
 }
 
 template void Emulator::AddDebugEvent<CpuType::Snes>(DebugEventType evtType);

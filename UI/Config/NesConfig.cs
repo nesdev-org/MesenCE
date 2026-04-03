@@ -405,6 +405,13 @@ namespace Mesen.Config
 		SubSystemOnly = 2
 	}
 
+	public enum GbLocalLinkOutputOption
+	{
+		Both = 0,
+		MainSystemOnly = 1,
+		SubSystemOnly = 2
+	}
+
 	public enum NesConsoleType
 	{
 		Nes001,

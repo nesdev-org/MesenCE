@@ -14,9 +14,14 @@ namespace Mesen.Config
 		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 		[Reactive] public ControllerConfig Controller { get; set; } = new();
+		[Reactive] public ControllerConfig LinkedController { get; set; } = new();
 
 		[Reactive] public GameboyModel Model { get; set; } = GameboyModel.AutoFavorBest;
 		[Reactive] public bool UseSgb2 { get; set; } = true;
+
+		[Reactive] public bool UseLocalLinkCable { get; set; } = true;
+		[Reactive] public GbLocalLinkOutputOption LocalLinkCableVideoOutput { get; set; } = GbLocalLinkOutputOption.Both;
+		[Reactive] public GbLocalLinkOutputOption LocalLinkCableAudioOutput { get; set; } = GbLocalLinkOutputOption.Both;
 
 		[Reactive] public bool BlendFrames { get; set; } = true;
 		[Reactive] public bool GbcAdjustColors { get; set; } = true;
@@ -43,8 +48,13 @@ namespace Mesen.Config
 
 			ConfigApi.SetGameboyConfig(new InteropGameboyConfig() {
 				Controller = Controller.ToInterop(),
+				LinkedController = LinkedController.ToInterop(),
 				Model = Model,
 				UseSgb2 = UseSgb2,
+
+				UseLocalLinkCable = UseLocalLinkCable,
+				LocalLinkCableVideoOutput = LocalLinkCableVideoOutput,
+				LocalLinkCableAudioOutput = LocalLinkCableAudioOutput,
 
 				BlendFrames = BlendFrames,
 				GbcAdjustColors = GbcAdjustColors,
@@ -76,9 +86,14 @@ namespace Mesen.Config
 	public struct InteropGameboyConfig
 	{
 		public InteropControllerConfig Controller;
+		public InteropControllerConfig LinkedController;
 
 		public GameboyModel Model;
 		[MarshalAs(UnmanagedType.I1)] public bool UseSgb2;
+
+		[MarshalAs(UnmanagedType.I1)] public bool UseLocalLinkCable;
+		public GbLocalLinkOutputOption LocalLinkCableVideoOutput;
+		public GbLocalLinkOutputOption LocalLinkCableAudioOutput;
 
 		[MarshalAs(UnmanagedType.I1)] public bool BlendFrames;
 		[MarshalAs(UnmanagedType.I1)] public bool GbcAdjustColors;

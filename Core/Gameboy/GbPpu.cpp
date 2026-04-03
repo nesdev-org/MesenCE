@@ -28,6 +28,7 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 	_dmaController = dmaController;
 	_vram = vram;
 	_oam = oam;
+	_settings = _emu->GetSettings();
 
 	_outputBuffers[0] = new uint16_t[GbConstants::PixelCount];
 	_outputBuffers[1] = new uint16_t[GbConstants::PixelCount];
@@ -806,7 +807,9 @@ void GbPpu::SendFrame()
 
 	UpdatePalette();
 
-	_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::PpuFrameDone);
+	if (_gameboy->IsPrimaryConsole()) {
+		_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::PpuFrameDone);
+	}
 
 	if(_forceBlankFrame) {
 		//Send blank frame on the first frame after enabling LCD
@@ -819,13 +822,55 @@ void GbPpu::SendFrame()
 	_isFirstFrame = false;
 
 	RenderedFrame frame(_currentBuffer, GbConstants::ScreenWidth, GbConstants::ScreenHeight, 1.0, _state.FrameCount, _gameboy->GetControlManager()->GetPortStates());
-	bool rewinding = _emu->GetRewindManager()->IsRewinding();
-	_emu->GetVideoDecoder()->UpdateFrame(frame, rewinding, rewinding);
 
-	_emu->ProcessEndOfFrame();
+	if(_gameboy->GetLinkedConsole()) {
+		SendLinkedFrame();
+		if(_gameboy->IsPrimaryConsole()) {
+			_emu->ProcessEndOfFrame();
+		}
+	} else {
+		bool rewinding = _emu->GetRewindManager()->IsRewinding();
+		_emu->GetVideoDecoder()->UpdateFrame(frame, rewinding, rewinding);
+		_emu->ProcessEndOfFrame();
+	}
+
 	_gameboy->ProcessEndOfFrame();
 
 	_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+}
+
+void GbPpu::SendLinkedFrame()
+{
+	GameboyConfig& cfg = _settings->GetGameboyConfig();
+	bool forRewind = _emu->GetRewindManager()->IsRewinding();
+
+	RenderedFrame frame(_currentBuffer, GbConstants::ScreenWidth, GbConstants::ScreenHeight, 1.0, _state.FrameCount, _gameboy->GetControlManager()->GetPortStates());
+
+	if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::MainSystemOnly && _gameboy->IsPrimaryConsole()) {
+		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
+	} else if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::SubSystemOnly && !_gameboy->IsPrimaryConsole()) {
+		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
+	} else if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::Both) {
+		if(_gameboy->IsPrimaryConsole()) {
+			uint16_t* mergedBuffer = new uint16_t[GbConstants::ScreenWidth * GbConstants::ScreenHeight * 2];
+
+			uint16_t* in1 = _currentBuffer;
+			uint16_t* in2 = ((GbPpu*)_gameboy->GetLinkedConsole()->GetPpu())->_currentBuffer;
+			uint16_t* out = mergedBuffer;
+			for(int i = 0; i < GbConstants::ScreenHeight; i++) {
+				memcpy(out, in1, GbConstants::ScreenWidth * sizeof(uint16_t));
+				out += GbConstants::ScreenWidth;
+				in1 += GbConstants::ScreenWidth;
+				memcpy(out, in2, GbConstants::ScreenWidth * sizeof(uint16_t));
+				out += GbConstants::ScreenWidth;
+				in2 += GbConstants::ScreenWidth;
+			}
+
+			RenderedFrame mergedFrame(mergedBuffer, GbConstants::ScreenWidth * 2, GbConstants::ScreenHeight, 1.0, _state.FrameCount, _gameboy->GetControlManager()->GetPortStates());
+			_emu->GetVideoDecoder()->UpdateFrame(mergedFrame, true, forRewind);
+			delete[] mergedBuffer;
+		}
+	}
 }
 
 void GbPpu::DebugSendFrame()

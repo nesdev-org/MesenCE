@@ -13,8 +13,8 @@ GbDefaultVideoFilter::GbDefaultVideoFilter(Emulator* emu, bool applyNtscFilter) 
 {
 	InitLookupTable();
 	_applyNtscFilter = applyNtscFilter;
-	_prevFrame = new uint16_t[GbConstants::PixelCount];
-	memset(_prevFrame, 0, GbConstants::PixelCount * sizeof(uint16_t));
+	_prevFrame = new uint16_t[GbConstants::LinkedPixelCount];
+	memset(_prevFrame, 0, GbConstants::LinkedPixelCount * sizeof(uint16_t));
 }
 
 GbDefaultVideoFilter::~GbDefaultVideoFilter()
@@ -88,7 +88,7 @@ void GbDefaultVideoFilter::OnBeforeApplyFilter()
 	bool blendFrames = gbConfig.BlendFrames && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused();
 	if(_blendFrames != blendFrames) {
 		_blendFrames = blendFrames;
-		memset(_prevFrame, 0, GbConstants::PixelCount * sizeof(uint16_t));
+		memset(_prevFrame, 0, GbConstants::LinkedPixelCount * sizeof(uint16_t));
 	}
 	_videoConfig = config;
 }
@@ -98,21 +98,22 @@ void GbDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	if(_emu->GetRomInfo().Format == RomFormat::Gbs) {
 		return;
 	}
+	FrameInfo frame = _baseFrameInfo;
 
 	uint32_t* out = GetOutputBuffer();
 	
-	for(uint32_t i = 0; i < GbConstants::ScreenHeight; i++) {
-		for(uint32_t j = 0; j < GbConstants::ScreenWidth; j++) {
-			out[i * GbConstants::ScreenWidth + j] = GetPixel(ppuOutputBuffer, i * GbConstants::ScreenWidth + j);
+	for(uint32_t i = 0; i < frame.Height; i++) {
+		for(uint32_t j = 0; j < frame.Width; j++) {
+			out[i * _baseFrameInfo.Width + j] = GetPixel(ppuOutputBuffer, i * _baseFrameInfo.Width + j);
 		}
 	}
 
 	if(_blendFrames) {
-		std::copy(ppuOutputBuffer, ppuOutputBuffer + GbConstants::PixelCount, _prevFrame);
+		std::copy(ppuOutputBuffer, ppuOutputBuffer + GbConstants::LinkedPixelCount, _prevFrame);
 	}
 
 	if(_applyNtscFilter) {
-		_ntscFilter.ApplyFilter(out, GbConstants::ScreenWidth, GbConstants::ScreenHeight, 0);
+		_ntscFilter.ApplyFilter(out, frame.Width, frame.Height, 0);
 	}
 }
 

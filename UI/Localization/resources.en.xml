@@ -402,7 +402,14 @@
 			<Control ID="tpgInput">Input</Control>
 			<Control ID="grpControllers">Controllers</Control>
 			<Control ID="lblPlayer1">Player 1</Control>
+			<Control ID="lblPlayer2">Player 2</Control>
+			<Control ID="lblPlayer2UsedForLink">(Used for link cable emulation)</Control>
 			<Control ID="btnSetup">Setup</Control>
+
+			<Control ID="chkLocalLinkCable">Emulate two linked Game Boy consoles</Control>
+			<Control ID="lblLocalLinkCable">Link cable emulation</Control>
+			<Control ID="lblLocalLinkCablePlayAudio">Play audio for:</Control>
+			<Control ID="lblLocalLinkCableShowVideo">Show video for:</Control>
 		</Form>
 		
 		<Form ID="GbaConfigView">
@@ -2521,6 +2528,11 @@ E
 			<Value ID="Delay">Delay</Value>
 			<Value ID="Panning">Panning</Value>
 			<Value ID="CombFilter">Comb filter</Value>
+		</Enum>
+		<Enum ID="GbLocalLinkOutputOption">
+			<Value ID="Both">Both</Value>
+			<Value ID="MainSystemOnly">First system only</Value>
+			<Value ID="SubSystemOnly">Second system only</Value>
 		</Enum>
 		<Enum ID="VsDualOutputOption">
 			<Value ID="Both">Both</Value>

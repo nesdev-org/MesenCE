@@ -156,6 +156,9 @@ void Gameboy::Run(uint64_t runUntilClock)
 {
 	while(_cpu->GetCycleCount() < runUntilClock) {
 		_cpu->Exec();
+		if(_secondaryConsole) {
+			RunLinkedConsole();
+		}
 	}
 }
 
@@ -230,6 +233,11 @@ GbMemoryManager* Gameboy::GetMemoryManager()
 Emulator* Gameboy::GetEmulator()
 {
 	return _emu;
+}
+
+GbApu* Gameboy::GetApu()
+{
+	return _apu.get();
 }
 
 GbPpu* Gameboy::GetPpu()
@@ -333,6 +341,14 @@ SuperGameboy* Gameboy::GetSgb()
 	return _superGameboy;
 }
 
+Gameboy* Gameboy::GetLinkedConsole()
+{
+	if(_secondaryConsole) {
+		return _secondaryConsole.get();
+	}
+	return _mainConsole;
+}
+
 uint64_t Gameboy::GetCycleCount()
 {
 	return _cpu->GetCycleCount();
@@ -341,6 +357,11 @@ uint64_t Gameboy::GetCycleCount()
 uint64_t Gameboy::GetApuCycleCount()
 {
 	return _memoryManager->GetApuCycleCount();
+}
+
+bool Gameboy::IsPrimaryConsole()
+{
+	return _mainConsole == nullptr;
 }
 
 void Gameboy::Serialize(Serializer& s)
@@ -361,6 +382,10 @@ void Gameboy::Serialize(Serializer& s)
 	SVArray(_highRam, Gameboy::HighRamSize);
 
 	SV(_controlManager);
+
+	if(_secondaryConsole) {
+		SV(_secondaryConsole);
+	}
 }
 
 SaveStateCompatInfo Gameboy::ValidateSaveStateCompatibility(ConsoleType stateConsoleType)
@@ -400,7 +425,7 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 			//Pad to multiple of 16kb
 			gbsRomData.insert(gbsRomData.end(), 0x4000 - (gbsRomData.size() & 0x3FFF), 0);
 		}
-		
+
 		MessageManager::Log("-----------------------------");
 		MessageManager::Log("File: " + romFile.GetFileName());
 
@@ -460,6 +485,22 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 				Init(cart, romData, gbxFooter.GetRamSize(), gbxFooter.HasBattery());
 			} else {
 				Init(cart, romData, header.GetCartRamSize(), header.HasBattery());
+			}
+
+			EmuSettings* settings = _emu->GetSettings();
+			GameboyConfig cfg = settings->GetGameboyConfig();
+			if(!_mainConsole && cfg.UseLocalLinkCable) {
+				_emu->SetDebuggerDisabled(true);
+
+				// Create second console and link it with this one
+				_secondaryConsole.reset(new Gameboy(_emu));
+				_secondaryConsole->_mainConsole = this;
+				LoadRomResult result = _secondaryConsole->LoadRom(romFile);
+
+				_emu->SetDebuggerDisabled(false);
+				if(result != LoadRomResult::Success) {
+					return result;
+				}
 			}
 			return LoadRomResult::Success;
 		} else {
@@ -562,12 +603,32 @@ GameboyModel Gameboy::GetEffectiveModel(GameboyHeader& header)
 void Gameboy::RunFrame()
 {
 	uint32_t frameCount = _ppu->GetFrameCount();
+
 	while(frameCount == _ppu->GetFrameCount()) {
 		_cpu->Exec();
+		if(_secondaryConsole) {
+			RunLinkedConsole();
+		}
 	}
 
 	_apu->Run();
 	_apu->PlayQueuedAudio();
+}
+
+void Gameboy::RunLinkedConsole()
+{
+	_emu->SetDebuggerDisabled(true);
+	int64_t cycleGap;
+	while(true) {
+		//Run the sub console until it catches up to the main CPU
+		cycleGap = (int64_t)(_cpu->GetCycleCount() - _secondaryConsole->_cpu->GetCycleCount());
+		if(cycleGap > 5 || _ppu->GetFrameCount() > _secondaryConsole->_ppu->GetFrameCount()) {
+			_secondaryConsole->_cpu->Exec();
+		} else {
+			break;
+		}
+	}
+	_emu->SetDebuggerDisabled(false);
 }
 
 void Gameboy::ProcessEndOfFrame()
