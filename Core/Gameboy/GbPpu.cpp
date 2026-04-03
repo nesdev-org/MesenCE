@@ -48,6 +48,10 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 
 	_gameboy->InitializeRam(_state.CgbBgPalettes, 4 * 8 * sizeof(uint16_t));
 	_gameboy->InitializeRam(_state.CgbObjPalettes, 4 * 8 * sizeof(uint16_t));
+	if(_state.CgbEnabled) {
+		_emu->RegisterMemory(MemoryType::GbBgPaletteRam, _state.CgbBgPalettes, 4 * 8 * sizeof(uint16_t));
+		_emu->RegisterMemory(MemoryType::GbObjPaletteRam, _state.CgbObjPalettes, 4 * 8 * sizeof(uint16_t));
+	}
 
 	UpdatePalette();
 
@@ -1247,7 +1251,9 @@ void GbPpu::WriteCgbRegister(uint16_t addr, uint8_t value)
 uint8_t GbPpu::ReadCgbPalette(uint8_t& pos, uint16_t* pal)
 {
 	if(_state.Mode <= PpuMode::OamEvaluation) {
-		return (pal[pos >> 1] >> ((pos & 0x01) ? 8 : 0)) & 0xFF;
+		uint8_t value = (pal[pos >> 1] >> ((pos & 0x01) ? 8 : 0)) & 0xFF;
+		_emu->ProcessPpuRead<CpuType::Gameboy>(pos, value, (pal == _state.CgbBgPalettes) ? MemoryType::GbBgPaletteRam : MemoryType::GbObjPaletteRam);
+		return value;
 	}
 	return 0xFF;
 }
@@ -1255,6 +1261,7 @@ uint8_t GbPpu::ReadCgbPalette(uint8_t& pos, uint16_t* pal)
 void GbPpu::WriteCgbPalette(uint8_t& pos, uint16_t* pal, bool autoInc, uint8_t value)
 {
 	if(_state.Mode <= PpuMode::OamEvaluation) {
+		_emu->ProcessPpuWrite<CpuType::Gameboy>(pos, value, (pal == _state.CgbBgPalettes) ? MemoryType::GbBgPaletteRam : MemoryType::GbObjPaletteRam);
 		if(pos & 0x01) {
 			pal[pos >> 1] = (pal[pos >> 1] & 0xFF) | (value << 8);
 		} else {

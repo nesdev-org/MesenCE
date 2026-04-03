@@ -2821,6 +2821,8 @@ E
 			<Value ID="GbBootRom">GB - Boot ROM</Value>
 			<Value ID="GbVideoRam">GB - Video RAM</Value>
 			<Value ID="GbSpriteRam">GB - Sprite RAM</Value>
+			<Value ID="GbBgPaletteRam">GB - Background Palette RAM</Value>
+			<Value ID="GbObjPaletteRam">GB - Sprite Palette RAM</Value>
 
 			<Value ID="NesMemory">CPU Memory</Value>
 			<Value ID="NesPpuMemory">PPU Memory</Value>

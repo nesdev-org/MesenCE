@@ -104,6 +104,8 @@ public:
 			case MemoryType::GbBootRom:
 			case MemoryType::GbVideoRam:
 			case MemoryType::GbSpriteRam:
+			case MemoryType::GbBgPaletteRam:
+			case MemoryType::GbObjPaletteRam:
 			case MemoryType::GameboyMemory:
 				return CpuType::Gameboy;
 
