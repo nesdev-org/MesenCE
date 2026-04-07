@@ -296,7 +296,7 @@ DebugTilemapTileInfo GbaPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 				uint16_t columnCount = screenSize >> 3;
 				tilemapAddr = offset + row * columnCount + column;
 			} else {
-				tilemapAddr = offset + (((row & 0x1F) << 5) + column) * 2;
+				tilemapAddr = offset + (((row & 0x1F) << 5) + (column & 0x1F)) * 2;
 				if(column >= 32) {
 					tilemapAddr += 0x800;
 				}
