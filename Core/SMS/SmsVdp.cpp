@@ -1561,6 +1561,8 @@ void SmsVdp::Serialize(Serializer& s)
 		SV(_bgTileIndex);
 		SV(_bgPatternData);
 		SV(_textModeStep);
+		
+		SVArray(_memAccess, sizeof(_memAccess));
 
 		SV(_needCramDot);
 		SV(_cramDotColor);
