@@ -1509,7 +1509,7 @@ template<class T> void NesPpu<T>::UpdateState()
 			_memoryReadBuffer = ReadVram(_ppuBusAddress & 0x3FFF, MemoryOperationType::Read);
 			_needVideoRamIncrement = true;
 		}
-			_needStateUpdate = true;
+		_needStateUpdate = true;
 	}
 
 	if(_ppuMemoryDataWriteStateMachine > 0) {
@@ -1529,7 +1529,7 @@ template<class T> void NesPpu<T>::UpdateState()
 			}
 			_needVideoRamIncrement = true;
 		}
-			_needStateUpdate = true;
+		_needStateUpdate = true;
 	}
 }
 
