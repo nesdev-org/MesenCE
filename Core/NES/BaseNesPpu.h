@@ -103,6 +103,9 @@ protected:
 	bool _needVideoRamIncrement = false;
 	bool _allowFullPpuAccess = false;
 
+	uint8_t _ppuMemoryDataReadStateMachine = 0;
+	uint8_t _ppuMemoryDataWriteStateMachine = 0;
+	uint8_t _ppuMemoryDataWriteLatch = 0;
 	uint8_t _memoryReadBuffer = 0;
 	PPUStatusFlags _statusFlags = {};
 

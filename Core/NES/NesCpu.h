@@ -440,7 +440,7 @@ private:
 			DummyRead();
 
 			if(CheckPageCrossed(PC(), offset)) {
-				DummyRead();
+				MemoryRead(((PC() & 0xFF00) | ((PC() + offset) & 0xFF)), MemoryOperationType::DummyRead);
 			}
 
 			SetPC(PC() + offset);
@@ -523,8 +523,9 @@ private:
 	}
 
 	void RTS() {
-		DummyRead();
+		MemoryRead(0x100 + SP(), MemoryOperationType::DummyRead);
 		uint16_t addr = PopWord();
+		SetPC(addr);
 		DummyRead();
 		SetPC(addr + 1);
 	}

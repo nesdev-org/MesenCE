@@ -378,7 +378,8 @@ template<class T> uint8_t NesPpu<T>::ReadRam(uint16_t addr)
 				openBusMask = 0xFF;
 			} else {
 				returnValue = _memoryReadBuffer;
-				_memoryReadBuffer = ReadVram(_ppuBusAddress & 0x3FFF, MemoryOperationType::Read);
+				// The PPU Read Buffer is not updated until the CPU read ends, and 2 more ppu cycles have passed.
+				_ppuMemoryDataReadStateMachine = 5;
 
 				if((_ppuBusAddress & 0x3FFF) >= 0x3F00 && !_console->GetNesConfig().DisablePaletteRead) {
 					//Note: When grayscale is turned on, the read values also have the grayscale mask applied to them
@@ -395,7 +396,6 @@ template<class T> uint8_t NesPpu<T>::ReadRam(uint16_t addr)
 
 				_ignoreVramRead = 6;
 				_needStateUpdate = true;
-				_needVideoRamIncrement = true;
 			}
 			break;
 
@@ -444,7 +444,7 @@ template<class T> void NesPpu<T>::WriteRam(uint16_t addr, uint8_t value)
 			} else {
 				//"Writes to OAMDATA during rendering (on the pre-render line and the visible lines 0-239, provided either sprite or background rendering is enabled) do not modify values in OAM, 
 				//but do perform a glitchy increment of OAMADDR, bumping only the high 6 bits"
-				_spriteRamAddr = (_spriteRamAddr + 4) & 0xFF;
+				_spriteRamAddr = (_spriteRamAddr + 4) & 0xFC;
 				_emu->BreakIfDebugging(CpuType::Nes, BreakSource::NesInvalidOamWrite);
 			}
 			break;
@@ -485,20 +485,10 @@ template<class T> void NesPpu<T>::WriteRam(uint16_t addr, uint8_t value)
 			break;
 
 		case PpuRegisters::VideoMemoryData:
-			if((_ppuBusAddress & 0x3FFF) >= 0x3F00) {
-				WritePaletteRam(_ppuBusAddress, value);
-				_emu->ProcessPpuWrite<CpuType::Nes>(_ppuBusAddress, value, MemoryType::NesPpuMemory);
-			} else {
-				if(_scanline >= 240 || !IsRenderingEnabled()) {
-					_mapper->WriteVram(_ppuBusAddress & 0x3FFF, value);
-				} else {
-					//During rendering, the value written is ignored, and instead the address' LSB is used (not confirmed, based on Visual NES)
-					_mapper->WriteVram(_ppuBusAddress & 0x3FFF, _ppuBusAddress & 0xFF);
-					_emu->BreakIfDebugging(CpuType::Nes, BreakSource::NesInvalidVramAccess);
-				}
-			}
+			// The write to VRAM does not occur until the CPU write ends, and 2 more ppu cycles have passed.
+			_ppuMemoryDataWriteStateMachine = 5;
+			_ppuMemoryDataWriteLatch = value;
 			_needStateUpdate = true;
-			_needVideoRamIncrement = true;
 			break;
 
 		case PpuRegisters::SpriteDMA:
@@ -674,8 +664,10 @@ template<class T> void NesPpu<T>::LoadTileInfo()
 				_previousTilePalette = _currentTilePalette;
 				_currentTilePalette = _tile.PaletteOffset;
 
-				_lowBitShift |= _tile.LowByte;
+				_highBitShift &= 0xFF00; // This shift register pulls in 1's, so we need to mask away the lower 8 bits before bringing in the data from the tile fetch.
 				_highBitShift |= _tile.HighByte;
+				_lowBitShift &= 0xFF00; // Similar to the high bit plane, it's possible there are 1's in the lower 8 bits if you toggle rendering at the right time.
+				_lowBitShift |= _tile.LowByte;
 
 				uint8_t tileIndex = ReadVram(GetNameTableAddr());
 				_tile.TileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
@@ -812,6 +804,7 @@ template<class T> void NesPpu<T>::ShiftTileRegisters()
 {
 	_lowBitShift <<= 1;
 	_highBitShift <<= 1;
+	_highBitShift |= 1;
 }
 
 template<class T> uint8_t NesPpu<T>::GetPixelColor()
@@ -880,8 +873,9 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 
 		if(_scanline >= 0) {
 			((T*)this)->DrawPixel();
-			ShiftTileRegisters();
-
+			if(IsRenderingEnabled()) {
+				ShiftTileRegisters();
+			}
 			//"Secondary OAM clear and sprite evaluation do not occur on the pre-render line"
 			ProcessSpriteEvaluation();
 		} else if(_cycle < 9) {
@@ -897,14 +891,6 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			}
 		}
 	} else if(_cycle >= 257 && _cycle <= 320) {
-		if(_cycle == 257) {
-			_spriteIndex = 0;
-			memset(_hasSprite, 0, sizeof(_hasSprite));
-			if(_prevRenderingEnabled) {
-				//copy horizontal scrolling value from t
-				_videoRamAddr = (_videoRamAddr & ~0x041F) | (_tmpVideoRamAddr & 0x041F);
-			}
-		}
 		if(IsRenderingEnabled()) {
 			//"OAMADDR is set to 0 during each of ticks 257-320 (the sprite tile loading interval) of the pre-render and visible scanlines." (When rendering)
 			_spriteRamAddr = 0;
@@ -913,8 +899,8 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				//Garbage NT sprite fetch (257, 265, 273, etc.) - Required for proper MC-ACC IRQs (MMC3 clone)
 				case 0: ReadVram(GetNameTableAddr()); break;
 
-				//Garbage AT sprite fetch
-				case 2: ReadVram(GetAttributeAddr()); break;
+				//Garbage NT sprite fetch
+				case 2: ReadVram(GetNameTableAddr()); break;
 
 				//Cycle 260, 268, etc.  This is an approximation (each tile is actually loaded in 8 steps (e.g from 257 to 264))
 				case 4: LoadSpriteTileInfo(); break;
@@ -929,6 +915,14 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			// and the extra sprites will potentially read from the wrong banks
 			if(_cycle == 320) {
 				LoadExtraSprites();
+			}
+		}
+		if(_cycle == 257) {
+			_spriteIndex = 0;
+			memset(_hasSprite, 0, sizeof(_hasSprite));
+			if(_prevRenderingEnabled) {
+				//copy horizontal scrolling value from t
+				_videoRamAddr = (_videoRamAddr & ~0x041F) | (_tmpVideoRamAddr & 0x041F);
 			}
 		}
 	} else if(_cycle >= 321 && _cycle <= 336) {
@@ -1023,10 +1017,9 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 
 				if(_oamCopyDone && !_settings->GetNesConfig().EnablePpuSpriteEvalBug) {
 					_spriteAddrH = (_spriteAddrH + 1) & 0x3F;
-					if(_secondaryOamAddr >= 0x20) {
-						//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
-						_oamCopybuffer = _secondarySpriteRam[_secondaryOamAddr & 0x1F];
-					}
+					//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
+					_oamCopybuffer = _secondarySpriteRam[_secondaryOamAddr & 0x1F];
+					
 				} else {
 					if(!_spriteInRange && _scanline >= _oamCopybuffer && _scanline < _oamCopybuffer + (_control.LargeSprites ? 16 : 8)) {
 						_spriteInRange = !_oamCopyDone;
@@ -1509,6 +1502,35 @@ template<class T> void NesPpu<T>::UpdateState()
 		_needVideoRamIncrement = false;
 		UpdateVideoRamAddr();
 	}
+
+	if(_ppuMemoryDataReadStateMachine > 0) {
+		_ppuMemoryDataReadStateMachine--;
+		if(_ppuMemoryDataReadStateMachine == 0) {
+			_memoryReadBuffer = ReadVram(_ppuBusAddress & 0x3FFF, MemoryOperationType::Read);
+			_needVideoRamIncrement = true;
+		}
+		_needStateUpdate = true;
+	}
+
+	if(_ppuMemoryDataWriteStateMachine > 0) {
+		_ppuMemoryDataWriteStateMachine--;
+		if(_ppuMemoryDataWriteStateMachine == 0) {
+			if((_ppuBusAddress & 0x3FFF) >= 0x3F00) {
+				WritePaletteRam(_ppuBusAddress, _ppuMemoryDataWriteLatch);
+				_emu->ProcessPpuWrite<CpuType::Nes>(_ppuBusAddress, _ppuMemoryDataWriteLatch, MemoryType::NesPpuMemory);
+			} else {
+				if(_scanline >= 240 || !IsRenderingEnabled()) {
+					_mapper->WriteVram(_ppuBusAddress & 0x3FFF, _ppuMemoryDataWriteLatch);
+				} else {
+					//During rendering, the value written is ignored, and instead the address' LSB is used (not confirmed, based on Visual NES)
+					_mapper->WriteVram(_ppuBusAddress & 0x3FFF, _ppuBusAddress & 0xFF);
+					_emu->BreakIfDebugging(CpuType::Nes, BreakSource::NesInvalidVramAccess);
+				}
+			}
+			_needVideoRamIncrement = true;
+		}
+		_needStateUpdate = true;
+	}
 }
 
 template<class T> uint32_t NesPpu<T>::GetPixelBrightness(uint8_t x, uint8_t y)
@@ -1565,6 +1587,10 @@ template<class T> void NesPpu<T>::Serialize(Serializer& s)
 		SV(_updateVramAddrDelay);
 
 		SV(_allowFullPpuAccess);
+
+		SV(_ppuMemoryDataReadStateMachine);
+		SV(_ppuMemoryDataWriteStateMachine);
+		SV(_ppuMemoryDataWriteLatch);
 
 		for(int i = 0; i < _spriteCount; i++) {
 			SVI(_spriteTiles[i].SpriteX); SVI(_spriteTiles[i].LowByte); SVI(_spriteTiles[i].HighByte); SVI(_spriteTiles[i].PaletteOffset); SVI(_spriteTiles[i].HorizontalMirror); SVI(_spriteTiles[i].BackgroundPriority);
