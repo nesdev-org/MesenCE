@@ -434,12 +434,14 @@ private:
 		if(branch) {
 			//"a taken non-page-crossing branch ignores IRQ/NMI during its last clock, so that next instruction executes before the IRQ"
 			//Fixes "branch_delays_irq" test
-			if(_runIrq && !_prevRunIrq) {
-				_runIrq = false;
-			}
+			//Branches actually poll on both the 2nd and 4th cycles. An interrupt is handled even if an IRQ was only seen on the first poll.
+			_runIrq = _prevRunIrq;
+
 			DummyRead();
 
 			if(CheckPageCrossed(PC(), offset)) {
+				//Combine the 2nd and 4th cycle IRQ results.
+				_runIrq |= _prevRunIrq;
 				MemoryRead(((PC() & 0xFF00) | ((PC() + offset) & 0xFF)), MemoryOperationType::DummyRead);
 			}
 
