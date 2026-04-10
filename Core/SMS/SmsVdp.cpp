@@ -651,8 +651,8 @@ void SmsVdp::ProcessEndOfScanline()
 
 		UpdateConfig();
 
-		_console->ProcessEndOfFrame();
 		_emu->ProcessEndOfFrame();
+		_console->ProcessEndOfFrame();
 	} else if(_state.Scanline >= _scanlineCount) {
 		_state.Scanline = 0;
 		_state.VerticalScrollLatch = _state.VerticalScroll;
