@@ -76,11 +76,16 @@ private:
 		return opCode;
 	}
 
-	void DummyRead()
+	void DummyPcRead()
 	{
 		MemoryRead(_state.PC, MemoryOperationType::DummyRead);
 	}
-	
+
+	void DummyStackRead()
+	{
+		MemoryRead(0x100 + SP(), MemoryOperationType::DummyRead);
+	}
+
 	uint8_t ReadByte()
 	{
 		uint8_t value = MemoryRead(_state.PC, MemoryOperationType::ExecOperand);
@@ -437,7 +442,7 @@ private:
 			//Branches actually poll on both the 2nd and 4th cycles. An interrupt is handled even if an IRQ was only seen on the first poll.
 			_runIrq = _prevRunIrq;
 
-			DummyRead();
+			DummyPcRead();
 
 			if(CheckPageCrossed(PC(), offset)) {
 				//Combine the 2nd and 4th cycle IRQ results.
@@ -485,11 +490,11 @@ private:
 		Push((uint8_t)flags);
 	}
 	void PLA() { 
-		DummyRead();
+		DummyStackRead();
 		SetA(Pop()); 
 	}
 	void PLP() { 
-		DummyRead();
+		DummyStackRead();
 		SetPS(Pop()); 
 	}
 
@@ -518,17 +523,17 @@ private:
 
 	void JSR() {
 		uint8_t lo = ReadByte();
-		DummyRead();
+		DummyStackRead();
 		Push(PC());
 		uint16_t addr = (ReadByte() << 8) | lo;
 		JMP(addr);
 	}
 
 	void RTS() {
-		MemoryRead(0x100 + SP(), MemoryOperationType::DummyRead);
+		DummyStackRead();
 		uint16_t addr = PopWord();
 		SetPC(addr);
-		DummyRead();
+		DummyPcRead();
 		SetPC(addr + 1);
 	}
 
@@ -575,7 +580,7 @@ private:
 	void BRK();
 	
 	void RTI() {
-		DummyRead();
+		DummyStackRead();
 		SetPS(Pop());
 		SetPC(PopWord());
 	}
