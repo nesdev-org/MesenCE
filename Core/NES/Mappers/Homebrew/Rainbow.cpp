@@ -474,7 +474,7 @@ uint8_t Rainbow::ReadChr(uint32_t fetchAddr, uint16_t ppuAddr)
 		case 0: return _chrRomSize ? _chrRom[fetchAddr & (_chrRomSize - 1)] : 0;
 		case 1: return _chrRamSize ? _chrRam[fetchAddr & (_chrRamSize - 1)] : 0;
 		case 2: return _mapperRam[fetchAddr & 0x1FFF];
-		case 3: return InternalReadVram(ppuAddr & 0x7FF);
+		case 3: return GetNametable((ppuAddr & 0x400) >> 10)[ppuAddr & 0x3FF];
 	}
 }
 
@@ -960,10 +960,8 @@ uint8_t Rainbow::DebugReadChr(ExtModeConfig& cfg, uint32_t addr)
 		default:
 		case 0: return _chrRomSize ? _chrRom[addr & (_chrRomSize - 1)] : 0;
 		case 1: return _chrRamSize ? _chrRam[addr & (_chrRamSize - 1)] : 0;
-
-		case 2:
-		case 3:
-			return cfg.ExtRam[addr & 0x1FFF];
+		case 2: return cfg.ExtRam[addr & 0x1FFF];
+		case 3: return GetNametable((addr & 0x400) >> 10)[addr & 0x3FF];
 	}
 }
 
