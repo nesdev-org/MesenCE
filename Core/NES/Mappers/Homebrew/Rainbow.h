@@ -122,7 +122,7 @@ private:
 	uint8_t _sendSrcAddr = 0;
 	uint8_t _recvDstAddr = 0;
 
-	uint8_t ReadChr(uint32_t addr);
+	uint8_t ReadChr(uint32_t fetchAddr, uint16_t ppuAddr);
 	void UpdateInWindowFlag();
 	void UpdateIrqStatus();
 	void AckCpuIrq();
