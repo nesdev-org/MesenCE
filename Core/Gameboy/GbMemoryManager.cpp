@@ -102,7 +102,7 @@ void GbMemoryManager::ExecMasterCycle()
 {
 	uint64_t& cycleCount = _cpu->GetState().CycleCount;
 	cycleCount++;
-	if(cycleCount & 1) {
+	if(!(cycleCount & 1)) {
 		ExecTimerDmaSerial();
 	}
 	_ppu->Exec<true>();
