@@ -106,6 +106,7 @@ protected:
 	void ProcessCpuClock() override;
 	void UpdateCrc(uint8_t value);
 
+	void SetFdsControlReg(uint8_t value);
 	void WriteRegister(uint16_t addr, uint8_t value) override;
 	uint8_t ReadRegister(uint16_t addr) override;
 

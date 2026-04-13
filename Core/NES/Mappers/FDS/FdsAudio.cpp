@@ -70,6 +70,7 @@ FdsAudio::FdsAudio(NesConsole* console) : BaseExpansionAudio(console)
 {
 }
 
+//TODO Update to switch statement and map read-only FDS audio registers at $4090-$4097
 uint8_t FdsAudio::ReadRegister(uint16_t addr)
 {
 	uint8_t value = _console->GetMemoryManager()->GetOpenBus();

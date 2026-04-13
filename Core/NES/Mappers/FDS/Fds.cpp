@@ -254,6 +254,13 @@ void Fds::ProcessAutoDiskInsert()
 	}
 }
 
+/**TODO:
+ - Proper byte transfer flag handling (set every 1792 master cycles, or 149+1/3 CPU cycles, under normal conditions)
+   - Should allow for accurate handling of level 2->3 load bug in Ai Senshi Nicol
+ - Verify End of Head handling (may affect Kosodate Gokko and FMC Disk Card Checker)
+ - DRAM refresh watchdog implementation (must track PRG-RAM vs external access cycles...)
+ (Ongoing research, please consult TakuikaNinja for further details)
+**/
 void Fds::ProcessCpuClock()
 {
 	BaseProcessCpuClock();
@@ -389,6 +396,18 @@ void Fds::UpdateCrc(uint8_t value)
 	}
 }
 
+void Fds::SetFdsControlReg(uint8_t value)
+{
+	_motorOn = (value & 0x01) == 0x01;
+	_resetTransfer = (value & 0x02) == 0x02;
+	_readMode = (value & 0x04) == 0x04;
+	SetMirroringType(value & 0x08 ? MirroringType::Horizontal : MirroringType::Vertical);
+	_crcControl = (value & 0x10) == 0x10;
+	//TODO $4025 bit 5 is unknown, all known software sets it to 1
+	_diskReady = (value & 0x40) == 0x40;
+	_diskIrqEnabled = (value & 0x80) == 0x80;
+}
+
 void Fds::WriteRegister(uint16_t addr, uint8_t value)
 {
 	if((!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) || (!_soundRegEnabled && addr >= 0x4040)) {
@@ -417,10 +436,15 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 
 		case 0x4023:
 			_diskRegEnabled = (value & 0x01) == 0x01;
+			//TODO Disabling sound registers should pause audio output?
 			_soundRegEnabled = (value & 0x02) == 0x02;
 
 			if(!_diskRegEnabled) {
 				_irqEnabled = false;
+				//Disabling disk registers forces $4025 = $06 (bit 3 reflected in $4030 reads)
+				SetFdsControlReg(0x06);
+				//TODO Does disabling disk registers force the external connector = 0xFF ?
+				//_extConWriteReg = 0xFF;
 				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			}
@@ -435,14 +459,7 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x4025:
-			_motorOn = (value & 0x01) == 0x01;
-			_resetTransfer = (value & 0x02) == 0x02;
-			_readMode = (value & 0x04) == 0x04;
-			SetMirroringType(value & 0x08 ? MirroringType::Horizontal : MirroringType::Vertical);
-			_crcControl = (value & 0x10) == 0x10;
-			//Bit 6 is not used, always 1
-			_diskReady = (value & 0x40) == 0x40;
-			_diskIrqEnabled = (value & 0x80) == 0x80;
+			SetFdsControlReg(value);
 
 			//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
 			//Fixes issues in some unlicensed games (error $20 at power on)
@@ -464,20 +481,24 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 uint8_t Fds::ReadRegister(uint16_t addr)
 {
 	uint8_t value = _memoryManager->GetOpenBus();
-	if(_soundRegEnabled && addr >= 0x4040) {
+	if(addr >= 0x4040) {
 		return _audio->ReadRegister(addr);
-	} else if(_diskRegEnabled && addr <= 0x4033) {
+	} else if(addr <= 0x4033) {
 		switch(addr) {
 			case 0x4030:
-				//These 3 pins are open bus
+				//These 2 pins are open bus
 				value &= 0x24;
-
+				/**TODO:
+				 - DRAM refresh watchdog IRQ status is returned in bit 1, needs implementation
+				 - End of Head is returned in bit 6, needs verification
+				 - Byte transfer flag is returned in bit 7, not bit 1 (required by Tonkachi Editor)
+				**/
 				value |= _cpu->HasIrqSource(IRQSource::External) ? 0x01 : 0x00;
 				value |= _transferComplete ? 0x02 : 0x00;
 				value |= GetMirroringType() == MirroringType::Horizontal ? 0x08 : 0;
 				value |= _useQdFormat && _badCrc ? 0x10 : 0x00;
 				//value |= _endOfHead ? 0x40 : 0x00;
-				//value |= _diskRegEnabled ? 0x80 : 0x00;
+				//value |= _transferComplete ? 0x80 : 0x00;
 
 				_transferComplete = false;
 				_cpu->ClearIrqSource(IRQSource::External);
