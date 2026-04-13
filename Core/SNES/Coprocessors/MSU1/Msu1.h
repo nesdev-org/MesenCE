@@ -11,6 +11,8 @@ class Emulator;
 class Msu1 final : public ISerializable, public IAudioProvider
 {
 private:
+	static constexpr uint32_t DefaultStartOffset = 8;
+
 	Spc* _spc = nullptr;
 	Emulator* _emu = nullptr;
 	PcmReader _pcmReader;
@@ -22,20 +24,19 @@ private:
 	string _romFolder;
 	string _trackPath;
 
-	uint16_t _audioResumeTrack = 0;
-	uint32_t _audioResumeOffset = 8;
+	uint16_t _audioResumeTrack = -1;
+	uint32_t _audioResumeOffset = DefaultStartOffset;
 
 	bool _repeat = false;
 	bool _paused = false;
 	bool _audioBusy = false; //Always false
 	bool _dataBusy = false; //Always false
 	bool _trackMissing = false;
-	bool _resume = false;
 
 	ifstream _dataFile;
 	uint32_t _dataSize;
-	
-	void LoadTrack(uint32_t startOffset = 8);
+
+	void LoadTrack(uint32_t startOffset = DefaultStartOffset);
 
 public:
 	Msu1(Emulator* emu, VirtualFile& romFile, Spc* spc);
