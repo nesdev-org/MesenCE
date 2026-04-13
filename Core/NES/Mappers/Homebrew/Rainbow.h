@@ -80,6 +80,7 @@ private:
 	bool _inFrame = false;
 	bool _inHBlank = false;
 	uint8_t _jitterCounter = 0;
+	bool _parityCounter = false;
 
 	uint16_t _cpuIrqCounter = 0;
 	uint16_t _cpuIrqReloadValue = 0;
@@ -121,7 +122,7 @@ private:
 	uint8_t _sendSrcAddr = 0;
 	uint8_t _recvDstAddr = 0;
 
-	uint8_t ReadChr(uint32_t addr);
+	uint8_t ReadChr(uint32_t fetchAddr, uint16_t ppuAddr);
 	void UpdateInWindowFlag();
 	void UpdateIrqStatus();
 	void AckCpuIrq();

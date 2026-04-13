@@ -32,6 +32,7 @@ public:
 	Epsm(Emulator* emu, NesConsole* console, vector<uint8_t>& adpcmRom);
 	~Epsm();
 
+	void Reset();
 	void Write(uint8_t dataBus, uint8_t outPins);
 	void WriteRam(uint16_t addr, uint8_t value) override;
 	void Exec();

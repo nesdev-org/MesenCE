@@ -15,7 +15,7 @@ namespace Mesen.Config
 
 		[Reactive] public ControllerConfig Controller { get; set; } = new();
 
-		[Reactive] public GameboyModel Model { get; set; } = GameboyModel.AutoFavorGbc;
+		[Reactive] public GameboyModel Model { get; set; } = GameboyModel.AutoFavorBest;
 		[Reactive] public bool UseSgb2 { get; set; } = true;
 
 		[Reactive] public bool BlendFrames { get; set; } = true;
@@ -107,6 +107,7 @@ namespace Mesen.Config
 
 	public enum GameboyModel
 	{
+		AutoFavorBest,
 		AutoFavorGbc,
 		AutoFavorSgb,
 		AutoFavorGb,

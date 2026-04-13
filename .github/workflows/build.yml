@@ -62,10 +62,6 @@ jobs:
           {os: ubuntu-22.04, path: x64},
           {os: ubuntu-22.04-arm, path: arm64}
         ]
-        exclude:
-          # ARM64 AOT build doesn't seem to work properly (crashes when launched)
-          - platform: { os: ubuntu-22.04-arm, path: arm64 }
-            compiler: clang_aot
         include:
           - compiler: gcc
             make_flags: "USE_GCC=true"
@@ -157,8 +153,8 @@ jobs:
       matrix:
         compiler: [clang, clang_aot]
         platform: [
-          {os: macos-13, arch: x64},
-          {os: macos-14, arch: arm64}
+          {os: macos-15-intel, arch: x64},
+          {os: macos-15, arch: arm64}
         ]
         include:
           - compiler: clang

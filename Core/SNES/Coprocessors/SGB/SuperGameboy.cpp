@@ -74,7 +74,9 @@ uint8_t SuperGameboy::Read(uint32_t addr)
 	addr &= 0xF80F;
 	
 	if(addr >= 0x7000 && addr <= 0x700F) {
-		_packetReady = false;
+		if(addr == 0x7000) {
+			_packetReady = false;
+		}
 		return _packetData[addr & 0x0F];
 	} else if(addr >= 0x7800 && addr <= 0x780F) {
 		if(_readPosition >= 320) {
