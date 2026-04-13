@@ -251,10 +251,12 @@ void Cx4::ProcessDma(uint64_t targetCycle)
 uint8_t Cx4::GetAccessDelay(uint32_t addr)
 {
 	IMemoryHandler* handler = _mappings.GetHandler(addr);
-	if(handler->GetMemoryType() == MemoryType::SnesPrgRom) {
-		return 1 + _state.RomAccessDelay;
-	} else if(handler->GetMemoryType() == MemoryType::SnesSaveRam) {
-		return 1 + _state.RamAccessDelay;
+	if(handler) {
+		if(handler->GetMemoryType() == MemoryType::SnesPrgRom) {
+			return 1 + _state.RomAccessDelay;
+		} else if(handler->GetMemoryType() == MemoryType::SnesSaveRam) {
+			return 1 + _state.RamAccessDelay;
+		}
 	}
 
 	return 1;
