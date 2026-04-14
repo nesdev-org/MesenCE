@@ -443,8 +443,8 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 				_irqEnabled = false;
 				//Disabling disk registers forces $4025 = $06 (bit 3 reflected in $4030 reads)
 				SetFdsControlReg(0x06);
-				//TODO Does disabling disk registers force the external connector = 0xFF ?
-				//_extConWriteReg = 0xFF;
+				//Disabling disk registers forces $4026 (external connector) = 0x7F
+				_extConWriteReg = 0x7F;
 				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			}
@@ -542,7 +542,7 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 
 			case 0x4033:
 				//Always return good battery
-				return _extConWriteReg;
+				return _extConWriteReg | 0x80;
 		}
 	}
 
