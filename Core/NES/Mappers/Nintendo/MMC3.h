@@ -268,7 +268,7 @@ protected:
 		entries.push_back(MapperStateEntry("$8000.6", "PRG Banking Mode", (_state.Reg8000 & 0x40) != 0));
 		entries.push_back(MapperStateEntry("$8000.7", "CHR Banking Mode", (_state.Reg8000 & 0x80) != 0));
 
-		entries.push_back(MapperStateEntry("$A000.0", "Mirroring", _state.RegA000 & 0x01 ? "Horizontal" : "Vertical"));
+		entries.push_back(MapperStateEntry("$A000.0", "Mirroring", GetMirroringType() == MirroringType::Horizontal ? "Horizontal" : "Vertical", GetMirroringType() == MirroringType::Horizontal ? 1 : 0));
 
 		if(isMmc6) {
 			entries.push_back(MapperStateEntry("$A001.4", "Work RAM Bank 0 Write Enabled", (_state.RegA001 & 0x10) != 0));
