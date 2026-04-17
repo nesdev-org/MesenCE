@@ -87,6 +87,16 @@ bool OggMixer::Play(string filename, bool isSfx, uint32_t startOffset, uint32_t 
 	shared_ptr<OggReader> reader(new OggReader(_emu));
 	bool loop = !isSfx && (_options & (int)OggPlaybackOptions::Loop) != 0;
 	if(reader->Init(filename, loop, _sampleRate, startOffset, loopPosition)) {
+		if(_emu->IsRunAheadFrame()) {
+			//If this was done on runahead frames, SFX/BGM will attempt to start playing multiple times (once per runahead frame)
+			//This causes all sound effects to be duplicated.
+			//Skipping the processing on runahead here is an imperfect workaround - it allows 1 runahead frame to usually work properly
+			//but attempting to use over 1 frame of runahead will instead cause SFX to not play properly at times.
+			//Ideally, the exact state of the BGM/SFX (what is playing exactly, and at which part of their playback they are) should
+			//be part of the save state data and restored like any other state (but this isn't trivial to implement at the moment)
+			return true;
+		}
+
 		if(isSfx) {
 			_sfx.push_back(reader);
 		} else {
