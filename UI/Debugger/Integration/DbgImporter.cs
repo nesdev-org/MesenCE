@@ -319,11 +319,13 @@ namespace Mesen.Debugger.Integration
 					isRam = false;
 
 					if(row.Contains("type=rw")) {
-						//TODOv2 fix this
-						//Assume a RW segment inside the .sfc file is SPC code
 						isRam = true;
-						memType = MemoryType.SpcRam;
 					}
+				}
+
+				//Assume that segments with names containing "SPC" are in audio RAM
+				if(row.Contains("SPC")) {
+					memType = MemoryType.SpcRam;
 				}
 
 				SegmentInfo segment = new SegmentInfo(id, start, size, isRam, fileOffset, memType);
@@ -916,7 +918,7 @@ namespace Mesen.Debugger.Integration
 		{
 			DbgImporter? importer = romFormat switch {
 				RomFormat.Sfc => new SnesDbgImporter(romFormat),
-				RomFormat.iNes or RomFormat.Nsf or RomFormat.VsSystem or RomFormat.VsDualSystem => new NesDbgImporter(romFormat),
+				RomFormat.iNes or RomFormat.Nsf or RomFormat.VsSystem or RomFormat.VsDualSystem or RomFormat.Fds => new NesDbgImporter(romFormat),
 				RomFormat.Pce or RomFormat.PceHes => new PceDbgImporter(romFormat),
 				_ => null
 			};

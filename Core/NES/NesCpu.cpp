@@ -191,8 +191,8 @@ void NesCpu::IRQ()
 		ProcessPendingDma(_state.PC, MemoryOperationType::ExecOpCode);
 	}
 
-	DummyRead();  //fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
-	DummyRead();  //read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)
+	DummyPcRead();  //fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
+	DummyPcRead();  //read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)
 	Push((uint16_t)(PC()));
 
 	if(_needNmi) {
@@ -271,7 +271,7 @@ uint16_t NesCpu::FetchOperand()
 {
 	switch(_instAddrMode) {
 		case NesAddrMode::Acc:
-		case NesAddrMode::Imp: DummyRead(); return 0;
+		case NesAddrMode::Imp: DummyPcRead(); return 0;
 		case NesAddrMode::Imm:
 		case NesAddrMode::Rel: return GetImmediate();
 		case NesAddrMode::Zero: return GetZeroAddr();

@@ -163,11 +163,13 @@ void GbDmaController::ProcessHdma()
 	_state.CgbHdmaTrigger = trigger;
 
 	if(_state.CgbHdmaPending && !_cpu->IsHalted()) {
+		// prevent DMA blocks from being processed again when an hblank transfer crosses a scanline boundary
+		// fixes hangs and grapics corruption in "Championship Motocross 2001 featuring Ricky Carmichael"
+		_state.CgbHdmaPending = false;
 		//4 cycles for setup
 		_memoryManager->Exec();
 		_memoryManager->Exec();
 		ProcessDmaBlock();
-		_state.CgbHdmaPending = false;
 	}
 }
 

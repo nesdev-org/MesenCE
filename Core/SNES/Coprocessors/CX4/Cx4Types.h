@@ -20,6 +20,7 @@ struct Cx4Suspend
 struct Cx4Cache
 {
 	bool Enabled;
+	bool Preload;
 	uint8_t Page;
 	bool Lock[2];
 	uint32_t Address[2];

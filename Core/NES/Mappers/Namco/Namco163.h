@@ -250,8 +250,8 @@ protected:
 					switch((value & 0xC0) >> 6) {
 						case 0: SetMirroringType(MirroringType::ScreenAOnly); break;
 						case 1: SetMirroringType(MirroringType::Vertical); break;
-						case 2: SetMirroringType(MirroringType::Horizontal); break;
-						case 3: SetMirroringType(MirroringType::ScreenBOnly); break;
+						case 2: SetMirroringType(MirroringType::ScreenBOnly); break;
+						case 3: SetMirroringType(MirroringType::Horizontal); break;
 					}
 				} else if(_variant == NamcoVariant::Namco163) {
 					_audio->WriteRegister(addr, value);

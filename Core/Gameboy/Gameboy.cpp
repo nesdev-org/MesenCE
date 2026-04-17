@@ -446,7 +446,13 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 		}
 
 		GbCart* cart = GbCartFactory::CreateCart(_emu, header, gbxFooter, romData);
-		
+
+		switch(_model) {
+			case GameboyModel::Gameboy: MessageManager::Log("Game Boy model selected: Game Boy"); break;
+			case GameboyModel::SuperGameboy: MessageManager::Log("Game Boy model selected: Super Game Boy"); break;
+			case GameboyModel::GameboyColor: MessageManager::Log("Game Boy model selected: Game Boy Color"); break;
+		}
+
 		MessageManager::Log("-----------------------------");
 
 		if(cart) {
@@ -531,6 +537,16 @@ GameboyModel Gameboy::GetEffectiveModel(GameboyHeader& header)
 				model = GameboyModel::SuperGameboy;
 			} else {
 				model = GameboyModel::GameboyColor;
+			}
+			break;
+
+		case GameboyModel::AutoFavorBest:
+			if(cgbFlag == CgbCompat::GameboyColorExclusive || cgbFlag == CgbCompat::GameboyColorSupport) {
+				model = GameboyModel::GameboyColor;
+			} else if(supportsSgb) {
+				model = GameboyModel::SuperGameboy;
+			} else {
+				model = GameboyModel::Gameboy;
 			}
 			break;
 	}

@@ -236,11 +236,11 @@ struct WsMemoryManagerState
 	bool Enable4bppPacked;
 	
 	bool BootRomDisabled;
-	bool CartWordBus;
+	bool CartWordBus = true;
 	bool SlowRom;
 
-	bool SlowSram;
-	bool SlowPort;
+	bool SlowSram = true;
+	bool SlowPort = true;
 
 	bool EnableLowBatteryNmi;
 	bool PowerOffRequested;

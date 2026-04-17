@@ -189,7 +189,7 @@ private:
 			_lastChrReg = 0;
 		}
 
-		bool chrA = !largeSprites || (_splitTileNumber >= 32 && _splitTileNumber < 40) || (!_ppuInFrame && _lastChrReg <= 0x5127);
+		bool chrA = !largeSprites || (_splitTileNumber >= 32 && _splitTileNumber < 48) || (!_ppuInFrame && _lastChrReg <= 0x5127);
 		if(!forceUpdate && chrA == _prevChrA) {
 			return;
 		}
@@ -480,16 +480,16 @@ protected:
 
 		if(_extendedRamMode <= 1 && _ppuInFrame) {
 			if(_verticalSplitEnabled) {
-				uint8_t scanline = _splitTileNumber >= 41 ? _scanlineCounter + 1 : _scanlineCounter;
+				uint8_t scanline = _splitTileNumber >= 49 ? _scanlineCounter + 1 : _scanlineCounter;
 				uint8_t verticalSplitScroll = (scanline + _verticalSplitScroll) % 240;
-				uint8_t column = (_splitTileNumber + 2) % 42;
+				uint8_t column = (_splitTileNumber + 2) % 50;
 				if(addr >= 0x2000) {
 					if(isNtFetch) {
 						if(column == 0) {
 							_splitInSplitRegion = !_verticalSplitRightSide;
 						}
 
-						if(column == _verticalSplitDelimiterTile && _splitTileNumber < 42) {
+						if(column == _verticalSplitDelimiterTile && _splitTileNumber < 50) {
 							//Enter/exit split section when the current column matches the column number written to $5200
 							_splitInSplitRegion = !_splitInSplitRegion;
 						} else if(column > 32) {
@@ -514,7 +514,7 @@ protected:
 				}
 			}
 
-			if(_extendedRamMode == 1 && (_splitTileNumber < 32 || _splitTileNumber >= 40)) {
+			if(_extendedRamMode == 1 && (_splitTileNumber < 32 || _splitTileNumber >= 48)) {
 				//"In Mode 1, nametable fetches are processed normally, and can come from CIRAM nametables, fill mode, or even Expansion RAM, but attribute fetches are replaced by data from Expansion RAM."
 				//"Each byte of Expansion RAM is used to enhance the tile at the corresponding address in every nametable"
 

@@ -18,6 +18,11 @@ Epsm::~Epsm()
 	_emu->GetSoundMixer()->UnregisterAudioProvider(this);
 }
 
+void Epsm::Reset()
+{
+	_clockCounter = 0;
+}
+
 void Epsm::Write(uint8_t dataBus, uint8_t outPins)
 {
 	//4016 writes

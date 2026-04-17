@@ -29,12 +29,16 @@ public class NesHeaderEditViewModel : DisposableViewModel
 	[Reactive] public string ErrorMessage { get; private set; } = "";
 
 	private RomInfo _romInfo;
+	private byte[] _prgRom;
+	private byte[] _chrRom;
 
 	public NesHeaderEditViewModel()
 	{
 		bool releaseDebugger = !DebugWindowManager.HasOpenedDebugWindows();
 		bool paused = EmuApi.IsPaused();
 		byte[] headerBytes = DebugApi.GetRomHeader();
+		_prgRom = DebugApi.GetMemoryState(MemoryType.NesPrgRom);
+		_chrRom = DebugApi.GetMemoryState(MemoryType.NesChrRom);
 		if(releaseDebugger) {
 			//GetRomHeader will initialize the debugger - stop the debugger if no other debug window is opened
 			DebugApi.ReleaseDebugger();
@@ -150,16 +154,14 @@ public class NesHeaderEditViewModel : DisposableViewModel
 
 	public async Task<bool> Save(Window wnd)
 	{
-		string? filepath = await FileDialogHelper.SaveFile(Path.GetDirectoryName(_romInfo.RomPath), Path.GetFileName(_romInfo.RomPath), wnd, FileDialogHelper.NesExt);
+		string? filepath = await FileDialogHelper.SaveFile(Path.GetDirectoryName(_romInfo.RomPath), _romInfo.GetRomName(), wnd, FileDialogHelper.NesExt);
 		if(filepath != null) {
-			byte[]? data = FileHelper.ReadAllBytes(_romInfo.RomPath);
-			if(data != null) {
-				byte[] header = Header.ToBytes();
-				for(int i = 0; i < 16; i++) {
-					data[i] = header[i];
-				}
-				return FileHelper.WriteAllBytes(filepath, data);
-			}
+			byte[] data = new byte[_prgRom.Length + _chrRom.Length + 16];
+			byte[] header = Header.ToBytes();
+			Array.Copy(header, data, 16);
+			Array.Copy(_prgRom, 0, data, 16, _prgRom.Length);
+			Array.Copy(_chrRom, 0, data, 16 + _prgRom.Length, _chrRom.Length);
+			return FileHelper.WriteAllBytes(filepath, data);
 		}
 		return false;
 	}
