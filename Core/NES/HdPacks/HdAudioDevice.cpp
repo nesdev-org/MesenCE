@@ -18,7 +18,7 @@ HdAudioDevice::HdAudioDevice(Emulator* emu, HdPackData* hdData)
 	_sfxVolume = 128;
 	_bgmVolume = 128;
 
-	_oggMixer.reset(new OggMixer());
+	_oggMixer.reset(new OggMixer(emu));
 	_oggMixer->SetBgmVolume(_bgmVolume);
 	_oggMixer->SetSfxVolume(_sfxVolume);
 	_emu->GetSoundMixer()->RegisterAudioProvider(_oggMixer.get());
@@ -40,12 +40,15 @@ void HdAudioDevice::Serialize(Serializer& s)
 		SV(_album); SV(_lastBgmTrack); SV(trackOffset); SV(_sfxVolume); SV(_bgmVolume); SV(_playbackOptions);
 	} else {
 		SV(_album); SV(_lastBgmTrack); SV(trackOffset); SV(_sfxVolume); SV(_bgmVolume); SV(_playbackOptions);
-		if(_lastBgmTrack != -1 && trackOffset > 0) {
-			PlayBgmTrack(_lastBgmTrack, trackOffset);
+		
+		if(!_emu->IsRunAheadFrame()) {
+			if(_lastBgmTrack != -1 && trackOffset > 0) {
+				PlayBgmTrack(_lastBgmTrack, trackOffset);
+			}
+			_oggMixer->SetBgmVolume(_bgmVolume);
+			_oggMixer->SetSfxVolume(_sfxVolume);
+			_oggMixer->SetPlaybackOptions(_playbackOptions);
 		}
-		_oggMixer->SetBgmVolume(_bgmVolume);
-		_oggMixer->SetSfxVolume(_sfxVolume);
-		_oggMixer->SetPlaybackOptions(_playbackOptions);
 	}
 }
 

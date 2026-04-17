@@ -4,6 +4,7 @@
 #include "Utilities/Audio/HermiteResampler.h"
 
 struct stb_vorbis;
+class Emulator;
 
 class OggReader
 {
@@ -13,6 +14,7 @@ private:
 	int16_t* _oggBuffer = nullptr;
 
 	HermiteResampler _resampler;
+	Emulator* _emu = nullptr;
 
 	bool _loop = false;
 	bool _done = false;
@@ -25,7 +27,7 @@ private:
 	vector<uint8_t> _fileData;
 
 public:
-	OggReader();
+	OggReader(Emulator* emu);
 	~OggReader();
 
 	bool Init(string filename, bool loop, uint32_t sampleRate, uint32_t startOffset = 0, uint32_t loopPosition = 0);
