@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "NES/HdPacks/OggReader.h"
 #include "NES/HdPacks/OggMixer.h"
+#include "Shared/Emulator.h"
 
 enum class OggPlaybackOptions
 {
@@ -9,8 +10,9 @@ enum class OggPlaybackOptions
 	Loop = 0x01
 };
 
-OggMixer::OggMixer()
+OggMixer::OggMixer(Emulator* emu)
 {
+	_emu = emu;
 }
 
 void OggMixer::Reset(uint32_t sampleRate)
@@ -82,7 +84,7 @@ void OggMixer::SetSampleRate(int sampleRate)
 
 bool OggMixer::Play(string filename, bool isSfx, uint32_t startOffset, uint32_t loopPosition)
 {
-	shared_ptr<OggReader> reader(new OggReader());
+	shared_ptr<OggReader> reader(new OggReader(_emu));
 	bool loop = !isSfx && (_options & (int)OggPlaybackOptions::Loop) != 0;
 	if(reader->Init(filename, loop, _sampleRate, startOffset, loopPosition)) {
 		if(isSfx) {

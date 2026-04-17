@@ -1,9 +1,11 @@
 #include "pch.h"
+#include "Shared/Emulator.h"
 #include "NES/HdPacks/OggReader.h"
 #include "Utilities/Audio/stb_vorbis.h"
 
-OggReader::OggReader()
+OggReader::OggReader(Emulator* emu)
 {
+	_emu = emu;
 	_done = false;
 	_oggBuffer = new int16_t[10000];
 	_outputBuffer = new int16_t[2000];
@@ -63,6 +65,10 @@ void OggReader::SetLoopFlag(bool loop)
 
 void OggReader::ApplySamples(int16_t* buffer, size_t sampleCount, uint8_t volume)
 {
+	if(_emu->IsRunAheadFrame()) {
+		return;
+	}
+
 	int32_t samplesNeeded = (int32_t)sampleCount - _resampler.GetPendingCount();
 	uint32_t samplesRead = 0;
 	if(samplesNeeded > 0) {
@@ -88,5 +94,5 @@ void OggReader::ApplySamples(int16_t* buffer, size_t sampleCount, uint8_t volume
 
 uint32_t OggReader::GetOffset()
 {
-	return stb_vorbis_get_file_offset(_vorbis);
+	return stb_vorbis_get_sample_offset(_vorbis);
 }
