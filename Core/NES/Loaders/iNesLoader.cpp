@@ -2,6 +2,7 @@
 #include "NES/Loaders/iNesLoader.h"
 #include "Utilities/CRC32.h"
 #include "Utilities/HexUtilities.h"
+#include "Utilities/StringUtilities.h"
 #include "NES/MapperFactory.h"
 #include "NES/NesHeader.h"
 #include "NES/RomData.h"
@@ -118,18 +119,18 @@ void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *
 		Log("[iNes] System: " + type);
 	}
 
-	Log("[iNes] PRG ROM: " + std::to_string(prgSize/1024) + " KB");
-	Log("[iNes] CHR ROM: " + std::to_string(chrSize/1024) + " KB");
+	Log("[iNes] PRG ROM: " + StringUtilities::SizeToString(prgSize));
+	Log("[iNes] CHR ROM: " + StringUtilities::SizeToString(chrSize));
 	if(romData.ChrRamSize > 0 || romData.Info.IsNes20Header) {
-		Log("[iNes] CHR RAM: " + std::to_string(romData.ChrRamSize / 1024) + " KB");
+		Log("[iNes] CHR RAM: " + StringUtilities::SizeToString(romData.ChrRamSize));
 	} else if(chrSize == 0) {
 		Log("[iNes] CHR RAM: 8 KB");
 	}
 	if(romData.WorkRamSize > 0 || romData.Info.IsNes20Header) {
-		Log("[iNes] Work RAM: " + std::to_string(romData.WorkRamSize / 1024) + " KB");
+		Log("[iNes] Work RAM: " + StringUtilities::SizeToString(romData.WorkRamSize));
 	}
 	if(romData.SaveRamSize > 0 || romData.Info.IsNes20Header) {
-		Log("[iNes] Save RAM: " + std::to_string(romData.SaveRamSize / 1024) + " KB");
+		Log("[iNes] Save RAM: " + StringUtilities::SizeToString(romData.SaveRamSize));
 	}
 
 	Log("[iNes] Mirroring: " + string(romData.Info.Mirroring == MirroringType::Horizontal ? "Horizontal" : romData.Info.Mirroring == MirroringType::Vertical ? "Vertical" : "Four Screens"));
