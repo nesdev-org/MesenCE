@@ -545,7 +545,7 @@ void Emulator::InitConsole(unique_ptr<IConsole>& newConsole, ConsoleMemoryInfo o
 	if(preserveRom && _console) {
 		//When power cycling, copy over the content of any ROM memory from the previous instance
 		magic_enum::enum_for_each<MemoryType>([&](MemoryType memType) {
-			if(DebugUtilities::IsRom(memType)) {
+			if(DebugUtilities::IsCartRom(memType)) {
 				uint32_t orgSize = originalConsoleMemory[(int)memType].Size;
 				if(orgSize > 0 && GetMemory(memType).Size == orgSize) {
 					memcpy(_consoleMemory[(int)memType].Memory, originalConsoleMemory[(int)memType].Memory, orgSize);

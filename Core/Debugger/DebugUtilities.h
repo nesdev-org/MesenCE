@@ -222,12 +222,11 @@ public:
 		}
 	}
 
-	static constexpr bool IsRom(MemoryType memType)
+	static constexpr bool IsCartRom(MemoryType memType)
 	{
 		switch(memType) {
 			case MemoryType::SnesPrgRom:
 			case MemoryType::GbPrgRom:
-			case MemoryType::GbBootRom:
 			case MemoryType::NesPrgRom:
 			case MemoryType::NesChrRom:
 			case MemoryType::PcePrgRom:
@@ -235,14 +234,30 @@ public:
 			case MemoryType::DspProgramRom:
 			case MemoryType::St018PrgRom:
 			case MemoryType::St018DataRom:
-			case MemoryType::SufamiTurboFirmware:
 			case MemoryType::SufamiTurboSecondCart:
-			case MemoryType::SpcRom:
 			case MemoryType::SmsPrgRom:
-			case MemoryType::SmsBootRom:
 			case MemoryType::GbaPrgRom:
-			case MemoryType::GbaBootRom:
 			case MemoryType::WsPrgRom:
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	static constexpr bool IsRom(MemoryType memType)
+	{
+		if(IsCartRom(memType)) {
+			return true;
+		}
+
+		switch(memType) {
+			case MemoryType::GbBootRom:
+			case MemoryType::SufamiTurboFirmware:
+			case MemoryType::SpcRom:
+			case MemoryType::SmsBootRom:
+			case MemoryType::GbaBootRom:
+			case MemoryType::WsBootRom:
 				return true;
 
 			default:
