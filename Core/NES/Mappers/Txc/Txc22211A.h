@@ -39,7 +39,7 @@ protected:
 	{
 		uint8_t openBus = _console->GetMemoryManager()->GetOpenBus();
 		uint8_t value = openBus;
-		if((addr & 0x103) == 0x100) {
+		if((addr & 0x100) == 0x100) {
 			value = (openBus & 0xF0) | (_txc.Read() & 0x0F);
 		}
 		UpdateState();
