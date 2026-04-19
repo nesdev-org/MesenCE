@@ -22,6 +22,7 @@ namespace Mesen.Config
 
 		public string Version { get; set; } = "2.1.1";
 		public int ConfigUpgrade { get; set; } = 0;
+		public bool EnableTestMode { get; set; } = false;
 
 		[Reactive] public VideoConfig Video { get; set; } = new();
 		[Reactive] public AudioConfig Audio { get; set; } = new();
