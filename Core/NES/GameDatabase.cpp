@@ -264,16 +264,16 @@ void GameDatabase::SetGameInfo(uint32_t romCrc, RomData &romData, bool updateRom
 			}
 			MessageManager::Log(msg);
 		}
-		MessageManager::Log("[DB] PRG ROM: " + std::to_string(info.PrgRomSize / 1024) + " KB");
-		MessageManager::Log("[DB] CHR ROM: " + std::to_string(info.ChrRomSize / 1024) + " KB");
+		MessageManager::Log("[DB] PRG ROM: " + StringUtilities::SizeToString(PrgRomSize);
+		MessageManager::Log("[DB] CHR ROM: " + StringUtilities::SizeToString(ChrRomSize);
 		if(info.ChrRamSize > 0) {
-			MessageManager::Log("[DB] CHR RAM: " + std::to_string(info.ChrRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] CHR RAM: " + StringUtilities::SizeToString(ChrRamSize);
 		}
 		if(info.WorkRamSize > 0) {
-			MessageManager::Log("[DB] Work RAM: " + std::to_string(info.WorkRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] Work RAM: " + StringUtilities::SizeToString(WorkRamSize);
 		}
 		if(info.SaveRamSize > 0) {
-			MessageManager::Log("[DB] Save RAM: " + std::to_string(info.SaveRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] Save RAM: " + StringUtilities::SizeToString(SaveRamSize);
 		}
 		MessageManager::Log("[DB] Battery: " + string(info.HasBattery ? "Yes" : "No"));
 
