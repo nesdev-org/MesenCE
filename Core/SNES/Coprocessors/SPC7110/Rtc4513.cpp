@@ -6,6 +6,7 @@
 #include "Shared/BatteryManager.h"
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Serializer.h"
+#include "Utilities/TimeUtilities.h"
 
 //TODO: Partial implementation
 //Missing stuff: most flags e.g: 30ADJ, 24/12, CAL/HW, WRAP, etc.
@@ -78,7 +79,7 @@ void Rtc4513::UpdateTime()
 	tm.tm_mon = GetMonth() - 1;
 	tm.tm_year = (GetYear() >= 90 ? 0 : 100) + GetYear();
 
-	std::time_t tt = mktime(&tm);
+	std::time_t tt = TimeUtilities::TmToUtc(&tm);
 	if(tt == -1 || GetMonth() == 0) {
 		_lastTime = currentTime;
 		return;
@@ -97,9 +98,9 @@ void Rtc4513::UpdateTime()
 	std::time_t newTime = system_clock::to_time_t(timePoint);
 	std::tm newTm;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-	localtime_s(&newTm, &newTime);
+	gmtime_s(&newTm, &newTime);
 #else
-	localtime_r(&newTime, &newTm);
+	gmtime_r(&newTime, &newTm);
 #endif
 
 	_regs[0] = newTm.tm_sec % 10;

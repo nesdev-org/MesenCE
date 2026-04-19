@@ -245,6 +245,7 @@
     <ClInclude Include="StaticFor.h" />
     <ClInclude Include="StringUtilities.h" />
     <ClInclude Include="SZReader.h" />
+    <ClInclude Include="TimeUtilities.h" />
     <ClInclude Include="UPnPPortMapper.h" />
     <ClInclude Include="SimpleLock.h" />
     <ClInclude Include="Socket.h" />
