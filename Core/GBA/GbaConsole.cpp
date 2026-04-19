@@ -188,6 +188,9 @@ void GbaConsole::InitSaveRam(string& gameCode, vector<uint8_t>& romData)
 		} else if(gameCode == "AI2E") {
 			//Iridion II crashes if it has SRAM, force it to none
 			_saveType = GbaSaveType::None;
+		} else if(gameCode == "BR4J") {
+			//Rockman EXE 4.5 claims SRAM, but needs 64K flash.
+			_saveType = GbaSaveType::Flash64;
 		} else {
 			auto checkMarker = [&](string marker, GbaSaveType type) {
 				if(_saveType == GbaSaveType::AutoDetect && std::search(romData.begin(), romData.end(), marker.begin(), marker.end()) != romData.end()) {
