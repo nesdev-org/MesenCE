@@ -105,6 +105,8 @@ private:
 	uint16_t _latchRequestX = 0;
 	uint16_t _latchRequestY = 0;
 
+	uint16_t _prevMainPixel = 0;
+
 	Timer _frameSkipTimer;
 	bool _skipRender = false;
 	uint8_t _configVisibleLayers = 0xFF;

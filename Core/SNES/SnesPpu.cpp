@@ -1285,7 +1285,8 @@ void SnesPpu::ApplyColorMath()
 			//Keep original subscreen color, which is used to apply color math to the main screen after
 			uint16_t subPixel = _subScreenBuffer[x];
 			//Apply the color math based on the previous main pixel
-			uint16_t prevMainPixel = x > 0 ? _mainScreenBuffer[x - 1] : 0;
+			uint16_t prevMainPixel = x > 0 ? _prevMainPixel : 0;
+			_prevMainPixel = _mainScreenBuffer[x];
 			int prevX = x > 0 ? x - 1 : 0;
 			ApplyColorMathToPixel(_subScreenBuffer[x], prevMainPixel, prevX, isInsideWindow);
 
