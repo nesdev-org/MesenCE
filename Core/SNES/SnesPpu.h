@@ -131,6 +131,7 @@ private:
 	template<bool hiResMode, uint8_t bpp, bool secondTile = false>
 	void GetChrData(uint8_t layerIndex, uint8_t column, uint8_t plane);
 
+	uint16_t GetHvOffsetByteAddress(uint8_t columnIndex, bool forVertOffset);
 	void GetHorizontalOffsetByte(uint8_t columnIndex);
 	void GetVerticalOffsetByte(uint8_t columnIndex);
 	void FetchTileData();

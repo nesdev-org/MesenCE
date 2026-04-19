@@ -254,25 +254,37 @@ void SnesPpu::GetChrData(uint8_t layerIndex, uint8_t column, uint8_t plane)
 	tileData.ChrData[plane + (secondTile ? bpp / 2 : 0)] = _vram[pixelStart & 0x7FFF];
 }
 
+uint16_t SnesPpu::GetHvOffsetByteAddress(uint8_t columnIndex, bool forVertOffset)
+{
+	uint16_t tilemapAddr = _state.Layers[2].TilemapAddress;
+	
+	uint8_t shift = _state.Layers[2].LargeTiles ? 4 : 3;
+
+	uint16_t baseColumn = ((columnIndex << 3) + (_state.Layers[2].HScroll & ~0x07)) >> shift;
+
+	uint16_t columnOffset = baseColumn & (_state.Layers[2].DoubleWidth ? 0x3F : 0x1F);
+	if(columnOffset >= 0x20) {
+		tilemapAddr += 0x400;
+		columnOffset &= 0x1F;
+	}
+
+	uint16_t rowOffset = (_state.Layers[2].VScroll >> shift) & (_state.Layers[2].DoubleHeight ? 0x3F : 0x1F);
+	if(rowOffset >= 0x20) {
+		tilemapAddr += 0x400 << (_state.Layers[2].DoubleWidth ? 1 : 0);
+		rowOffset &= 0x1F;
+	}
+
+	return (tilemapAddr + ((columnOffset + (rowOffset << 5) + (forVertOffset ? 0x20 : 0)) & 0x3FF)) & 0x7FFF;
+}
+
 void SnesPpu::GetHorizontalOffsetByte(uint8_t columnIndex)
 {
-	uint16_t columnOffset = (((columnIndex << 3) + (_state.Layers[2].HScroll & ~0x07)) >> 3) & (_state.Layers[2].DoubleWidth ? 0x3F : 0x1F);
-	uint16_t rowOffset = (_state.Layers[2].VScroll >> 3) & (_state.Layers[2].DoubleHeight ? 0x3F : 0x1F);
-
-	_hOffset = _vram[(_state.Layers[2].TilemapAddress + columnOffset + (rowOffset << 5)) & 0x7FFF];
+	_hOffset = _vram[GetHvOffsetByteAddress(columnIndex, false)];
 }
 
 void SnesPpu::GetVerticalOffsetByte(uint8_t columnIndex)
 {
-	uint16_t columnOffset = (((columnIndex << 3) + (_state.Layers[2].HScroll & ~0x07)) >> 3) & (_state.Layers[2].DoubleWidth ? 0x3F : 0x1F);
-	uint16_t rowOffset = (_state.Layers[2].VScroll >> 3) & (_state.Layers[2].DoubleHeight ? 0x3F : 0x1F);
-
-	uint16_t tileOffset = columnOffset + (rowOffset << 5);
-
-	//The vertical offset is 0x40 bytes later - but wraps around within the tilemap based on the tilemap size (0x800 or 0x1000 bytes)
-	uint16_t vOffsetAddr = _state.Layers[2].TilemapAddress + ((tileOffset + 0x20) & (_state.Layers[2].DoubleHeight ? 0x7FF : 0x3FF));
-
-	_vOffset = _vram[vOffsetAddr & 0x7FFF];
+	_vOffset = _vram[GetHvOffsetByteAddress(columnIndex, true)];
 }
 
 void SnesPpu::FetchTileData()
