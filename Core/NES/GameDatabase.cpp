@@ -23,6 +23,18 @@ T GameDatabase::ToInt(string value)
 	return std::stoi(value);
 }
 
+template<typename T>
+T GameDatabase::ToSize(string value)
+{
+	if(value.empty()) {
+		return 0;
+	} else if(value[0] == 'b') {
+		return std::stoi(value.substr(1));
+	} else {
+		return std::stoi(value) * 1024;
+	}
+}
+
 void GameDatabase::LoadGameDb(vector<string> data)
 {
 	for(string &row : data) {
@@ -35,11 +47,11 @@ void GameDatabase::LoadGameDb(vector<string> data)
 			gameInfo.Pcb = values[3];
 			gameInfo.Chip = values[4];
 			gameInfo.MapperID = (uint16_t)ToInt<uint32_t>(values[5]);
-			gameInfo.PrgRomSize = ToInt<uint32_t>(values[6]) * 1024;
-			gameInfo.ChrRomSize = ToInt<uint32_t>(values[7]) * 1024;
-			gameInfo.ChrRamSize = ToInt<uint32_t>(values[8]) * 1024;
-			gameInfo.WorkRamSize = ToInt<uint32_t>(values[9]) * 1024;
-			gameInfo.SaveRamSize = ToInt<uint32_t>(values[10]) * 1024;
+			gameInfo.PrgRomSize = ToSize<uint32_t>(values[6]);
+			gameInfo.ChrRomSize = ToSize<uint32_t>(values[7]);
+			gameInfo.ChrRamSize = ToSize<uint32_t>(values[8]);
+			gameInfo.WorkRamSize = ToSize<uint32_t>(values[9]);
+			gameInfo.SaveRamSize = ToSize<uint32_t>(values[10]);
 			gameInfo.HasBattery = ToInt<uint32_t>(values[11]) == 0 ? false : true;
 			gameInfo.Mirroring = values[12];
 			gameInfo.InputType = (GameInputType)ToInt<uint32_t>(values[13]);

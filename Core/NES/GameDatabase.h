@@ -15,6 +15,7 @@ private:
 	static SimpleLock _loadLock;
 
 	template<typename T> static T ToInt(string value);
+	template<typename T> static T ToSize(string value);
 
 	static BusConflictType GetBusConflictType(string busConflictSetting);
 	static GameSystem GetGameSystem(string system);

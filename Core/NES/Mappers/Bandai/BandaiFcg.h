@@ -66,7 +66,7 @@ protected:
 			//"INES Mapper 016 submapper 5: LZ93D50 ASIC and no or 256-byte serial EEPROM, banked CHR-ROM"
 			
 			//Add a 256 byte serial EEPROM (24C02)
-			if(_romInfo.SubMapperID == 0 || (_romInfo.SubMapperID == 5 && _romInfo.Header.GetSaveRamSize() == 256)) {
+			if(_romInfo.SubMapperID == 0 || (_romInfo.SubMapperID == 5 && _saveRamSize == 256)) {
 				//Connect a 256-byte EEPROM for iNES roms, and when submapper 5 + 256 bytes of save ram in header
 				_standardEeprom.reset(new Eeprom24C02(_console));
 			}
