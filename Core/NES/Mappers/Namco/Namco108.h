@@ -56,6 +56,33 @@ protected:
 		// N108 uses hardwired mirroring, so let the header deal with that
 	}
 
+	void UpdateState() override
+	{
+		MMC3::UpdateState();
+		if(_romInfo.MapperID == 206 && _romInfo.SubMapperID == 1) {
+			//SubMapper 1
+			//"206: 1 Namcot 3407, 3417 and 3451 PCBs with unbanked 32 KiB PRG-ROM."
+			SelectPrgPage4x(0, 0);
+		}
+	}
+
+	vector<MapperStateEntry> GetMapperStateEntries() override
+	{
+		vector<MapperStateEntry> entries;
+		entries.push_back(MapperStateEntry("$8000.0-2", "Current Register", MMC3::GetCurrentRegister(), MapperStateValueType::Number8));
+
+		entries.push_back(MapperStateEntry("", "Register 0 (CHR)", _registers[0], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "Register 1 (CHR)", _registers[1], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "Register 2 (CHR)", _registers[2], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "Register 3 (CHR)", _registers[3], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "Register 4 (CHR)", _registers[4], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "Register 5 (CHR)", _registers[5], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "Register 6 (PRG)", _registers[6], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "Register 7 (PRG)", _registers[7], MapperStateValueType::Number8));
+
+		return entries;
+	}
+
 	// more thorough IRQ removal
 	void NotifyVramAddressChange(uint16_t addr) override
 	{
