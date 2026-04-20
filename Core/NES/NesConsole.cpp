@@ -657,8 +657,14 @@ void NesConsole::InitializeRam(void* data, uint32_t length)
 DipSwitchInfo NesConsole::GetDipSwitchInfo()
 {
 	DipSwitchInfo info = {};
-	info.DipSwitchCount = _mapper->GetMapperDipSwitchCount();
 	info.DatabaseId = _mapper->GetRomInfo().Hash.PrgCrc32;
+
+	switch(GetRomFormat()) {
+		case RomFormat::VsSystem: info.DipSwitchCount = 8; break;
+		case RomFormat::VsDualSystem: info.DipSwitchCount = 16; break;
+		default: info.DipSwitchCount = _mapper->GetMapperDipSwitchCount(); break;
+	}
+
 	return info;
 }
 
