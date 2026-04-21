@@ -184,12 +184,12 @@ void NesCpu::IRQ()
 {
 #ifndef DUMMYCPU
 	uint16_t originalPc = PC();
-#endif
 
 	if(_console->GetRegion() == ConsoleRegion::Pal) {
 		//On PAL, IRQ/NMI sequence also checks for DMA on the first read
 		ProcessPendingDma(_state.PC, MemoryOperationType::ExecOpCode);
 	}
+#endif
 
 	DummyPcRead();  //fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
 	DummyPcRead();  //read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)

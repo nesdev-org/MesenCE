@@ -226,6 +226,17 @@ public:
 		return _irqFlag;
 	}
 
+	bool PeekIrqFlag()
+	{
+		if(_irqFlag && _irqFlagClearClock != 0) {
+			uint64_t clock = _console->GetMasterClock();
+			if(clock >= _irqFlagClearClock) {
+				return false;
+			}
+		}
+		return _irqFlag;
+	}
+
 	ApuFrameCounterState GetState()
 	{
 		ApuFrameCounterState state;
