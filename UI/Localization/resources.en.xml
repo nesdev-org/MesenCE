@@ -2621,6 +2621,11 @@ E
 			<Value ID="Vertical">Vertical</Value>
 			<Value ID="FourScreens">Four Screens</Value>
 		</Enum>
+		<Enum ID="RomSizeUnit">
+			<Value ID="Bytes">bytes</Value>
+			<Value ID="KB">KB</Value>
+			<Value ID="MB">MB</Value>
+		</Enum>
 		<Enum ID="VsPpuType">
 			<Value ID="RP2C03B">RP2C03B</Value>
 			<Value ID="RP2C03G">RP2C03G</Value>
