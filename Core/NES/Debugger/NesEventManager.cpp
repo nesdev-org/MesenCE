@@ -301,7 +301,15 @@ void NesEventManager::DrawNtscBorders(uint32_t *buffer)
 	
 	if(!_forAutoRefresh && _snapshotScanline < 242) {
 		uint32_t snapshotPos = (_snapshotScanline * NesConstants::CyclesPerLine) + _snapshotCycle;
-		std::fill(bgColor.begin() + currentPos, bgColor.begin() + snapshotPos, currentColor);
+		if(currentPos < snapshotPos) {
+			//After step back, some events might exist past the snapshot's scanline+cycle, because
+			//step back restores a save state right before pausing (to restore the state of the
+			//previous instruction). This can cause currentPos to be higher than snapshotPos if a BgColorChange
+			//event is triggered on the last instruction just before restoring the save state.
+			//This then causes std::fill to cause crashes (memory corruption, etc.) if executed
+			//(so skip this operation when this happens)
+			std::fill(bgColor.begin() + currentPos, bgColor.begin() + snapshotPos, currentColor);
+		}
 		currentPos = snapshotPos;
 		ProcessNtscBorderColorEvents(_snapshotPrevFrame, bgColor, currentPos, currentColor);
 	}
