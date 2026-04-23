@@ -95,8 +95,11 @@ void NsfMapper::Reset(bool softReset)
 	_vrc6Audio.reset(new Vrc6Audio(_console));
 	_vrc7Audio.reset(new Vrc7Audio(_console));
 	_fdsAudio.reset(new FdsAudio(_console));
-	_namcoAudio.reset(new Namco163Audio(_console));
 	_sunsoftAudio.reset(new Sunsoft5bAudio(_console));
+	
+	//Put the audio ram for this in "NesMapperRam" memory type,
+	//starting at offset 0x100 (first 0x100 is the "bios")
+	_namcoAudio.reset(new Namco163Audio(_console, _mapperRam + 0x100, 0x100));
 }
 
 void NsfMapper::OnAfterResetPowerOn()

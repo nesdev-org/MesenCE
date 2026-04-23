@@ -11,7 +11,7 @@ public:
 	static constexpr uint32_t AudioRamSize = 0x80;
 
 private:
-	uint8_t _internalRam[Namco163Audio::AudioRamSize] = {};
+	uint8_t* _internalRam = nullptr;
 	int16_t _channelOutput[8] = {};
 	uint8_t _ramPosition = 0;
 	bool _autoIncrement = false;
@@ -19,6 +19,7 @@ private:
 	int8_t _currentChannel = 0;
 	int16_t _lastOutput = 0;
 	bool _disableSound = false;
+	uint32_t _ramOffset = 0;
 
 	enum SoundReg
 	{
@@ -138,12 +139,12 @@ protected:
 	}
 
 public:
-	Namco163Audio(NesConsole* console) : BaseExpansionAudio(console)
+	Namco163Audio(NesConsole* console, uint8_t* audioRam, uint32_t ramOffset = 0) : BaseExpansionAudio(console)
 	{
-		console->InitializeRam(_internalRam, Namco163Audio::AudioRamSize);
-		console->GetEmulator()->RegisterMemory(MemoryType::NesMapperRam, _internalRam, Namco163Audio::AudioRamSize);
+		_internalRam = audioRam;
 		memset(_channelOutput, 0, sizeof(_channelOutput));
 		_ramPosition = 0;
+		_ramOffset = ramOffset;
 		_autoIncrement = false;
 		_updateCounter = 0;
 		_currentChannel = 7;
@@ -160,7 +161,7 @@ public:
 	{
 		switch(addr & 0xF800) {
 			case 0x4800:
-				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Write>(_ramPosition, value);
+				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Write>(_ramPosition + _ramOffset, value);
 				_internalRam[_ramPosition] = value;
 				if(_autoIncrement) {
 					_ramPosition = (_ramPosition + 1) & 0x7F;
@@ -183,7 +184,7 @@ public:
 		switch(addr & 0xF800) {
 			case 0x4800: {
 				value = _internalRam[_ramPosition];
-				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Read>(_ramPosition, value);
+				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Read>(_ramPosition + _ramOffset, value);
 				if(_autoIncrement) {
 					_ramPosition = (_ramPosition + 1) & 0x7F;
 				}

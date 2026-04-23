@@ -57,10 +57,11 @@ protected:
 	uint32_t GetSaveRamPageSize() override { return 0x800; }
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
+	uint32_t GetMapperRamSize() override { return Namco163Audio::AudioRamSize; }
 
 	void InitMapper() override
 	{
-		_audio.reset(new Namco163Audio(_console));
+		_audio.reset(new Namco163Audio(_console, _mapperRam));
 
 		switch(_romInfo.MapperID) {
 			case 19:
