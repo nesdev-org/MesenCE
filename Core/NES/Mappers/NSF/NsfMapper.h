@@ -77,7 +77,7 @@ protected:
 	uint32_t GetWorkRamPageSize() override { return 0x1000; }
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
-	uint32_t GetMapperRamSize() override { return 0x200; }
+	uint32_t GetMapperRamSize() override { return 0x180; }
 
 	void Serialize(Serializer& s) override;
 
