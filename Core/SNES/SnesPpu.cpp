@@ -258,9 +258,12 @@ uint16_t SnesPpu::GetHvOffsetByteAddress(uint8_t columnIndex, bool forVertOffset
 {
 	uint16_t tilemapAddr = _state.Layers[2].TilemapAddress;
 	
-	uint8_t shift = _state.Layers[2].LargeTiles ? 4 : 3;
+	// Mode 6 always uses tiles that are 16 pixels wide, so the 8x8 size becomes 16x8.
+	// Other code in this file already applies this, so don't apply it a second time here.
+	uint8_t vShift = _state.Layers[2].LargeTiles ? 4 : 3;
+	uint8_t hShift = _state.BgMode == 6 ? 3 : vShift;
 
-	uint16_t baseColumn = ((columnIndex << 3) + (_state.Layers[2].HScroll & ~0x07)) >> shift;
+	uint16_t baseColumn = ((columnIndex << 3) + (_state.Layers[2].HScroll & ~0x07)) >> hShift;
 
 	uint16_t columnOffset = baseColumn & (_state.Layers[2].DoubleWidth ? 0x3F : 0x1F);
 	if(columnOffset >= 0x20) {
@@ -268,13 +271,14 @@ uint16_t SnesPpu::GetHvOffsetByteAddress(uint8_t columnIndex, bool forVertOffset
 		columnOffset &= 0x1F;
 	}
 
-	uint16_t rowOffset = (_state.Layers[2].VScroll >> shift) & (_state.Layers[2].DoubleHeight ? 0x3F : 0x1F);
+	uint16_t rowOffset = (_state.Layers[2].VScroll + (forVertOffset ? 8 : 0)) >> vShift;
+	rowOffset &= _state.Layers[2].DoubleHeight ? 0x3F : 0x1F;
 	if(rowOffset >= 0x20) {
 		tilemapAddr += 0x400 << (_state.Layers[2].DoubleWidth ? 1 : 0);
 		rowOffset &= 0x1F;
 	}
 
-	return (tilemapAddr + ((columnOffset + (rowOffset << 5) + (forVertOffset ? 0x20 : 0)) & 0x3FF)) & 0x7FFF;
+	return (tilemapAddr + ((columnOffset + (rowOffset << 5)) & 0x3FF)) & 0x7FFF;
 }
 
 void SnesPpu::GetHorizontalOffsetByte(uint8_t columnIndex)
