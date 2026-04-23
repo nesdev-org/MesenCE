@@ -1242,6 +1242,9 @@ template bool Debugger::ProcessMemoryWrite<CpuType::Gba, 4>(uint32_t addr, uint3
 template bool Debugger::ProcessMemoryWrite<CpuType::Ws, 1>(uint32_t addr, uint8_t& value, MemoryOperationType opType);
 template bool Debugger::ProcessMemoryWrite<CpuType::Ws, 2>(uint32_t addr, uint16_t& value, MemoryOperationType opType);
 
+template void Debugger::ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Read>(uint32_t addr, uint8_t& value);
+template void Debugger::ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Write>(uint32_t addr, uint8_t& value);
+
 template void Debugger::ProcessMemoryAccess<CpuType::Pce, MemoryType::PceAdpcmRam, MemoryOperationType::Write>(uint32_t addr, uint8_t& value);
 template void Debugger::ProcessMemoryAccess<CpuType::Pce, MemoryType::PceAdpcmRam, MemoryOperationType::Read>(uint32_t addr, uint8_t& value);
 template void Debugger::ProcessMemoryAccess<CpuType::Pce, MemoryType::PceArcadeCardRam, MemoryOperationType::Write>(uint32_t addr, uint8_t& value);

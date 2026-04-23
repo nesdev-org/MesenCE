@@ -141,6 +141,7 @@ public:
 	Namco163Audio(NesConsole* console) : BaseExpansionAudio(console)
 	{
 		console->InitializeRam(_internalRam, Namco163Audio::AudioRamSize);
+		console->GetEmulator()->RegisterMemory(MemoryType::NesMapperRam, _internalRam, Namco163Audio::AudioRamSize);
 		memset(_channelOutput, 0, sizeof(_channelOutput));
 		_ramPosition = 0;
 		_autoIncrement = false;
@@ -159,6 +160,7 @@ public:
 	{
 		switch(addr & 0xF800) {
 			case 0x4800:
+				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Write>(_ramPosition, value);
 				_internalRam[_ramPosition] = value;
 				if(_autoIncrement) {
 					_ramPosition = (_ramPosition + 1) & 0x7F;
@@ -181,6 +183,7 @@ public:
 		switch(addr & 0xF800) {
 			case 0x4800: {
 				value = _internalRam[_ramPosition];
+				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Read>(_ramPosition, value);
 				if(_autoIncrement) {
 					_ramPosition = (_ramPosition + 1) & 0x7F;
 				}
