@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Mesen.Utilities;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -135,6 +136,8 @@ namespace Mesen.Debugger.Controls
 
 		private Typeface Font { get; set; }
 		private Size LetterSize { get; set; }
+		private SKTypeface _skTypeface;
+
 		private double RowHeight => HighDensityMode ? LetterSize.Height * 0.8 : LetterSize.Height;
 
 		private int HeaderCharLength => DataProvider.Length > 0 ? (DataProvider.Length - 1).ToString(HexFormat).Length : 0;
@@ -793,6 +796,7 @@ namespace Mesen.Debugger.Controls
 			this.Font = new Typeface(FontFamily);
 			var text = new FormattedText("A", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Font, FontSize, null);
 			this.LetterSize = new Size(text.Width, text.Height);
+			_skTypeface = SKTypeface.FromFamilyName(FontFamily.Name);
 		}
 
 		private void DrawRowHeaders(DrawingContext context)
