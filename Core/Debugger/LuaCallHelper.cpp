@@ -135,6 +135,12 @@ void LuaCallHelper::Return(uint32_t value)
 	_returnCount++;
 }
 
+void LuaCallHelper::Return(uint64_t value)
+{
+	lua_pushinteger(_lua, value);
+	_returnCount++;
+}
+
 void LuaCallHelper::Return(string value)
 {
 	lua_pushlstring(_lua, value.c_str(), value.size());

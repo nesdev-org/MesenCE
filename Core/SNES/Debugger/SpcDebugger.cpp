@@ -274,6 +274,11 @@ ITraceLogger* SpcDebugger::GetTraceLogger()
 	return _traceLogger.get();
 }
 
+ISerializable* SpcDebugger::GetSerializableCpu()
+{
+	return _spc;
+}
+
 template void SpcDebugger::ProcessRead<MemoryAccessFlags::None>(uint32_t addr, uint8_t value, MemoryOperationType opType);
 template void SpcDebugger::ProcessRead<MemoryAccessFlags::DspAccess>(uint32_t addr, uint8_t value, MemoryOperationType opType);
 

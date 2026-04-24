@@ -426,6 +426,11 @@ PpuTools* GbaDebugger::GetPpuTools()
 	return _ppuTools.get();
 }
 
+ISerializable* GbaDebugger::GetSerializableCpu()
+{
+	return _cpu;
+}
+
 bool GbaDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption)
 {
 	vector<uint8_t> output;

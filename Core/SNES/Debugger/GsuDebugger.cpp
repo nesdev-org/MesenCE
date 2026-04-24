@@ -194,3 +194,8 @@ ITraceLogger* GsuDebugger::GetTraceLogger()
 {
 	return _traceLogger.get();
 }
+
+ISerializable* GsuDebugger::GetSerializableCpu()
+{
+	return _gsu;
+}

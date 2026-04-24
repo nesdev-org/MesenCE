@@ -166,6 +166,11 @@ DebuggerType* Debugger::GetDebugger()
 	return (DebuggerType*)_debuggers[(int)type].Debugger.get();
 }
 
+IDebugger* Debugger::GetCpuDebugger(CpuType cpuType)
+{
+	return _debuggers[(int)cpuType].Debugger.get();
+}
+
 IDebugger* Debugger::GetMainDebugger()
 {
 	return _debuggers[(int)_mainCpuType].Debugger.get();
@@ -869,6 +874,14 @@ void Debugger::SetCpuState(BaseState& srcState, CpuType cpuType)
 		case CpuType::Gba: memcpy(&dstState, &srcState, sizeof(GbaCpuState)); break;
 		case CpuType::Ws: memcpy(&dstState, &srcState, sizeof(WsCpuState)); break;
 	}
+}
+
+ISerializable* Debugger::GetSerializableCpu(CpuType cpuType)
+{
+	if(_debuggers[(int)cpuType].Debugger) {
+		 return _debuggers[(int)cpuType].Debugger->GetSerializableCpu();
+	}
+	return nullptr;
 }
 
 BaseState& Debugger::GetCpuStateRef(CpuType cpuType)

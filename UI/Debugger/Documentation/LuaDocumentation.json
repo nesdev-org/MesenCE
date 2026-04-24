@@ -154,6 +154,24 @@
 	"returnValue": { "type": "Array", "description": "Array of bytes" }
 },
 {
+	"name": "getCpuState",
+	"category": "Emulation",
+	"description": "Returns a table containing key-value pairs that describe the CPU's current state.\n\nNote: The name of the values returned may change from one version to another. Some values may represent the emulator's internal state and may not be useful (these will be hidden in future versions.)",
+	"parameters": [
+		{ "name": "cpuType", "type": "Enum", "enumName": "cpuType", "description": "CPU type", "defaultValue": "main CPU" }
+	],
+	"returnValue": { "type": "Table", "description": "Content is CPU-specific" }
+},
+{
+	"name": "getCpuCycleCount",
+	"category": "Emulation",
+	"description": "Returns the number of elapsed CPU cycles since power on/reset (for the specified CPU)",
+	"parameters": [
+		{ "name": "cpuType", "type": "Enum", "enumName": "cpuType", "description": "CPU type", "defaultValue": "main CPU" }
+	],
+	"returnValue": { "type": "Int", "description": "Number of CPU cycles" }
+},
+{
 	"name": "getDrawSurfaceSize",
 	"category": "Drawing",
 	"description": "Returns a table containing the full size, visible size and overscan size for the selected draw surface.",
@@ -186,6 +204,12 @@
 	"category": "Logging",
 	"description": "Returns the same text as what is shown in the emulator's log window.",
 	"returnValue": { "type": "String", "description": "A string containing the log shown in the log window" }
+},
+{
+	"name": "getMasterClock",
+	"category": "Emulation",
+	"description": "Returns the number of elapsed master clocks since power on/reset for the console.",
+	"returnValue": { "type": "Int", "description": "Number of master clock cycles" }
 },
 {
 	"name": "getMemorySize",
@@ -344,6 +368,15 @@
 	"parameters": [
 		{ "name": "surface", "type": "Enum", "enumName": "drawSurface", "description": "Draw surface" },
 		{ "name": "scale", "type": "Int", "description": "Scale to use for the \"scriptHud\" surface (max: 4)", "defaultValue": "current scale" }
+	]
+},
+{
+	"name": "setCpuState",
+	"category": "Emulation",
+	"description": "Changes the state of the CPU to match the values provided in the \"state\" parameter.\n\nNote: The name of the values returned may change from one version to another. Some values may represent the emulator's internal state and should not be changed (access to these will be removed in future versions.)",
+	"parameters": [
+		{ "name": "state", "type": "Table", "description": "A key-value table containing the CPU state to be applied." },
+		{ "name": "cpuType", "type": "Enum", "enumName": "cpuType", "description": "CPU type", "defaultValue": "main CPU" }
 	]
 },
 {

@@ -3,6 +3,7 @@
 #include "Lua/lua.hpp"
 #include "Debugger/LuaCallHelper.h"
 #include "Debugger/Debugger.h"
+#include "Debugger/IDebugger.h"
 #include "Debugger/MemoryDumper.h"
 #include "Debugger/ScriptingContext.h"
 #include "Debugger/MemoryAccessCounter.h"
@@ -58,6 +59,7 @@ Debugger* LuaApi::_debugger = nullptr;
 Emulator* LuaApi::_emu = nullptr;
 MemoryDumper* LuaApi::_memoryDumper = nullptr;
 ScriptingContext* LuaApi::_context = nullptr;
+Serializer LuaApi::_serializer(0, true, SerializeFormat::Map);
 
 enum class AccessCounterType
 {
@@ -152,6 +154,12 @@ int LuaApi::GetLibrary(lua_State *lua)
 
 		{ "getState", LuaApi::GetState },
 		{ "setState", LuaApi::SetState },
+		{ "getCpuState", LuaApi::GetCpuState },
+		{ "setCpuState", LuaApi::SetCpuState },
+
+		{ "getCpuCycleCount", LuaApi::GetCpuCycleCount },
+		{ "getMasterClock", LuaApi::GetMasterClock },
+
 
 		{ "selectDrawSurface", LuaApi::SelectDrawSurface },
 
@@ -1073,7 +1081,8 @@ int LuaApi::GetState(lua_State *lua)
 	LuaCallHelper l(lua);
 	checkparams();
 
-	Serializer s(0, true, SerializeFormat::Map);
+	Serializer& s = _serializer;
+	s.Reset();
 	s.Stream(*_emu->GetConsole().get(), "", -1);
 
 	//Add some more Lua-specific values
@@ -1088,20 +1097,26 @@ int LuaApi::GetState(lua_State *lua)
 	SV(region);
 	SV(frameCount);
 	SV(masterClock);
+	
+	GenerateStateTable(s, lua);
 
-	unordered_map<string, SerializeMapValue>& values = s.GetMapValues();
+	return 1;
+}
 
-	lua_newtable(lua);
-	for(auto& kvp : values) {
-		lua_pushlstring(lua, kvp.first.c_str(), kvp.first.size());
-		switch(kvp.second.Format) {
-			case SerializeMapValueFormat::Integer: lua_pushinteger(lua, kvp.second.Value.Integer); break;
-			case SerializeMapValueFormat::Double: lua_pushnumber(lua, kvp.second.Value.Double); break;
-			case SerializeMapValueFormat::Bool: lua_pushboolean(lua, kvp.second.Value.Bool); break;
-			case SerializeMapValueFormat::String: lua_pushlstring(lua, kvp.second.StringValue.c_str(), kvp.second.StringValue.size()); break;
-		}
-		lua_settable(lua, -3);
+int LuaApi::GetCpuState(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	l.ForceParamCount(1);
+	CpuType cpuType = (CpuType)l.ReadInteger((uint32_t)_context->GetDefaultCpuType());
+	checkEnum(CpuType, cpuType, "invalid cpu type");
+
+	Serializer& s = _serializer;
+	s.Reset();
+	ISerializable* cpu = _debugger->GetSerializableCpu(cpuType);
+	if(cpu) {
+		s.Stream(*cpu, "", -1);
 	}
+	GenerateStateTable(s, lua);
 	return 1;
 }
 
@@ -1110,6 +1125,52 @@ int LuaApi::SetState(lua_State* lua)
 	lua_settop(lua, 1);
 	luaL_checktype(lua, -1, LUA_TTABLE);
 
+	Serializer s(0, false, SerializeFormat::Map);
+	ReadStateTable(s, lua);
+	s.Stream(*_emu->GetConsole().get(), "", -1);
+	return 0;
+}
+
+int LuaApi::SetCpuState(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	l.ForceParamCount(2);
+
+	CpuType cpuType = (CpuType)l.ReadInteger((uint32_t)_context->GetDefaultCpuType());
+	checkEnum(CpuType, cpuType, "invalid cpu type");
+
+	ISerializable* cpu = _debugger->GetSerializableCpu(cpuType);
+	if(cpu) {
+		lua_settop(lua, 1);
+		luaL_checktype(lua, -1, LUA_TTABLE);
+
+		Serializer s(0, false, SerializeFormat::Map);
+		ReadStateTable(s, lua);
+
+		s.Stream(*cpu, "", -1);
+	}
+	return 0;
+}
+
+void LuaApi::GenerateStateTable(Serializer& s, lua_State* lua)
+{
+	vector<string>& keys = s.GetMapKeys();
+	vector<SerializeMapValue>& values = s.GetMapValues();
+
+	lua_createtable(lua, 0, (int)values.size());
+	for(size_t i = 0, len = values.size(); i < len; i++) {
+		switch(values[i].Format) {
+			case SerializeMapValueFormat::Integer: lua_pushinteger(lua, values[i].Value.Integer); break;
+			case SerializeMapValueFormat::Double: lua_pushnumber(lua, values[i].Value.Double); break;
+			case SerializeMapValueFormat::Bool: lua_pushboolean(lua, values[i].Value.Bool); break;
+			case SerializeMapValueFormat::String: lua_pushlstring(lua, values[i].StringValue.c_str(), values[i].StringValue.size()); break;
+		}
+		lua_setfield(lua, -2, keys[i].c_str());
+	}
+}
+
+void LuaApi::ReadStateTable(Serializer& s, lua_State* lua)
+{
 	unordered_map<string, SerializeMapValue> map;
 
 	lua_pushnil(lua);  /* first key */
@@ -1141,9 +1202,25 @@ int LuaApi::SetState(lua_State* lua)
 		lua_pop(lua, 1);
 	}
 
-	Serializer s(0, false, SerializeFormat::Map);
 	s.LoadFromMap(map);
+}
 
-	s.Stream(*_emu->GetConsole().get(), "", -1);
-	return 0;
+int LuaApi::GetCpuCycleCount(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	l.ForceParamCount(1);
+	CpuType cpuType = (CpuType)l.ReadInteger((uint32_t)_context->GetDefaultCpuType());
+	checkEnum(CpuType, cpuType, "invalid cpu type");
+
+	IDebugger* debugger = _debugger->GetCpuDebugger(cpuType);
+	l.Return(debugger ? debugger->GetCpuCycleCount() : 0);
+	return l.ReturnCount();
+}
+
+int LuaApi::GetMasterClock(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	checkparams();
+	l.Return(_emu->GetMasterClock());
+	return l.ReturnCount();
 }

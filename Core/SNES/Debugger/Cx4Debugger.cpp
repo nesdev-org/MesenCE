@@ -235,3 +235,8 @@ ITraceLogger* Cx4Debugger::GetTraceLogger()
 {
 	return _traceLogger.get();
 }
+
+ISerializable* Cx4Debugger::GetSerializableCpu()
+{
+	return _cx4;
+}

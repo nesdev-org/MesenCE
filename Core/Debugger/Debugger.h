@@ -36,6 +36,7 @@ class IDebugger;
 class ITraceLogger;
 class TraceLogFileSaver;
 class FrozenAddressManager;
+class ISerializable;
 
 struct TraceRow;
 struct BaseState;
@@ -150,6 +151,7 @@ public:
 
 	void GetCpuState(BaseState& dstState, CpuType cpuType);
 	void SetCpuState(BaseState& srcState, CpuType cpuType);
+	ISerializable* GetSerializableCpu(CpuType cpuType);
 	BaseState& GetCpuStateRef(CpuType cpuType);
 
 	void GetPpuState(BaseState& state, CpuType cpuType);
@@ -182,6 +184,7 @@ public:
 	uint32_t GetExecutionTrace(TraceRow output[], uint32_t startOffset, uint32_t maxLineCount);
 	
 	CpuType GetMainCpuType() { return _mainCpuType; }
+	IDebugger* GetCpuDebugger(CpuType cpuType);
 	IDebugger* GetMainDebugger();
 
 	TraceLogFileSaver* GetTraceLogFileSaver() { return _traceLogSaver.get(); }

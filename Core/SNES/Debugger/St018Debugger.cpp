@@ -284,6 +284,11 @@ ITraceLogger* St018Debugger::GetTraceLogger()
 	return _traceLogger.get();
 }
 
+ISerializable* St018Debugger::GetSerializableCpu()
+{
+	return _cpu;
+}
+
 IAssembler* St018Debugger::GetAssembler()
 {
 	throw std::runtime_error("Assembler not supported for ST018");

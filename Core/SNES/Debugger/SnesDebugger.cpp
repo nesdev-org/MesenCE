@@ -529,6 +529,15 @@ PpuTools* SnesDebugger::GetPpuTools()
 	return _ppuTools.get();
 }
 
+ISerializable* SnesDebugger::GetSerializableCpu()
+{
+	if(_cpuType == CpuType::Snes) {
+		return _cpu;
+	} else {
+		return _sa1;
+	}
+}
+
 BaseState& SnesDebugger::GetState()
 {
 	return GetCpuState();

@@ -12,7 +12,7 @@ Serializer::Serializer(uint32_t version, bool forSave, SerializeFormat format)
 	if(forSave) {
 		switch(format) {
 			case SerializeFormat::Binary: _data.reserve(0x50000); break;
-			case SerializeFormat::Map: _mapValues.reserve(500); break;
+			case SerializeFormat::Map: _mapSaveValues.reserve(500); _mapSaveKeys.reserve(500); break;
 			case SerializeFormat::Text: _values.reserve(500); break;
 		}
 	}
@@ -231,17 +231,22 @@ void Serializer::SaveTo(ostream& file, int compressionLevel)
 
 void Serializer::LoadFromMap(unordered_map<string, SerializeMapValue>& map)
 {
-	_mapValues = map;
+	_mapLoadValues = map;
 }
 
 string Serializer::NormalizeName(const char* name, int index)
 {
-	string valName = name[0] == '_' ? name + 1 : name;
-	if(valName.size() > 6 && memcmp(valName.c_str(), "state.", 6) == 0) {
-		valName = valName.substr(6);
+	if(name[0] == '_') {
+		name++;
+	}
+	size_t len = strlen(name);
+	if(len > 6 && memcmp(name, "state.", 6) == 0) {
+		name += 6;
+		len -= 6;
 	}
 
-	for(size_t i = 0, len = valName.size(); i < len; i++) {
+	string valName(name, len);
+	for(size_t i = 0; i < len; i++) {
 		char c = valName[i];
 		if(c >= 'A' && c <= 'Z') {
 			valName[i] = ::tolower(c);

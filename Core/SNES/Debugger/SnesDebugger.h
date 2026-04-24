@@ -117,6 +117,7 @@ public:
 	IAssembler* GetAssembler() override;
 	BaseEventManager* GetEventManager() override;
 	PpuTools* GetPpuTools() override;
+	ISerializable* GetSerializableCpu() override;
 
 	BaseState& GetState() override;
 	void GetPpuState(BaseState& state) override;

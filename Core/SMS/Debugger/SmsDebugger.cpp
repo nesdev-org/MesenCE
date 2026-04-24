@@ -435,6 +435,11 @@ PpuTools* SmsDebugger::GetPpuTools()
 	return _ppuTools.get();
 }
 
+ISerializable* SmsDebugger::GetSerializableCpu()
+{
+	return _cpu;
+}
+
 bool SmsDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption)
 {
 	vector<uint8_t> output;

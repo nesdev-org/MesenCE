@@ -207,3 +207,8 @@ ITraceLogger* NecDspDebugger::GetTraceLogger()
 {
 	return _traceLogger.get();
 }
+
+ISerializable* NecDspDebugger::GetSerializableCpu()
+{
+	return _dsp;
+}

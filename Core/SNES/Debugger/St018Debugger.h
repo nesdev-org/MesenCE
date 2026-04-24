@@ -68,6 +68,7 @@ public:
 	ITraceLogger* GetTraceLogger() override;
 	IAssembler* GetAssembler() override;
 	BaseEventManager* GetEventManager() override;
+	ISerializable* GetSerializableCpu() override;
 
 	BaseState& GetState() override;
 };

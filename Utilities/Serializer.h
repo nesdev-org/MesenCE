@@ -80,7 +80,9 @@ private:
 	unordered_map<string, SerializeValue> _values;
 
 	//Used by Lua API
-	unordered_map<string, SerializeMapValue> _mapValues;
+	unordered_map<string, SerializeMapValue> _mapLoadValues;
+	vector<string> _mapSaveKeys;
+	vector<SerializeMapValue> _mapSaveValues;
 
 	uint32_t _version = 0;
 	bool _saving = false;
@@ -95,12 +97,17 @@ private:
 	string GetKey(const char* name, int index)
 	{
 		string valName = NormalizeName(name, index);
+#ifdef DEBUG
 		if(valName.empty()) {
 			throw std::runtime_error("invalid value name");
 		}
-		return _prefix + valName;
+#endif
+		if(_prefix.size()) {
+			return _prefix + valName;
+		} else {
+			return valName;
+		}
 	}
-
 	template<typename T>
 	void WriteValue(T value)
 	{
@@ -127,21 +134,25 @@ private:
 	void WriteMapFormat(string& key, T& value)
 	{
 		if constexpr(std::is_same<T, bool>::value) {
-			_mapValues.try_emplace(key, SerializeMapValueFormat::Bool, (bool)value);
+			_mapSaveKeys.push_back(key);
+			_mapSaveValues.push_back({ SerializeMapValueFormat::Bool, (bool)value });
 		} else if constexpr(std::is_integral<T>::value) {
-			_mapValues.try_emplace(key, SerializeMapValueFormat::Integer, (int64_t)value);
+			_mapSaveKeys.push_back(key);
+			_mapSaveValues.push_back({ SerializeMapValueFormat::Integer, (int64_t)value });
 		} else if constexpr(std::is_floating_point<T>::value) {
-			_mapValues.try_emplace(key, SerializeMapValueFormat::Double, (double)value);
+			_mapSaveKeys.push_back(key);
+			_mapSaveValues.push_back({ SerializeMapValueFormat::Double, (double)value });
 		} else if constexpr(std::is_same<T, string>::value) {
-			_mapValues.try_emplace(key, value);
+			_mapSaveKeys.push_back(key);
+			_mapSaveValues.push_back({ (string)value });
 		}
 	}
 
 	template<typename T>
 	void ReadMapFormat(string& key, T& value)
 	{
-		auto result = _mapValues.find(key);
-		if(result != _mapValues.end()) {
+		auto result = _mapLoadValues.find(key);
+		if(result != _mapLoadValues.end()) {
 			SerializeMapValue mapVal = result->second;
 			if constexpr(std::is_same<T, bool>::value) {
 				if(mapVal.Format == SerializeMapValueFormat::Bool) {
@@ -220,10 +231,25 @@ public:
 	bool IsSaving() { return _saving; }
 	
 	SerializeFormat GetFormat() { return _format; }
-	unordered_map<string, SerializeMapValue>& GetMapValues() { return _mapValues; }
+	vector<string>& GetMapKeys() { return _mapSaveKeys; }
+	vector<SerializeMapValue>& GetMapValues() { return _mapSaveValues; }
 
 	void SetErrorFlag() { _hasError = true; }
 	bool HasError() { return _hasError; }
+
+	void Reset()
+	{
+		_data.clear();
+		_prefixes.clear();
+		_prefix.clear();
+
+		_usedKeys.clear();
+		_values.clear();
+		_mapLoadValues.clear();
+		_mapSaveKeys.clear();
+		_mapSaveValues.clear();
+		_hasError = false;
+	}
 
 	bool IsValid() { return _values.size() > 0; }
 	void AddKeyPrefix(string prefix);

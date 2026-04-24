@@ -66,6 +66,7 @@ public:
 	virtual void SetProgramCounter(uint32_t addr, bool updateDebuggerOnly = false) = 0;
 
 	virtual uint8_t GetCpuFlags(uint32_t addr) { return 0; }
+	virtual ISerializable* GetSerializableCpu() { return nullptr; }
 
 	virtual BreakpointManager* GetBreakpointManager() = 0;
 	virtual CallstackManager* GetCallstackManager() = 0;

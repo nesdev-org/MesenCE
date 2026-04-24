@@ -446,6 +446,11 @@ PpuTools* PceDebugger::GetPpuTools()
 	return _ppuTools.get();
 }
 
+ISerializable* PceDebugger::GetSerializableCpu()
+{
+	return _cpu;
+}
+
 bool PceDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption)
 {
 	vector<uint8_t> output;

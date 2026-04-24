@@ -11,6 +11,7 @@ class Emulator;
 class MemoryDumper;
 class DebugHud;
 class BaseVideoFilter;
+class Serializer;
 
 class LuaApi
 {
@@ -84,8 +85,17 @@ public:
 	static int GetRomInfo(lua_State *lua);
 	static int GetLogWindowLog(lua_State *lua);
 
-	static int SetState(lua_State *lua);
+	static void GenerateStateTable(Serializer& s, lua_State* lua);
+	static void ReadStateTable(Serializer& s, lua_State* lua);
+
+	static int GetCpuCycleCount(lua_State* lua);
+	static int GetMasterClock(lua_State* lua);
+
 	static int GetState(lua_State *lua);
+	static int GetCpuState(lua_State* lua);
+
+	static int SetState(lua_State *lua);
+	static int SetCpuState(lua_State* lua);
 
 	static int GetAccessCounters(lua_State *lua);
 	static int ResetAccessCounters(lua_State *lua);
@@ -99,6 +109,7 @@ private:
 	static Debugger* _debugger;
 	static MemoryDumper* _memoryDumper;
 	static ScriptingContext* _context;
+	static Serializer _serializer;
 	
 	static std::pair<unique_ptr<BaseVideoFilter>, FrameInfo> GetRenderedFrame();
 	template<typename T> static void GenerateEnumDefinition(lua_State* lua, string enumName, unordered_set<T> excludedValues = {});

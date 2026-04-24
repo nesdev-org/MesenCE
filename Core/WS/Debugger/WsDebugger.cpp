@@ -459,6 +459,11 @@ PpuTools* WsDebugger::GetPpuTools()
 	return _ppuTools.get();
 }
 
+ISerializable* WsDebugger::GetSerializableCpu()
+{
+	return _cpu;
+}
+
 bool WsDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption)
 {
 	vector<uint8_t> output;
