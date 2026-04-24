@@ -9,6 +9,7 @@
 #include "NES/NesMemoryManager.h"
 #include "NES/NesControlManager.h"
 #include "NES/NesConsole.h"
+#include "NES/NesTypes.h"
 #include "Shared/MessageManager.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/Emulator.h"
@@ -477,10 +478,12 @@ uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool en
 
 		switch(internalAddr) {
 			case 0x4015:
-				val = _memoryManager->Read(internalAddr, MemoryOperationType::DmaRead);
+				//Reads to $4015 don't update the value on the external bus
+				//Only the CPU's internal bus is updated
+				val = _memoryManager->Read<NesCpuBusType::Internal>(internalAddr, MemoryOperationType::DmaRead);
 				if(!isSameAddress) {
 					//Also trigger a read from the actual address the CPU was supposed to read from (external bus)
-					_memoryManager->Read(addr, MemoryOperationType::DmaRead);
+					_memoryManager->Read<NesCpuBusType::External>(addr, MemoryOperationType::DmaRead);
 				}
 				break;
 

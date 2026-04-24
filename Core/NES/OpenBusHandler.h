@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "NES/INesMemoryHandler.h"
+#include "NES/NesTypes.h"
 #include "Utilities/Serializer.h"
 
 class OpenBusHandler : public INesMemoryHandler, public ISerializable
@@ -31,17 +32,25 @@ public:
 
 	__forceinline uint8_t GetInternalOpenBus()
 	{
-		return _externalOpenBus;
+		return _internalOpenBus;
 	}
 
-	__forceinline void SetOpenBus(uint8_t value, bool setInternalOnly)
+	template<NesCpuBusType busType = NesCpuBusType::Both>
+	__forceinline void SetOpenBus(uint8_t value, bool forceInternal = false)
 	{
-		//Reads to $4015 don't update the value on the external bus
-		//Only the CPU's internal bus is updated
-		if(!setInternalOnly) {
-			_externalOpenBus = value;
+		if(forceInternal) {
+			_internalOpenBus = value;
+			return;
 		}
-		_internalOpenBus = value;
+
+		switch(busType) {
+			case NesCpuBusType::Internal: _internalOpenBus = value; break;
+			case NesCpuBusType::External: _externalOpenBus = value; break;
+			case NesCpuBusType::Both:
+				_internalOpenBus = value;
+				_externalOpenBus = value;
+				break;
+		}
 	}
 
 	void GetMemoryRanges(MemoryRanges & ranges) override

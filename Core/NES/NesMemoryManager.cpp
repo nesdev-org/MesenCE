@@ -122,6 +122,7 @@ uint16_t NesMemoryManager::DebugReadWord(uint16_t addr)
 	return DebugRead(addr) | (DebugRead(addr + 1) << 8);
 }
 
+template<NesCpuBusType busType>
 uint8_t NesMemoryManager::Read(uint16_t addr, MemoryOperationType operationType)
 {
 	uint8_t value = _ramReadHandlers[addr]->ReadRam(addr);
@@ -130,7 +131,7 @@ uint8_t NesMemoryManager::Read(uint16_t addr, MemoryOperationType operationType)
 	}
 	_emu->ProcessMemoryRead<CpuType::Nes>(addr, value, operationType);
 
-	_openBusHandler.SetOpenBus(value, addr == 0x4015);
+	_openBusHandler.SetOpenBus<busType>(value, addr == 0x4015);
 
 	return value;
 }
@@ -139,7 +140,7 @@ void NesMemoryManager::Write(uint16_t addr, uint8_t value, MemoryOperationType o
 {
 	if(_emu->ProcessMemoryWrite<CpuType::Nes>(addr, value, operationType)) {
 		_ramWriteHandlers[addr]->WriteRam(addr, value);
-		_openBusHandler.SetOpenBus(value, false);
+		_openBusHandler.SetOpenBus(value);
 	}
 }
 
@@ -177,3 +178,7 @@ uint8_t NesMemoryManager::GetInternalOpenBus(uint8_t mask)
 {
 	return _openBusHandler.GetInternalOpenBus() & mask;
 }
+
+template uint8_t NesMemoryManager::Read<NesCpuBusType::Both>(uint16_t, MemoryOperationType);
+template uint8_t NesMemoryManager::Read<NesCpuBusType::Internal>(uint16_t, MemoryOperationType);
+template uint8_t NesMemoryManager::Read<NesCpuBusType::External>(uint16_t, MemoryOperationType);
