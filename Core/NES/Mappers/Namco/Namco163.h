@@ -55,6 +55,7 @@ protected:
 	uint16_t GetPrgPageSize() override { return 0x2000; }
 	uint16_t GetChrPageSize() override { return 0x400; }
 	uint32_t GetSaveRamPageSize() override { return 0x800; }
+	uint32_t GetWorkRamPageSize() override { return 0x800; }
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
 	uint32_t GetMapperRamSize() override { return Namco163Audio::AudioRamSize; }
