@@ -97,7 +97,7 @@ namespace Mesen.Debugger.Utilities
 			return Interlocked.Increment(ref _nextId);
 		}
 
-		private static int RegisterWindow(Window wnd, RefreshTimingConfig cfg, CpuType cpuType)
+		private static int RegisterWindow(Window wnd, RefreshTimingConsoleConfig cfg, CpuType cpuType)
 		{
 			if(_activeWindows.ContainsKey(wnd)) {
 				throw new Exception("Register window called twice");
@@ -136,7 +136,7 @@ namespace Mesen.Debugger.Utilities
 			}
 		}
 
-		private static int GetViewerId(Window wnd, RefreshTimingConfig cfg, CpuType cpuType)
+		private static int GetViewerId(Window wnd, RefreshTimingConsoleConfig cfg, CpuType cpuType)
 		{
 			if(_activeWindows.TryGetValue(wnd, out ToolInfo? toolInfo)) {
 				if(cfg.RefreshScanline != toolInfo.Scanline || cfg.RefreshCycle != toolInfo.Cycle) {
@@ -160,7 +160,7 @@ namespace Mesen.Debugger.Utilities
 
 		public static void ProcessNotification(Window wnd, NotificationEventArgs e, RefreshTimingViewModel cfg, ICpuTypeModel model, Action refresh)
 		{
-			int viewerId = GetViewerId(wnd, cfg.Config, model.CpuType);
+			int viewerId = GetViewerId(wnd, cfg.ConsoleConfig, model.CpuType);
 
 			switch(e.NotificationType) {
 				case ConsoleNotificationType.ViewerRefresh:
@@ -197,7 +197,7 @@ namespace Mesen.Debugger.Utilities
 
 					if(_activeWindows.TryGetValue(wnd, out ToolInfo? toolInfo)) {
 						toolInfo.CpuType = model.CpuType;
-						DebugApi.SetViewerUpdateTiming(toolInfo.ViewerId, cfg.Config.RefreshScanline, cfg.Config.RefreshCycle, model.CpuType);
+						DebugApi.SetViewerUpdateTiming(toolInfo.ViewerId, cfg.ConsoleConfig.RefreshScanline, cfg.ConsoleConfig.RefreshCycle, model.CpuType);
 					}
 					break;
 			}

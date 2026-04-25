@@ -26,7 +26,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public bool IsNes { get; private set; }
 
 		public TilemapViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		[Reactive] public Rect SelectionRect { get; set; }
 		[Reactive] public int GridSizeX { get; set; } = 8;
@@ -71,7 +71,6 @@ namespace Mesen.Debugger.ViewModels
 		{
 			Config = ConfigManager.Config.Debug.TilemapViewer.Clone();
 			CpuType = cpuType;
-			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, cpuType);
 
 			_picViewer = picViewer;
 			InitForCpuType();
@@ -294,8 +293,10 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
+		[MemberNotNull(nameof(RefreshTiming))]
 		private void InitForCpuType()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
 			IsNes = CpuType == CpuType.Nes;
 
 			if(IsNes) {
@@ -736,8 +737,8 @@ namespace Mesen.Debugger.ViewModels
 				palette,
 				wnd,
 				CpuType,
-				RefreshTiming.Config.RefreshScanline,
-				RefreshTiming.Config.RefreshCycle
+				RefreshTiming.ConsoleConfig.RefreshScanline,
+				RefreshTiming.ConsoleConfig.RefreshCycle
 			);
 		}
 

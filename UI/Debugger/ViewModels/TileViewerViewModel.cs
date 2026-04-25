@@ -27,7 +27,7 @@ namespace Mesen.Debugger.ViewModels
 		public CpuType CpuType { get; set; }
 
 		public TileViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
 
@@ -264,8 +264,11 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
+		[MemberNotNull(nameof(RefreshTiming))]
 		private void InitForCpuType()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
+
 			string selectedPreset = Config.SelectedPreset;
 
 			AvailableFormats = CpuType switch {
@@ -599,8 +602,8 @@ namespace Mesen.Debugger.ViewModels
 				SelectedPalette,
 				wnd,
 				CpuType,
-				RefreshTiming.Config.RefreshScanline,
-				RefreshTiming.Config.RefreshCycle
+				RefreshTiming.ConsoleConfig.RefreshScanline,
+				RefreshTiming.ConsoleConfig.RefreshCycle
 			);
 		}
 

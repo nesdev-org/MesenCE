@@ -21,7 +21,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public List<RegisterViewerTab> Tabs { get; set; } = new List<RegisterViewerTab>();
 		
 		public RegisterViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		[Reactive] public List<object> FileMenuActions { get; private set; } = new();
 		[Reactive] public List<object> ViewMenuActions { get; private set; } = new();
@@ -157,6 +157,7 @@ namespace Mesen.Debugger.ViewModels
 
 		public void OnGameLoaded()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
 			UpdateRomInfo();
 			RefreshData();
 		}

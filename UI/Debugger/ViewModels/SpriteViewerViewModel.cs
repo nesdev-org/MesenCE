@@ -26,7 +26,7 @@ namespace Mesen.Debugger.ViewModels
 	public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
 	{
 		public SpriteViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		public CpuType CpuType { get; set; }
 
@@ -211,8 +211,8 @@ namespace Mesen.Debugger.ViewModels
 							sprite.Palette + paletteOffset,
 							wnd,
 							CpuType,
-							RefreshTiming.Config.RefreshScanline,
-							RefreshTiming.Config.RefreshCycle
+							RefreshTiming.ConsoleConfig.RefreshScanline,
+							RefreshTiming.ConsoleConfig.RefreshCycle
 						);
 					}
 				}
@@ -688,6 +688,7 @@ namespace Mesen.Debugger.ViewModels
 
 		public void OnGameLoaded()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
 			RefreshData();
 		}
 	}
