@@ -540,6 +540,13 @@ enum class DspInterpolationType
 	None
 };
 
+enum class SnesHighResBlendMode
+{
+	None,
+	BlendAll,
+	BlendEvenOdd
+};
+
 struct SnesConfig
 {
 	ControllerConfig Port1;
@@ -551,7 +558,7 @@ struct SnesConfig
 	ConsoleRegion Region = ConsoleRegion::Auto;
 
 	bool AllowInvalidInput = false;
-	bool BlendHighResolutionModes = false;
+	SnesHighResBlendMode HighResBlendMode = SnesHighResBlendMode::None;
 	bool HideBgLayer1 = false;
 	bool HideBgLayer2 = false;
 	bool HideBgLayer3 = false;

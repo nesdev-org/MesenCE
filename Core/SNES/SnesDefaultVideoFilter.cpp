@@ -72,7 +72,7 @@ void SnesDefaultVideoFilter::OnBeforeApplyFilter()
 		InitLookupTable();
 	}
 	_forceFixedRes = snesConfig.ForceFixedResolution;
-	_blendHighRes = snesConfig.BlendHighResolutionModes;
+	_highResBlendMode = snesConfig.HighResBlendMode;
 	_videoConfig = config;
 }
 
@@ -104,12 +104,32 @@ void SnesDefaultVideoFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
 		}
 	}
 
-	if(_baseFrameInfo.Width == 512 && _blendHighRes) {
+	if(_baseFrameInfo.Width == 512) {
+		ApplyBlend(frameInfo, out);
+	}
+}
+
+void SnesDefaultVideoFilter::ApplyBlend(FrameInfo frameInfo, uint32_t* out)
+{
+	if(_highResBlendMode == SnesHighResBlendMode::None) {
+		return;
+	}
+
+	if(_highResBlendMode == SnesHighResBlendMode::BlendAll) {
 		//Very basic blend effect for high resolution modes
 		for(uint32_t i = 0; i < frameInfo.Height; i++) {
 			for(uint32_t j = 0; j < frameInfo.Width; j++) {
-				uint32_t &pixel1 = out[i*frameInfo.Width + j];
+				uint32_t& pixel1 = out[i * frameInfo.Width + j];
 				pixel1 = BlendPixels(pixel1, out[i * frameInfo.Width + j + 1]);
+			}
+		}
+	} else {
+		//Blend even-odd columns together (looks nice for fake transparency effects, but bad for high resolution text, etc.)
+		for(uint32_t i = 0; i < frameInfo.Height; i++) {
+			for(uint32_t j = 0; j < frameInfo.Width; j += 2) {
+				uint32_t& pixel1 = out[i * frameInfo.Width + j];
+				pixel1 = BlendPixels(pixel1, out[i * frameInfo.Width + j + 1]);
+				out[i * frameInfo.Width + j + 1] = pixel1;
 			}
 		}
 	}

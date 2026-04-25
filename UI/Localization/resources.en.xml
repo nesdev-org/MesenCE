@@ -269,7 +269,7 @@
 			<Control ID="tpgVideo">Video</Control>
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
 
-			<Control ID="chkBlendHighResolutionModes">Blend high resolution modes</Control>
+			<Control ID="lblHighResBlendMode">High resolution blend mode: </Control>
 			<Control ID="chkHideBgLayer1">Hide background layer 1</Control>
 			<Control ID="chkHideBgLayer2">Hide background layer 2</Control>
 			<Control ID="chkHideBgLayer3">Hide background layer 3</Control>
@@ -2470,6 +2470,11 @@ E
 		<Enum ID="MesenTheme">
 			<Value ID="Light">Light</Value>
 			<Value ID="Dark">Dark</Value>
+		</Enum>
+		<Enum ID="SnesHighResBlendMode">
+			<Value ID="None">None (default)</Value>
+			<Value ID="BlendAll">Blend entire screen</Value>
+			<Value ID="BlendEvenOdd">Blend even/odd columns (fake transparency)</Value>
 		</Enum>
 		<Enum ID="PceConsoleType">
 			<Value ID="Auto">Auto (recommended)</Value>

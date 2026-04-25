@@ -33,7 +33,7 @@ namespace Mesen.Config
 		[Reactive] public ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
 
 		//Video
-		[Reactive] public bool BlendHighResolutionModes { get; set; } = false;
+		[Reactive] public SnesHighResBlendMode HighResBlendMode { get; set; } = SnesHighResBlendMode.None;
 		[Reactive] public bool HideBgLayer1 { get; set; } = false;
 		[Reactive] public bool HideBgLayer2 { get; set; } = false;
 		[Reactive] public bool HideBgLayer3 { get; set; } = false;
@@ -92,7 +92,7 @@ namespace Mesen.Config
 
 				AllowInvalidInput = this.AllowInvalidInput,
 
-				BlendHighResolutionModes = this.BlendHighResolutionModes,
+				HighResBlendMode = this.HighResBlendMode,
 				HideBgLayer1 = this.HideBgLayer1,
 				HideBgLayer2 = this.HideBgLayer2,
 				HideBgLayer3 = this.HideBgLayer3,
@@ -151,7 +151,8 @@ namespace Mesen.Config
 		public ConsoleRegion Region;
 
 		[MarshalAs(UnmanagedType.I1)] public bool AllowInvalidInput;
-		[MarshalAs(UnmanagedType.I1)] public bool BlendHighResolutionModes;
+		
+		public SnesHighResBlendMode HighResBlendMode;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer1;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer2;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer3;
@@ -190,5 +191,12 @@ namespace Mesen.Config
 		Cubic,
 		Sinc,
 		None
+	}
+
+	public enum SnesHighResBlendMode
+	{
+		None,
+		BlendAll,
+		BlendEvenOdd
 	}
 }
