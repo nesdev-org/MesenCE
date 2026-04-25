@@ -11,6 +11,7 @@ using Mesen.Config;
 using System.Text.RegularExpressions;
 using Mesen.Debugger.Utilities;
 using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mesen.Debugger.Controls
 {
@@ -791,6 +792,7 @@ namespace Mesen.Debugger.Controls
 			}
 		}
 
+		[MemberNotNull(nameof(HexEditor._skTypeface))]
 		private void InitFontAndLetterSize()
 		{
 			this.Font = new Typeface(FontFamily);
