@@ -52,6 +52,8 @@ private:
 	static void ExecutionCountHook(lua_State* lua);
 	void LuaOpenLibs(lua_State* L, bool allowIoOsAccess);
 	void ProcessLuaError();
+	string GetErrorMessage();
+	string SerializeTable();
 
 protected:
 	string _scriptName;

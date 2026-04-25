@@ -104,15 +104,64 @@ bool ScriptingContext::LoadScript(string scriptName, string path, string scriptC
 		}
 	}
 
-	if(lua_isstring(_lua, -1)) {
-		ProcessLuaError();
-	}
+	ProcessLuaError();
+
 	return false;
+}
+
+string ScriptingContext::GetErrorMessage()
+{
+	string errorMsg = "";
+	if(lua_type(_lua, -1) == LUA_TSTRING) {
+		errorMsg = lua_tostring(_lua, -1);
+	} else if(lua_istable(_lua, -1)) {
+		//Serialize tables to Lua-formatted string
+		errorMsg = "error: " + SerializeTable();
+	} else {
+		//Convert all other values to a string
+		luaL_tolstring(_lua, -1, nullptr);
+		errorMsg = string("error: ") + lua_tostring(_lua, -1);
+		lua_pop(_lua, 1);
+	}
+	return errorMsg;
+}
+
+string ScriptingContext::SerializeTable()
+{
+	string result = "{ ";
+	bool firstKey = true;
+	lua_pushnil(_lua);
+	while(lua_next(_lua, -2) != 0) {
+		if(lua_type(_lua, -2) == LUA_TSTRING) {
+			size_t len = 0;
+			const char* cstr = lua_tolstring(_lua, -2, &len);
+			if(!firstKey) {
+				result += ", ";
+			}
+			firstKey = false;
+			result += string(cstr, len);
+			result += " = ";
+
+			if(lua_type(_lua, -1) == LUA_TSTRING) {
+				result += "\"";
+				result += lua_tostring(_lua, -1);
+				result += "\"";
+			} else if(lua_istable(_lua, -1)) {
+				result += SerializeTable();
+			} else {
+				luaL_tolstring(_lua, -1, nullptr);
+				result += lua_tostring(_lua, -1);
+				lua_pop(_lua, 1);
+			}
+		}
+		lua_pop(_lua, 1);
+	}
+	return result + " }";
 }
 
 void ScriptingContext::ProcessLuaError()
 {
-	string errorMsg = lua_tostring(_lua, -1);
+	string errorMsg = GetErrorMessage();
 	if(StringUtilities::Contains(errorMsg, "attempt to call a nil value (global 'require')") || StringUtilities::Contains(errorMsg, "attempt to index a nil value (global 'os')") || StringUtilities::Contains(errorMsg, "attempt to index a nil value (global 'io')")) {
 		Log("I/O and OS libraries are disabled by default for security.\nYou can enable them here:\nScript->Settings->Script Window->Restrictions->Allow access to I/O and OS functions.");
 	} else if(StringUtilities::Contains(errorMsg, "module 'socket.core' not found")) {
