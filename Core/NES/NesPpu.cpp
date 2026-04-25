@@ -1271,16 +1271,17 @@ template<class T> void NesPpu<T>::TriggerNmi()
 template<class T> void NesPpu<T>::UpdateApuStatus()
 {
 	NesApu* apu = _console->GetApu();
-	apu->SetApuStatus(true);
+	bool enabled = true;
 	if(_scanline > 240) {
 		if(_scanline > _standardVblankEnd) {
 			//Disable APU for extra lines after NMI
-			apu->SetApuStatus(false);
+			enabled = false;
 		} else if(_scanline >= _standardNmiScanline && _scanline < _nmiScanline) {
 			//Disable APU for extra lines before NMI
-			apu->SetApuStatus(false);
+			enabled = false;
 		}
 	}
+	apu->SetApuStatus(enabled);
 }
 
 template<class T> void NesPpu<T>::DebugUpdateFrameBuffer(bool toGrayscale)

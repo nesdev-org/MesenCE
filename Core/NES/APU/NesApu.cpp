@@ -246,6 +246,9 @@ void NesApu::Serialize(Serializer& s)
 	if(s.GetFormat() != SerializeFormat::Map) {
 		//End the Apu frame - makes it simpler to restore sound after a state reload
 		EndFrame();
+
+		SV(_apuEnabled);
+		SV(_apuDisabledStamp);
 	}
 
 	SV(_square1);
@@ -263,7 +266,23 @@ void NesApu::AddExpansionAudioDelta(AudioChannel channel, int16_t delta)
 
 void NesApu::SetApuStatus(bool enabled)
 {
-	_apuEnabled = enabled;
+	if(_apuEnabled == enabled) {
+		return;
+	}
+
+	if(!enabled) {
+		_apuDisabledStamp = _console->GetCpu()->GetCycleCount();
+		_apuEnabled = false;
+	} else {
+		uint64_t gap = _console->GetCpu()->GetCycleCount() - _apuDisabledStamp;
+		if(gap & 0x01) {
+			//CPU ran an odd number of cycles while the APU was disabled for overclocking
+			//Run an extra APU cycle here to re-sync odd/even cycles with the CPU
+			//This is needed to ensure DMC DMA occurs on the correct cycles with overclocking.
+			Exec();
+		}
+		_apuEnabled = true;
+	}
 }
 
 bool NesApu::IsApuEnabled()

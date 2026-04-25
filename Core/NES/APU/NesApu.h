@@ -40,6 +40,8 @@ private:
 	EmuSettings* _settings;
 
 	ConsoleRegion _region;
+	
+	uint64_t _apuDisabledStamp = 0;
 
 private:
 	__forceinline bool NeedToRun(uint32_t currentCycle);
