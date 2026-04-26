@@ -88,6 +88,7 @@ namespace Mesen.Config
 		[Reactive] [MinMax(0, 1000)] public UInt32 PpuExtraScanlinesAfterNmi { get; set; } = 0;
 
 		//Audio
+		[Reactive] public bool NonlinearSquareMixer { get; set; } = true;
 		[Reactive] public bool DisableNoiseModeFlag { get; set; } = false;
 		[Reactive] public bool ReduceDmcPopping { get; set; } = false;
 		[Reactive] public bool SilenceTriangleHighFreq { get; set; } = false;
@@ -207,6 +208,7 @@ namespace Mesen.Config
 				PpuExtraScanlinesAfterNmi = PpuExtraScanlinesAfterNmi,
 				PpuExtraScanlinesBeforeNmi = PpuExtraScanlinesBeforeNmi,
 
+				NonlinearSquareMixer = NonlinearSquareMixer,
 				DisableNoiseModeFlag = DisableNoiseModeFlag,
 				ReduceDmcPopping = ReduceDmcPopping,
 				SilenceTriangleHighFreq = SilenceTriangleHighFreq,
@@ -344,6 +346,7 @@ namespace Mesen.Config
 		public UInt32 PpuExtraScanlinesBeforeNmi;
 		public UInt32 PpuExtraScanlinesAfterNmi;
 
+		[MarshalAs(UnmanagedType.I1)] public bool NonlinearSquareMixer;
 		[MarshalAs(UnmanagedType.I1)] public bool DisableNoiseModeFlag;
 		[MarshalAs(UnmanagedType.I1)] public bool ReduceDmcPopping;
 		[MarshalAs(UnmanagedType.I1)] public bool SilenceTriangleHighFreq;

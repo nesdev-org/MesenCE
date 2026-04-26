@@ -49,6 +49,12 @@ public:
 			_lastOutput = output;
 		}
 	}
+	
+	__forceinline void SendVolume(uint8_t rawVolume)
+	{
+		//Only square channel needs raw volume, for linear mixing
+		_mixer->RawVolume(_channel, rawVolume);
+	}
 
 	int8_t GetLastOutput()
 	{

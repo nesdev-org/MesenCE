@@ -132,6 +132,7 @@ struct AudioConfig
 	uint32_t SampleRate = 48000;
 	uint32_t AudioLatency = 60;
 
+	bool NonlinearSquareMixer = true;
 	bool MuteSoundInBackground = false;
 	bool ReduceSoundInBackground = true;
 	bool ReduceSoundInFastForward = false;
@@ -661,6 +662,7 @@ struct NesConfig
 	uint32_t PpuExtraScanlinesBeforeNmi = 0;
 	uint32_t PpuExtraScanlinesAfterNmi = 0;
 
+	bool NonlinearSquareMixer = true;
 	bool DisableNoiseModeFlag = false;
 	bool ReduceDmcPopping = false;
 	bool SilenceTriangleHighFreq = false;
