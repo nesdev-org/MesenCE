@@ -565,6 +565,8 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 
 		case 0x412F: return _windowControl.ToByte();
 
+		case 0x4150: return (uint8_t)_scanlineCounter;
+
 		case 0x4151:
 			_slIrqPending = false;
 			UpdateIrqStatus();
