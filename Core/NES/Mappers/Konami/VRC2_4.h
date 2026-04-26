@@ -13,6 +13,7 @@ enum class VRCVariant
 	VRC4c,	//21
 	VRC4d,	//25
 	VRC4e,	//23
+	VRC4f,	//23
 	VRC4_27, //27
 	VRC6a,
 	VRC6b
@@ -55,6 +56,7 @@ class VRC2_4 : public BaseMapper
 					switch(_romInfo.SubMapperID) {
 						default:
 						case 0: _variant = VRCVariant::VRC2b; break;
+						case 1: _variant = VRCVariant::VRC4f; break;
 						case 2: _variant = VRCVariant::VRC4e; break;
 						case 3: _variant = VRCVariant::VRC2b; break;
 					}
@@ -234,8 +236,9 @@ class VRC2_4 : public BaseMapper
 
 					case VRCVariant::VRC2b:
 					case VRCVariant::VRC4e:
+					case VRCVariant::VRC4f:
 						//Mapper 23
-						//VRC2b
+						//VRC2b, VRC4f
 						A0 = addr & 0x01;
 						A1 = (addr >> 1) & 0x01;
 
@@ -287,6 +290,7 @@ class VRC2_4 : public BaseMapper
 						break;
 
 					case VRCVariant::VRC2b:
+					case VRCVariant::VRC4f:
 						//Mapper 23
 						A0 = addr & 0x01;
 						A1 = (addr >> 1) & 0x01;
