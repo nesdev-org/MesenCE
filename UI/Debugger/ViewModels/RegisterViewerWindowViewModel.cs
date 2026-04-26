@@ -49,7 +49,6 @@ namespace Mesen.Debugger.ViewModels
 			}
 
 			UpdateRomInfo();
-			RefreshTiming.UpdateMinMaxValues(CpuType);
 			RefreshData();
 		}
 

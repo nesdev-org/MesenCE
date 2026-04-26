@@ -189,10 +189,6 @@ namespace Mesen.Debugger.Utilities
 							model.CpuType = romInfo.ConsoleType.GetMainCpuType();
 						}
 						model.OnGameLoaded();
-
-						Dispatcher.UIThread.Post(() => {
-							cfg.UpdateMinMaxValues(model.CpuType);
-						});
 					}
 
 					if(_activeWindows.TryGetValue(wnd, out ToolInfo? toolInfo)) {

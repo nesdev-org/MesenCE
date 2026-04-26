@@ -24,7 +24,7 @@ namespace Mesen.Config
 		}
 	}
 
-	public class RefreshTimingConsoleConfig : BaseConfig<RefreshTimingConfig>
+	public class RefreshTimingConsoleConfig : BaseConfig<RefreshTimingConsoleConfig>
 	{
 		[Reactive] public int RefreshScanline { get; set; } = 240;
 		[Reactive] public int RefreshCycle { get; set; } = 0;
