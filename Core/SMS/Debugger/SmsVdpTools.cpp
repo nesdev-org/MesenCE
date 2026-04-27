@@ -217,7 +217,7 @@ DebugTilemapTileInfo SmsVdpTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 
 		result.TileMapAddress = entryAddr;
 		result.TileIndex = tileIndex;
-		result.TileAddress = tileIndex * 32;
+		result.AddAddress(tileIndex * 32);
 		result.PaletteIndex = paletteOffset >> 4;
 		result.PaletteAddress = paletteOffset;
 		result.HighPriority = (ntData & 0x1000) ? NullableBoolean::True : NullableBoolean::False;
@@ -230,7 +230,7 @@ DebugTilemapTileInfo SmsVdpTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 		uint16_t tileAddr = (state.BgPatternTableAddress & 0x3800) + (tileIndex * 8);
 		result.TileMapAddress = ntAddr;
 		result.TileIndex = tileIndex;
-		result.TileAddress = tileAddr;
+		result.AddAddress(tileAddr);
 	} else {
 		//Graphic 1 / Graphic 2 / Multicolor
 		uint16_t ntAddr = state.NametableAddress + (column + row * 32);
@@ -250,7 +250,7 @@ DebugTilemapTileInfo SmsVdpTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 		}
 		result.TileMapAddress = ntAddr;
 		result.TileIndex = tileIndex;
-		result.TileAddress = tileAddr;
+		result.AddAddress(tileAddr);
 
 		int32_t colorTableAddr;
 		if(state.M3_Use240LineMode) {

@@ -152,7 +152,9 @@ struct DebugTilemapTileInfo
 	int32_t TileMapAddress = -1;
 
 	int32_t TileIndex = -1;
-	int32_t TileAddress = -1;
+	
+	uint32_t TileCount = 0;
+	uint32_t TileAddresses[4] = {};
 
 	int32_t PixelData = -1;
 
@@ -166,6 +168,15 @@ struct DebugTilemapTileInfo
 	NullableBoolean HorizontalMirroring = NullableBoolean::Undefined;
 	NullableBoolean VerticalMirroring = NullableBoolean::Undefined;
 	NullableBoolean HighPriority = NullableBoolean::Undefined;
+
+	void AddAddress(uint32_t addr)
+	{
+		if(TileCount >= 4) {
+			throw std::runtime_error("Too many addresses for tile - array size needs to be increased");
+		}
+		TileAddresses[TileCount] = addr;
+		TileCount++;
+	}
 };
 
 struct DebugSpritePreviewInfo

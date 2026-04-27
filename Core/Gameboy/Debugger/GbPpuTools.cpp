@@ -152,7 +152,7 @@ DebugTilemapTileInfo GbPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uint
 	result.Width = 8;
 	result.TileMapAddress = addr;
 	result.TileIndex = tileIndex;
-	result.TileAddress = tileStart;
+	result.AddAddress(tileStart);
 
 	if(isCgb) {
 		result.PaletteIndex = (attributes & 0x07);

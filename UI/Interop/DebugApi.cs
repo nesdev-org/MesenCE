@@ -1176,8 +1176,11 @@ namespace Mesen.Interop
 		public Int32 TileMapAddress;
 
 		public Int32 TileIndex;
-		public Int32 TileAddress;
+		public UInt32 TileCount;
 		
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+		public UInt32[] TileAddresses;
+
 		public Int32 PixelData;
 
 		public Int32 PaletteIndex;
@@ -1190,6 +1193,8 @@ namespace Mesen.Interop
 		public NullableBoolean HorizontalMirroring;
 		public NullableBoolean VerticalMirroring;
 		public NullableBoolean HighPriority;
+
+		public Int32 TileAddress => TileCount == 0 ? -1 : (Int32)TileAddresses[0];
 	};
 
 	public enum TileFilter

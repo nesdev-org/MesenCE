@@ -689,7 +689,7 @@ namespace Mesen.Debugger.ViewModels
 		{
 			return new ContextMenuAction() {
 				ActionType = ActionType.Custom,
-				CustomText = $"{columnCount}x{rowCount} ({GridSizeX * columnCount}px x {GridSizeY * rowCount}px)",
+				DynamicText = () => $"{columnCount}x{rowCount} ({GridSizeX * columnCount}px x {GridSizeY * rowCount}px)",
 				OnClick = () => EditTileGrid(columnCount, rowCount, wnd)
 			};
 		}
@@ -701,12 +701,33 @@ namespace Mesen.Debugger.ViewModels
 			}
 
 			PixelPoint p = ViewerMousePos ?? PixelPoint.FromPoint(SelectionRect.TopLeft, 1);
-			List<AddressInfo> addresses = new();
+			List<TileAddressInfo> addresses = new();
 			MemoryType memType = GetVramMemoryType();
 			int palette = -1;
+			bool doubleWidth = false;
+			bool doubleHeight = false;
+			TileFormat format = _data.TilemapInfo.Format;
+			int tileWidth = GridSizeX;
+			int tileHeight = GridSizeY;
+	
+			PixelSize size = format.GetTileSize();
+
+			//On the SNES, the tile size may be 8x8, but the tilemap is defined in 16x16 (or 16x8) blocks.
+			//In this scenario, adjust the column/row count fetch the data for each part of the tilemap entry separately
+			doubleWidth = tileWidth == size.Width * 2;
+			if(doubleWidth) {
+				columnCount *= 2;
+				tileWidth /= 2;
+			}
+			doubleHeight = tileHeight == size.Height * 2;
+			if(doubleHeight) {
+				rowCount *= 2;
+				tileHeight /= 2;
+			}
+
 			for(int row = 0; row < rowCount; row++) {
 				for(int col = 0; col < columnCount; col++) {
-					DebugTilemapTileInfo? tile = DebugApi.GetTilemapTileInfo((uint)(p.X + GridSizeX*col), (uint)(p.Y + GridSizeY*row), CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
+					DebugTilemapTileInfo? tile = DebugApi.GetTilemapTileInfo((uint)(p.X + tileWidth*col), (uint)(p.Y + tileHeight*row), CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
 					if(tile == null) {
 						if(col == 0) {
 							rowCount = row;
@@ -720,7 +741,20 @@ namespace Mesen.Debugger.ViewModels
 					if(palette == -1) {
 						palette = tile.Value.PaletteIndex;
 					}
-					addresses.Add(new AddressInfo() { Address = tile.Value.TileAddress, Type = memType });
+
+					bool hMirror = tile.Value.HorizontalMirroring == NullableBoolean.True;
+					bool vMirror = tile.Value.VerticalMirroring == NullableBoolean.True;
+
+					int colIndex = hMirror ? (~col & 0x01) : (col & 0x01);
+					int rowIndex = vMirror ? (~row & 0x01) : (row & 0x01);
+					int tileAddrIndex = (doubleWidth ? colIndex : 0) + (doubleHeight ? rowIndex * 2 : 0);
+					if(tileAddrIndex < tile.Value.TileCount) {
+						addresses.Add(new TileAddressInfo() {
+							Address = new AddressInfo() { Address = (int)tile.Value.TileAddresses[tileAddrIndex], Type = memType },
+							HorizontalMirroring = hMirror,
+							VerticalMirroring = vMirror
+						});
+					}
 				}
 			}
 

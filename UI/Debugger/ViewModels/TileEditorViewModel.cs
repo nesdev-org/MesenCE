@@ -39,7 +39,7 @@ public class TileEditorViewModel : DisposableViewModel
 	public List<ContextMenuAction> ToolbarActions { get; private set; } = new();
 
 	private CpuType _cpuType;
-	private List<AddressInfo> _tileAddresses;
+	private List<TileAddressInfo> _tileAddresses;
 	private int _columnCount = 1;
 	private int _rowCount = 1;
 	private TileFormat _tileFormat;
@@ -48,13 +48,13 @@ public class TileEditorViewModel : DisposableViewModel
 	[Obsolete("For designer only")]
 	public TileEditorViewModel() : this(new() { new() }, 1, TileFormat.Bpp4, 0) { }
 
-	public TileEditorViewModel(List<AddressInfo> tileAddresses, int columnCount, TileFormat format, int initialPalette)
+	public TileEditorViewModel(List<TileAddressInfo> tileAddresses, int columnCount, TileFormat format, int initialPalette)
 	{
 		Config = ConfigManager.Config.Debug.TileEditor;
 		_tileAddresses = tileAddresses;
 		_columnCount = columnCount;
 		_rowCount = tileAddresses.Count / columnCount;
-		_cpuType = tileAddresses[0].Type.ToCpuType();
+		_cpuType = tileAddresses[0].Address.Type.ToCpuType();
 		_tileFormat = format;
 		SelectedColor = initialPalette * GetColorsPerPalette(_tileFormat);
 
@@ -244,13 +244,22 @@ public class TileEditorViewModel : DisposableViewModel
 		int row = position.Y / tileSize.Height;
 		int tileX = position.X % tileSize.Width;
 		int tileY = position.Y % tileSize.Height;
+
+		TileAddressInfo tile = _tileAddresses[column + row * _columnCount];
+		if(tile.HorizontalMirroring) {
+			tileX = (tileSize.Width - tileX) - 1;
+		}
+		if(tile.VerticalMirroring) {
+			tileY = (tileSize.Height - tileY) - 1;
+		}
+
 		return new(column, row, tileX, tileY);
 	}
 
 	public int GetColorAtPosition(PixelPoint position)
 	{
 		TilePixelPositionInfo pos = GetPositionInfo(position);
-		int paletteColorIndex = DebugApi.GetTilePixel(_tileAddresses[pos.Column + pos.Row * _columnCount], _tileFormat, pos.TileX, pos.TileY);
+		int paletteColorIndex = DebugApi.GetTilePixel(_tileAddresses[pos.Column + pos.Row * _columnCount].Address, _tileFormat, pos.TileX, pos.TileY);
 		return SelectedColor - (SelectedColor % GetColorsPerPalette(_tileFormat)) + paletteColorIndex;
 	}
 
@@ -262,7 +271,7 @@ public class TileEditorViewModel : DisposableViewModel
 	private void SetPixelColor(PixelPoint position, int color)
 	{
 		TilePixelPositionInfo pos = GetPositionInfo(position);
-		DebugApi.SetTilePixel(_tileAddresses[pos.Column + pos.Row * _columnCount], _tileFormat, pos.TileX, pos.TileY, color);
+		DebugApi.SetTilePixel(_tileAddresses[pos.Column + pos.Row * _columnCount].Address, _tileFormat, pos.TileX, pos.TileY, color);
 	}
 
 	public void UpdatePixel(PixelPoint position, bool clearPixel)
@@ -288,15 +297,17 @@ public class TileEditorViewModel : DisposableViewModel
 				for(int y = 0; y < _rowCount; y++) {
 					for(int x = 0; x < _columnCount; x++) {
 						fixed(UInt32* ptr = _tileBuffer) {
-							AddressInfo addr = _tileAddresses[y * _columnCount + x];
-							byte[] sourceData = DebugApi.GetMemoryValues(addr.Type, (uint)addr.Address, (uint)(addr.Address + bytesPerTile - 1));
+							TileAddressInfo addr = _tileAddresses[y * _columnCount + x];
+							byte[] sourceData = DebugApi.GetMemoryValues(addr.Address.Type, (uint)addr.Address.Address, (uint)(addr.Address.Address + bytesPerTile - 1));
 							DebugApi.GetTileView(_cpuType, GetOptions(x, y), sourceData, sourceData.Length, PaletteColors, (IntPtr)ptr);
 							UInt32* viewer = (UInt32*)framebuffer.FrameBuffer.Address;
 							int rowPitch = ViewerBitmap.PixelSize.Width;
 							int baseOffset = x * tileSize.Width + y * tileSize.Height * rowPitch;
 							for(int j = 0; j < tileSize.Height; j++) {
+								int yDest = addr.VerticalMirroring ? (tileSize.Height - j - 1) : j;
 								for(int i = 0; i < tileSize.Width; i++) {
-									viewer[baseOffset + j * rowPitch + i] = ptr[j * tileSize.Width + i];
+									int xDest = addr.HorizontalMirroring ? (tileSize.Width - i - 1) : i;
+									viewer[baseOffset + yDest * rowPitch + xDest] = ptr[j * tileSize.Width + i];
 								}
 							}
 						}
@@ -326,14 +337,14 @@ public class TileEditorViewModel : DisposableViewModel
 		int tileIndex = row * _columnCount + column;
 
 		return new GetTileViewOptions() {
-			MemType = _tileAddresses[tileIndex].Type,
+			MemType = _tileAddresses[tileIndex].Address.Type,
 			Format = _tileFormat,
 			Width = _tileFormat.GetTileSize().Width / 8,
 			Height = _tileFormat.GetTileSize().Height / 8,
 			Palette = SelectedColor / GetColorsPerPalette(_tileFormat),
 			Layout = TileLayout.Normal,
 			Filter = TileFilter.None,
-			StartAddress = _tileAddresses[tileIndex].Address,
+			StartAddress = _tileAddresses[tileIndex].Address.Address,
 			Background = Config.Background,
 			UseGrayscalePalette = false
 		};
@@ -350,4 +361,11 @@ public class TileEditorViewModel : DisposableViewModel
 		TranslateUp,
 		TranslateDown,
 	}
+}
+
+public class TileAddressInfo
+{
+	public AddressInfo Address { get; set; }
+	public bool HorizontalMirroring { get; set; }
+	public bool VerticalMirroring { get; set; }
 }
