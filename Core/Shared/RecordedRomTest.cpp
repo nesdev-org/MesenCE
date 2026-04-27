@@ -124,6 +124,8 @@ void RecordedRomTest::Record(string filename, bool reset)
 		Reset();
 
 		EmuSettings* settings = _emu->GetSettings();
+		settings->GetEmulationConfig().RunAheadFrames = 0;
+
 		settings->GetSnesConfig().RamPowerOnState = RamState::AllZeros;
 		settings->GetNesConfig().RamPowerOnState = RamState::AllZeros;
 		settings->GetGameboyConfig().RamPowerOnState = RamState::AllZeros;
@@ -213,6 +215,8 @@ RomTestResult RecordedRomTest::Run(string filename)
 		} else {
 			settings->GetNesConfig().Region = ConsoleRegion::Auto;
 		}
+
+		settings->GetEmulationConfig().RunAheadFrames = 0;
 
 		settings->GetSnesConfig().RamPowerOnState = RamState::AllZeros;
 		settings->GetNesConfig().RamPowerOnState = RamState::AllZeros;
