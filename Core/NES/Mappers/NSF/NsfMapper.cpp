@@ -154,7 +154,7 @@ void NsfMapper::OnAfterResetPowerOn()
 
 	NesCpuState& state = _console->GetCpu()->GetState();
 	state.A = _songNumber;
-	state.X = (_nsfHeader.Flags & 0x01) ? 1 : 0; //PAL = 1, NTSC = 0
+	state.X = _console->GetRegion() == ConsoleRegion::Pal ? 1 : 0; //PAL = 1, NTSC = 0
 	state.Y = 0;
 	state.SP = 0xFD;
 
