@@ -351,7 +351,7 @@ DebugTilemapTileInfo GbaPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 	result.Width = width;
 	result.TileMapAddress = tilemapAddr;
 	result.TileIndex = tileIndex;
-	result.TileAddress = tileStart;
+	result.AddAddress(tileStart);
 	result.PixelData = pixelData;
 	result.PaletteIndex = paletteIndex;
 	result.PaletteAddress = paletteIndex << 5;

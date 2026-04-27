@@ -589,10 +589,10 @@ namespace Mesen.Debugger.ViewModels
 		private void EditTileGrid(int columnCount, int rowCount, Window wnd)
 		{
 			PixelPoint p = ViewerMousePos ?? PixelPoint.FromPoint(SelectionRect.TopLeft, 1);
-			List<AddressInfo> addresses = new();
+			List<TileAddressInfo> addresses = new();
 			for(int row = 0; row < rowCount; row++) {
 				for(int col = 0; col < columnCount; col++) {
-					addresses.Add(new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + col*GridSizeX, p.Y + row*GridSizeY)), Type = Config.Source });
+					addresses.Add(new TileAddressInfo() { Address = new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + col*GridSizeX, p.Y + row*GridSizeY)), Type = Config.Source } });
 				}
 			}
 			TileEditorWindow.OpenAtTile(

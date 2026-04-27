@@ -352,7 +352,7 @@ DebugTilemapTileInfo NesPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 	result.Height = 8;
 	result.TileMapAddress = baseAddr + ntOffset;
 	result.TileIndex = vram[result.TileMapAddress];
-	result.TileAddress = bgAddr + (result.TileIndex << 4);
+	result.AddAddress(bgAddr + (result.TileIndex << 4));
 	result.PaletteIndex = paletteBaseAddr >> 2;
 	result.PaletteAddress = 0x3F00 | paletteBaseAddr;
 	result.AttributeAddress = attributeAddress;

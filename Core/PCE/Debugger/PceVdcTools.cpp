@@ -52,7 +52,7 @@ DebugTilemapTileInfo PceVdcTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 	result.TileIndex = (batEntry & 0xFFF);
 	result.TileMapAddress = entryAddr;
 
-	result.TileAddress = result.TileIndex * 32;
+	result.AddAddress(result.TileIndex * 32);
 	result.PaletteAddress = result.PaletteIndex * 16;
 
 	result.Row = row;

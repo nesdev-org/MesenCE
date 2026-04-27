@@ -151,7 +151,7 @@ DebugTilemapTileInfo WsPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uint
 	result.Width = 8;
 	result.TileMapAddress = tilemapAddr;
 	result.TileIndex = tileIndex;
-	result.TileAddress = tilesetAddr + tileIndex * tileSize;
+	result.AddAddress(tilesetAddr + tileIndex * tileSize);
 
 	result.PaletteIndex = tilePalette;
 	result.PaletteAddress = state.Mode >= WsVideoMode::Color2bpp ? (0xFE00 | (result.PaletteIndex << 4)) : (result.PaletteIndex << 2);

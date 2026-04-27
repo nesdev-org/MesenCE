@@ -493,7 +493,7 @@ DebugTilemapTileInfo SnesPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, ui
 
 		result.TileMapAddress = row * 256 + column * 2;
 		result.TileIndex = vram[result.TileMapAddress];
-		result.TileAddress = result.TileIndex * 128;
+		result.AddAddress(result.TileIndex * 128);
 		result.Height = 8;
 		result.Width = 8;
 	} else {
@@ -524,8 +524,14 @@ DebugTilemapTileInfo SnesPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, ui
 		result.TileMapAddress = addr;
 		
 		uint16_t tileStart = (layer.ChrAddress << 1) + result.TileIndex * 8 * bpp;
-		result.TileAddress = tileStart;
-
+		result.AddAddress(tileStart);
+		if(largeTileWidth) {
+			result.AddAddress((uint16_t)(tileStart + (8 * bpp)));
+			if(largeTileHeight) {
+				result.AddAddress((uint16_t)(tileStart + (16 * 8 * bpp)));
+				result.AddAddress((uint16_t)(tileStart + (17 * 8 * bpp)));
+			}
+		}
 	}
 
 	result.Row = row;
