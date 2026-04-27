@@ -1,0 +1,46 @@
+name: Test Mesen
+
+on: [push, pull_request]
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  windows:
+    strategy:
+      matrix:
+        platform: [
+          {netversion: 8.x, targetframework: net8.0, aot: false, singleFile: true}
+        ]
+      fail-fast: false
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.platform.netversion }}
+
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v2
+        with:
+          msbuild-architecture: x64
+
+      - name: Restore packages
+        run: dotnet restore -p:TargetFramework="${{ matrix.platform.targetframework }}" -r win-x64 -p:PublishAot="${{ matrix.platform.aot }}" -p:BuildWithNetFrameworkHostedCompiler=true
+
+      - name: Build Mesen
+        run: msbuild -nologo -v:d -clp:ForceConsoleColor -m -p:Configuration=Release -p:Platform=x64 -t:Clean,UI -p:TargetFramework="${{ matrix.platform.targetframework }}"
+
+      - name: Get recorded tests
+        run: git clone https://github.com/nesdev-org/MesenTests/ ./Tests/bin/Release/Tests
+       
+      - name: Run MSTest Tests
+        run: dotnet test -p:Configuration=Release --no-build --verbosity normal
+ 

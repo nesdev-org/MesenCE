@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mesen.Interop
 {
-	class TestApi
+	public class TestApi
 	{
 		private const string DllPath = EmuApi.DllName;
 
