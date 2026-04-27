@@ -1,5 +1,4 @@
-﻿using Avalonia.Threading;
-using Mesen.Config;
+﻿using Mesen.Config;
 using Mesen.Interop;
 using System.Collections.Concurrent;
 using System.Reflection;
@@ -52,10 +51,19 @@ public sealed class RecordedTests
 		ConcurrentDictionary<string, RomTestResult> results = new();
 		EmuApi.InitializeEmu(_homeFolder, IntPtr.Zero, IntPtr.Zero, false, true, true, true);
 
-		List<string> testFiles = Directory.EnumerateFiles(testFolder, "*.mtp", SearchOption.AllDirectories).ToList();
+		List<string> testFiles = new();
+		if(Directory.Exists(testFolder)) {
+			testFiles = Directory.EnumerateFiles(testFolder, "*.mtp", SearchOption.AllDirectories).ToList();
+		}
 		if(testFiles.Count == 0) {
 			testFolder = Path.Combine(_homeFolder, "Tests");
-			testFiles = Directory.EnumerateFiles(testFolder, "*.mtp", SearchOption.AllDirectories).ToList();
+			if(Directory.Exists(testFolder)) {
+				testFiles = Directory.EnumerateFiles(testFolder, "*.mtp", SearchOption.AllDirectories).ToList();
+			}
+		}
+
+		if(testFiles.Count == 0) {
+			Assert.Fail("No tests found");
 		}
 
 		Parallel.ForEach(testFiles, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount - 2 }, (string testFile) => {
