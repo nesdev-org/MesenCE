@@ -698,57 +698,44 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 	bool verticalMirror = (attributes & 0x80) == 0x80;
 
 	uint16_t tileAddr;
-	uint8_t lineOffset;
+	int16_t rangeResult;
+	const uint8_t spriteSizeMask = _control.LargeSprites ? 15 : 7;
+	const uint8_t scanline8Bit = (_scanline + 256) & 0xff;
+
+	rangeResult = scanline8Bit - spriteY;
 	if(verticalMirror) {
-		lineOffset = (_control.LargeSprites ? 15 : 7) - (_scanline - spriteY);
-	} else {
-		lineOffset = _scanline - spriteY;
+		rangeResult ^= spriteSizeMask;
 	}
 
 	if(_control.LargeSprites) {
-		tileAddr = (((tileIndex & 0x01) ? 0x1000 : 0x0000) | ((tileIndex & ~0x01) << 4)) + (lineOffset >= 8 ? lineOffset + 8 : lineOffset);
+		tileAddr = (((tileIndex & 0x01) << 12) | ((tileIndex & ~0x01) << 4)) + ((rangeResult & 0x08) << 1) + (rangeResult & 0x07);
 	} else {
-		tileAddr = ((tileIndex << 4) | _control.SpritePatternAddr) + lineOffset;
+		tileAddr = (_control.SpritePatternAddr | (tileIndex << 4)) + (rangeResult & 0x07);
 	}
 
-	bool fetchLastSprite = true;
-	if((_spriteIndex < _spriteCount || extraSprite) && spriteY < 240) {
-		NesSpriteInfo &info = _spriteTiles[_spriteIndex];
-		info.BackgroundPriority = backgroundPriority;
-		info.HorizontalMirror = horizontalMirror;
-		info.PaletteOffset = ((attributes & 0x03) << 2) | 0x10;
-		if(extraSprite) {
-			//Use DebugReadVram for extra sprites to prevent side-effects.
-			info.LowByte = _mapper->DebugReadVram(tileAddr);
-			info.HighByte = _mapper->DebugReadVram(tileAddr + 8);
-		} else {
-			fetchLastSprite = false;
-			info.LowByte = ReadVram(tileAddr);
-			info.HighByte = ReadVram(tileAddr + 8);
-		}
-		info.SpriteX = spriteX;
-		((T*)this)->StoreSpriteInformation(verticalMirror, tileAddr, lineOffset); //Used by HD packs
-
-		if(_scanline >= 0) {
-			//Sprites read on prerender scanline are not shown on scanline 0
-			for(int i = 0; i < 8 && spriteX + i + 1 < 257; i++) {
-				_hasSprite[spriteX + i + 1] = true;
-			}
-		}
+	NesSpriteInfo &info = _spriteTiles[_spriteIndex];
+	info.BackgroundPriority = backgroundPriority;
+	info.HorizontalMirror = horizontalMirror;
+	info.PaletteOffset = ((attributes & 0x03) << 2) | 0x10;
+	if(extraSprite) {
+		//Use DebugReadVram for extra sprites to prevent side-effects.
+		info.LowByte = _mapper->DebugReadVram(tileAddr);
+		info.HighByte = _mapper->DebugReadVram(tileAddr + 8);
+	} else {
+		info.LowByte = ReadVram(tileAddr);
+		info.HighByte = ReadVram(tileAddr + 8);
 	}
+	info.SpriteX = spriteX;
 
-	if(fetchLastSprite) {
-		//Fetches to sprite 0xFF for remaining sprites/hidden - used by MMC3 IRQ counter
-		lineOffset = 0;
-		tileIndex = 0xFF;
-		if(_control.LargeSprites) {
-			tileAddr = (((tileIndex & 0x01) ? 0x1000 : 0x0000) | ((tileIndex & ~0x01) << 4)) + (lineOffset >= 8 ? lineOffset + 8 : lineOffset);
-		} else {
-			tileAddr = ((tileIndex << 4) | _control.SpritePatternAddr) + lineOffset;
+	if(rangeResult >= 0) {
+		((T*)this)->StoreSpriteInformation(verticalMirror, tileAddr, rangeResult); //Used by HD packs
+
+		for(int i = 0; i < 8 && spriteX + i + 1 < 257; i++) {
+			_hasSprite[spriteX + i + 1] = true;
 		}
-
-		ReadVram(tileAddr);
-		ReadVram(tileAddr + 8);
+	} else {
+		info.LowByte = 0;
+		info.HighByte = 0;
 	}
 
 	_spriteIndex++;
