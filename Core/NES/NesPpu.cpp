@@ -724,9 +724,11 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 	bool verticalMirror = (attributes & 0x80) == 0x80;
 
 	uint16_t tileAddr;
-	int16_t rangeResult;
+	uint16_t rangeResult;
 	const uint8_t spriteSizeMask = _control.LargeSprites ? 15 : 7;
-	const uint8_t scanline8Bit = (_scanline + 256) & 0xff;
+	//This function is only called on rendering scanlines (0-239) or pre-render (-1). We need to handle the pre-render scanline numbers manually.
+	//These are deliberately truncated to 8 bits to match hardware behavior.
+	const uint8_t scanline8Bit = _scanline >= 0 ? _scanline : (_region == ConsoleRegion::Ntsc ? 261 : 311);
 
 	rangeResult = scanline8Bit - spriteY;
 	if(verticalMirror) {
@@ -753,12 +755,14 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 	}
 	info.SpriteX = spriteX;
 
-	if(rangeResult >= 0) {
+	if(rangeResult <= spriteSizeMask) {
 		((T*)this)->StoreSpriteInformation(verticalMirror, tileAddr, rangeResult); //Used by HD packs
 
 		for(int i = 0; i < 8 && spriteX + i + 1 < 257; i++) {
 			_hasSprite[spriteX + i + 1] = true;
 		}
+
+		_spriteCount++;
 	} else {
 		info.LowByte = 0;
 		info.HighByte = 0;
@@ -897,7 +901,12 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			_console->GetCpu()->ClearNmiFlag();
 		}
 	} else if(_cycle >= 257 && _cycle <= 320) {
-		if(_prevRenderingEnabled) {
+		if(_cycle == 257) {
+			//Initialize this variable so we can count active sprites in OAM2.
+			_spriteCount = 0;
+		}
+		if(IsRenderingEnabled()) {
+			//sprite_0_on_next_scanline is copied to sprite_0_on_this_scanline every dot in this range.
 			_sprite0Visible = _sprite0Added;
 
 			//"OAMADDR is set to 0 during each of ticks 257-320 (the sprite tile loading interval) of the pre-render and visible scanlines." (When rendering)
@@ -982,31 +991,6 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluationStart()
 	_lastVisibleSpriteAddr = _firstVisibleSpriteAddr;
 }
 
-template<class T> void NesPpu<T>::ProcessSpriteEvaluationEnd()
-{
-	//Add 3 to address to count any partially-copied sprite.
-	//If eval is misaligned and wraps back to the start of OAM, the copy can
-	//be stopped mid-sprite (e.g only 1 to 3 bytes are copied to secondary OAM)
-	_spriteCount = ((_secondaryOamAddr + 3) >> 2);
-
-	if(_settings->GetNesConfig().EnablePpuSpriteEvalBug) {
-		//(Not entirely confirmed - but matches observed behavior)
-		//For early PPUs (2C02B and earlier), after sprite eval wraps back to the start of OAM,
-		//all subsequent sprites appear to be considered as "out of range", causing only their
-		//Y coordinate to be copied to secondary OAM, and then skipping to the next sprite.
-		//However, if the last Y position copied to secondary OAM by this process happens to be
-		//"in range", it will be end up being shown as a sprite. The sprite's remaining 3 bytes
-		//will be $FF (because secondary OAM was cleared at the start of the scanline), causing
-		//it to display pixels from sprite tile $FF at X=255, with h+v mirroring and sprite palette 3.
-		bool inRange = (_scanline >= _oamCopybuffer && _scanline < _oamCopybuffer + (_control.LargeSprites ? 16 : 8));
-		if(inRange && _spriteCount < 8) {
-			_spriteCount++;
-		}
-	}
-
-	_secondaryOamAddr = 0;
-}
-
 template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 {
 	if(_prevRenderingEnabled) {
@@ -1028,6 +1012,14 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 				uint8_t spriteAddrH = _spriteRamAddr >> 2;
 				uint8_t spriteAddrL = _spriteRamAddr & 3;
 
+				//(Not entirely confirmed - but matches observed behavior)
+				//For early PPUs (2C02B and earlier), after sprite eval wraps back to the start of OAM,
+				//all subsequent sprites appear to be considered as "out of range", causing only their
+				//Y coordinate to be copied to secondary OAM, and then skipping to the next sprite.
+				//However, if the last Y position copied to secondary OAM by this process happens to be 
+				//"in range", it will be end up being shown as a sprite. The sprite's remaining 3 bytes
+				//will be $FF (because secondary OAM was cleared at the start of the scanline), causing
+				//it to display pixels from sprite tile $FF at X=255, with h+v mirroring and sprite palette 3.
 				if(_oamCopyDone && !_settings->GetNesConfig().EnablePpuSpriteEvalBug) {
 					spriteAddrH = (spriteAddrH + 1) & 0x3F;
 					//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
