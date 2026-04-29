@@ -11,7 +11,7 @@
 NesNtscFilter::NesNtscFilter(Emulator* emu) : BaseVideoFilter(emu)
 {
 	memset(&_ntscData, 0, sizeof(_ntscData));
-	_ntscSetup = { };
+	_ntscSetup = {};
 	nes_ntsc_init(&_ntscData, &_ntscSetup);
 	_ntscBuffer = new uint32_t[NES_NTSC_OUT_WIDTH(256) * 240];
 }
@@ -29,10 +29,10 @@ OverscanDimensions NesNtscFilter::GetOverscan()
 FrameInfo NesNtscFilter::GetFrameInfo()
 {
 	OverscanDimensions overscan = GetOverscan();
-	
+
 	FrameInfo frameInfo;
 	frameInfo.Width = NES_NTSC_OUT_WIDTH(_baseFrameInfo.Width) - overscan.Left - overscan.Right;
-	frameInfo.Height = _baseFrameInfo.Height*2 - overscan.Top - overscan.Bottom;
+	frameInfo.Height = _baseFrameInfo.Height * 2 - overscan.Top - overscan.Bottom;
 	return frameInfo;
 }
 
@@ -67,14 +67,14 @@ void NesNtscFilter::OnBeforeApplyFilter()
 	_nesConfig = nesCfg;
 }
 
-void NesNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
+void NesNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 {
 	FrameInfo frameInfo = _frameInfo;
 	OverscanDimensions overscan = GetOverscan();
-	
+
 	uint32_t baseWidth = NES_NTSC_OUT_WIDTH(_baseFrameInfo.Width);
 	uint32_t xOffset = overscan.Left;
-	uint32_t yOffset = overscan.Top/2 * baseWidth;
+	uint32_t yOffset = overscan.Top / 2 * baseWidth;
 
 	if(_nesConfig.EnablePalBorders && _emu->GetRegion() != ConsoleRegion::Ntsc) {
 		NesDefaultVideoFilter::ApplyPalBorder(ppuOutputBuffer);
@@ -82,9 +82,9 @@ void NesNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
 
 	nes_ntsc_blit(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, GetVideoPhase(), _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, NES_NTSC_OUT_WIDTH(_baseFrameInfo.Width) * 4);
 
-	for(uint32_t i = 0; i < frameInfo.Height; i+=2) {
-		memcpy(GetOutputBuffer()+i*frameInfo.Width, _ntscBuffer + yOffset + xOffset + (i/2)*baseWidth, frameInfo.Width * sizeof(uint32_t));
-		memcpy(GetOutputBuffer()+(i+1)*frameInfo.Width, _ntscBuffer + yOffset + xOffset + (i/2)*baseWidth, frameInfo.Width * sizeof(uint32_t));
+	for(uint32_t i = 0; i < frameInfo.Height; i += 2) {
+		memcpy(GetOutputBuffer() + i * frameInfo.Width, _ntscBuffer + yOffset + xOffset + (i / 2) * baseWidth, frameInfo.Width * sizeof(uint32_t));
+		memcpy(GetOutputBuffer() + (i + 1) * frameInfo.Width, _ntscBuffer + yOffset + xOffset + (i / 2) * baseWidth, frameInfo.Width * sizeof(uint32_t));
 	}
 }
 

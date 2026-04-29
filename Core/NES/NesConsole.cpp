@@ -61,7 +61,7 @@ NesConfig& NesConsole::GetNesConfig()
 	return _emu->GetSettings()->GetNesConfig();
 }
 
-void NesConsole::ProcessCpuClock() 
+void NesConsole::ProcessCpuClock()
 {
 	if(_mapper->HasCpuClockHook()) {
 		_mapper->ProcessCpuClock();
@@ -114,7 +114,7 @@ void NesConsole::Serialize(Serializer& s)
 		//For VS Dualsystem, the sub console's savestate is appended to the end of the file
 		SV(_vsSubConsole);
 	}
-	
+
 	SV(_controlManager);
 
 	if(!s.IsSaving()) {
@@ -125,7 +125,7 @@ void NesConsole::Serialize(Serializer& s)
 void NesConsole::Reset()
 {
 	_memoryManager->Reset(true);
-	
+
 	_ppu->Reset(true);
 	_apu->Reset(true);
 	_cpu->Reset(true, _region);
@@ -158,7 +158,7 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile)
 				return result;
 			}
 		}
-		
+
 		if(GetNesConfig().AutoConfigureInput && romData.Info.InputType != GameInputType::Unspecified) {
 			//Auto-configure the inputs (if option is enabled)
 			InitializeInputDevices(romData.Info.InputType, romData.Info.System);
@@ -205,7 +205,7 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile)
 		UpdateRegion();
 
 		_mixer->Reset();
-		
+
 		_ppu->Reset(false);
 		_apu->Reset(false);
 		_memoryManager->Reset(false);
@@ -213,7 +213,7 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile)
 		_cpu->Reset(false, _region);
 		_mapper->OnAfterResetPowerOn();
 	}
-    return result;
+	return result;
 }
 
 void NesConsole::LoadHdPack(VirtualFile& romFile)
@@ -400,7 +400,7 @@ void NesConsole::SaveBattery()
 	if(_mapper) {
 		_mapper->SaveBattery();
 	}
-	
+
 	if(_controlManager) {
 		_controlManager->SaveBattery();
 	}
@@ -412,7 +412,7 @@ ShortcutState NesConsole::IsShortcutAllowed(EmulatorShortcut shortcut, uint32_t 
 	bool isNetplayClient = _emu->GetGameClient()->Connected();
 	bool isMoviePlaying = _emu->GetMovieManager()->Playing();
 	RomFormat romFormat = GetRomFormat();
-	
+
 	switch(shortcut) {
 		case EmulatorShortcut::FdsEjectDisk:
 		case EmulatorShortcut::FdsInsertNextDisk:
@@ -706,7 +706,7 @@ void NesConsole::StopRecordingHdPack()
 {
 	if(_hdPackBuilder) {
 		auto lock = _emu->AcquireLock();
-		
+
 		_emu->GetVideoDecoder()->WaitForAsyncFrameDecode();
 
 		std::stringstream saveState;

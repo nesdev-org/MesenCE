@@ -13,15 +13,15 @@ private:
 	vector<uint8_t> _stateData;
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
 		SVVector(_stateData);
 		SVVector(_activeCheats);
 	}
 
 public:
-	SaveStateMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) { }
-	
+	SaveStateMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
+
 	SaveStateMessage(Emulator* emu) : NetMessage(MessageType::SaveState)
 	{
 		//Used when sending state to clients
@@ -36,7 +36,7 @@ public:
 		_stateData.resize(dataSize);
 		state.read((char*)_stateData.data(), dataSize);
 	}
-	
+
 	void LoadState(Emulator* emu)
 	{
 		std::stringstream ss;

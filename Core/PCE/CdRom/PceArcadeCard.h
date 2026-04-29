@@ -35,6 +35,6 @@ public:
 
 	uint8_t Read(uint8_t bank, uint16_t addr, uint8_t value) override;
 	void Write(uint8_t bank, uint16_t addr, uint8_t value) override;
-	
+
 	void Serialize(Serializer& s) override;
 };

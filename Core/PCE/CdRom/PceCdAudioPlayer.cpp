@@ -124,7 +124,7 @@ void PceCdAudioPlayer::Serialize(Serializer& s)
 	SV(_state.CurrentSample);
 	SV(_state.LeftSample);
 	SV(_state.RightSample);
-	
+
 	SV(_irqCounter);
 	SV(_subcodePosition);
 	SV(_subcodeSector);

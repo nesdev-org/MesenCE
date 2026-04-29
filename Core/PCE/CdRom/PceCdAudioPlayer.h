@@ -24,9 +24,9 @@ class PceCdAudioPlayer final : public IAudioProvider, public ISerializable
 	uint32_t _subcodeSector = 0;
 	uint32_t _nextSubcodeSector = 0;
 	uint32_t _seekDelay = 0;
-	
+
 	HermiteResampler _resampler;
-	
+
 	void PlaySample();
 	void ProcessAudioPlaybackStart();
 
@@ -40,11 +40,11 @@ public:
 	void Stop() { _state.Status = CdAudioStatus::Stopped; }
 	void Pause() { _state.Status = CdAudioStatus::Paused; }
 	void SetIdle() { _state.Status = CdAudioStatus::Inactive; }
-	
+
 	PceCdAudioPlayerState& GetState() { return _state; }
 
 	CdAudioStatus GetStatus() { return _state.Status; }
-	
+
 	uint32_t GetSubcodeSector() { return _subcodeSector; }
 	uint8_t GetSubcodePosition() { return _subcodePosition; }
 	uint32_t GetCurrentSector() { return _state.CurrentSector; }

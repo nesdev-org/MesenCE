@@ -19,10 +19,23 @@ namespace PSFlags
 
 enum class NesAddrMode
 {
-	None, Acc, Imp, Imm, Rel,
-	Zero, Abs, ZeroX, ZeroY,
-	Ind, IndX, IndY, IndYW,
-	AbsX, AbsXW, AbsY, AbsYW,
+	None,
+	Acc,
+	Imp,
+	Imm,
+	Rel,
+	Zero,
+	Abs,
+	ZeroX,
+	ZeroY,
+	Ind,
+	IndX,
+	IndY,
+	IndYW,
+	AbsX,
+	AbsXW,
+	AbsY,
+	AbsYW,
 	Other
 };
 
@@ -41,7 +54,6 @@ enum class MemoryOperation
 	Write = 2,
 	Any = 3
 };
-
 
 enum NesCpuBusType
 {
@@ -111,7 +123,7 @@ enum class MapperStateValueType
 struct MapperStateEntry
 {
 	static constexpr int MaxLength = 40;
-	
+
 	int64_t RawValue = INT64_MIN;
 	MapperStateValueType Type = MapperStateValueType::Number8;
 	uint8_t Address[MapperStateEntry::MaxLength] = {};
@@ -240,7 +252,7 @@ struct NesPpuState : public BaseState
 	uint32_t SafeOamScanline;
 	uint16_t BusAddress;
 	uint8_t MemoryReadBuffer;
-	
+
 	uint16_t VideoRamAddr;
 	uint16_t TmpVideoRamAddr;
 	uint8_t ScrollX;
