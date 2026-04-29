@@ -53,7 +53,7 @@ struct WsEventViewerConfig : public BaseEventViewerConfig
 class WsEventManager final : public BaseEventManager
 {
 private:
-	static constexpr int ScanlineWidth = WsConstants::ClocksPerScanline*2;
+	static constexpr int ScanlineWidth = WsConstants::ClocksPerScanline * 2;
 	static constexpr int ScreenHeight = WsConstants::ScanlineCount;
 
 	WsEventViewerConfig _config;

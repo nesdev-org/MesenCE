@@ -19,7 +19,7 @@ shared_ptr<BaseControlDevice> WsControlManager::CreateControllerDevice(Controlle
 	switch(type) {
 		default:
 		case ControllerType::None: break;
-		
+
 		case ControllerType::WsController:
 		case ControllerType::WsControllerVertical:
 			device.reset(new WsController(_emu, _console, port, cfg.ControllerHorizontal.Keys, cfg.ControllerVertical.Keys));
@@ -94,7 +94,7 @@ bool WsControlManager::IsSoundPressed()
 void WsControlManager::UpdateInputState()
 {
 	BaseControlManager::UpdateInputState();
-	
+
 	uint8_t newInput = Read();
 	if((_prevInput | newInput) > _prevInput) {
 		//Trigger IRQ (on scanline 144) whenever any extra bits are set compared to the previous input

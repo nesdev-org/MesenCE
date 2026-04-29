@@ -7,7 +7,7 @@
 #include "Debugger/MemoryDumper.h"
 #include "Shared/SettingTypes.h"
 
-WsPpuTools::WsPpuTools(Debugger* debugger, Emulator *emu, WsConsole* console) : PpuTools(debugger, emu)
+WsPpuTools::WsPpuTools(Debugger* debugger, Emulator* emu, WsConsole* console) : PpuTools(debugger, emu)
 {
 	_console = console;
 }
@@ -134,7 +134,7 @@ DebugTilemapTileInfo WsPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uint
 	int column = x / 8;
 
 	uint16_t baseAddr = state.BgLayers[options.Layer].MapAddress;
-	
+
 	uint16_t tilemapAddr = (baseAddr + row * 64 + column * 2);
 
 	uint16_t tilemapData = vram[tilemapAddr] | (vram[tilemapAddr + 1] << 8);
@@ -169,9 +169,9 @@ void WsPpuTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& ba
 	std::fill(outBuffer, outBuffer + 256 * WsConstants::ScreenHeight, bgColor);
 	std::fill(outBuffer + 256 * WsConstants::ScreenHeight, outBuffer + 256 * 256, darkBg);
 	for(int i = 0; i < WsConstants::ScreenHeight; i++) {
-		std::fill(outBuffer + WsConstants::ScreenWidth + i * 256, outBuffer + 256 +  i * 256 , darkBg);
+		std::fill(outBuffer + WsConstants::ScreenWidth + i * 256, outBuffer + 256 + i * 256, darkBg);
 	}
-	
+
 	int spriteCount = 128;
 	for(int i = spriteCount - 1; i >= 0; i--) {
 		DebugSpriteInfo& sprite = sprites[i];
@@ -248,19 +248,19 @@ void WsPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview,
 
 	sprite.SpriteIndex = i;
 	sprite.UseExtendedVram = false;
-	sprite.RawY = oam[i*4 + 2];
-	sprite.RawX = oam[i*4 + 3];
+	sprite.RawY = oam[i * 4 + 2];
+	sprite.RawX = oam[i * 4 + 3];
 	sprite.Y = sprite.RawY;
 	sprite.X = sprite.RawX;
 	sprite.UseSecondTable = NullableBoolean::Undefined;
-	
-	uint8_t attributes = oam[i*4 + 1];
+
+	uint8_t attributes = oam[i * 4 + 1];
 	bool highPriority = attributes & 0x20;
 
 	bool vMirror = attributes & 0x80;
 	bool hMirror = attributes & 0x40;
 
-	uint16_t tileIndex = oam[i*4] | ((attributes & 0x01) << 8);
+	uint16_t tileIndex = oam[i * 4] | ((attributes & 0x01) << 8);
 	sprite.TileIndex = tileIndex;
 	uint8_t sprPalette = ((attributes >> 1) & 0x07);
 	int paletteSize = state.Mode == WsVideoMode::Monochrome ? 4 : 16;
@@ -268,7 +268,7 @@ void WsPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview,
 	sprite.Palette = sprPalette;
 	sprite.PaletteAddress = (8 + sprPalette) * paletteSize;
 	sprite.Priority = highPriority ? DebugSpritePriority::Foreground : DebugSpritePriority::Background;
-	
+
 	sprite.Width = 8;
 	sprite.Height = 8;
 

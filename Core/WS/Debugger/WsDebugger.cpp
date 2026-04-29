@@ -39,13 +39,13 @@ WsDebugger::WsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator())
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 
 	_console = ((WsConsole*)debugger->GetConsole());
-	
+
 	_cpu = _console->GetCpu();
 	_ppu = _console->GetPpu();
 	_memoryManager = _console->GetMemoryManager();
 
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::WsPrgRom, _emu->GetMemory(MemoryType::WsPrgRom).Size, CpuType::Ws, _emu->GetCrc32()));
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
@@ -59,7 +59,7 @@ WsDebugger::WsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator())
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Ws, _eventManager.get()));
 	_step.reset(new StepRequest());
 	_assembler.reset(new WsAssembler(debugger->GetLabelManager()));
-	
+
 	_dummyCpu.reset(new DummyWsCpu(_emu, _console, _memoryManager));
 
 	ResetPrevOpCode();
@@ -329,10 +329,7 @@ void WsDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool 
 	ProcessCallStackUpdates(ret, originalPc, originalSp);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::Ws, *this, *_step.get(), 
-		ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::Ws, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi);
 }
 
 void WsDebugger::ProcessPpuCycle()
@@ -370,7 +367,7 @@ DebuggerFeatures WsDebugger::GetSupportedFeatures()
 	features.CpuVectors[2] = { "INT3", 3 * 4, VectorType::x86 };
 	features.CpuVectors[3] = { "INTO", 4 * 4, VectorType::x86 };
 	features.CpuVectors[4] = { "BOUND", 5 * 4, VectorType::x86 };
-	
+
 	features.IrqVectorOffset = _memoryManager->GetState().IrqVectorOffset;
 	features.CpuVectors[5] = { "UART Send", 0, VectorType::x86WithOffset };
 	features.CpuVectors[6] = { "Key Pressed", 1, VectorType::x86WithOffset };
