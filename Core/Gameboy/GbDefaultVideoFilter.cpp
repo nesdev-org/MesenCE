@@ -109,7 +109,7 @@ void GbDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	}
 
 	if(_blendFrames) {
-		std::copy(ppuOutputBuffer, ppuOutputBuffer + GbConstants::LinkedPixelCount, _prevFrame);
+		std::copy(ppuOutputBuffer, ppuOutputBuffer + (frame.Width * frame.Height), _prevFrame);
 	}
 
 	if(_applyNtscFilter) {

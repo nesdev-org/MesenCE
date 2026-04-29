@@ -2531,8 +2531,8 @@ E
 		</Enum>
 		<Enum ID="GbLocalLinkOutputOption">
 			<Value ID="Both">Both</Value>
-			<Value ID="MainSystemOnly">First system only</Value>
-			<Value ID="SubSystemOnly">Second system only</Value>
+			<Value ID="MainSystemOnly">Player 1 only</Value>
+			<Value ID="SubSystemOnly">Player 2 only</Value>
 		</Enum>
 		<Enum ID="VsDualOutputOption">
 			<Value ID="Both">Both</Value>
