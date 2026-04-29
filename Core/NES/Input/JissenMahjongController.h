@@ -10,7 +10,30 @@ private:
 	uint32_t _stateBuffer = 0;
 
 protected:
-	enum Buttons { A = 0, B, C, D, E, F, G, H, I, J, K, L, M, N, Select, Start, Kan, Pon, Chii, Riichi, Ron };
+	enum Buttons
+	{
+		A = 0,
+		B,
+		C,
+		D,
+		E,
+		F,
+		G,
+		H,
+		I,
+		J,
+		K,
+		L,
+		M,
+		N,
+		Select,
+		Start,
+		Kan,
+		Pon,
+		Chii,
+		Riichi,
+		Ron
+	};
 
 	string GetKeyNames() override
 	{
@@ -29,7 +52,8 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_row); SV(_stateBuffer);
+		SV(_row);
+		SV(_stateBuffer);
 	}
 
 public:

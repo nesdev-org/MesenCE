@@ -16,7 +16,7 @@
 #include "NES/NesHeader.h"
 #include "NES/GameDatabase.h"
 
-bool RomLoader::LoadFile(VirtualFile &romFile, RomData& romData, bool databaseEnabled)
+bool RomLoader::LoadFile(VirtualFile& romFile, RomData& romData, bool databaseEnabled)
 {
 	if(!romFile.IsValid()) {
 		return false;
@@ -29,7 +29,7 @@ bool RomLoader::LoadFile(VirtualFile &romFile, RomData& romData, bool databaseEn
 	if(fileData.size() < 15) {
 		return false;
 	}
-	
+
 	string filename = romFile.GetFileName();
 	string romName = FolderUtilities::GetFilename(filename, true);
 

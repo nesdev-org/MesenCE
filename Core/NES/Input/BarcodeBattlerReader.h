@@ -21,7 +21,9 @@ protected:
 		BaseControlDevice::Serialize(s);
 
 		SVArray(_barcodeStream, BarcodeBattlerReader::StreamSize);
-		SV(_newBarcode); SV(_newBarcodeDigitCount); SV(_insertCycle);
+		SV(_newBarcode);
+		SV(_newBarcodeDigitCount);
+		SV(_insertCycle);
 	}
 
 	bool IsRawString() override

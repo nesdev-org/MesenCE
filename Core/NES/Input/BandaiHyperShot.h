@@ -12,8 +12,11 @@ private:
 	uint32_t _hypershotState = 0;
 
 protected:
-	enum ZapperButtons { Fire = 9 };
-	
+	enum ZapperButtons
+	{
+		Fire = 9
+	};
+
 	bool HasCoordinates() override { return true; }
 
 	string GetKeyNames() override

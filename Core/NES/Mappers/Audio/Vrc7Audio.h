@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include "pch.h"
 #include "NES/APU/BaseExpansionAudio.h"
 #include "NES/APU/NesApu.h"
@@ -39,7 +39,10 @@ protected:
 	{
 		BaseExpansionAudio::Serialize(s);
 
-		SV(_currentReg); SV(_previousOutput); SV(_clockTimer); SV(_muted);
+		SV(_currentReg);
+		SV(_previousOutput);
+		SV(_clockTimer);
+		SV(_muted);
 		Emu2413Serializer::Serialize(_opll, s);
 	}
 
@@ -50,7 +53,7 @@ public:
 		_currentReg = 0;
 		_muted = false;
 		_clockTimer = 0;
-		
+
 		_opll = OPLL_new(Vrc7Audio::OpllClockRate, Vrc7Audio::OpllSampleRate);
 
 		//Set OPLL emulator to VRC7 mode

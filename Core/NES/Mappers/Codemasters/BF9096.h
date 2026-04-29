@@ -16,7 +16,7 @@ protected:
 	{
 		_prgPage = 0;
 		_prgBlock = 0;
-		
+
 		SelectPrgPage(0, 0);
 		SelectPrgPage(1, 3);
 
@@ -36,9 +36,8 @@ protected:
 			} else {
 				_prgBlock = (value >> 3) & 0x03;
 			}
-
 		}
-		
+
 		SelectPrgPage(0, (_prgBlock << 2) | _prgPage);
 		SelectPrgPage(1, (_prgBlock << 2) | 3);
 	}

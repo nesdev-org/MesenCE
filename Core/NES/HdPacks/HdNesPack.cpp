@@ -108,12 +108,11 @@ uint32_t HdNesPack<scale>::AdjustBrightness(uint8_t input[4], int brightness)
 		std::min(255, (brightness * ((int)input[0] + 1)) >> 8) |
 		(std::min(255, (brightness * ((int)input[1] + 1)) >> 8) << 8) |
 		(std::min(255, (brightness * ((int)input[2] + 1)) >> 8) << 16) |
-		(input[3] << 24)
-	);
+		(input[3] << 24));
 }
 
 template<uint32_t scale>
-void HdNesPack<scale>::DrawColor(uint32_t color, uint32_t *outputBuffer, uint32_t screenWidth)
+void HdNesPack<scale>::DrawColor(uint32_t color, uint32_t* outputBuffer, uint32_t screenWidth)
 {
 	if constexpr(scale == 1) {
 		*outputBuffer = color;
@@ -121,7 +120,7 @@ void HdNesPack<scale>::DrawColor(uint32_t color, uint32_t *outputBuffer, uint32_
 		outputBuffer[0] = color;
 		outputBuffer[1] = color;
 		outputBuffer[screenWidth] = color;
-		outputBuffer[screenWidth+1] = color;
+		outputBuffer[screenWidth + 1] = color;
 	} else {
 		for(uint32_t i = 0; i < scale; i++) {
 			std::fill(outputBuffer, outputBuffer + scale, color);
@@ -132,10 +131,10 @@ void HdNesPack<scale>::DrawColor(uint32_t color, uint32_t *outputBuffer, uint32_
 
 template<uint32_t scale>
 template<HdPackBlendMode blendMode>
-void HdNesPack<scale>::DrawCustomBackground(HdBackgroundInfo& bgInfo, uint32_t *outputBuffer, uint32_t x, uint32_t y, uint32_t screenWidth)
+void HdNesPack<scale>::DrawCustomBackground(HdBackgroundInfo& bgInfo, uint32_t* outputBuffer, uint32_t x, uint32_t y, uint32_t screenWidth)
 {
 	uint32_t width = bgInfo.Data->Width;
-	uint32_t *pngData = bgInfo.data() + ((bgInfo.Top + y) * scale * width) + ((bgInfo.Left + x) * scale);
+	uint32_t* pngData = bgInfo.data() + ((bgInfo.Top + y) * scale * width) + ((bgInfo.Left + x) * scale);
 
 	if(bgInfo.Brightness == 255) {
 		for(uint32_t i = 0; i < scale; i++) {
@@ -175,13 +174,13 @@ void HdNesPack<scale>::DrawCustomBackground(HdBackgroundInfo& bgInfo, uint32_t *
 }
 
 template<uint32_t scale>
-void HdNesPack<scale>::DrawTile(HdPpuTileInfo &tileInfo, HdPackTileInfo &hdPackTileInfo, uint32_t *outputBuffer, uint32_t screenWidth)
+void HdNesPack<scale>::DrawTile(HdPpuTileInfo& tileInfo, HdPackTileInfo& hdPackTileInfo, uint32_t* outputBuffer, uint32_t screenWidth)
 {
 	if(hdPackTileInfo.IsFullyTransparent) {
 		return;
 	}
 
-	uint32_t *bitmapData = hdPackTileInfo.HdTileData.data();
+	uint32_t* bitmapData = hdPackTileInfo.HdTileData.data();
 	uint32_t tileWidth = 8 * scale;
 	uint8_t tileOffsetX = tileInfo.HorizontalMirroring ? 7 - tileInfo.OffsetX : tileInfo.OffsetX;
 	uint32_t bitmapOffset = (tileInfo.OffsetY * scale) * tileWidth + tileOffsetX * scale;
@@ -234,13 +233,13 @@ void HdNesPack<scale>::DrawTile(HdPpuTileInfo &tileInfo, HdPackTileInfo &hdPackT
 }
 
 template<uint32_t scale>
-void HdNesPack<scale>::OnLineStart(HdPpuPixelInfo &lineFirstPixel, uint8_t y)
+void HdNesPack<scale>::OnLineStart(HdPpuPixelInfo& lineFirstPixel, uint8_t y)
 {
 	_scrollX = ((lineFirstPixel.TmpVideoRamAddr & 0x1F) << 3) | lineFirstPixel.XScroll | ((lineFirstPixel.TmpVideoRamAddr & 0x400) ? 0x100 : 0);
 	_useCachedTile = false;
 
 	int32_t scrollY = (((lineFirstPixel.TmpVideoRamAddr & 0x3E0) >> 2) | ((lineFirstPixel.TmpVideoRamAddr & 0x7000) >> 12)) + ((lineFirstPixel.TmpVideoRamAddr & 0x800) ? 240 : 0);
-	
+
 	for(int layer = 0; layer < 4; layer++) {
 		for(int i = 0; i < _activeBgCount[layer]; i++) {
 			HdBgConfig& cfg = _bgConfig[layer * HdNesPack::PriorityLevelsPerLayer + i];
@@ -302,8 +301,8 @@ void HdNesPack<scale>::OnBeforeApplyFilter()
 		for(int i = 0; i < HdNesPack::PriorityLevelsPerLayer; i++) {
 			int32_t index = GetLayerIndex(layer * HdNesPack::PriorityLevelsPerLayer + i);
 			if(index >= 0) {
-				_bgConfig[layer*10+activeCount].BgPriority = layer * HdNesPack::PriorityLevelsPerLayer + i;
-				_bgConfig[layer*10+activeCount].BackgroundIndex = index;
+				_bgConfig[layer * 10 + activeCount].BgPriority = layer * HdNesPack::PriorityLevelsPerLayer + i;
+				_bgConfig[layer * 10 + activeCount].BackgroundIndex = index;
 				activeCount++;
 			}
 		}
@@ -455,7 +454,7 @@ HdPackTileInfo* HdNesPack<scale>::GetMatchingTile(uint32_t x, uint32_t y, HdPpuT
 				}
 			}
 		}
-	
+
 		if(hdTile == _hdData->TileByKey.end()) {
 			hdTile = _hdData->TileByKey.find(tile->GetKey(true));
 		}
@@ -494,10 +493,10 @@ void HdNesPack<scale>::DrawBackgroundLayer(uint8_t priority, uint32_t x, uint32_
 }
 
 template<uint32_t scale>
-void HdNesPack<scale>::GetPixels(uint32_t x, uint32_t y, HdPpuPixelInfo &pixelInfo, uint32_t *outputBuffer, uint32_t screenWidth)
+void HdNesPack<scale>::GetPixels(uint32_t x, uint32_t y, HdPpuPixelInfo& pixelInfo, uint32_t* outputBuffer, uint32_t screenWidth)
 {
-	HdPackTileInfo *hdPackTileInfo = nullptr;
-	HdPackTileInfo *hdPackSpriteInfo = nullptr;
+	HdPackTileInfo* hdPackTileInfo = nullptr;
+	HdPackTileInfo* hdPackSpriteInfo = nullptr;
 
 	bool hasSprite = pixelInfo.SpriteCount > 0;
 	bool renderOriginalTiles = ((_hdData->OptionFlags & (int)HdPackOptions::DontRenderOriginalTiles) == 0);
@@ -506,11 +505,11 @@ void HdNesPack<scale>::GetPixels(uint32_t x, uint32_t y, HdPpuPixelInfo &pixelIn
 	}
 
 	int lowestBgSprite = 999;
-	
+
 	DrawColor(_palette[pixelInfo.Tile.PpuBackgroundColor], outputBuffer, screenWidth);
 
 	for(int i = 0; i < _activeBgCount[0]; i++) {
-		DrawBackgroundLayer(HdNesPack::BehindBgSpritesPriority+i, x, y, outputBuffer, screenWidth);
+		DrawBackgroundLayer(HdNesPack::BehindBgSpritesPriority + i, x, y, outputBuffer, screenWidth);
 	}
 
 	if(hasSprite) {
@@ -529,11 +528,11 @@ void HdNesPack<scale>::GetPixels(uint32_t x, uint32_t y, HdPpuPixelInfo &pixelIn
 			}
 		}
 	}
-	
+
 	for(int i = 0; i < _activeBgCount[1]; i++) {
-		DrawBackgroundLayer(HdNesPack::BehindBgPriority+i, x, y, outputBuffer, screenWidth);
+		DrawBackgroundLayer(HdNesPack::BehindBgPriority + i, x, y, outputBuffer, screenWidth);
 	}
-	
+
 	if(hdPackTileInfo) {
 		DrawTile(pixelInfo.Tile, *hdPackTileInfo, outputBuffer, screenWidth);
 	} else if(renderOriginalTiles) {
@@ -544,7 +543,7 @@ void HdNesPack<scale>::GetPixels(uint32_t x, uint32_t y, HdPpuPixelInfo &pixelIn
 	}
 
 	for(int i = 0; i < _activeBgCount[2]; i++) {
-		DrawBackgroundLayer(HdNesPack::BehindFgSpritesPriority+i, x, y, outputBuffer, screenWidth);
+		DrawBackgroundLayer(HdNesPack::BehindFgSpritesPriority + i, x, y, outputBuffer, screenWidth);
 	}
 
 	if(hasSprite) {
@@ -561,12 +560,12 @@ void HdNesPack<scale>::GetPixels(uint32_t x, uint32_t y, HdPpuPixelInfo &pixelIn
 	}
 
 	for(int i = 0; i < _activeBgCount[3]; i++) {
-		DrawBackgroundLayer(HdNesPack::ForegroundPriority+i, x, y, outputBuffer, screenWidth);
+		DrawBackgroundLayer(HdNesPack::ForegroundPriority + i, x, y, outputBuffer, screenWidth);
 	}
 }
 
 template<uint32_t scale>
-void HdNesPack<scale>::Process(HdScreenInfo *hdScreenInfo, uint32_t* outputBuffer, OverscanDimensions &overscan)
+void HdNesPack<scale>::Process(HdScreenInfo* hdScreenInfo, uint32_t* outputBuffer, OverscanDimensions& overscan)
 {
 	_hdScreenInfo = hdScreenInfo;
 	uint32_t hdScale = GetScale();
@@ -587,14 +586,14 @@ void HdNesPack<scale>::Process(HdScreenInfo *hdScreenInfo, uint32_t* outputBuffe
 }
 
 template<uint32_t scale>
-void HdNesPack<scale>::ProcessGrayscaleAndEmphasis(HdPpuPixelInfo &pixelInfo, uint32_t* outputBuffer, uint32_t hdScreenWidth)
+void HdNesPack<scale>::ProcessGrayscaleAndEmphasis(HdPpuPixelInfo& pixelInfo, uint32_t* outputBuffer, uint32_t hdScreenWidth)
 {
 	//Apply grayscale/emphasis bits on a scanline level (less accurate, but shouldn't cause issues and simpler to implement)
 	if(pixelInfo.Grayscale) {
 		uint32_t* out = outputBuffer;
 		for(uint32_t y = 0; y < scale; y++) {
 			for(uint32_t x = 0; x < hdScreenWidth; x++) {
-				uint32_t &rgbValue = out[x];
+				uint32_t& rgbValue = out[x];
 				uint8_t average = (((rgbValue >> 16) & 0xFF) + ((rgbValue >> 8) & 0xFF) + (rgbValue & 0xFF)) / 3;
 				rgbValue = (rgbValue & 0xFF000000) | (average << 16) | (average << 8) | average;
 			}
@@ -627,7 +626,7 @@ void HdNesPack<scale>::ProcessGrayscaleAndEmphasis(HdPpuPixelInfo &pixelInfo, ui
 		uint32_t* out = outputBuffer;
 		for(uint32_t y = 0; y < scale; y++) {
 			for(uint32_t x = 0; x < hdScreenWidth; x++) {
-				uint32_t &rgbValue = out[x];
+				uint32_t& rgbValue = out[x];
 
 				rgbValue = 0xFF000000 |
 					(std::min<uint16_t>((uint16_t)(((rgbValue >> 16) & 0xFF) * red), 255) << 16) |

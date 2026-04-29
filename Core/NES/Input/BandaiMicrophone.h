@@ -7,7 +7,12 @@
 class BandaiMicrophone : public BaseControlDevice
 {
 protected:
-	enum Buttons { A, B, Microphone };
+	enum Buttons
+	{
+		A,
+		B,
+		Microphone
+	};
 
 	string GetKeyNames() override
 	{
@@ -37,8 +42,7 @@ public:
 	uint8_t ReadRam(uint16_t addr) override
 	{
 		if(addr >= 0x6000 && addr <= 0x7FFF) {
-			return
-				(IsPressed(Buttons::A) ? 0 : 0x01) |
+			return (IsPressed(Buttons::A) ? 0 : 0x01) |
 				(IsPressed(Buttons::B) ? 0 : 0x02) |
 				(IsPressed(Buttons::Microphone) ? 0x04 : 0);
 		} else {
