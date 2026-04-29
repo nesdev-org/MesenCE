@@ -56,7 +56,7 @@ struct MissingFirmwareMessage
 class FirmwareHelper
 {
 private:
-	static bool AttemptLoadDspFirmware(string combinedFilename, string splitFilenameProgram, string splitFilenameData, vector<uint8_t> &programRom, vector<uint8_t> &dataRom, uint32_t programSize, uint32_t dataSize)
+	static bool AttemptLoadDspFirmware(string combinedFilename, string splitFilenameProgram, string splitFilenameData, vector<uint8_t>& programRom, vector<uint8_t>& dataRom, uint32_t programSize, uint32_t dataSize)
 	{
 		VirtualFile combinedFirmware(FolderUtilities::CombinePath(FolderUtilities::GetFirmwareFolder(), combinedFilename));
 		if(combinedFirmware.GetSize() == programSize + dataSize) {
@@ -77,7 +77,7 @@ private:
 		}
 		return false;
 	}
-	
+
 	static bool AttemptLoadBsxFirmware(uint8_t** prgRom, uint32_t& prgSize)
 	{
 		VirtualFile firmware(FolderUtilities::CombinePath(FolderUtilities::GetFirmwareFolder(), "BS-X.bin"));
@@ -127,7 +127,7 @@ private:
 	}
 
 public:
-	static bool LoadDspFirmware(Emulator* emu, FirmwareType type, string combinedFilename, string splitFilenameProgram, string splitFilenameData, vector<uint8_t> &programRom, vector<uint8_t> &dataRom, vector<uint8_t> &embeddedFirmware, uint32_t programSize = 0x1800, uint32_t dataSize = 0x800)
+	static bool LoadDspFirmware(Emulator* emu, FirmwareType type, string combinedFilename, string splitFilenameProgram, string splitFilenameData, vector<uint8_t>& programRom, vector<uint8_t>& dataRom, vector<uint8_t>& embeddedFirmware, uint32_t programSize = 0x1800, uint32_t dataSize = 0x800)
 	{
 		if(embeddedFirmware.size() == programSize + dataSize) {
 			programRom.insert(programRom.end(), embeddedFirmware.begin(), embeddedFirmware.begin() + programSize);
@@ -175,9 +175,9 @@ public:
 			return true;
 		}
 
-		MissingFirmwareMessage msg("BS-X.bin", FirmwareType::Satellaview, 1024*1024);
+		MissingFirmwareMessage msg("BS-X.bin", FirmwareType::Satellaview, 1024 * 1024);
 		emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::MissingFirmware, &msg);
-		
+
 		if(AttemptLoadBsxFirmware(prgRom, prgSize)) {
 			return true;
 		}
@@ -189,7 +189,7 @@ public:
 	static bool LoadSufamiTurboFirmware(Emulator* emu, vector<uint8_t>& data)
 	{
 		string filename = "SufamiTurbo.sfc";
-		
+
 		if(AttemptLoadFirmware(data, filename, 0x40000)) {
 			return true;
 		}
@@ -232,10 +232,25 @@ public:
 		string altFilename;
 		switch(type) {
 			default:
-			case FirmwareType::Gameboy: filename = "dmg_boot.bin"; altFilename = "gb_bios.bin"; break;
-			case FirmwareType::GameboyColor: filename = "cgb_boot.bin"; altFilename = "gbc_bios.bin"; break;
-			case FirmwareType::Sgb1GameboyCpu: filename = "sgb_boot.bin"; altFilename = "sgb_bios.bin"; break;
-			case FirmwareType::Sgb2GameboyCpu: filename = "sgb2_boot.bin"; altFilename = "sgb_bios.bin"; break;
+			case FirmwareType::Gameboy:
+				filename = "dmg_boot.bin";
+				altFilename = "gb_bios.bin";
+				break;
+
+			case FirmwareType::GameboyColor:
+				filename = "cgb_boot.bin";
+				altFilename = "gbc_bios.bin";
+				break;
+
+			case FirmwareType::Sgb1GameboyCpu:
+				filename = "sgb_boot.bin";
+				altFilename = "sgb_bios.bin";
+				break;
+
+			case FirmwareType::Sgb2GameboyCpu:
+				filename = "sgb2_boot.bin";
+				altFilename = "sgb_bios.bin";
+				break;
 		}
 
 		uint32_t size = type == FirmwareType::GameboyColor ? 2304 : 256;
@@ -388,9 +403,20 @@ public:
 		FirmwareType firmwareType;
 		switch(model) {
 			default:
-			case WsModel::Monochrome: filename = "bootrom.ws"; firmwareType = FirmwareType::WonderSwan; break;
-			case WsModel::Color: filename = "bootrom.wsc"; firmwareType = FirmwareType::WonderSwanColor; break;
-			case WsModel::SwanCrystal: filename = "bootrom_sc.wsc"; firmwareType = FirmwareType::SwanCrystal; break;
+			case WsModel::Monochrome:
+				filename = "bootrom.ws";
+				firmwareType = FirmwareType::WonderSwan;
+				break;
+
+			case WsModel::Color:
+				filename = "bootrom.wsc";
+				firmwareType = FirmwareType::WonderSwanColor;
+				break;
+
+			case WsModel::SwanCrystal:
+				filename = "bootrom_sc.wsc";
+				firmwareType = FirmwareType::SwanCrystal;
+				break;
 		}
 		uint32_t size = model == WsModel::Monochrome ? 0x1000 : 0x2000;
 		string path = FolderUtilities::CombinePath(FolderUtilities::GetFirmwareFolder(), filename);
@@ -427,5 +453,4 @@ public:
 		MessageManager::DisplayMessage("Error", "Could not find ADPCM ROM for YMF288 (EPSM) - sound emulation will be incorrect.");
 		return false;
 	}
-
 };

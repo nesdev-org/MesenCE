@@ -58,7 +58,7 @@ bool SaveStateManager::LoadState()
 	return LoadState(_lastIndex);
 }
 
-void SaveStateManager::GetSaveStateHeader(ostream &stream)
+void SaveStateManager::GetSaveStateHeader(ostream& stream)
 {
 	uint32_t emuVersion = _emu->GetSettings()->GetVersion();
 	uint32_t formatVersion = SaveStateManager::FileFormatVersion;
@@ -76,7 +76,7 @@ void SaveStateManager::GetSaveStateHeader(ostream &stream)
 	stream.write(romName.c_str(), romName.size());
 }
 
-void SaveStateManager::SaveState(ostream &stream)
+void SaveStateManager::SaveState(ostream& stream)
 {
 	GetSaveStateHeader(stream);
 	_emu->Serialize(stream, false);
@@ -152,7 +152,7 @@ bool SaveStateManager::GetVideoData(vector<uint8_t>& out, RenderedFrame& frame, 
 	return false;
 }
 
-bool SaveStateManager::LoadState(istream &stream)
+bool SaveStateManager::LoadState(istream& stream)
 {
 	if(!_emu->IsRunning()) {
 		//Can't load a state if no game is running
@@ -176,7 +176,7 @@ bool SaveStateManager::LoadState(istream &stream)
 			MessageManager::DisplayMessage("SaveStates", "SaveStateIncompatibleVersion");
 			return false;
 		}
-		
+
 		if(fileFormatVersion <= 3) {
 			//Skip over old SHA1 field
 			stream.seekg(40, ios::cur);
@@ -194,7 +194,7 @@ bool SaveStateManager::LoadState(istream &stream)
 		}
 
 		uint32_t nameLength = ReadValue(stream);
-			
+
 		vector<char> nameBuffer(nameLength);
 		stream.read(nameBuffer.data(), nameBuffer.size());
 		string romName(nameBuffer.data(), nameLength);
@@ -320,7 +320,7 @@ void SaveStateManager::LoadRecentGame(string filename, bool resetGame)
 				SaveStateManager::LoadState(stateStream);
 			}
 		}
-	} catch(std::exception&) { 
+	} catch(std::exception&) {
 		_emu->Stop(true);
 	}
 }
@@ -356,7 +356,7 @@ int32_t SaveStateManager::GetSaveStatePreview(string saveStatePath, uint8_t* png
 			FrameInfo baseFrameInfo;
 			baseFrameInfo.Width = frame.Width;
 			baseFrameInfo.Height = frame.Height;
-			
+
 			unique_ptr<BaseVideoFilter> filter(_emu->GetVideoFilter(true));
 			filter->SetBaseFrameInfo(baseFrameInfo);
 			FrameInfo frameInfo = filter->SendFrame((uint16_t*)frameData.data(), 0, 0, nullptr);
@@ -388,7 +388,7 @@ uint32_t SaveStateManager::ReadValue(istream& stream)
 	stream.get(b);
 	stream.get(c);
 	stream.get(d);
-	
+
 	uint32_t result = (uint8_t)a | ((uint8_t)b << 8) | ((uint8_t)c << 16) | ((uint8_t)d << 24);
 	return result;
 }

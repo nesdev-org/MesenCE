@@ -37,6 +37,7 @@ private:
 	uint8_t* _videoRam = nullptr;
 	uint16_t _internalPaletteRam[0x20] = {};
 
+	// clang-format off
 	uint16_t _smsSgPalette[0x10] = {
 		ColorUtilities::Rgb222To555(0x00), ColorUtilities::Rgb222To555(0x00), ColorUtilities::Rgb222To555(0x08), ColorUtilities::Rgb222To555(0x0C),
 		ColorUtilities::Rgb222To555(0x10), ColorUtilities::Rgb222To555(0x30), ColorUtilities::Rgb222To555(0x01), ColorUtilities::Rgb222To555(0x3C),
@@ -48,6 +49,7 @@ private:
 		0x0000, 0x0000, 0x2324, 0x3f6b, 0x754a, 0x7dcf, 0x255a, 0x7ba8,
 		0x295f, 0x3dff, 0x2b1a, 0x433c, 0x1ec4, 0x5d79, 0x6739, 0x7fff
 	};
+	// clang-format on
 
 	const uint16_t* _activeSgPalette = nullptr;
 	bool _disableBackground = false;
@@ -83,7 +85,7 @@ private:
 	uint8_t _evalCounter = 0;
 	uint8_t _inRangeSpriteCount = 0;
 	bool _spriteOverflowPending = false;
-	
+
 	uint8_t _spriteIndex = 0;
 	uint8_t _inRangeSpriteIndex = 0;
 	uint8_t _spriteCount = 0;
@@ -124,7 +126,7 @@ private:
 	void ProcessVramWrite();
 
 	uint8_t ReverseBitOrder(uint8_t val);
-	
+
 	__forceinline void Exec();
 	__forceinline void ExecForcedBlank();
 	__forceinline void ProcessForcedBlankVblank();
@@ -134,7 +136,7 @@ private:
 	void LoadBgTilesSg();
 	void LoadBgTilesSgTextMode();
 	void PushBgPixel(uint8_t color, int index);
-	
+
 	__forceinline void DrawPixel();
 
 	void ProcessScanlineEvents();
@@ -160,7 +162,7 @@ private:
 
 	void InitSmsPostBiosState();
 	void InitGgPowerOnState();
-	
+
 	void UpdateConfig();
 
 public:

@@ -39,13 +39,13 @@ SmsDebugger::SmsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 
 	_console = ((SmsConsole*)debugger->GetConsole());
-	
+
 	_cpu = _console->GetCpu();
 	_vdp = _console->GetVdp();
 	_memoryManager = _console->GetMemoryManager();
 
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::SmsPrgRom, _emu->GetMemory(MemoryType::SmsPrgRom).Size, CpuType::Sms, _emu->GetCrc32()));
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
@@ -59,7 +59,7 @@ SmsDebugger::SmsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Sms, _eventManager.get()));
 	_step.reset(new StepRequest());
 	_assembler.reset(new SmsAssembler(debugger->GetLabelManager()));
-	
+
 	_dummyCpu.reset(new DummySmsCpu());
 	_dummyCpu->Init(_emu, _console, _console->GetMemoryManager());
 }
@@ -305,10 +305,7 @@ void SmsDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool
 	ProcessCallStackUpdates(ret, originalPc, originalSp);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::Sms, *this, *_step.get(), 
-		ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::Sms, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi);
 }
 
 void SmsDebugger::ProcessPpuRead(uint16_t addr, uint8_t value, MemoryType memoryType)

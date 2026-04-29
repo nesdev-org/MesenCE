@@ -7,10 +7,10 @@
 class SmsSegaCart : public SmsCart
 {
 private:
-	uint8_t _prgBanks[3] = { 0,1,2 };
+	uint8_t _prgBanks[3] = { 0, 1, 2 };
 	bool _ramEnabled[2] = {};
 	uint8_t _ramBank = 0;
-	
+
 	//TODOSMS unused
 	uint8_t _bankShift = 0;
 	bool _romWriteEnabled = false;
@@ -58,9 +58,20 @@ public:
 				_memoryManager->RefreshMappings();
 				break;
 
-			case 0xFFFD: _prgBanks[0] = value; _memoryManager->RefreshMappings(); break;
-			case 0xFFFE: _prgBanks[1] = value; _memoryManager->RefreshMappings(); break;
-			case 0xFFFF: _prgBanks[2] = value; _memoryManager->RefreshMappings(); break;
+			case 0xFFFD:
+				_prgBanks[0] = value;
+				_memoryManager->RefreshMappings();
+				break;
+
+			case 0xFFFE:
+				_prgBanks[1] = value;
+				_memoryManager->RefreshMappings();
+				break;
+
+			case 0xFFFF:
+				_prgBanks[2] = value;
+				_memoryManager->RefreshMappings();
+				break;
 		}
 	}
 
