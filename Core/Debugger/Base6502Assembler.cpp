@@ -50,7 +50,7 @@ void Base6502Assembler<T>::ProcessLine(string code, uint32_t& instructionAddress
 		output.push_back(AssemblerSpecialCodes::EndOfLine);
 		return;
 	}
-	
+
 	AssemblerLineData op = {};
 
 	size_t opnameOffset = code.find_first_of(' ', 0);
@@ -83,7 +83,7 @@ void Base6502Assembler<T>::ProcessLine(string code, uint32_t& instructionAddress
 		output.push_back(result);
 		return;
 	}
-	
+
 	AssembleInstruction(op, instructionAddress, output, firstPass);
 }
 
@@ -283,7 +283,7 @@ void Base6502Assembler<T>::AssembleInstruction(AssemblerLineData& op, uint32_t& 
 			output.push_back((op.Operands[i].Value >> 16) & 0xFF);
 		}
 	}
-			
+
 	output.push_back(AssemblerSpecialCodes::EndOfLine);
 }
 
