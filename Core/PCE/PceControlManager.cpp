@@ -20,7 +20,7 @@ shared_ptr<BaseControlDevice> PceControlManager::CreateControllerDevice(Controll
 {
 	PcEngineConfig& cfg = _emu->GetSettings()->GetPcEngineConfig();
 	shared_ptr<BaseControlDevice> device;
-	
+
 	switch(type) {
 		default:
 		case ControllerType::None: break;

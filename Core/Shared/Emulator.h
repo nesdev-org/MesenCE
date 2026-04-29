@@ -81,7 +81,7 @@ private:
 	const unique_ptr<CheatManager> _cheatManager;
 	const unique_ptr<MovieManager> _movieManager;
 	const unique_ptr<HistoryViewer> _historyViewer;
-	
+
 	const shared_ptr<GameServer> _gameServer;
 	const shared_ptr<GameClient> _gameClient;
 	const shared_ptr<RewindManager> _rewindManager;
@@ -114,7 +114,7 @@ private:
 	unique_ptr<FrameLimiter> _frameLimiter;
 	Timer _lastFrameTimer;
 	double _frameDelay = 0;
-	
+
 	uint32_t _autoSaveStateFrameCounter = 0;
 	int32_t _stopCode = 0;
 	bool _stopRequested = false;
@@ -240,7 +240,7 @@ public:
 	uint32_t GetFrameCount();
 
 	uint32_t GetLagCounter();
-	void ResetLagCounter();	
+	void ResetLagCounter();
 	bool HasControlDevice(ControllerType type);
 	void RegisterInputRecorder(IInputRecorder* recorder);
 	void UnregisterInputRecorder(IInputRecorder* recorder);
@@ -248,7 +248,7 @@ public:
 	void UnregisterInputProvider(IInputProvider* provider);
 
 	double GetFps();
-	
+
 	template<CpuType type> __forceinline void ProcessInstruction()
 	{
 		if(_debugger) {

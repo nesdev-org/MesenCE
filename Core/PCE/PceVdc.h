@@ -64,7 +64,7 @@ private:
 	PceVpc* _vpc = nullptr;
 	uint16_t* _vram = nullptr;
 	uint16_t* _spriteRam = nullptr;
-	
+
 	uint16_t _rowBuffer[PceConstants::MaxScreenWidth] = {};
 
 	uint16_t _vramOpenBus = 0;
@@ -74,7 +74,7 @@ private:
 
 	PceVdcModeH _hMode = PceVdcModeH::Hds;
 	int16_t _hModeCounter = 0;
-	
+
 	PceVdcModeV _vMode = PceVdcModeV::Vds;
 	int16_t _vModeCounter = 0;
 
@@ -153,7 +153,7 @@ private:
 	__noinline void IncrementRcrCounter();
 	__noinline void IncScrollY();
 	__noinline void ProcessEndOfScanline();
-	
+
 	void TriggerDmaStart();
 	__noinline void TriggerVerticalBlank();
 	__noinline void ProcessSatbTransfer();
@@ -175,13 +175,13 @@ private:
 	__noinline void LoadSpriteTiles();
 
 	bool IsDmaAllowed();
-	
+
 	template<bool skipRender>
 	__forceinline void LoadBackgroundTiles();
 
 	__noinline void LoadBackgroundTilesWidth2(uint16_t end, uint16_t scrollOffset, uint16_t columnMask, uint16_t row);
 	__noinline void LoadBackgroundTilesWidth4(uint16_t end, uint16_t scrollOffset, uint16_t columnMask, uint16_t row);
-	
+
 	__forceinline void LoadBatEntry(uint16_t scrollOffset, uint16_t columnMask, uint16_t row);
 	__forceinline void LoadTileDataCg0(uint16_t row);
 	__forceinline void LoadTileDataCg1(uint16_t row);

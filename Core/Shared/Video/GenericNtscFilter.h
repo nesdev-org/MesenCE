@@ -63,8 +63,7 @@ public:
 			ntscSetup.fringing != cfg.NtscFringing ||
 			ntscSetup.gamma != cfg.NtscGamma ||
 			ntscSetup.resolution != cfg.NtscResolution ||
-			ntscSetup.sharpness != cfg.NtscSharpness
-		);
+			ntscSetup.sharpness != cfg.NtscSharpness);
 	}
 
 	template<typename T>

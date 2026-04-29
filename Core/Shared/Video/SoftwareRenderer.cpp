@@ -71,7 +71,7 @@ struct SoftwareRendererFrame
 void SoftwareRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud)
 {
 	auto lock = _frameLock.AcquireSafe();
-	
+
 	if(_needSwap) {
 		_needSwap = false;
 		auto textureLock = _textureLock.AcquireSafe();
