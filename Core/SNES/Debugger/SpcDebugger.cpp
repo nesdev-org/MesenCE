@@ -159,7 +159,7 @@ void SpcDebugger::ProcessWrite(uint32_t addr, uint8_t value, MemoryOperationType
 
 	//Always invalidate cache, even if DSP writes are ignored
 	_disassembler->InvalidateCache(addressInfo, CpuType::Spc);
-	
+
 	if constexpr(flags == MemoryAccessFlags::None) {
 		//SPC write
 		_debugger->ProcessBreakConditions(CpuType::Spc, *_step.get(), _breakpointManager.get(), operation, addressInfo);
@@ -194,7 +194,7 @@ void SpcDebugger::Step(int32_t stepCount, StepType type)
 			break;
 
 		case StepType::StepOver:
-			if(_prevOpCode == 0x3F || _prevOpCode == 0x0F || _prevOpCode == 0x4F || (_prevOpCode&0x0F) == 0x01) {
+			if(_prevOpCode == 0x3F || _prevOpCode == 0x0F || _prevOpCode == 0x4F || (_prevOpCode & 0x0F) == 0x01) {
 				//JSR, BRK, PCALL, TCALL
 				step.BreakAddress = _prevProgramCounter + SpcDisUtils::GetOpSize(_prevOpCode);
 				step.BreakStackPointer = _prevStackPointer;
@@ -203,7 +203,7 @@ void SpcDebugger::Step(int32_t stepCount, StepType type)
 				step.StepCount = 1;
 			}
 			break;
-		
+
 		case StepType::SpecificScanline:
 		case StepType::PpuStep:
 			break;

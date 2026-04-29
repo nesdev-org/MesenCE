@@ -99,7 +99,7 @@ void Gsu::JMP(uint8_t reg)
 		//LJMP
 		_state.ProgramBank = _state.R[reg] & 0x7F;
 		WriteRegister(15, ReadSrcReg());
-		
+
 		_state.CacheBase = _state.R[15] & 0xFFF0;
 		InvalidateCache();
 	} else {
@@ -169,7 +169,7 @@ void Gsu::LOOP()
 	_state.R[12]--;
 	_state.SFR.Zero = (_state.R[12] == 0);
 	_state.SFR.Sign = (_state.R[12] & 0x8000) != 0;
-	
+
 	//Loop until counter hits zero
 	if(!_state.SFR.Zero) {
 		WriteRegister(15, _state.R[13]);
@@ -288,7 +288,7 @@ void Gsu::MULT(uint8_t reg)
 		//MULT - Signed multiply
 		value = (uint16_t)((int8_t)ReadSrcReg() * (int8_t)operand);
 	}
-	
+
 	WriteDestReg(value);
 	_state.SFR.Sign = (value & 0x8000) != 0;
 	_state.SFR.Zero = value == 0;
@@ -380,7 +380,7 @@ void Gsu::LSR()
 {
 	uint16_t src = ReadSrcReg();
 	_state.SFR.Carry = (src & 0x01) != 0;
-	
+
 	uint16_t dst = src >> 1;
 	WriteDestReg(dst);
 	_state.SFR.Zero = dst == 0;
@@ -420,7 +420,7 @@ void Gsu::ASR()
 void Gsu::ROR()
 {
 	uint16_t src = ReadSrcReg();
-	
+
 	uint16_t dst = (src >> 1) | ((int)_state.SFR.Carry << 15);
 	_state.SFR.Carry = (src & 0x01) != 0;
 
@@ -629,7 +629,7 @@ uint8_t Gsu::ReadPixel(uint8_t x, uint8_t y)
 	WritePixelCache(_state.PrimaryCache);
 
 	uint32_t tileAddress = GetTileAddress(x, y);
-	
+
 	x = (x & 7) ^ 7;
 
 	uint8_t data = 0;
@@ -690,7 +690,7 @@ void Gsu::FlushPrimaryCache(uint8_t x, uint8_t y)
 	_state.PrimaryCache.Y = y;
 }
 
-void Gsu::WritePixelCache(GsuPixelCache &cache)
+void Gsu::WritePixelCache(GsuPixelCache& cache)
 {
 	if(cache.ValidBits == 0) {
 		return;

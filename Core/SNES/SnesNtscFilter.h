@@ -19,7 +19,7 @@ public:
 	SnesNtscFilter(Emulator* emu);
 	virtual ~SnesNtscFilter();
 
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 	FrameInfo GetFrameInfo() override;
 	OverscanDimensions GetOverscan() override;
 	HudScaleFactors GetScaleFactor() override;

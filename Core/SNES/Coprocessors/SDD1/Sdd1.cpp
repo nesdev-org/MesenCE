@@ -11,10 +11,10 @@ Sdd1::Sdd1(SnesConsole* console)
 {
 	//This handler is used to dynamically map the ROM based on the banking registers
 	_sdd1Mmc.reset(new Sdd1Mmc(_state, console->GetCartridge()));
-	
-	MemoryMappings *cpuMappings = console->GetMemoryManager()->GetMemoryMappings();
-	vector<unique_ptr<IMemoryHandler>> &prgRomHandlers = console->GetCartridge()->GetPrgRomHandlers();
-	vector<unique_ptr<IMemoryHandler>> &saveRamHandlers = console->GetCartridge()->GetSaveRamHandlers();
+
+	MemoryMappings* cpuMappings = console->GetMemoryManager()->GetMemoryMappings();
+	vector<unique_ptr<IMemoryHandler>>& prgRomHandlers = console->GetCartridge()->GetPrgRomHandlers();
+	vector<unique_ptr<IMemoryHandler>>& saveRamHandlers = console->GetCartridge()->GetSaveRamHandlers();
 
 	//Regular A Bus register handler, keep a reference to it, it'll be overwritten below
 	_cpuRegisterHandler = cpuMappings->GetHandler(0x4000);
@@ -58,11 +58,14 @@ uint8_t Sdd1::Read(uint32_t addr)
 			case 0: return _state.AllowDmaProcessing;
 			case 1: return _state.ProcessNextDma;
 
-			case 4: case 5: case 6: case 7:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
 				return _state.SelectedBanks[addr & 0x03];
 		}
 	}
-	
+
 	return _cpuRegisterHandler->Read(addr);
 }
 
@@ -74,7 +77,10 @@ void Sdd1::Write(uint32_t addr, uint8_t value)
 			case 0: _state.AllowDmaProcessing = value; break;
 			case 1: _state.ProcessNextDma = value; break;
 
-			case 4: case 5: case 6: case 7:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
 				_state.SelectedBanks[addr & 0x03] = value;
 				break;
 		}
@@ -91,14 +97,16 @@ void Sdd1::Write(uint32_t addr, uint8_t value)
 			}
 		}
 
-		//Forward everything else to the regular handler 
+		//Forward everything else to the regular handler
 		_cpuRegisterHandler->Write(addr, value);
 	}
 }
 
-void Sdd1::Serialize(Serializer &s)
+void Sdd1::Serialize(Serializer& s)
 {
-	SV(_state.AllowDmaProcessing); SV(_state.ProcessNextDma); SV(_state.NeedInit);
+	SV(_state.AllowDmaProcessing);
+	SV(_state.ProcessNextDma);
+	SV(_state.NeedInit);
 	SVArray(_state.DmaAddress, 8);
 	SVArray(_state.DmaLength, 8);
 	SVArray(_state.SelectedBanks, 4);

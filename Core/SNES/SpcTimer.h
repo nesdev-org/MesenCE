@@ -91,8 +91,15 @@ public:
 		_output = value;
 	}
 
-	void Serialize(Serializer &s)
+	void Serialize(Serializer& s)
 	{
-		SV(_stage0); SV(_stage1); SV(_stage2); SV(_output); SV(_target); SV(_enabled); SV(_timersEnabled); SV(_prevStage1);
+		SV(_stage0);
+		SV(_stage1);
+		SV(_stage2);
+		SV(_output);
+		SV(_target);
+		SV(_enabled);
+		SV(_timersEnabled);
+		SV(_prevStage1);
 	}
 };

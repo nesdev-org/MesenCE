@@ -37,7 +37,7 @@ public:
 		return Read(addr);
 	}
 
-	void PeekBlock(uint32_t addr, uint8_t *output) override
+	void PeekBlock(uint32_t addr, uint8_t* output) override
 	{
 		_handler->PeekBlock(addr, output);
 	}

@@ -6,7 +6,7 @@
 
 Obc1::Obc1(SnesConsole* console, uint8_t* saveRam, uint32_t saveRamSize)
 {
-	MemoryMappings *mappings = console->GetMemoryManager()->GetMemoryMappings();	
+	MemoryMappings* mappings = console->GetMemoryManager()->GetMemoryMappings();
 	mappings->RegisterHandler(0x00, 0x3F, 0x6000, 0x7FFF, this);
 	mappings->RegisterHandler(0x80, 0xBF, 0x6000, 0x7FFF, this);
 
@@ -78,7 +78,7 @@ uint16_t Obc1::GetHighAddress()
 	return (GetBaseAddress() | ((ReadRam(0x1FF6) & 0x7F) >> 2)) + 0x200;
 }
 
-void Obc1::Serialize(Serializer &s)
+void Obc1::Serialize(Serializer& s)
 {
 }
 
@@ -87,7 +87,7 @@ uint8_t Obc1::Peek(uint32_t addr)
 	return 0;
 }
 
-void Obc1::PeekBlock(uint32_t addr, uint8_t *output)
+void Obc1::PeekBlock(uint32_t addr, uint8_t* output)
 {
 	memset(output, 0, 0x1000);
 }

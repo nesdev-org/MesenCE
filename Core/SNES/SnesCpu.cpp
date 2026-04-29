@@ -13,7 +13,7 @@
 #include "Shared/MemoryOperationType.h"
 
 #ifndef DUMMYCPU
-SnesCpu::SnesCpu(SnesConsole *console)
+SnesCpu::SnesCpu(SnesConsole* console)
 {
 	_console = console;
 	_emu = console->GetEmulator();
@@ -121,7 +121,7 @@ void SnesCpu::IdleTakeBranch()
 void SnesCpu::ProcessCpuCycle()
 {
 	_state.CycleCount++;
-	if(_dmaController->HasPendingTransfer()){
+	if(_dmaController->HasPendingTransfer()) {
 		_state.IrqLock = _dmaController->ProcessPendingTransfers();
 	} else {
 		_state.IrqLock = false;
