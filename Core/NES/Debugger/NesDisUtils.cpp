@@ -10,6 +10,7 @@
 #include "Utilities/FastString.h"
 #include "Shared/MemoryType.h"
 
+// clang-format off
 static constexpr uint8_t _opSize[17] = {
 	1, 1, 1, 2, 2,
 	2, 3, 2, 2,
@@ -77,6 +78,7 @@ static constexpr bool _isUnofficial[256] = {
 	false,false,true, true, false,false,false,true, false,false,false,true, false,false,false,true, //E
 	false,false,true, true, true, false,false,true, false,false,true, true, true, false,false,true  //F
 };
+// clang-format on
 
 void NesDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
@@ -98,8 +100,8 @@ void NesDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 			if(label.size()) {
 				operand.Write(label, true);
 			}
-		} 
-		
+		}
+
 		if(operand.GetSize() == 0) {
 			if(opSize == 3 || addrMode == NesAddrMode::Rel) {
 				operand.WriteAll('$', HexUtilities::ToHex((uint16_t)opAddr));
@@ -169,7 +171,7 @@ EffectiveAddressInfo NesDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Nes
 	NesAddrMode addrMode = _opMode[info.GetOpCode()];
 	if(isJump && addrMode != NesAddrMode::Ind) {
 		//For jumps, show no address/value (except indirect jump)
-		return { };
+		return {};
 	}
 
 	uint8_t* byteCode = info.GetByteCode();
@@ -201,7 +203,7 @@ EffectiveAddressInfo NesDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Nes
 			uint8_t hi = memoryDumper->GetMemoryValue(MemoryType::NesMemory, (addr & 0xFF00) | ((addr + 1) & 0xFF));
 			return { lo | (hi << 8), 1, true };
 		}
-	
+
 		case NesAddrMode::AbsX:
 		case NesAddrMode::AbsXW:
 			return { (uint16_t)((byteCode[1] | (byteCode[2] << 8)) + state.X) & 0xFFFF, 1, true };
@@ -294,7 +296,7 @@ CdlFlags::CdlFlags NesDisUtils::GetOpFlags(uint8_t opCode, uint16_t pc, uint16_t
 		case 0x00: //BRK
 		case 0x20: //JSR
 			return CdlFlags::SubEntryPoint;
-		
+
 		case 0x10: //BPL
 		case 0x30: //BMI
 		case 0x4C: //JMP (Absolute)

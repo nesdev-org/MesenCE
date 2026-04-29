@@ -67,7 +67,7 @@ public:
 				backgroundColor = (((_lowBitShift << _xScroll) & 0x8000) >> 15) | (((_highBitShift << _xScroll) & 0x8000) >> 14);
 			}
 
-			if(_needChrHash ) {
+			if(_needChrHash) {
 				uint16_t addr = 0;
 				_bankHashes.clear();
 				while(addr < 0x2000) {

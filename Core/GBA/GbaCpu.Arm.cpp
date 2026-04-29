@@ -36,7 +36,7 @@ void GbaCpu::ArmBranch()
 	int32_t offset = (((int32_t)_opCode << 8) >> 6); //sign extend + shift right by 2
 	if(withLink) {
 		_state.R[14] = _state.R[15] - 4;
-	} 
+	}
 
 	_state.R[15] += offset;
 	_state.Pipeline.ReloadRequested = true;
@@ -155,7 +155,7 @@ void GbaCpu::ArmDataProcessing()
 		} else {
 			shift = (_opCode >> 7) & 0x1F;
 		}
-		
+
 		switch(shiftType) {
 			case 0: op2 = ShiftLsl(op2, shift, carry); break;
 			case 1: op2 = ShiftLsr(op2, (useRegValue || shift) ? shift : 32, carry); break;
@@ -163,7 +163,7 @@ void GbaCpu::ArmDataProcessing()
 			case 3: op2 = (!useRegValue && shift == 0) ? ShiftRrx(op2, carry) : ShiftRor(op2, shift, carry); break;
 		}
 	}
-	
+
 	switch((ArmAluOperation)((_opCode >> 21) & 0x0F)) {
 		case ArmAluOperation::And: SetR(dstReg, LogicalOp(op1 & op2, carry, updateFlags)); break;
 		case ArmAluOperation::Eor: SetR(dstReg, LogicalOp(op1 ^ op2, carry, updateFlags)); break;
@@ -216,7 +216,7 @@ void GbaCpu::ArmMultiply()
 	if(rd != 15) {
 		SetR(rd, result);
 	}
-	
+
 	if(updateFlags) {
 		_state.CPSR.Carry = output.Carry;
 		_state.CPSR.Zero = result == 0;
@@ -232,7 +232,7 @@ void GbaCpu::ArmMultiplyLong()
 	uint8_t rl = (_opCode >> 12) & 0x0F;
 	uint8_t rs = (_opCode >> 8) & 0x0F;
 	uint8_t rm = _opCode & 0x0F;
-	
+
 	bool updateFlags = (_opCode & (1 << 20)) != 0;
 	bool multAndAcc = (_opCode & (1 << 21)) != 0;
 	bool sign = (_opCode & (1 << 22)) != 0;
@@ -301,9 +301,9 @@ void GbaCpu::ArmSingleDataTransfer()
 	bool load = (_opCode & (1 << 20)) != 0;
 	uint8_t rn = (_opCode >> 16) & 0x0F;
 	uint8_t rd = (_opCode >> 12) & 0x0F;
-	
+
 	uint32_t addr = R(rn);
-	
+
 	int32_t offset;
 	if(immediate) {
 		offset = _opCode & 0xFFF;
@@ -355,7 +355,7 @@ void GbaCpu::ArmSignedHalfDataTransfer()
 	bool load = (_opCode & (1 << 20)) != 0;
 	uint8_t rn = (_opCode >> 16) & 0x0F;
 	uint8_t rd = (_opCode >> 12) & 0x0F;
-	
+
 	bool sign = (_opCode & (1 << 6)) != 0;
 	bool half = (_opCode & (1 << 5)) != 0;
 
@@ -464,7 +464,7 @@ void GbaCpu::ArmBlockDataTransfer()
 				//LDM doesn't appear to be affected by the rotation that is usually applied to unaligned reads? based on gba-tests/arm test 508
 				SetR(i, Read(mode | GbaAccessMode::NoRotate, addr));
 			}
-			
+
 			mode |= GbaAccessMode::Sequential;
 			addr += 4;
 		}

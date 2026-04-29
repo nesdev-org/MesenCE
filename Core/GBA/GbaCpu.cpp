@@ -11,7 +11,7 @@ void GbaCpu::Init(Emulator* emu, GbaMemoryManager* memoryManager, GbaRomPrefetch
 	_emu = emu;
 	_memoryManager = memoryManager;
 	_prefetch = prefetch;
-	
+
 	_state = {};
 	_state.Pipeline.ReloadRequested = true;
 
@@ -62,7 +62,7 @@ void GbaCpu::SwitchMode(GbaCpuMode mode)
 		case GbaCpuMode::Fiq:
 			memcpy(_state.FiqRegs, &_state.R[8], 7 * sizeof(uint32_t));
 			break;
-		
+
 		case GbaCpuMode::Irq:
 			memcpy(_state.UserRegs, &_state.R[8], 5 * sizeof(uint32_t));
 			memcpy(_state.IrqRegs, &_state.R[13], 2 * sizeof(uint32_t));
@@ -152,7 +152,7 @@ uint32_t GbaCpu::ReadCode(GbaAccessModeVal mode, uint32_t addr)
 
 	uint32_t value = _memoryManager->Read(mode, addr);
 	_hasPendingIrq = _memoryManager->HasPendingIrq();
-	
+
 	//Next access should be sequential
 	_state.Pipeline.Mode |= GbaAccessMode::Sequential;
 

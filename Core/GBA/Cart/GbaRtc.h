@@ -64,7 +64,7 @@ private:
 	void ProcessDataIn(uint8_t value);
 	void ProcessDataOut();
 	void ProcessCommand();
-	
+
 	void Reset();
 	void UpdateTime();
 

@@ -15,7 +15,7 @@ private:
 	GbaMemoryManager* _memoryManager = nullptr;
 	GbaConfig _prevConfig = {};
 	GbaControlManagerState _state = {};
-	
+
 	uint8_t ReadController(uint32_t addr);
 	void CheckForIrq();
 
@@ -24,7 +24,7 @@ public:
 	void Init(GbaMemoryManager* memoryManager);
 
 	GbaControlManagerState& GetState();
-	
+
 	void UpdateInputState() override;
 
 	shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override;
