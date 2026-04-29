@@ -8,7 +8,7 @@ void GbTimer::Init(GbMemoryManager* memoryManager, GbApu* apu)
 {
 	_apu = apu;
 	_memoryManager = memoryManager;
-	
+
 	_state = {};
 	_state.TimerDivider = 1024;
 
@@ -146,5 +146,12 @@ void GbTimer::Write(uint16_t addr, uint8_t value)
 
 void GbTimer::Serialize(Serializer& s)
 {
-	SV(_state.Divider); SV(_state.Counter); SV(_state.Modulo); SV(_state.Control); SV(_state.TimerEnabled); SV(_state.TimerDivider); SV(_state.NeedReload); SV(_state.Reloaded);
+	SV(_state.Divider);
+	SV(_state.Counter);
+	SV(_state.Modulo);
+	SV(_state.Control);
+	SV(_state.TimerEnabled);
+	SV(_state.TimerDivider);
+	SV(_state.NeedReload);
+	SV(_state.Reloaded);
 }

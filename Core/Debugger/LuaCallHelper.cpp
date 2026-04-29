@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "LuaCallHelper.h"
 
-LuaCallHelper::LuaCallHelper(lua_State *lua) : _lua(lua)
+LuaCallHelper::LuaCallHelper(lua_State* lua) : _lua(lua)
 {
 	_stackSize = lua_gettop(lua);
 }

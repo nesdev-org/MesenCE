@@ -4,7 +4,7 @@
 #include "Debugger/DebugUtilities.h"
 #include "Debugger/DebugBreakHelper.h"
 
-LabelManager::LabelManager(Debugger *debugger)
+LabelManager::LabelManager(Debugger* debugger)
 {
 	_debugger = debugger;
 }
@@ -70,7 +70,7 @@ string LabelManager::GetLabel(AddressInfo address, bool checkRegisterLabels)
 	return label;
 }
 
-bool LabelManager::InternalGetLabel(AddressInfo address, string &label)
+bool LabelManager::InternalGetLabel(AddressInfo address, string& label)
 {
 	int64_t key = GetLabelKey(address.Address, address.Type);
 	if(key >= 0) {
@@ -97,7 +97,7 @@ string LabelManager::GetComment(AddressInfo absAddress)
 	return "";
 }
 
-bool LabelManager::GetLabelAndComment(AddressInfo address, LabelInfo &labelInfo)
+bool LabelManager::GetLabelAndComment(AddressInfo address, LabelInfo& labelInfo)
 {
 	if(DebugUtilities::IsRelativeMemory(address.Type)) {
 		address = _debugger->GetAbsoluteAddress(address);
@@ -117,7 +117,7 @@ bool LabelManager::GetLabelAndComment(AddressInfo address, LabelInfo &labelInfo)
 	return false;
 }
 
-bool LabelManager::ContainsLabel(string &label)
+bool LabelManager::ContainsLabel(string& label)
 {
 	return _codeLabelReverseLookup.find(label) != _codeLabelReverseLookup.end();
 }
@@ -134,7 +134,7 @@ AddressInfo LabelManager::GetLabelAbsoluteAddress(string& label)
 	return addr;
 }
 
-int32_t LabelManager::GetLabelRelativeAddress(string &label, CpuType cpuType)
+int32_t LabelManager::GetLabelRelativeAddress(string& label, CpuType cpuType)
 {
 	auto result = _codeLabelReverseLookup.find(label);
 	if(result == _codeLabelReverseLookup.end()) {

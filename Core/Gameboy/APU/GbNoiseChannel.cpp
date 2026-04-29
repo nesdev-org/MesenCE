@@ -62,8 +62,8 @@ uint8_t GbNoiseChannel::GetRawOutput()
 
 double GbNoiseChannel::GetOutput()
 {
-	//"If a DAC is enabled, the digital range $0 to $F is linearly translated to the analog range -1 to 1, 
-	//in arbitrary units. Importantly, the slope is negative: “digital 0” maps to “analog 1”, not “analog -1”."	
+	//"If a DAC is enabled, the digital range $0 to $F is linearly translated to the analog range -1 to 1,
+	//in arbitrary units. Importantly, the slope is negative: “digital 0” maps to “analog 1”, not “analog -1”."
 
 	//Return -7 to 7 "analog" range (higher digital value = lower analog value)
 	return (7 - (int8_t)_state.Output) * (double)_dac.GetDacVolume() / 100;
@@ -101,7 +101,7 @@ void GbNoiseChannel::Exec(uint32_t clocksToRun)
 		uint16_t shiftedValue = _state.ShiftRegister >> 1;
 		uint8_t xorResult = (_state.ShiftRegister & 0x01) ^ (shiftedValue & 0x01);
 		_state.ShiftRegister = (xorResult << 14) | shiftedValue;
-		
+
 		if(_state.ShortWidthMode) {
 			//If width mode is 1 (NR43), the XOR result is ALSO put into bit 6 AFTER the shift, resulting in a 7-bit LFSR.
 			_state.ShiftRegister &= ~0x40;
@@ -119,19 +119,17 @@ uint8_t GbNoiseChannel::Read(uint16_t addr)
 	uint8_t value = 0;
 	switch(addr) {
 		case 2:
-			value = (
+			value =
 				(_state.EnvVolume << 4) |
 				(_state.EnvRaiseVolume ? 0x08 : 0) |
-				_state.EnvPeriod
-			);
+				_state.EnvPeriod;
 			break;
 
 		case 3:
-			value = (
+			value =
 				(_state.PeriodShift << 4) |
 				(_state.ShortWidthMode ? 0x08 : 0) |
-				_state.Divisor
-			);
+				_state.Divisor;
 			break;
 
 		case 4: value = _state.LengthEnabled ? 0x40 : 0; break;
@@ -230,8 +228,20 @@ void GbNoiseChannel::Write(uint16_t addr, uint8_t value)
 
 void GbNoiseChannel::Serialize(Serializer& s)
 {
-	SV(_state.Volume); SV(_state.EnvVolume); SV(_state.EnvRaiseVolume); SV(_state.EnvPeriod); SV(_state.EnvTimer); SV(_state.EnvStopped);
-	SV(_state.ShiftRegister); SV(_state.PeriodShift); SV(_state.Divisor); SV(_state.ShortWidthMode);
-	SV(_state.Length); SV(_state.LengthEnabled); SV(_state.Enabled); SV(_state.Timer); SV(_state.Output);
+	SV(_state.Volume);
+	SV(_state.EnvVolume);
+	SV(_state.EnvRaiseVolume);
+	SV(_state.EnvPeriod);
+	SV(_state.EnvTimer);
+	SV(_state.EnvStopped);
+	SV(_state.ShiftRegister);
+	SV(_state.PeriodShift);
+	SV(_state.Divisor);
+	SV(_state.ShortWidthMode);
+	SV(_state.Length);
+	SV(_state.LengthEnabled);
+	SV(_state.Enabled);
+	SV(_state.Timer);
+	SV(_state.Output);
 	SV(_dac);
 }

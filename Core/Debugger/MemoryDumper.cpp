@@ -66,7 +66,7 @@ MemoryDumper::MemoryDumper(Debugger* debugger)
 	}
 }
 
-void MemoryDumper::SetMemoryState(MemoryType type, uint8_t *buffer, uint32_t length)
+void MemoryDumper::SetMemoryState(MemoryType type, uint8_t* buffer, uint32_t length)
 {
 	if(length > GetMemorySize(type)) {
 		return;
@@ -111,7 +111,7 @@ uint32_t MemoryDumper::GetMemorySize(MemoryType type)
 	}
 }
 
-void MemoryDumper::GetMemoryState(MemoryType type, uint8_t *buffer)
+void MemoryDumper::GetMemoryState(MemoryType type, uint8_t* buffer)
 {
 	if(GetMemorySize(type) == 0) {
 		return;
@@ -119,8 +119,8 @@ void MemoryDumper::GetMemoryState(MemoryType type, uint8_t *buffer)
 
 	switch(type) {
 		case MemoryType::SnesMemory:
-			for(int i = 0; i <= 0xFFFFFF; i+=0x1000) {
-				_memoryManager->PeekBlock(i, buffer+i);
+			for(int i = 0; i <= 0xFFFFFF; i += 0x1000) {
+				_memoryManager->PeekBlock(i, buffer + i);
 			}
 			break;
 
@@ -129,7 +129,7 @@ void MemoryDumper::GetMemoryState(MemoryType type, uint8_t *buffer)
 				buffer[i] = _spc->DebugRead(i);
 			}
 			break;
-		
+
 		case MemoryType::Sa1Memory:
 			if(_cartridge->GetSa1()) {
 				for(int i = 0; i <= 0xFFFFFF; i += 0x1000) {
@@ -234,7 +234,7 @@ void MemoryDumper::GetMemoryState(MemoryType type, uint8_t *buffer)
 			break;
 		}
 
-		default: 
+		default:
 			uint8_t* src = GetMemoryBuffer(type);
 			if(src) {
 				memcpy(buffer, src, GetMemorySize(type));
@@ -246,7 +246,7 @@ void MemoryDumper::GetMemoryState(MemoryType type, uint8_t *buffer)
 void MemoryDumper::InternalSetMemoryValues(MemoryType originalMemoryType, uint32_t startAddress, uint8_t* data, uint32_t length, bool disableSideEffects, bool undoAllowed)
 {
 	uint32_t memSize = GetMemorySize(originalMemoryType);
-	
+
 	UndoBatch undoBatch = {};
 	UndoEntry undoEntry = { MemoryType::None };
 
@@ -307,7 +307,8 @@ void MemoryDumper::InternalSetMemoryValues(MemoryType originalMemoryType, uint32
 					//Prevent invalid memory values
 					switch(memoryType) {
 						case MemoryType::SnesCgRam: src[address] = (address & 0x01) ? (value & 0x7F) : value; break;
-						case MemoryType::NesSpriteRam: case MemoryType::NesSecondarySpriteRam: src[address] = (address & 0x03) == 0x02 ? (value & 0xE3) : value; break;
+						case MemoryType::NesSpriteRam:
+						case MemoryType::NesSecondarySpriteRam: src[address] = (address & 0x03) == 0x02 ? (value & 0xE3) : value; break;
 						case MemoryType::NesPaletteRam: src[address] = value & 0x3F; break;
 						case MemoryType::PcePaletteRam: src[address] = (address & 0x01) ? (value & 0x01) : value; break;
 						case MemoryType::SmsPaletteRam: _smsConsole->GetVdp()->DebugWritePalette(address, value); break;
