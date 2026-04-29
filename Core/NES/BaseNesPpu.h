@@ -79,16 +79,19 @@ protected:
 	//176
 	PpuControlFlags _control = {}; // 8 bytes
 	PpuMaskFlags _mask = {}; // 8 bytes
-  ////////////////////////
-	//192 : end of cache line
 	////////////////////////
+	 //192 : end of cache line
+	 ////////////////////////
 	uint8_t _spriteRam[0x100] = {};
 	////////////////////////
 	//448 : end of cache line
 	////////////////////////
-	bool _hasSprite[257] = {};
-	//705
 	NesSpriteInfo _spriteTiles[64] = {};
+
+	uint16_t _spriteShifterList[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0xfff0 }; //Ordered by X coordinate.
+	uint8_t _nextSpriteShifter = 0;
+	uint8_t _activeSpriteShifters = 0;
+	bool _dotSkipped = false;
 
 	Emulator* _emu = nullptr;
 	EmuSettings* _settings = nullptr;
@@ -117,7 +120,7 @@ protected:
 
 	uint64_t _oamDecayCycles[0x40] = {};
 	bool _corruptOamRow[32] = {};
-	
+
 	bool IsRenderingEnabled();
 	void UpdateGrayscaleAndIntensifyBits();
 	void UpdateColorBitMasks();
