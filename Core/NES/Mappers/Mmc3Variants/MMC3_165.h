@@ -11,7 +11,7 @@ private:
 protected:
 	uint16_t GetChrPageSize() override { return 0x1000; }
 	uint32_t GetChrRamSize() override { return 0x1000; }
-	uint16_t GetChrRamPageSize() override { return 0x1000; }	
+	uint16_t GetChrRamPageSize() override { return 0x1000; }
 	bool EnableVramAddressHook() override { return true; }
 
 	void Serialize(Serializer& s) override
@@ -25,7 +25,7 @@ protected:
 	void UpdateChrMapping() override
 	{
 		uint16_t page;
-		
+
 		for(int i = 0; i < 2; i++) {
 			page = _registers[i == 0 ? (_chrLatch[0] ? 1 : 0) : (_chrLatch[1] ? 4 : 2)];
 			if(page == 0) {
@@ -46,7 +46,8 @@ protected:
 
 		//MMC2 style latch
 		switch(addr & 0x2FF8) {
-			case 0xFD0: case 0xFE8:
+			case 0xFD0:
+			case 0xFE8:
 				_chrLatch[(addr >> 12) & 0x01] = ((addr & 0x08) == 0x08);
 				_needUpdate = true;
 				break;

@@ -73,9 +73,9 @@ private:
 		UpdatePrgBanks();
 	}
 
-	void GetCpuBankInfo(uint16_t reg, uint8_t &bankNumber, PrgMemoryType &memoryType, uint8_t &accessType)
+	void GetCpuBankInfo(uint16_t reg, uint8_t& bankNumber, PrgMemoryType& memoryType, uint8_t& accessType)
 	{
-		bankNumber = _prgBanks[reg-0x5113];
+		bankNumber = _prgBanks[reg - 0x5113];
 		memoryType = PrgMemoryType::PrgRom;
 		if((((bankNumber & 0x80) == 0x00) && reg != 0x5117) || reg == 0x5113) {
 			accessType = MemoryAccessType::Read;
@@ -335,7 +335,7 @@ protected:
 		AddRegisterRange(0xFFFA, 0xFFFB, MemoryOperation::Read);
 
 		_audio.reset(new Mmc5Audio(_console));
-		
+
 		//Override the 2000-2007 registers to catch all writes to the PPU registers (but not their mirrors)
 		_mmc5MemoryHandler.reset(new Mmc5MemoryHandler(_console));
 
@@ -376,7 +376,7 @@ protected:
 			vector<uint8_t> data(_saveRamSize + _mapperRamSize);
 			_emu->GetBatteryManager()->LoadBattery(".sav", data.data(), _saveRamSize + _mapperRamSize);
 			memcpy(_saveRam, data.data(), _saveRamSize);
-			memcpy(_mapperRam, data.data()+_saveRamSize, _mapperRamSize);
+			memcpy(_mapperRam, data.data() + _saveRamSize, _mapperRamSize);
 		}
 	}
 
@@ -397,12 +397,36 @@ protected:
 		SVArray(_prgBanks, 5);
 		SVArray(_chrBanks, 12);
 		SV(_audio);
-		SV(_prgRamProtect1); SV(_prgRamProtect2); SV(_fillModeTile); SV(_fillModeColor); SV(_verticalSplitEnabled); SV(_verticalSplitRightSide);
-		SV(_verticalSplitDelimiterTile); SV(_verticalSplitScroll); SV(_verticalSplitBank); SV(_multiplierValue1); SV(_multiplierValue2);
-		SV(_nametableMapping); SV(_extendedRamMode); SV(_exAttributeLastNametableFetch); SV(_exAttrLastFetchCounter); SV(_exAttrSelectedChrBank);
-		SV(_prgMode); SV(_chrMode); SV(_chrUpperBits); SV(_lastChrReg);
-		SV(_irqCounterTarget); SV(_irqEnabled); SV(_scanlineCounter); SV(_irqPending); SV(_ppuInFrame);
-		SV(_splitInSplitRegion); SV(_splitVerticalScroll); SV(_splitTile); SV(_splitTileNumber); SV(_needInFrame);
+		SV(_prgRamProtect1);
+		SV(_prgRamProtect2);
+		SV(_fillModeTile);
+		SV(_fillModeColor);
+		SV(_verticalSplitEnabled);
+		SV(_verticalSplitRightSide);
+		SV(_verticalSplitDelimiterTile);
+		SV(_verticalSplitScroll);
+		SV(_verticalSplitBank);
+		SV(_multiplierValue1);
+		SV(_multiplierValue2);
+		SV(_nametableMapping);
+		SV(_extendedRamMode);
+		SV(_exAttributeLastNametableFetch);
+		SV(_exAttrLastFetchCounter);
+		SV(_exAttrSelectedChrBank);
+		SV(_prgMode);
+		SV(_chrMode);
+		SV(_chrUpperBits);
+		SV(_lastChrReg);
+		SV(_irqCounterTarget);
+		SV(_irqEnabled);
+		SV(_scanlineCounter);
+		SV(_irqPending);
+		SV(_ppuInFrame);
+		SV(_splitInSplitRegion);
+		SV(_splitVerticalScroll);
+		SV(_splitTile);
+		SV(_splitTileNumber);
+		SV(_needInFrame);
 
 		SV(_prevChrA);
 		SV(_ppuIdleCounter);
@@ -527,8 +551,7 @@ protected:
 					//Attribute fetches
 					_exAttrLastFetchCounter--;
 					switch(_exAttrLastFetchCounter) {
-						case 2:
-						{
+						case 2: {
 							//PPU palette fetch
 							//Check work ram (expansion ram) to see which tile/palette to use
 							//Use InternalReadRam to bypass the fact that the ram is supposed to be write-only in mode 0/1
@@ -550,7 +573,7 @@ protected:
 				}
 			}
 		}
-		
+
 		return InternalReadVram(addr);
 	}
 
@@ -562,28 +585,54 @@ protected:
 			SwitchChrBank(addr, value);
 		} else {
 			switch(addr) {
-				case 0x5000: case 0x5001: case 0x5002: case 0x5003: case 0x5004: case 0x5005: case 0x5006: case 0x5007: case 0x5010: case 0x5011: case 0x5015:
+				case 0x5000:
+				case 0x5001:
+				case 0x5002:
+				case 0x5003:
+				case 0x5004:
+				case 0x5005:
+				case 0x5006:
+				case 0x5007:
+				case 0x5010:
+				case 0x5011:
+				case 0x5015:
 					_audio->WriteRegister(addr, value);
 					break;
 
-				case 0x5100: _prgMode = value & 0x03; UpdatePrgBanks(); break;
-				case 0x5101: _chrMode = value & 0x03; UpdateChrBanks(true); break;
-				case 0x5102: _prgRamProtect1 = value & 0x03; UpdatePrgBanks(); break;
-				case 0x5103: _prgRamProtect2 = value & 0x03; UpdatePrgBanks(); break;
+				case 0x5100:
+					_prgMode = value & 0x03;
+					UpdatePrgBanks();
+					break;
+
+				case 0x5101:
+					_chrMode = value & 0x03;
+					UpdateChrBanks(true);
+					break;
+
+				case 0x5102:
+					_prgRamProtect1 = value & 0x03;
+					UpdatePrgBanks();
+					break;
+
+				case 0x5103:
+					_prgRamProtect2 = value & 0x03;
+					UpdatePrgBanks();
+					break;
+
 				case 0x5104: SetExtendedRamMode(value & 0x03); break;
 				case 0x5105: SetNametableMapping(value); break;
 				case 0x5106: SetFillModeTile(value); break;
 				case 0x5107: SetFillModeColor(value & 0x03); break;
 				case 0x5130: _chrUpperBits = value & 0x03; break;
-				case 0x5200: 
-					_verticalSplitEnabled = (value & 0x80) == 0x80; 
-					_verticalSplitRightSide = (value & 0x40) == 0x40; 
+				case 0x5200:
+					_verticalSplitEnabled = (value & 0x80) == 0x80;
+					_verticalSplitRightSide = (value & 0x40) == 0x40;
 					_verticalSplitDelimiterTile = (value & 0x1F);
 					break;
 				case 0x5201: _verticalSplitScroll = value; break;
 				case 0x5202: _verticalSplitBank = value; break;
 				case 0x5203: _irqCounterTarget = value; break;
-				case 0x5204: 
+				case 0x5204:
 					_irqEnabled = (value & 0x80) == 0x80;
 					if(!_irqEnabled) {
 						_console->GetCpu()->ClearIrqSource(IRQSource::External);
@@ -603,21 +652,21 @@ protected:
 	uint8_t ReadRegister(uint16_t addr) override
 	{
 		switch(addr) {
-			case 0x5010: case 0x5015: 
+			case 0x5010:
+			case 0x5015:
 				return _audio->ReadRegister(addr);
 
-			case 0x5204:
-			{
+			case 0x5204: {
 				uint8_t value = (_ppuInFrame ? 0x40 : 0x00) | (_irqPending ? 0x80 : 0x00);
 				_irqPending = false;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				return value;
 			}
 
-			case 0x5205: return (_multiplierValue1*_multiplierValue2) & 0xFF;
-			case 0x5206: return (_multiplierValue1*_multiplierValue2) >> 8;
+			case 0x5205: return (_multiplierValue1 * _multiplierValue2) & 0xFF;
+			case 0x5206: return (_multiplierValue1 * _multiplierValue2) >> 8;
 
-			case 0xFFFA: 
+			case 0xFFFA:
 			case 0xFFFB:
 				_ppuInFrame = false;
 				UpdateChrBanks(true);
@@ -637,7 +686,7 @@ protected:
 
 		entries.push_back(MapperStateEntry("$5100", "PRG Mode", _prgMode, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5101", "CHR Mode", _chrMode, MapperStateValueType::Number8));
-		
+
 		entries.push_back(MapperStateEntry("$5102", "Work RAM Write Protect", _prgRamProtect1, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5103", "Work RAM Write Protect", _prgRamProtect1, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5102/3", "Work RAM Write Protected", _prgRamProtect1 != 0x02 || _prgRamProtect2 != 0x01));
@@ -647,7 +696,7 @@ protected:
 		entries.push_back(MapperStateEntry("$5105.2-3", "Nametable 1", (_nametableMapping >> 2) & 0x03, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5105.4-5", "Nametable 2", (_nametableMapping >> 4) & 0x03, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5105.6-7", "Nametable 3", (_nametableMapping >> 6) & 0x03, MapperStateValueType::Number8));
-		
+
 		entries.push_back(MapperStateEntry("$5106", "Fill Mode Tile", _fillModeTile, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5107", "Fill Mode Color", _fillModeColor, MapperStateValueType::Number8));
 
@@ -660,7 +709,7 @@ protected:
 		}
 
 		entries.push_back(MapperStateEntry("$5130", "CHR Upper Bits", _chrUpperBits, MapperStateValueType::Number8));
-		
+
 		entries.push_back(MapperStateEntry("$5200.0-4", "Vertical Split - Delimiter Tile", _verticalSplitDelimiterTile, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5200.6", "Vertical Split - Right Side", _verticalSplitRightSide));
 		entries.push_back(MapperStateEntry("$5200.7", "Vertical Split - Enabled", _verticalSplitEnabled));
@@ -672,7 +721,7 @@ protected:
 
 		entries.push_back(MapperStateEntry("$5205", "Multiplicand", _multiplierValue1, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$5206", "Multiplier", _multiplierValue2, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$5205/6", "Multiplication Result", _multiplierValue1*_multiplierValue2, MapperStateValueType::Number16));
+		entries.push_back(MapperStateEntry("$5205/6", "Multiplication Result", _multiplierValue1 * _multiplierValue2, MapperStateValueType::Number16));
 
 		_audio->GetMapperStateEntries(entries);
 
@@ -694,7 +743,7 @@ public:
 	{
 		return cfg.Nametables[0].AttrExtMode;
 	}
-	
+
 	bool HasExtendedBackground(ExtModeConfig& cfg, uint8_t ntIndex) override
 	{
 		if(ntIndex == 4) {

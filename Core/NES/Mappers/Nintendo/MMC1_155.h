@@ -3,7 +3,7 @@
 
 class MMC1_155 : public MMC1
 {
-protected :
+protected:
 	void UpdateState()
 	{
 		//WRAM disable bit does not exist in mapper 155

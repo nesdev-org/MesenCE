@@ -95,8 +95,15 @@ protected:
 		string mirroringType;
 		int64_t mirValue = 0;
 		switch(GetMirroringType()) {
-			case MirroringType::Vertical: mirroringType = "Vertical"; mirValue = 0; break;
-			case MirroringType::Horizontal: mirroringType = "Horizontal"; mirValue = 1; break;
+			case MirroringType::Vertical:
+				mirroringType = "Vertical";
+				mirValue = 0;
+				break;
+
+			case MirroringType::Horizontal:
+				mirroringType = "Horizontal";
+				mirValue = 1;
+				break;
 		}
 		entries.push_back(MapperStateEntry("$A000.0-3", "PRG Bank", _prgPage, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$B000.0-4", "CHR Bank ($0000) ($FD)", _leftChrPage[0], MapperStateValueType::Number8));

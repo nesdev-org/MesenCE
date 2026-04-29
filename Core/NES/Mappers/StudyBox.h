@@ -30,7 +30,7 @@ private:
 	uint8_t _currentPage = 0;
 	int16_t _seekPage = 0;
 	uint32_t _seekPageDelay = 0;
-	
+
 	bool _enableDecoder = false;
 
 	bool _audioEnabled = false;
@@ -128,8 +128,25 @@ protected:
 	{
 		BaseMapper::Serialize(s);
 		int32_t audioPosition = _wavReader ? _wavReader->GetPosition() : -1;
-		SV(_readyForBit); SV(_processBitDelay); SV(_reg4202); SV(_commandCounter); SV(_command); SV(_currentPage); SV(_seekPage); SV(_seekPageDelay); SV(_enableDecoder);
-		SV(_audioEnabled); SV(_motorDisabled); SV(_byteReadDelay); SV(_irqEnabled); SV(_pageFound); SV(_pageIndex); SV(_pagePosition); SV(_inDataDelay); SV(_inDataRegion); SV(audioPosition);
+		SV(_readyForBit);
+		SV(_processBitDelay);
+		SV(_reg4202);
+		SV(_commandCounter);
+		SV(_command);
+		SV(_currentPage);
+		SV(_seekPage);
+		SV(_seekPageDelay);
+		SV(_enableDecoder);
+		SV(_audioEnabled);
+		SV(_motorDisabled);
+		SV(_byteReadDelay);
+		SV(_irqEnabled);
+		SV(_pageFound);
+		SV(_pageIndex);
+		SV(_pagePosition);
+		SV(_inDataDelay);
+		SV(_inDataRegion);
+		SV(audioPosition);
 
 		if(!s.IsSaving() && audioPosition >= 0 && _wavReader) {
 			_wavReader->Play(audioPosition);
@@ -179,7 +196,7 @@ protected:
 						break;
 					}
 				}
-				
+
 				ReadLeadInTrack();
 			}
 		} else if(_inDataDelay > 0) {
@@ -210,7 +227,7 @@ protected:
 			}
 		}
 	}
-	
+
 	uint8_t ReadRegister(uint16_t addr) override
 	{
 		switch(addr) {
@@ -228,7 +245,7 @@ protected:
 				//After command $86, games expect to read 1 $AA byte before the $C5 header
 				return 0xAA;
 			}
-			
+
 			case 0x4201: {
 				/*	Tape read status ?
 				$80 - something to do with $4202.0 ? decoder disabled ? | decoder data ready ?
@@ -239,11 +256,10 @@ protected:
 					//0x10 |
 					(_inDataRegion ? 0x20 : 0) |
 					(_pageFound ? 0x40 : 0) |
-					(_enableDecoder ? 0x80 : 0)
-				);
+					(_enableDecoder ? 0x80 : 0));
 
 				_pageFound = false;
-				
+
 				return value;
 			}
 
@@ -253,10 +269,9 @@ protected:
 				//$08 - power supply not connected
 				return (
 					//(_powerDisconnected ? 0x08 : 0) |
-					(_readyForBit ? 0x40 : 0)
-				);
+					(_readyForBit ? 0x40 : 0));
 
-			case 0x4203: 
+			case 0x4203:
 				//unused?
 				return 0x00;
 		}
@@ -275,7 +290,7 @@ protected:
 
 			case 0x4201:
 				//PRG Select
-				SelectPrgPage(0, value); 
+				SelectPrgPage(0, value);
 				break;
 
 			case 0x4202:

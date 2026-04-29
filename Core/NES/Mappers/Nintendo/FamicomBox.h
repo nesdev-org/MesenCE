@@ -15,7 +15,7 @@ private:
 protected:
 	uint32_t GetDipSwitchCount() override { return 8; }
 	uint16_t RegisterStartAddress() override { return 0x5000; }
-	uint16_t RegisterEndAddress() override { return 0x5FFF; }	
+	uint16_t RegisterEndAddress() override { return 0x5FFF; }
 	uint16_t GetPrgPageSize() override { return 0x4000; }
 	uint16_t GetChrPageSize() override { return 0x2000; }
 	bool AllowRegisterRead() override { return true; }
@@ -47,7 +47,7 @@ protected:
 	uint8_t ReadRegister(uint16_t addr) override
 	{
 		switch(addr & 7) {
-			case 0: 
+			case 0:
 				/*
 					5000R: Device which caused an exception (0 = this device caused the exception)
 					-----
@@ -62,7 +62,7 @@ protected:
 				*/
 				_regs[0] = 0xFF; // clear all exceptions
 				return _regs[0];
-			
+
 			case 1:
 				//5001R (not implemented)
 				break;
@@ -91,7 +91,7 @@ protected:
 						11: Free Play
 				*/
 				return GetDipSwitches();
-			
+
 			case 3:
 				/*5003R
 					0 - key position 0 (1 = in this position)
@@ -103,12 +103,12 @@ protected:
 					6 - money system enabled (pin 9 of 3199)
 					7 - pin 10 of 3199
 				*/
-				return 0x00;	// 0, 1 - attract
-										// 2
-										// 4    - menu
-										// 8    - self check and game casette check
-										// 10   - lock?
-										// 20   - game title & count display
+				return 0x00; // 0, 1 - attract
+								 // 2
+								 // 4    - menu
+								 // 8    - self check and game casette check
+								 // 10   - lock?
+								 // 20   - game title & count display
 			case 4:
 				//5004R - DB-25 pins
 				return 0;
@@ -120,7 +120,7 @@ protected:
 			case 6:
 				//5006R: The enable for this runs to pin 27 of the expansion connector.
 				return 0;
-			
+
 			case 7:
 				/*
 					0 - TV type selection (1 = game, 0 = TV)
@@ -132,7 +132,7 @@ protected:
 					6 - pin 22 of exp. conn. (inverted)
 					7 - 5005.5W (inverted)
 				*/
-				return 0x22;	// TV type, key not turned, relay B
+				return 0x22; // TV type, key not turned, relay B
 		}
 		return 0;
 	}

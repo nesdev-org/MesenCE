@@ -24,8 +24,7 @@ private:
 				((uint8_t)BgExtMode << 1) |
 				(FpgaRamSrc << 2) |
 				((uint8_t)FillMode << 5) |
-				(Source << 6)
-			);
+				(Source << 6));
 		}
 	};
 
@@ -55,7 +54,7 @@ private:
 
 	uint8_t _fillModeTileIndex = 0;
 	uint8_t _fillModeAttrIndex = 0;
-	
+
 	NtControl _windowControl = {};
 	uint8_t _windowBank = 0;
 	uint8_t _windowX1 = 0;
@@ -65,7 +64,7 @@ private:
 	uint8_t _windowScrollX = 0;
 	uint8_t _windowScrollY = 0;
 	bool _inWindow = false;
-	
+
 	bool _slIrqEnabled = false;
 	bool _slIrqPending = false;
 	uint8_t _slIrqScanline = 0;
@@ -164,7 +163,7 @@ public:
 
 	void WriteRam(uint16_t addr, uint8_t value) override;
 	uint8_t ReadRam(uint16_t addr) override;
-	
+
 	void ProcessCpuClock() override;
 
 	uint8_t ReadRegister(uint16_t addr) override;

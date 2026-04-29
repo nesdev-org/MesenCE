@@ -110,23 +110,60 @@ protected:
 			_exRegs[addr & 0x03] = value;
 		} else {
 			switch(addr & 0x8C17) {
-				case 0x8000: _bank = value; UpdateState(); break;
-				case 0x8400: _mode = value; UpdateState(); break;
+				case 0x8000:
+					_bank = value;
+					UpdateState();
+					break;
+
+				case 0x8400:
+					_mode = value;
+					UpdateState();
+					break;
+
 				case 0x8800:
 					_irqCounter = (_irqCounter & 0xFF00) | value;
 					_console->GetCpu()->ClearIrqSource(IRQSource::External);
 					break;
+
 				case 0x8801:
 					_irqEnabled = (_mode & 0x80) != 0;
 					_irqCounter = (_irqCounter & 0xFF) | (value << 8);
 					break;
-				case 0x8c00: _regs[0] = value; UpdateState(); break;
-				case 0x8c01: _regs[1] = value; UpdateState(); break;
-				case 0x8c02: _regs[2] = value; UpdateState(); break;
-				case 0x8c10: _regs[3] = value; UpdateState(); break;
-				case 0x8c11: _regs[4] = value; UpdateState(); break;
-				case 0x8c16: _regs[5] = value; UpdateState(); break;
-				case 0x8c17: _regs[6] = value; UpdateState(); break;
+
+				case 0x8c00:
+					_regs[0] = value;
+					UpdateState();
+					break;
+
+				case 0x8c01:
+					_regs[1] = value;
+					UpdateState();
+					break;
+
+				case 0x8c02:
+					_regs[2] = value;
+					UpdateState();
+					break;
+
+				case 0x8c10:
+					_regs[3] = value;
+					UpdateState();
+					break;
+
+				case 0x8c11:
+					_regs[4] = value;
+					UpdateState();
+					break;
+
+				case 0x8c16:
+					_regs[5] = value;
+					UpdateState();
+					break;
+
+				case 0x8c17:
+					_regs[6] = value;
+					UpdateState();
+					break;
 			}
 		}
 	}
