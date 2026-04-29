@@ -23,7 +23,7 @@ protected:
 		SelectPrgPage(2, 0xFE);
 		SelectPrgPage(3, -1);
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
@@ -51,12 +51,13 @@ protected:
 			case 0x8000: SelectPrgPage(0, value); break;
 
 			case 0x9001: SetMirroringType(value & 0x80 ? MirroringType::Horizontal : MirroringType::Vertical); break;
-			case 0x9003: 
-				_irqEnabled = (value & 0x80) == 0x80; 
+
+			case 0x9003:
+				_irqEnabled = (value & 0x80) == 0x80;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
 
-			case 0x9004: 
+			case 0x9004:
 				_irqCounter = _irqReloadValue;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
@@ -65,7 +66,7 @@ protected:
 			case 0x9006: _irqReloadValue = (_irqReloadValue & 0xFF00) | value; break;
 
 			case 0xA000: SelectPrgPage(1, value); break;
-			
+
 			case 0xB000: SelectChrPage(0, value); break;
 			case 0xB001: SelectChrPage(1, value); break;
 			case 0xB002: SelectChrPage(2, value); break;

@@ -35,7 +35,7 @@ protected:
 	void UpdateState()
 	{
 		uint8_t prg = _regs[1] & 0x1E;
-		uint8_t chr = 
+		uint8_t chr =
 			((_regs[1] & 0x1E) << 2) |
 			(_regs[0] & 0x03);
 

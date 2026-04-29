@@ -57,10 +57,10 @@ protected:
 
 				case 4:
 				case 5:
-					MMC3::SelectChrPage(slot, page | ((_exReg & 0x01) << 8)); 
+					MMC3::SelectChrPage(slot, page | ((_exReg & 0x01) << 8));
 					break;
 
-				default: 
+				default:
 					MMC3::SelectChrPage(slot, page | ((_exReg & 0x02) << 7));
 					break;
 			}

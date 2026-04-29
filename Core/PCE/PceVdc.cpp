@@ -323,7 +323,7 @@ void PceVdc::ProcessSpriteEvaluation()
 			default:
 			case 0: height = 16; break;
 			case 1: height = 32; break;
-			
+
 			case 2:
 			case 3:
 				height = 64;
@@ -1258,7 +1258,7 @@ void PceVdc::WriteRegister(uint16_t addr, uint8_t value)
 						switch((value >> 4) & 0x03) {
 							case 0: _state.HvReg.ColumnCount = 32; break;
 							case 1: _state.HvReg.ColumnCount = 64; break;
-							
+
 							case 2:
 							case 3:
 								_state.HvReg.ColumnCount = 128;

@@ -63,7 +63,7 @@ void PceVce::Write(uint16_t addr, uint8_t value)
 			switch(value & 0x03) {
 				case 0: _state.ClockDivider = 4; break;
 				case 1: _state.ClockDivider = 3; break;
-				
+
 				case 2:
 				case 3:
 					_state.ClockDivider = 2;

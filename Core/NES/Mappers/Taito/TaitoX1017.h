@@ -95,7 +95,7 @@ protected:
 				if(_romInfo.MapperID == 82) {
 					SelectPrgPage(addr - 0x7EFA, value >> 2);
 				} else {
-					uint8_t page = 
+					uint8_t page =
 						((value & 0x20) >> 5) |
 						((value & 0x10) >> 3) |
 						((value & 0x08) >> 1) |

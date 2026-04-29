@@ -198,7 +198,7 @@ void PceVdcTools::InternalGetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* sprit
 			break;
 	}
 
-	bool visible = 
+	bool visible =
 		((spriteX + width) > 32 && (spriteX < 256 + 32)) ||
 		((spriteY + height) > 64 && (spriteY < 242 + 64));
 

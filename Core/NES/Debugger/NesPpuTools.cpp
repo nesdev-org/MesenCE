@@ -254,7 +254,7 @@ void NesPpuTools::ApplyHighlights(GetTilemapOptions options, uint8_t nametableIn
 
 					if(attrHighlighted) {
 						static constexpr uint32_t attrChangedColor = 0x80FFFF00;
-						bool isEdge = 
+						bool isEdge =
 							((column & 3) == 0 && x == 0) ||
 							((row & 3) == 0 && y == 0) ||
 							((column & 3) == 3 && x == 7) ||

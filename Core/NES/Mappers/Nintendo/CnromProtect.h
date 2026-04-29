@@ -27,7 +27,7 @@ protected:
 		//Submapper 5: Enable CHR-ROM if bits 0..1 of the latch hold the value 1, otherwise disable CHR-ROM.
 		//Submapper 6: Enable CHR-ROM if bits 0..1 of the latch hold the value 2, otherwise disable CHR-ROM.
 		//Submapper 7: Enable CHR-ROM if bits 0..1 of the latch hold the value 3, otherwise disable CHR-ROM.
-		_chrEnabled = 
+		_chrEnabled =
 			(_romInfo.SubMapperID == 0 && (value & 0x0F) != 0 && value != 0x13) ||
 			(_romInfo.SubMapperID == 4 && (value & 0x03) == 0) ||
 			(_romInfo.SubMapperID == 5 && (value & 0x03) == 1) ||

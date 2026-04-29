@@ -467,7 +467,7 @@ int64_t ExpressionEvaluator::Evaluate(ExpressionData& data, EvalResultType& resu
 				case EvalOperators::Substration: token = left - right; break;
 				case EvalOperators::ShiftLeft: token = left << right; break;
 				case EvalOperators::ShiftRight: token = left >> right; break;
-				
+
 				case EvalOperators::SmallerThan:
 					token = left < right;
 					resultType = EvalResultType::Boolean;
@@ -501,7 +501,7 @@ int64_t ExpressionEvaluator::Evaluate(ExpressionData& data, EvalResultType& resu
 				case EvalOperators::BinaryAnd: token = left & right; break;
 				case EvalOperators::BinaryXor: token = left ^ right; break;
 				case EvalOperators::BinaryOr: token = left | right; break;
-				
+
 				case EvalOperators::LogicalAnd:
 					token = (bool)(left && right);
 					resultType = EvalResultType::Boolean;

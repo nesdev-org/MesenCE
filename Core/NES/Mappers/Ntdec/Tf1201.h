@@ -104,7 +104,7 @@ protected:
 				case 0x9000:
 					SetMirroringType(value & 0x01 ? MirroringType::Horizontal : MirroringType::Vertical);
 					break;
-				
+
 				case 0x9001:
 					_swapPrg = (value & 0x03) != 0;
 					UpdatePrg();
