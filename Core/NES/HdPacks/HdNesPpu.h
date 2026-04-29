@@ -132,11 +132,7 @@ public:
 						tileInfo.Sprite[j].BackgroundPriority = sprite.BackgroundPriority;
 						tileInfo.Sprite[j].PaletteOffset = sprite.PaletteOffset;
 
-						if(sprite.HorizontalMirror) {
-							tileInfo.Sprite[j].SpriteColorIndex = ((sprite.LowByte >> shift) & 0x01) | ((sprite.HighByte >> shift) & 0x01) << 1;
-						} else {
-							tileInfo.Sprite[j].SpriteColorIndex = ((sprite.LowByte << shift) & 0x80) >> 7 | ((sprite.HighByte << shift) & 0x80) >> 6;
-						}
+						tileInfo.Sprite[j].SpriteColorIndex = ((sprite.LowByte << shift) & 0x80) >> 7 | ((sprite.HighByte << shift) & 0x80) >> 6;
 
 						if(tileInfo.Sprite[j].SpriteColorIndex == 0) {
 							tileInfo.Sprite[j].SpriteColor = ReadPaletteRam(0);

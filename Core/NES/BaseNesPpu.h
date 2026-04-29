@@ -85,9 +85,13 @@ protected:
 	////////////////////////
 	//448 : end of cache line
 	////////////////////////
-	bool _hasSprite[257] = {};
-	//705
 	NesSpriteInfo _spriteTiles[64] = {};
+
+	static constexpr int SpriteShifterDone = 0x8000;
+	uint16_t _spriteShifterList[9] = { SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone }; //Ordered by X coordinate.
+	uint8_t _nextSpriteShifter = 0;
+	uint8_t _activeSpriteShifters = 0;
+	bool _dotSkipped = false;
 
 	Emulator* _emu = nullptr;
 	EmuSettings* _settings = nullptr;
