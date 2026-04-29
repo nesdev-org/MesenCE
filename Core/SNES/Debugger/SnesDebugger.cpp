@@ -120,7 +120,7 @@ void SnesDebugger::ProcessConfigChange()
 	_predictiveBreakpoints = _settings->GetDebugConfig().UsePredictiveBreakpoints;
 
 	_runSpc = _spcTraceLogger->IsEnabled() || _settings->CheckDebuggerFlag(DebuggerFlags::SpcDebuggerEnabled);
-	_runCoprocessors = 
+	_runCoprocessors =
 		(_dspTraceLogger && _dspTraceLogger->IsEnabled()) ||
 		_settings->CheckDebuggerFlag(DebuggerFlags::NecDspDebuggerEnabled) ||
 		_settings->CheckDebuggerFlag(DebuggerFlags::GbDebuggerEnabled);

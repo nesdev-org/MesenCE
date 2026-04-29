@@ -207,7 +207,7 @@ private:
 	uint16_t GetIndAddr() { return ReadWord(); }
 	uint8_t GetImmediate() { return ReadByte(); }
 	uint8_t GetZeroAddr() { return ReadByte(); }
-	
+
 	uint8_t GetZeroXAddr()
 	{
 		uint8_t value = ReadByte();
@@ -511,19 +511,19 @@ private:
 	void TYA() { SetA(Y()); }
 
 	void PHA() { Push(A()); }
-	
+
 	void PHP()
 	{
 		uint8_t flags = PS() | PSFlags::Break | PSFlags::Reserved;
 		Push((uint8_t)flags);
 	}
-	
+
 	void PLA()
 	{
 		DummyStackRead();
 		SetA(Pop());
 	}
-	
+
 	void PLP()
 	{
 		DummyStackRead();

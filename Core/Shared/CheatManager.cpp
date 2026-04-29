@@ -340,7 +340,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromSnesGameGenie(string code)
 	InternalCheatCode cheat = {};
 	cheat.Type = CheatType::SnesGameGenie;
 	cheat.Cpu = CpuType::Snes;
-	cheat.Address = 
+	cheat.Address =
 		((rawValue & 0x3C00) << 10) |
 		((rawValue & 0x3C) << 14) |
 		((rawValue & 0xF00000) >> 8) |

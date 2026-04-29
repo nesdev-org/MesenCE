@@ -85,7 +85,7 @@ void InternalRegisters::UpdateIrqLevel()
 		return;
 	}
 
-	bool irqLevel = 
+	bool irqLevel =
 		(!_state.EnableHorizontalIrq || _state.HorizontalTimer == _hCounter) &&
 		(!_state.EnableVerticalIrq || _state.VerticalTimer == _vCounter);
 

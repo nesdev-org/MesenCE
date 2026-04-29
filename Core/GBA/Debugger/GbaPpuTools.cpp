@@ -6,7 +6,7 @@
 #include "GBA/GbaTypes.h"
 #include "Shared/ColorUtilities.h"
 
-GbaPpuTools::GbaPpuTools(Debugger* debugger, Emulator *emu) : PpuTools(debugger, emu)
+GbaPpuTools::GbaPpuTools(Debugger* debugger, Emulator* emu) : PpuTools(debugger, emu)
 {
 }
 
@@ -25,7 +25,7 @@ DebugTilemapInfo GbaPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 		result.TileHeight = 1;
 		result.TileWidth = 1;
 		result.RowCount = 228;
-		result.ColumnCount = 308*4;
+		result.ColumnCount = 308 * 4;
 		result.Bpp = 8;
 		result.Format = TileFormat::DirectColor;
 		for(int i = 0; i < sizeof(_memoryAccess); i++) {
@@ -43,19 +43,20 @@ DebugTilemapInfo GbaPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 		palette = (uint32_t*)_grayscaleColorsBpp4;
 		colorMask = 0x0F;
 	}
-	
+
 	std::fill(outBuffer, outBuffer + outputSize.Width * outputSize.Height, palette[0]);
 
 	DebugTilemapInfo result = {};
 
 	switch(state.BgMode) {
-		case 0: case 1: case 2:
-		{
+		case 0:
+		case 1:
+		case 2: {
 			GbaBgConfig& layer = state.BgLayers[options.Layer];
 
 			bool transformEnabled = (state.BgMode != 0 && options.Layer >= 2);
 			bool bpp8Mode = layer.Bpp8Mode || transformEnabled;
-			
+
 			result.ScrollX = transformEnabled ? 0 : layer.ScrollX;
 			result.ScrollY = transformEnabled ? 0 : layer.ScrollY;
 			result.ScrollWidth = transformEnabled ? 0 : 240;
@@ -133,8 +134,7 @@ DebugTilemapInfo GbaPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 			break;
 		}
 
-		case 3:
-		{
+		case 3: {
 			if(options.Layer != 2) {
 				break;
 			}
@@ -158,8 +158,7 @@ DebugTilemapInfo GbaPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 			break;
 		}
 
-		case 4:
-		{
+		case 4: {
 			if(options.Layer != 2) {
 				break;
 			}
@@ -171,7 +170,7 @@ DebugTilemapInfo GbaPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 			result.TileWidth = 1;
 			result.TileHeight = 1;
 			result.ColumnCount = 240;
-			result.RowCount = 160*2;
+			result.RowCount = 160 * 2;
 			result.TilemapAddress = 0;
 			result.TilesetAddress = 0;
 			result.ScrollWidth = 240;
@@ -183,8 +182,7 @@ DebugTilemapInfo GbaPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 			break;
 		}
 
-		case 5:
-		{
+		case 5: {
 			if(options.Layer != 2) {
 				break;
 			}
@@ -196,13 +194,13 @@ DebugTilemapInfo GbaPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 			result.TileWidth = 1;
 			result.TileHeight = 1;
 			result.ColumnCount = 160;
-			result.RowCount = 128*2;
+			result.RowCount = 128 * 2;
 			result.TilemapAddress = 0;
 			result.TilesetAddress = 0;
 			result.ScrollWidth = 160;
 			result.ScrollHeight = 128;
 
-			for(int i = 0; i < 160*128*2; i++) {
+			for(int i = 0; i < 160 * 128 * 2; i++) {
 				outBuffer[i] = ColorUtilities::Rgb555ToArgb(vram[i * 2] | (vram[i * 2 + 1] << 8));
 			}
 			break;
@@ -223,7 +221,9 @@ FrameInfo GbaPpuTools::GetTilemapSize(GetTilemapOptions options, BaseState& base
 
 	GbaPpuState& state = (GbaPpuState&)baseState;
 	switch(state.BgMode) {
-		case 0: case 1: case 2: {
+		case 0:
+		case 1:
+		case 2: {
 			GbaBgConfig& layer = state.BgLayers[options.Layer];
 			bool transformEnabled = (state.BgMode != 0 && options.Layer >= 2);
 			if(transformEnabled) {
@@ -246,7 +246,7 @@ FrameInfo GbaPpuTools::GetTilemapSize(GetTilemapOptions options, BaseState& base
 			}
 			break;
 
-		case 5: 
+		case 5:
 			if(options.Layer == 2) {
 				return { 160, 128 * 2 };
 			}
@@ -280,7 +280,7 @@ DebugTilemapTileInfo GbaPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 	int32_t paletteIndex = -1;
 	NullableBoolean hMirror = NullableBoolean::Undefined;
 	NullableBoolean vMirror = NullableBoolean::Undefined;
-	
+
 	switch(state.BgMode) {
 		case 0:
 		case 1:
@@ -333,7 +333,7 @@ DebugTilemapTileInfo GbaPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 			row = y;
 			width = 1;
 			height = 1;
-			
+
 			if(state.BgMode == 3 || state.BgMode == 5) {
 				tilemapAddr = (y * screenWidth + x) * 2;
 				pixelData = vram[tilemapAddr] | (vram[tilemapAddr + 1] << 8);
@@ -344,7 +344,7 @@ DebugTilemapTileInfo GbaPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 			break;
 		}
 	}
-	
+
 	result.Column = column;
 	result.Row = row;
 	result.Height = height;
@@ -359,7 +359,6 @@ DebugTilemapTileInfo GbaPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 	result.VerticalMirroring = vMirror;
 	return result;
 }
-
 
 void GbaPpuTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& baseState, DebugSpriteInfo* sprites, uint32_t* spritePreviews, uint32_t* palette, uint32_t* outBuffer)
 {
@@ -423,7 +422,7 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 
 	sprite.RawY = sprite.Y;
 	sprite.RawX = sprite.X;
-	
+
 	bool bpp8Mode = oam[addr + 1] & 0x20;
 	sprite.Bpp = bpp8Mode ? 8 : 4;
 	sprite.Format = bpp8Mode ? TileFormat::GbaBpp8 : TileFormat::GbaBpp4;
@@ -475,7 +474,7 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 
 	sprite.SpriteIndex = i;
 	sprite.UseExtendedVram = false;
-	
+
 	if(spriteHidden) {
 		sprite.Visibility = SpriteVisibility::Disabled;
 	} else {
@@ -485,9 +484,9 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 		uint8_t y2 = (sprite.Y + sprite.Height - 1) & 0xFF;
 		sprite.Visibility = ((x1 < 240 || x2 < 240) && (y1 < 160 || y2 < 160)) ? SpriteVisibility::Visible : SpriteVisibility::Offscreen;
 	}
-	
+
 	sprite.TileCount = (height / 8) * (width / 8);
-	
+
 	if(state.ObjVramMappingOneDimension) {
 		for(uint32_t j = 0; j < sprite.TileCount; j++) {
 			sprite.TileAddresses[j] = 0x10000 | (((sprite.TileIndex * 32) + (j * 32 * (bpp8Mode ? 2 : 1))) & 0x7FFF);
@@ -575,7 +574,7 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 			}
 
 			uint32_t outOffset = (y * sprite.Width) + x;
-			
+
 			if(color != 0) {
 				spritePreview[outOffset] = palette[0x100 + (sprite.Palette * 16) + color];
 			} else {
@@ -590,7 +589,7 @@ void GbaPpuTools::GetSpriteList(GetSpritePreviewOptions options, BaseState& base
 	GbaPpuState& state = (GbaPpuState&)baseState;
 	for(int i = 0; i < 128; i++) {
 		outBuffer[i].Init();
-		GetSpriteInfo(outBuffer[i], spritePreviews+i*_spritePreviewSize, i, options, state, vram, oamRam, palette);
+		GetSpriteInfo(outBuffer[i], spritePreviews + i * _spritePreviewSize, i, options, state, vram, oamRam, palette);
 	}
 
 	GetSpritePreview(options, baseState, outBuffer, spritePreviews, palette, screenPreview);

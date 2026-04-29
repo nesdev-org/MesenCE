@@ -119,22 +119,22 @@ void NecDspDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t
 			case 0xBA: str.Write("JSOAK"); break;
 			case 0xBC: str.Write("JNRQM"); break;
 			case 0xBE: str.Write("JRQM"); break;
-			
+
 			case 0x100:
 				str.Write("LJMP");
 				target &= ~0x2000;
 				break;
-			
+
 			case 0x101:
 				str.Write("HJMP");
 				target |= 0x2000;
 				break;
-			
+
 			case 0x140:
 				str.Write("LCALL");
 				target &= ~0x2000;
 				break;
-			
+
 			case 0x141:
 				str.Write("HCALL");
 				target |= 0x2000;

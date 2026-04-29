@@ -68,28 +68,40 @@ private:
 			case 0x00:
 				return new GbCart();
 
-			case 0x01: case 0x02: case 0x03: {
+			case 0x01:
+			case 0x02:
+			case 0x03: {
 				//When the boot rom logo appears at both of these offsets, this is usually a multicart collection
 				//which uses a MBC1 chip with slightly different wiring.
 				bool isMbc1m = prgRom.size() > 0x40134 && memcmp(&prgRom[0x104], &prgRom[0x40104], 0x30) == 0;
 				return new GbMbc1(isMbc1m);
 			}
 
-			case 0x05: case 0x06:
+			case 0x05:
+			case 0x06:
 				return new GbMbc2();
 
-			case 0x0B: case 0x0C: case 0x0D:
+			case 0x0B:
+			case 0x0C:
+			case 0x0D:
 				return new GbMmm01();
 
-			case 0x0F: case 0x10:
-			case 0x11: case 0x12: case 0x13:
-			{
+			case 0x0F:
+			case 0x10:
+			case 0x11:
+			case 0x12:
+			case 0x13: {
 				bool isMbc30 = header.GetCartRamSize() >= 0x10000;
 				bool hasRtc = header.CartType <= 0x10;
 				return new GbMbc3(emu, hasRtc, isMbc30);
 			}
 
-			case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: {
+			case 0x19:
+			case 0x1A:
+			case 0x1B:
+			case 0x1C:
+			case 0x1D:
+			case 0x1E: {
 				bool hasRumble = header.CartType >= 0x1C;
 				return new GbMbc5(hasRumble);
 			}
@@ -129,5 +141,4 @@ public:
 			return LoadFromGbHeader(emu, header, prgRom);
 		}
 	}
-
 };

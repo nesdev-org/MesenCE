@@ -136,7 +136,7 @@ protected:
 		VideoConfig& config = _emu->GetSettings()->GetVideoConfig();
 		PcEngineConfig& pceConfig = _emu->GetSettings()->GetPcEngineConfig();
 
-		bool optionsChanged = 
+		bool optionsChanged =
 			_videoConfig.Hue != config.Hue ||
 			_videoConfig.Saturation != config.Saturation ||
 			_videoConfig.Contrast != config.Contrast ||

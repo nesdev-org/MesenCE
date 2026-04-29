@@ -9,6 +9,7 @@
 #include "Utilities/FastString.h"
 #include "Utilities/HexUtilities.h"
 
+// clang-format off
 constexpr const char* _opTemplate[256] = {
 	"NOP",			"LD BC, e",		"LD (BC), A",	"INC BC",	"INC B",			"DEC B",			"LD B, d",		"RLCA",		"LD (a), SP",	"ADD HL, BC",	"LD A, (BC)",	"DEC BC",	"INC C",		"DEC C",		"LD C, d",		"RRCA",
 	"STOP d",		"LD DE, e",		"LD (DE), A",	"INC DE",	"INC D",			"DEC D",			"LD D, d",		"RLA",		"JR r",			"ADD HL, DE",	"LD A, (DE)",	"DEC DE",	"INC E",		"DEC E",		"LD E, d",		"RRA",
@@ -95,6 +96,7 @@ static constexpr const AddrType _gbEffAddrType[256] = {
 	AddrType::None,AddrType::Stk,	AddrType::C,	AddrType::None,AddrType::None,AddrType::Stk,	AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,
 	AddrType::None,AddrType::Stk,	AddrType::C,	AddrType::None,AddrType::None,AddrType::Stk,	AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None,AddrType::None
 };
+// clang-format on
 
 void GameboyDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
@@ -103,7 +105,7 @@ void GameboyDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_
 	AddressInfo addrInfo { 0, MemoryType::GameboyMemory };
 	auto getOperand = [&str, &addrInfo, labelManager](uint16_t addr) {
 		addrInfo.Address = addr;
-		string label = labelManager ? labelManager->GetLabel(addrInfo) :"";
+		string label = labelManager ? labelManager->GetLabel(addrInfo) : "";
 		if(label.empty()) {
 			str.WriteAll('$', HexUtilities::ToHex(addr));
 		} else {
@@ -144,7 +146,7 @@ EffectiveAddressInfo GameboyDisUtils::GetEffectiveAddress(DisassemblyInfo& info,
 	bool isJump = GameboyDisUtils::IsUnconditionalJump(info.GetOpCode()) || GameboyDisUtils::IsConditionalJump(info.GetOpCode());
 	if(isJump) {
 		//For jumps, show no address/value
-		return { };
+		return {};
 	}
 
 	switch(_gbEffAddrType[info.GetOpCode()]) {
@@ -175,7 +177,7 @@ EffectiveAddressInfo GameboyDisUtils::GetEffectiveAddress(DisassemblyInfo& info,
 			return { (int32_t)opInfo.Address, 1, false };
 		}
 	}
-	
+
 	return {};
 }
 
@@ -272,7 +274,6 @@ bool GameboyDisUtils::IsConditionalJump(uint8_t opCode)
 			return false;
 	}
 }
-
 
 CdlFlags::CdlFlags GameboyDisUtils::GetOpFlags(uint8_t opCode, uint16_t pc, uint16_t prevPc)
 {

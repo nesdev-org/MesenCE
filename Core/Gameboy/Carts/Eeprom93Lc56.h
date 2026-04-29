@@ -41,7 +41,7 @@ public:
 
 	uint8_t Read()
 	{
-		uint8_t result = 
+		uint8_t result =
 			(_chipSelect ? 0x80 : 0) |
 			(_clk ? 0x40 : 0) |
 			(_dataIn ? 0x02 : 0);

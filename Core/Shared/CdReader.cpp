@@ -274,7 +274,7 @@ void CdReader::LoadSubcodeFile(VirtualFile& cueFile, DiscInfo& disc)
 
 			for(int j = 0; j < 12; j++) {
 				for(int k = 7; k >= 0; k--) {
-					uint8_t encoded = 
+					uint8_t encoded =
 						(((subCode[i * 96 + j + 0] >> k) & 0x01) << 7) |
 						(((subCode[i * 96 + j + 12] >> k) & 0x01) << 6) |
 						(((subCode[i * 96 + j + 24] >> k) & 0x01) << 5) |

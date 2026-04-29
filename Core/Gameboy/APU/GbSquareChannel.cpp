@@ -167,7 +167,7 @@ uint8_t GbSquareChannel::Read(uint16_t addr)
 	uint8_t value = 0;
 	switch(addr) {
 		case 0:
-			value = 
+			value =
 				(_state.SweepPeriod << 4) |
 				(_state.SweepNegate ? 0x08 : 0) |
 				_state.SweepShift;
@@ -176,7 +176,7 @@ uint8_t GbSquareChannel::Read(uint16_t addr)
 		case 1: value = _state.Duty << 6; break;
 
 		case 2:
-			value = 
+			value =
 				(_state.EnvVolume << 4) |
 				(_state.EnvRaiseVolume ? 0x08 : 0) |
 				_state.EnvPeriod;
