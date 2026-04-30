@@ -29,7 +29,10 @@ public:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr) {
-			case 0xA000: _prgBank = value; _memoryManager->RefreshMappings(); break;
+			case 0xA000:
+				_prgBank = value;
+				_memoryManager->RefreshMappings();
+				break;
 		}
 	}
 

@@ -126,7 +126,7 @@ struct DebugTilemapInfo
 	uint32_t Bpp;
 	TileFormat Format;
 	TilemapMirroring Mirroring;
-	
+
 	uint32_t TileWidth;
 	uint32_t TileHeight;
 
@@ -152,7 +152,7 @@ struct DebugTilemapTileInfo
 	int32_t TileMapAddress = -1;
 
 	int32_t TileIndex = -1;
-	
+
 	uint32_t TileCount = 0;
 	uint32_t TileAddresses[4] = {};
 
@@ -227,13 +227,10 @@ struct DebugPaletteInfo
 class PpuTools
 {
 protected:
-	static constexpr uint32_t _spritePreviewSize = 128*128;
+	static constexpr uint32_t _spritePreviewSize = 128 * 128;
 	static constexpr uint32_t _grayscaleColorsBpp1[2] = { 0xFF000000, 0xFFFFFFFF };
 	static constexpr uint32_t _grayscaleColorsBpp2[4] = { 0xFF000000, 0xFF666666, 0xFFBBBBBB, 0xFFFFFFFF };
-	static constexpr uint32_t _grayscaleColorsBpp4[16] = {
-		0xFF000000, 0xFF303030, 0xFF404040, 0xFF505050, 0xFF606060, 0xFF707070, 0xFF808080, 0xFF909090,
-		0xFF989898, 0xFFA0A0A0, 0xFFAAAAAA, 0xFFBBBBBB, 0xFFCCCCCC, 0xFFDDDDDD, 0xFFEEEEEE, 0xFFFFFFFF
-	};
+	static constexpr uint32_t _grayscaleColorsBpp4[16] = { 0xFF000000, 0xFF303030, 0xFF404040, 0xFF505050, 0xFF606060, 0xFF707070, 0xFF808080, 0xFF909090, 0xFF989898, 0xFFA0A0A0, 0xFFAAAAAA, 0xFFBBBBBB, 0xFFCCCCCC, 0xFFDDDDDD, 0xFFEEEEEE, 0xFFFFFFFF };
 
 	Emulator* _emu;
 	Debugger* _debugger;
@@ -243,7 +240,7 @@ protected:
 
 	template<TileFormat format> __forceinline uint32_t GetRgbPixelColor(const uint32_t* colors, uint8_t colorIndex, uint8_t palette);
 	template<TileFormat format> __forceinline uint8_t GetTilePixelColor(const uint8_t* ram, const uint32_t ramMask, uint32_t rowStart, uint8_t pixelIndex);
-	
+
 	bool IsTileHidden(MemoryType memType, uint32_t addr, GetTileViewOptions& options);
 
 	uint32_t GetBackgroundColor(TileBackground bgColor, const uint32_t* colors, uint8_t paletteIndex = 0, uint8_t bpp = 0);
@@ -252,18 +249,18 @@ protected:
 	void GetSetTilePixel(AddressInfo tileAddress, TileFormat format, int32_t x, int32_t y, int32_t& color, bool forGet);
 
 public:
-	PpuTools(Debugger* debugger, Emulator *emu);
+	PpuTools(Debugger* debugger, Emulator* emu);
 
 	virtual void GetPpuToolsState(BaseState& state) {};
 
 	virtual DebugPaletteInfo GetPaletteInfo(GetPaletteInfoOptions options) = 0;
 
-	void GetTileView(GetTileViewOptions options, uint8_t *source, uint32_t srcSize, const uint32_t* palette, uint32_t *outBuffer);
+	void GetTileView(GetTileViewOptions options, uint8_t* source, uint32_t srcSize, const uint32_t* palette, uint32_t* outBuffer);
 
 	virtual DebugTilemapTileInfo GetTilemapTileInfo(uint32_t x, uint32_t y, uint8_t* vram, GetTilemapOptions options, BaseState& baseState, BaseState& ppuToolsState) = 0;
 	virtual FrameInfo GetTilemapSize(GetTilemapOptions options, BaseState& state) = 0;
 	virtual DebugTilemapInfo GetTilemap(GetTilemapOptions options, BaseState& state, BaseState& ppuToolsState, uint8_t* vram, uint32_t* palette, uint32_t* outBuffer) = 0;
-	
+
 	virtual DebugSpritePreviewInfo GetSpritePreviewInfo(GetSpritePreviewOptions options, BaseState& state, BaseState& ppuToolsState) = 0;
 	virtual void GetSpriteList(GetSpritePreviewOptions options, BaseState& baseState, BaseState& ppuToolsState, uint8_t* vram, uint8_t* oamRam, uint32_t* palette, DebugSpriteInfo outBuffer[], uint32_t* spritePreviews, uint32_t* screenPreview) = 0;
 
@@ -275,7 +272,7 @@ public:
 	void RemoveViewer(uint32_t viewerId);
 
 	void UpdateViewers(uint16_t scanline, uint16_t cycle);
-	
+
 	__forceinline bool HasOpenedViewer()
 	{
 		return _updateTimings.size() > 0;
@@ -291,8 +288,7 @@ template<TileFormat format> uint32_t PpuTools::GetRgbPixelColor(const uint32_t* 
 			return ColorUtilities::Rgb555ToArgb(
 				((((colorIndex & 0x07) << 1) | (palette & 0x01)) << 1) |
 				(((colorIndex & 0x38) | ((palette & 0x02) << 1)) << 4) |
-				(((colorIndex & 0xC0) | ((palette & 0x04) << 3)) << 7)
-			);
+				(((colorIndex & 0xC0) | ((palette & 0x04) << 3)) << 7));
 
 		case TileFormat::NesBpp2:
 		case TileFormat::Bpp2:
@@ -352,7 +348,7 @@ template<TileFormat format> __forceinline uint8_t PpuTools::GetTilePixelColor(co
 			color |= (((ram[(rowStart + 64) & ramMask] >> shift) & 0x01) << 2);
 			color |= (((ram[(rowStart + 96) & ramMask] >> shift) & 0x01) << 3);
 			return color;
-	
+
 		case TileFormat::PceSpriteBpp2Sp01:
 			color = (((ram[(rowStart + 0) & ramMask] >> shift) & 0x01) << 0);
 			color |= (((ram[(rowStart + 32) & ramMask] >> shift) & 0x01) << 1);

@@ -5,7 +5,7 @@
 enum class RomFormat
 {
 	Unknown,
-	
+
 	Sfc,
 	Spc,
 

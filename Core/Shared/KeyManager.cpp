@@ -27,7 +27,7 @@ void KeyManager::RefreshKeyState()
 	}
 }
 
-void KeyManager::SetSettings(EmuSettings *settings)
+void KeyManager::SetSettings(EmuSettings* settings)
 {
 	_settings = settings;
 }
@@ -123,8 +123,8 @@ void KeyManager::SetMousePosition(Emulator* emu, double x, double y)
 	} else {
 		OverscanDimensions overscan = emu->GetSettings()->GetOverscan();
 		FrameInfo frame = emu->GetVideoDecoder()->GetBaseFrameInfo(true);
-		_mousePosition.X = (int32_t)(x*frame.Width + overscan.Left);
-		_mousePosition.Y = (int32_t)(y*frame.Height + overscan.Top);
+		_mousePosition.X = (int32_t)(x * frame.Width + overscan.Left);
+		_mousePosition.Y = (int32_t)(y * frame.Height + overscan.Top);
 		_mousePosition.RelativeX = x;
 		_mousePosition.RelativeY = y;
 	}

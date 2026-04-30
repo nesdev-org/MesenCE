@@ -33,7 +33,7 @@ namespace Mesen.Debugger.ViewModels
 
 		[Reactive] public ViewModelBase ConsoleConfig { get; set; }
 		[Reactive] public GridRowColumn? GridHighlightPoint { get; set; }
-		
+
 		[Reactive] public bool ShowListView { get; set; }
 		[Reactive] public double MinListViewHeight { get; set; }
 		[Reactive] public double ListViewHeight { get; set; }
@@ -45,7 +45,7 @@ namespace Mesen.Debugger.ViewModels
 		public EventViewerListViewModel ListView { get; }
 
 		public EventViewerConfig Config { get; }
-		
+
 		[Reactive] public List<object> FileMenuItems { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
 		[Reactive] public List<object> ViewMenuItems { get; private set; } = new();
@@ -144,7 +144,7 @@ namespace Mesen.Debugger.ViewModels
 				UpdateConfig();
 				RefreshData();
 			}));
-			
+
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
 				UpdateConfig();
 				RefreshUi(false);
@@ -550,7 +550,7 @@ namespace Mesen.Debugger.ViewModels
 			_cpuType = cpuType;
 			_events = events;
 			_index = index;
-			
+
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Color"));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ProgramCounter"));
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Scanline"));
@@ -577,7 +577,7 @@ namespace Mesen.Debugger.ViewModels
 				if(label != null) {
 					address = label.Label + " (" + address + ")";
 				}
-				
+
 				if(evt.RegisterId >= 0) {
 					string regName = evt.GetRegisterName();
 					if(string.IsNullOrEmpty(regName)) {

@@ -143,7 +143,7 @@ void NesApu::WriteRam(uint16_t addr, uint8_t value)
 	_dmc->SetEnabled((value & 0x10) == 0x10);
 }
 
-void NesApu::GetMemoryRanges(MemoryRanges &ranges)
+void NesApu::GetMemoryRanges(MemoryRanges& ranges)
 {
 	ranges.AddHandler(MemoryOperation::Read, 0x4015);
 	ranges.AddHandler(MemoryOperation::Read, 0x4018, 0x401A);

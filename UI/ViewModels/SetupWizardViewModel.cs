@@ -100,7 +100,7 @@ namespace Mesen.ViewModels
 				//TODO OSX
 				return;
 			}
-			
+
 			if(OperatingSystem.IsWindows()) {
 				string linkPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Mesen.url");
 				FileHelper.WriteAllText(linkPath,

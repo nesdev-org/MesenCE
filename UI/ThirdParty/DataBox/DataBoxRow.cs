@@ -1,53 +1,50 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Styling;
 using DataBoxControl.Primitives;
+using System;
 
 namespace DataBoxControl;
 
 public class DataBoxRow : ListBoxItem
 {
-    private Rectangle? _bottomGridLine;
+	private Rectangle? _bottomGridLine;
 
-    protected override Type StyleKeyOverride => typeof(DataBoxRow);
+	protected override Type StyleKeyOverride => typeof(DataBoxRow);
 
-    internal DataBox? DataBox { get; set; }
+	internal DataBox? DataBox { get; set; }
 
-    internal DataBoxCellsPresenter? CellsPresenter { get; set; }
-        
-    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
-    {
-        base.OnApplyTemplate(e);
+	internal DataBoxCellsPresenter? CellsPresenter { get; set; }
 
-        _bottomGridLine = e.NameScope.Find<Rectangle>("PART_BottomGridLine");
+	protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+	{
+		base.OnApplyTemplate(e);
 
-        InvalidateBottomGridLine();
-            
-        CellsPresenter = e.NameScope.Find<DataBoxCellsPresenter>("PART_CellsPresenter");
+		_bottomGridLine = e.NameScope.Find<Rectangle>("PART_BottomGridLine");
 
-        if (CellsPresenter is { })
-        {
-            CellsPresenter.DataBox = DataBox;
-            CellsPresenter.Attach();
-        }
-    }
+		InvalidateBottomGridLine();
 
-    private void InvalidateBottomGridLine()
-    {
-        if (_bottomGridLine is { } && DataBox is { })
-        {
-            bool newVisibility =
-                DataBox.GridLinesVisibility == DataBoxGridLinesVisibility.Horizontal
-                || DataBox.GridLinesVisibility == DataBoxGridLinesVisibility.All;
+		CellsPresenter = e.NameScope.Find<DataBoxCellsPresenter>("PART_CellsPresenter");
 
-            if (newVisibility != _bottomGridLine.IsVisible)
-            {
-                _bottomGridLine.IsVisible = newVisibility;
-            }
+		if(CellsPresenter is { }) {
+			CellsPresenter.DataBox = DataBox;
+			CellsPresenter.Attach();
+		}
+	}
 
-            _bottomGridLine.Fill = DataBox.HorizontalGridLinesBrush;
-        }
-    }
+	private void InvalidateBottomGridLine()
+	{
+		if(_bottomGridLine is { } && DataBox is { }) {
+			bool newVisibility =
+				 DataBox.GridLinesVisibility == DataBoxGridLinesVisibility.Horizontal
+				 || DataBox.GridLinesVisibility == DataBoxGridLinesVisibility.All;
+
+			if(newVisibility != _bottomGridLine.IsVisible) {
+				_bottomGridLine.IsVisible = newVisibility;
+			}
+
+			_bottomGridLine.Fill = DataBox.HorizontalGridLinesBrush;
+		}
+	}
 }

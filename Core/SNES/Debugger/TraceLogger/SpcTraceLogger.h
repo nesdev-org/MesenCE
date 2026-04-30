@@ -20,9 +20,9 @@ protected:
 public:
 	SpcTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, SnesPpu* ppu, SnesMemoryManager* memoryManager);
 
-	void GetTraceRow(string &output, SpcState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo);
+	void GetTraceRow(string& output, SpcState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
-	
+
 	__forceinline uint32_t GetProgramCounter(SpcState& state) { return state.PC; }
 	__forceinline uint64_t GetCycleCount(SpcState& state) { return state.Cycle; }
 	__forceinline uint8_t GetStackPointer(SpcState& state) { return state.SP; }

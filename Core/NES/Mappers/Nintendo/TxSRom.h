@@ -15,7 +15,7 @@ protected:
 	{
 		if((addr & 0xE001) == 0x8001) {
 			uint8_t nametable = value >> 7;
-				
+
 			if(GetChrMode() == 0) {
 				switch(GetCurrentRegister()) {
 					case 0:

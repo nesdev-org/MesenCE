@@ -35,18 +35,18 @@ St018Debugger::St018Debugger(Debugger* debugger) : IDebugger(debugger->GetEmulat
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 
 	_console = console;
-	
+
 	_st018 = _console->GetCartridge()->GetSt018();
 	_cpu = _st018->GetCpu();
 
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_traceLogger.reset(new St018TraceLogger(debugger, this, console->GetPpu()));
-	
+
 	_callstackManager.reset(new CallstackManager(debugger, this));
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::St018, debugger->GetEventManager(CpuType::St018)));
 	_step.reset(new StepRequest());
-	
+
 	_dummyCpu.reset(new DummyArmV3Cpu());
 	_dummyCpu->Init(_emu, _st018);
 }
@@ -66,7 +66,7 @@ void St018Debugger::ProcessInstruction()
 	ArmV3CpuState& state = _cpu->GetState();
 	uint32_t pc = state.Pipeline.Execute.Address;
 	uint32_t opCode = state.Pipeline.Execute.OpCode;
-	
+
 	uint8_t flags = 0;
 
 	AddressInfo addressInfo = _st018->GetArmAbsoluteAddress(pc);
@@ -218,10 +218,7 @@ void St018Debugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bo
 	ProcessCallStackUpdates(ret, originalPc);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::St018, *this, *_step.get(), 
-		ret, originalPc, dest, currentPc, ret, originalPc, 0, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::St018, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, 0, forNmi);
 }
 
 DebuggerFeatures St018Debugger::GetSupportedFeatures()

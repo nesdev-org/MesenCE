@@ -1,8 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
 using Mesen.Config;
+using Mesen.Utilities;
 using System.Collections.Generic;
 
 namespace Mesen.Debugger.Controls

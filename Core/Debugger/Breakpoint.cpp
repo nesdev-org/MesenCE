@@ -4,7 +4,7 @@
 #include "Debugger/DebugUtilities.h"
 
 template<uint8_t accessWidth>
-bool Breakpoint::Matches(MemoryOperationInfo& operation, AddressInfo &info)
+bool Breakpoint::Matches(MemoryOperationInfo& operation, AddressInfo& info)
 {
 	if(operation.MemType == _memoryType && DebugUtilities::IsRelativeMemory(_memoryType)) {
 		for(int i = 0; i < accessWidth; i++) {

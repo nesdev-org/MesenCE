@@ -1,4 +1,5 @@
 #pragma once
+// clang-format off
 #include "pch.h"
 #include "Utilities/ISerializable.h"
 

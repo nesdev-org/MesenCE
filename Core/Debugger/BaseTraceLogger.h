@@ -84,7 +84,7 @@ enum class RowDataType
 	R15,
 	Src,
 	Dst,
-	
+
 	SFR,
 
 	MAR,
@@ -101,7 +101,7 @@ enum class RowDataType
 	SR,
 	TR,
 	TRB,
-	
+
 	FlagsA,
 	FlagsB,
 
@@ -163,7 +163,7 @@ protected:
 	DisassemblyInfo _lastDisassemblyInfo = {};
 
 	CpuStateType* _cpuState = nullptr;
-	DisassemblyInfo *_disassemblyCache = nullptr;
+	DisassemblyInfo* _disassemblyCache = nullptr;
 	uint64_t* _rowIds = nullptr;
 	TraceLogPpuState* _ppuState = nullptr;
 
@@ -198,7 +198,7 @@ protected:
 			output += std::string(rowPart.MinWidth - (output.size() - startPos), ' ');
 		}
 	}
-	
+
 	void WriteEffectiveAddress(DisassemblyInfo& info, RowPart& rowPart, void* cpuState, string& output, MemoryType cpuMemoryType, CpuType cpuType)
 	{
 		EffectiveAddressInfo effectiveAddress = info.GetEffectiveAddress(_debugger, cpuState, cpuType);
@@ -302,7 +302,7 @@ protected:
 		if(_debugger->GetTraceLogFileSaver()->IsEnabled()) {
 			string row;
 			row.reserve(300);
-			
+
 			//Display PC
 			RowPart rowPart = {};
 			rowPart.DisplayInHex = true;
@@ -498,7 +498,7 @@ public:
 		}
 
 		ParseFormatString(format);
-		
+
 		_debugger->ProcessConfigChange();
 	}
 
@@ -512,7 +512,7 @@ public:
 		return _rowIds[i];
 	}
 
-	bool ConditionMatches(DisassemblyInfo &disassemblyInfo, MemoryOperationInfo &operationInfo, AddressInfo& addressInfo)
+	bool ConditionMatches(DisassemblyInfo& disassemblyInfo, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo)
 	{
 		if(!_conditionData.RpnQueue.empty()) {
 			EvalResultType type;

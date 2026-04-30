@@ -14,7 +14,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public byte RegSP { get; set; }
 		[Reactive] public UInt16 RegPC { get; set; }
 		[Reactive] public byte RegPS { get; set; }
-		
+
 		[Reactive] public bool FlagN { get; set; }
 		[Reactive] public bool FlagV { get; set; }
 		[Reactive] public bool FlagP { get; set; }
@@ -63,7 +63,7 @@ namespace Mesen.Debugger.StatusViews
 			SpcState cpu = DebugApi.GetCpuState<SpcState>(CpuType.Spc);
 
 			UpdateCycleCount(cpu.Cycle);
-			
+
 			RegA = cpu.A;
 			RegX = cpu.X;
 			RegY = cpu.Y;

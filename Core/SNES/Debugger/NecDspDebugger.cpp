@@ -126,7 +126,7 @@ void NecDspDebugger::Step(int32_t stepCount, StepType type)
 
 	switch(type) {
 		case StepType::Step: step.StepCount = stepCount; break;
-		
+
 		case StepType::StepOut:
 			step.BreakAddress = _callstackManager->GetReturnAddress();
 			step.BreakStackPointer = _callstackManager->GetReturnStackPointer();

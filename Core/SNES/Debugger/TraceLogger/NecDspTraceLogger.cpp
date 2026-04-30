@@ -19,7 +19,7 @@ RowDataType NecDspTraceLogger::GetFormatTagType(string& tag)
 		return RowDataType::A;
 	} else if(tag == "B") {
 		return RowDataType::B;
-	}if(tag == "FlagsA") {
+	} else if(tag == "FlagsA") {
 		return RowDataType::FlagsA;
 	} else if(tag == "FlagsB") {
 		return RowDataType::FlagsB;

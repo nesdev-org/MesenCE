@@ -14,13 +14,17 @@ private:
 	bool _paused = false;
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
-		SV(_romFilename); SV(_crc32); SV(_controller.Port); SV(_controller.SubPort); SV(_paused);
+		SV(_romFilename);
+		SV(_crc32);
+		SV(_controller.Port);
+		SV(_controller.SubPort);
+		SV(_paused);
 	}
 
 public:
-	GameInformationMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) { }
+	GameInformationMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
 
 	GameInformationMessage(string filepath, uint32_t crc32, NetplayControllerInfo controller, bool paused) : NetMessage(MessageType::GameInformation)
 	{
@@ -29,7 +33,7 @@ public:
 		_controller = controller;
 		_paused = paused;
 	}
-	
+
 	NetplayControllerInfo GetPort()
 	{
 		return _controller;

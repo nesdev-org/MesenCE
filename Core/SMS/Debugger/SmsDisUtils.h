@@ -31,7 +31,7 @@ public:
 	static void GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings);
 	static SmsOpInfo GetSmsOpInfo(DisassemblyInfo& info);
 	static EffectiveAddressInfo GetEffectiveAddress(DisassemblyInfo& info, SmsConsole* console, SmsCpuState& state);
-	
+
 	static uint8_t GetOpSize(uint8_t opCode, uint32_t cpuAddress, MemoryType memType, MemoryDumper* memoryDumper);
 
 	static bool IsJumpToSub(uint8_t opCode);

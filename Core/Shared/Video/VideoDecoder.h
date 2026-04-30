@@ -22,7 +22,7 @@ private:
 
 	SimpleLock _stopStartLock;
 	AutoResetEvent _waitForFrame;
-	
+
 	atomic<bool> _frameChanged;
 	atomic<bool> _stopFlag;
 	uint32_t _frameCount = 0;
@@ -51,8 +51,8 @@ public:
 
 	void DecodeFrame(bool synchronous = false);
 	void TakeScreenshot();
-	void TakeScreenshot(std::stringstream &stream);
-	
+	void TakeScreenshot(std::stringstream& stream);
+
 	void ForceFilterUpdate() { _forceFilterUpdate = true; }
 
 	uint32_t GetFrameCount();

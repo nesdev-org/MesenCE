@@ -23,7 +23,7 @@ namespace Mesen.Debugger.Utilities
 
 		public static event EventHandler? SymbolProviderChanged;
 
-		public static DebugWorkspace Workspace 
+		public static DebugWorkspace Workspace
 		{
 			get
 			{

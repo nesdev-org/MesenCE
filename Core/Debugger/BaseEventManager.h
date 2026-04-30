@@ -86,6 +86,6 @@ public:
 	virtual uint32_t TakeEventSnapshot(bool forAutoRefresh) = 0;
 	virtual FrameInfo GetDisplayBufferSize() = 0;
 	virtual DebugEventInfo GetEvent(uint16_t scanline, uint16_t cycle) = 0;
-	
+
 	void GetDisplayBuffer(uint32_t* buffer, uint32_t bufferSize);
 };

@@ -6,13 +6,13 @@
 class BF909x : public BaseMapper
 {
 private:
-	bool _bf9097Mode = false;  //Auto-detect for firehawk
+	bool _bf9097Mode = false; //Auto-detect for firehawk
 
 protected:
 	virtual uint16_t GetPrgPageSize() override { return 0x4000; }
-	virtual uint16_t GetChrPageSize() override {	return 0x2000; }
+	virtual uint16_t GetChrPageSize() override { return 0x2000; }
 
-	void InitMapper() override 
+	void InitMapper() override
 	{
 		if(_romInfo.SubMapperID == 1) {
 			_bf9097Mode = true;

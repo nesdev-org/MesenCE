@@ -11,10 +11,13 @@ private:
 	uint8_t _sigCounter[2] = {};
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
 		ControllerHub::Serialize(s);
-		SV(_signature[0]); SV(_signature[1]); SV(_sigCounter[0]); SV(_sigCounter[1]);
+		SV(_signature[0]);
+		SV(_signature[1]);
+		SV(_sigCounter[0]);
+		SV(_sigCounter[1]);
 	}
 
 	void RefreshStateBuffer() override
@@ -33,7 +36,6 @@ protected:
 		_sigCounter[1] = 16;
 	}
 
-
 public:
 	FourScore(Emulator* emu, ControllerType type, uint8_t port, ControllerConfig controllers[]) : ControllerHub(emu, type, port, controllers)
 	{
@@ -44,7 +46,7 @@ public:
 		value &= 0x01;
 		ControllerHub::WriteRam(addr, value);
 	}
-	
+
 	uint8_t ReadRam(uint16_t addr) override
 	{
 		StrobeProcessRead();

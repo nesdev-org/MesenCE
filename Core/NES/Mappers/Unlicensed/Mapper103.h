@@ -48,7 +48,8 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0xF000) {
-			case 0x6000: case 0x7000:
+			case 0x6000:
+			case 0x7000:
 				//Workram is always writeable, even when PRG ROM is mapped to $6000
 				_workRam[addr - 0x6000] = value;
 				break;
@@ -57,8 +58,10 @@ protected:
 				_prgReg = value & 0x0F;
 				UpdateState();
 				break;
-			
-			case 0xB000: case 0xC000: case 0xD000:
+
+			case 0xB000:
+			case 0xC000:
+			case 0xD000:
 				//Workram is always writeable, even when PRG ROM is mapped to $B800-$D7FF
 				if(addr >= 0xB800 && addr < 0xD800) {
 					_workRam[0x2000 + addr - 0xB800] = value;

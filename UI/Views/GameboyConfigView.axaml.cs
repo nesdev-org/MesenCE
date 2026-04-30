@@ -2,17 +2,17 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
+using Avalonia.Media;
+using Avalonia.VisualTree;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
+using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
 using System;
-using Avalonia.Media;
 using System.Threading.Tasks;
-using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 
 namespace Mesen.Views
 {

@@ -14,7 +14,7 @@ namespace Mesen.ViewModels
 		[Reactive] public VideoConfigViewModel? Video { get; set; }
 		[Reactive] public PreferencesConfigViewModel? Preferences { get; set; }
 		[Reactive] public EmulationConfigViewModel? Emulation { get; set; }
-		
+
 		[Reactive] public SnesConfigViewModel? Snes { get; set; }
 		[Reactive] public NesConfigViewModel? Nes { get; set; }
 		[Reactive] public GameboyConfigViewModel? Gameboy { get; set; }
@@ -112,7 +112,7 @@ namespace Mesen.ViewModels
 				OtherConsoles?.CvOriginalConfig.IsIdentical(ConfigManager.Config.Cv) == false
 			);
 		}
-   }
+	}
 
 	public enum ConfigWindowTab
 	{

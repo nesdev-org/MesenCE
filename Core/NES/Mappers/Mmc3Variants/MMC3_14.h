@@ -56,7 +56,7 @@ protected:
 		for(int i = 0; i < 8; i++) {
 			SelectChrPage(i, _vrcChrRegs[i]);
 		}
-		
+
 		SetMirroringType(_vrcMirroring & 0x01 ? MirroringType::Horizontal : MirroringType::Vertical);
 	}
 

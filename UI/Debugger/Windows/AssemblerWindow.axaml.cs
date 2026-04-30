@@ -59,13 +59,13 @@ namespace Mesen.Debugger.Windows
 
 			_textEditor.TemplateApplied += textEditor_TemplateApplied;
 			_hexView.TemplateApplied += hexView_TemplateApplied;
-			
+
 			_textEditor.SyntaxHighlighting = _highlighting;
 
 			_model.Config.LoadWindowSettings(this);
 			_model.InitMenu(this);
 		}
-		
+
 		private void UpdateSyntaxDef()
 		{
 			((XshdColor)_syntaxDef.Elements[0]).Foreground = new SimpleHighlightingBrush(ColorHelper.GetColor(ConfigManager.Config.Debug.Debugger.CodeCommentColor));
@@ -118,7 +118,7 @@ namespace Mesen.Debugger.Windows
 
 		private void OnCellClick(DataBoxCell cell)
 		{
-			int lineNumber = (((AssemblerError?)cell.DataContext)?.LineNumber ?? 0)- 1;
+			int lineNumber = (((AssemblerError?)cell.DataContext)?.LineNumber ?? 0) - 1;
 			if(lineNumber >= 0) {
 				_textEditor.TextArea.Caret.Line = lineNumber;
 				_textEditor.TextArea.Caret.Column = 0;

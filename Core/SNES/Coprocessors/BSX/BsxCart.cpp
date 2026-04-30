@@ -37,7 +37,7 @@ BsxCart::BsxCart(SnesConsole* console, BsxMemoryPack* memPack)
 
 	Reset();
 }
- 
+
 BsxCart::~BsxCart()
 {
 	delete[] _psRam;
@@ -50,7 +50,7 @@ uint8_t BsxCart::Read(uint32_t addr)
 		return openBus;
 	} else {
 		uint8_t reg = (addr >> 16) & 0x0F;
-		
+
 		if(reg <= 0x0D) {
 			return (_regs[reg] << 7) | (openBus & 0x7F);
 		} else {
@@ -123,7 +123,7 @@ void BsxCart::UpdateMemoryMappings()
 		}
 	} else {
 		//HiROM
-		
+
 		//Memory pack mapping
 		mm->RegisterHandler(0x00, 0x3F, 0x8000, 0xFFFF, memPackHandlers, 8);
 		mm->RegisterHandler(0x40, 0x7D, 0x0000, 0xFFFF, memPackHandlers, 0);

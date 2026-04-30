@@ -25,7 +25,7 @@ protected:
 		_irqControl = 0;
 		_selectedReg = 0;
 		memset(_prgRegs, 0, sizeof(_prgRegs));
-		
+
 		SelectPrgPage(3, -1);
 	}
 
@@ -61,8 +61,8 @@ protected:
 			case 0x9000: _irqReloadValue = (_irqReloadValue & 0xFF0F) | ((value & 0x0F) << 4); break;
 			case 0xA000: _irqReloadValue = (_irqReloadValue & 0xF0FF) | ((value & 0x0F) << 8); break;
 			case 0xB000: _irqReloadValue = (_irqReloadValue & 0x0FFF) | ((value & 0x0F) << 12); break;
-			
-			case 0xC000: 
+
+			case 0xC000:
 				_irqControl = value;
 				if(_irqControl & 0x02) {
 					_irqCounter = _irqReloadValue;
@@ -73,9 +73,12 @@ protected:
 			case 0xD000: _console->GetCpu()->ClearIrqSource(IRQSource::External); break;
 			case 0xE000: _selectedReg = (value & 0x07) - 1; break;
 
-			case 0xF000: 
+			case 0xF000:
 				switch(_selectedReg) {
-					case 0: case 1: case 2: case 3:
+					case 0:
+					case 1:
+					case 2:
+					case 3:
 						_prgRegs[_selectedReg] = ((_prgRegs[_selectedReg]) & 0x10) | (value & 0x0F);
 						break;
 

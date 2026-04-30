@@ -57,7 +57,7 @@ void GbaTimer::ProcessPendingWrites()
 				timer.ProcessTimer = false;
 				timer.EnableDelay = 0;
 			}
-			
+
 			timer.ReloadValue = timer.NewReloadValue;
 		}
 	}
@@ -104,17 +104,26 @@ void GbaTimer::WriteRegister(uint32_t addr, uint8_t value)
 	uint8_t timerIndex = (addr & 0x0C) >> 2;
 	GbaTimerState& timer = _state.Timer[timerIndex];
 	switch(addr) {
-		case 0x100: case 0x104: case 0x108: case 0x10C:
+		case 0x100:
+		case 0x104:
+		case 0x108:
+		case 0x10C:
 			BitUtilities::SetBits<0>(timer.NewReloadValue, value);
 			TriggerUpdate(timer);
 			break;
 
-		case 0x101: case 0x105: case 0x109: case 0x10D:
+		case 0x101:
+		case 0x105:
+		case 0x109:
+		case 0x10D:
 			BitUtilities::SetBits<8>(timer.NewReloadValue, value);
 			TriggerUpdate(timer);
 			break;
 
-		case 0x102: case 0x106: case 0x10A: case 0x10E: {
+		case 0x102:
+		case 0x106:
+		case 0x10A:
+		case 0x10E: {
 			if(timerIndex == 0) {
 				//Mode is always disabled and always returns 0 for timer 0
 				value &= ~0x04;
@@ -125,7 +134,10 @@ void GbaTimer::WriteRegister(uint32_t addr, uint8_t value)
 			break;
 		}
 
-		case 0x103: case 0x107: case 0x10B: case 0x10F:
+		case 0x103:
+		case 0x107:
+		case 0x10B:
+		case 0x10F:
 			break;
 	}
 }
@@ -134,10 +146,29 @@ uint8_t GbaTimer::ReadRegister(uint32_t addr)
 {
 	GbaTimerState& timer = _state.Timer[(addr & 0x0C) >> 2];
 	switch(addr) {
-		case 0x100: case 0x104: case 0x108: case 0x10C: return BitUtilities::GetBits<0>(timer.Timer);
-		case 0x101: case 0x105: case 0x109: case 0x10D: return BitUtilities::GetBits<8>(timer.Timer);
-		case 0x102: case 0x106: case 0x10A: case 0x10E: return timer.Control;
-		case 0x103: case 0x107: case 0x10B: case 0x10F: return 0;
+		case 0x100:
+		case 0x104:
+		case 0x108:
+		case 0x10C:
+			return BitUtilities::GetBits<0>(timer.Timer);
+
+		case 0x101:
+		case 0x105:
+		case 0x109:
+		case 0x10D:
+			return BitUtilities::GetBits<8>(timer.Timer);
+
+		case 0x102:
+		case 0x106:
+		case 0x10A:
+		case 0x10E:
+			return timer.Control;
+
+		case 0x103:
+		case 0x107:
+		case 0x10B:
+		case 0x10F:
+			return 0;
 	}
 
 	return 0;

@@ -39,7 +39,7 @@ PceDebugger::PceDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_debugger = debugger;
 	_emu = debugger->GetEmulator();
 	PceConsole* console = (PceConsole*)debugger->GetConsole();
-	
+
 	_console = console;
 	_cpu = console->GetCpu();
 	_vdc = console->GetVdc();
@@ -129,7 +129,7 @@ void PceDebugger::ProcessInstruction()
 			_step->Break(BreakSource::BreakOnUnofficialOpCode);
 		}
 	}
-	
+
 	if(_step->StepCount != 0 && _breakpointManager->HasBreakpoints() && _settings->GetDebugConfig().UsePredictiveBreakpoints) {
 		_dummyCpu->SetDummyState(_cpu->GetState());
 		_dummyCpu->Exec();
@@ -182,7 +182,7 @@ void PceDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType 
 		if(addressInfo.Type == MemoryType::PcePrgRom && addressInfo.Address >= 0 && operation.Type != MemoryOperationType::DummyRead) {
 			_codeDataLogger->SetData(addressInfo.Address);
 		}
-		
+
 		if(_traceLogger->IsEnabled()) {
 			_traceLogger->LogNonExec(operation, addressInfo);
 		}
@@ -305,7 +305,7 @@ void PceDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool
 {
 	AddressInfo ret = _memoryManager->GetAbsoluteAddress(originalPc);
 	AddressInfo dest = _memoryManager->GetAbsoluteAddress(currentPc);
-	
+
 	if(dest.Type == MemoryType::PcePrgRom && dest.Address >= 0) {
 		_codeDataLogger->SetCode(dest.Address, CdlFlags::SubEntryPoint);
 	}
@@ -317,10 +317,7 @@ void PceDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool
 	ProcessCallStackUpdates(ret, originalPc, originalSp);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::Pce, *this, *_step.get(),
-		ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::Pce, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi);
 }
 
 void PceDebugger::ProcessPpuRead(uint16_t addr, uint16_t value, MemoryType memoryType)
@@ -458,7 +455,7 @@ bool PceDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption 
 	uint8_t* prgRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::PcePrgRom);
 	uint32_t prgRomSize = _debugger->GetMemoryDumper()->GetMemorySize(MemoryType::PcePrgRom);
 	vector<uint8_t> rom = vector<uint8_t>(prgRom, prgRom + prgRomSize);
-	
+
 	if(saveAsIps) {
 		vector<uint8_t> originalRom;
 		_emu->GetRomInfo().RomFile.ReadFile(originalRom);

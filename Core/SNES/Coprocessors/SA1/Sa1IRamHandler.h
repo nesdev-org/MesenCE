@@ -8,7 +8,7 @@ class Sa1IRamHandler : public IMemoryHandler
 {
 private:
 	uint8_t* _writeEnabled = nullptr;
-	uint8_t * _ram = nullptr;
+	uint8_t* _ram = nullptr;
 
 	__forceinline uint8_t InternalRead(uint32_t addr)
 	{
@@ -20,7 +20,7 @@ private:
 	}
 
 public:
-	Sa1IRamHandler(uint8_t* writeProtected, uint8_t *ram) : IMemoryHandler(MemoryType::Sa1InternalRam)
+	Sa1IRamHandler(uint8_t* writeProtected, uint8_t* ram) : IMemoryHandler(MemoryType::Sa1InternalRam)
 	{
 		_writeEnabled = writeProtected;
 		_ram = ram;
@@ -36,7 +36,7 @@ public:
 		return InternalRead(addr);
 	}
 
-	void PeekBlock(uint32_t addr, uint8_t *output) override
+	void PeekBlock(uint32_t addr, uint8_t* output) override
 	{
 		for(int i = 0; i < 0x1000; i++) {
 			output[i] = InternalRead(i);

@@ -96,7 +96,7 @@ public:
 			case 0x65: BitUtilities::SetBits<8>(_state->LeftOutput, value); break;
 			case 0x66: BitUtilities::SetBits<0>(_state->RightOutput, value); break;
 			case 0x67: BitUtilities::SetBits<8>(_state->RightOutput, value); break;
-		
+
 			case 0x69: WriteStereoInput(value); break;
 
 			case 0x6A: {

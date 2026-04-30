@@ -30,7 +30,7 @@ void GbaPpu::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryMa
 	_state = {};
 	_state.Scanline = 225;
 	_state.Cycle = 0;
-	
+
 	_paletteRam = (uint16_t*)_emu->GetMemory(MemoryType::GbaPaletteRam).Memory;
 	_vram = (uint8_t*)_emu->GetMemory(MemoryType::GbaVideoRam).Memory;
 	_vram16 = (uint16_t*)_emu->GetMemory(MemoryType::GbaVideoRam).Memory;
@@ -59,7 +59,7 @@ void GbaPpu::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryMa
 	for(int i = 0; i < 6; i++) {
 		_state.WindowActiveLayers[4][i] = true;
 	}
-	
+
 	StaticFor<0, 128>::Apply([=](auto i) {
 		_colorMathFunc[i] = &GbaPpu::ProcessColorMath<(GbaPpuBlendEffect)(i >> 5), (bool)(i & 0x01), (bool)(i & 0x02), (bool)(i & 0x04), (bool)(i & 0x08), (bool)(i & 0x10)>;
 	});
@@ -158,13 +158,13 @@ void GbaPpu::ProcessEndOfScanline()
 
 		_emu->ProcessEvent(EventType::StartFrame, CpuType::Gba);
 
-		_skipRender = (
+		_skipRender =
 			!cfg.DisableFrameSkipping &&
 			!_emu->GetRewindManager()->IsRewinding() &&
 			!_emu->GetVideoRenderer()->IsRecording() &&
 			(settings->GetEmulationSpeed() == 0 || settings->GetEmulationSpeed() > 150) &&
-			_frameSkipTimer.GetElapsedMS() < 15
-		);
+			_frameSkipTimer.GetElapsedMS() < 15;
+
 		if(!_skipRender) {
 			_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
 		}
@@ -232,7 +232,7 @@ void GbaPpu::RenderScanline(bool forceRender)
 		std::fill(rowStart, rowStart + GbaConstants::ScreenWidth, 0x7FFF);
 		return;
 	}
-	
+
 	uint8_t activeLayers = 0;
 	switch(_state.BgMode) {
 		case 0:
@@ -256,9 +256,20 @@ void GbaPpu::RenderScanline(bool forceRender)
 			activeLayers = _state.Control2 & 0x0C;
 			break;
 
-		case 3: RenderBitmapMode<3>(); activeLayers = _state.Control2 & 0x04; break;
-		case 4: RenderBitmapMode<4>(); activeLayers = _state.Control2 & 0x04; break;
-		case 5: RenderBitmapMode<5>(); activeLayers = _state.Control2 & 0x04; break;
+		case 3:
+			RenderBitmapMode<3>();
+			activeLayers = _state.Control2 & 0x04;
+			break;
+
+		case 4:
+			RenderBitmapMode<4>();
+			activeLayers = _state.Control2 & 0x04;
+			break;
+
+		case 5:
+			RenderBitmapMode<5>();
+			activeLayers = _state.Control2 & 0x04;
+			break;
 
 		default: break;
 	}
@@ -277,7 +288,7 @@ void GbaPpu::ProcessColorMath()
 	uint16_t* dst = _skipRender ? _skippedOutput : (_currentBuffer + (_state.Scanline * GbaConstants::ScreenWidth));
 	uint8_t mainCoeff = std::min<uint8_t>(16, _state.BlendMainCoefficient);
 	uint8_t subCoeff = std::min<uint8_t>(16, _state.BlendSubCoefficient);
-	
+
 	GbaPixelData main = {};
 	GbaPixelData sub = {};
 	uint8_t brightness = std::min<uint8_t>(16, _state.Brightness);
@@ -300,7 +311,7 @@ void GbaPpu::ProcessColorMath()
 			wnd = GbaPpu::NoWindow;
 			main = _oamReadOutput[x];
 		}
-		
+
 		if(!(main.Color & GbaPpu::SpriteMosaicFlag) || !(_renderSprPixel.Color & GbaPpu::SpriteMosaicFlag) || x % (_state.ObjMosaicSizeX + 1) == 0) {
 			_renderSprPixel = main;
 		} else {
@@ -349,11 +360,11 @@ void GbaPpu::ProcessColorMath()
 	}
 
 	if(_state.StereoscopicEnabled) {
-		for(int x = start & ~1; x + 1 <= end; x+=2) {
+		for(int x = start & ~1; x + 1 <= end; x += 2) {
 			uint16_t gLeft = dst[x] & 0x3E0;
-			uint16_t gRight = dst[x+1] & 0x3E0;
+			uint16_t gRight = dst[x + 1] & 0x3E0;
 			dst[x] = (dst[x] & ~0x3E0) | gRight;
-			dst[x+1] = (dst[x+1] & ~0x3E0) | gLeft;
+			dst[x + 1] = (dst[x + 1] & ~0x3E0) | gLeft;
 		}
 	}
 }
@@ -420,7 +431,7 @@ void GbaPpu::ProcessWindow()
 	if(x >= end) {
 		return;
 	}
-	
+
 	if(_state.Window0Enabled || _state.Window1Enabled) {
 		for(int i = -1; i < 4; i++) {
 			uint16_t changePos = i < 0 ? 0 : _windowChangePos[i];
@@ -509,12 +520,11 @@ void GbaPpu::PushBgPixels(int renderX)
 		if constexpr(bpp8) {
 			tileData = ((tileData & 0xFF00) >> 8) | ((tileData & 0x00FF) << 8);
 		} else {
-			tileData = (
-				((tileData & 0xF000) >> 12) | 
+			tileData =
+				((tileData & 0xF000) >> 12) |
 				((tileData & 0x0F00) >> 4) |
 				((tileData & 0x00F0) << 4) |
-				((tileData & 0x000F) << 12)
-			);
+				((tileData & 0x000F) << 12);
 		}
 	}
 
@@ -740,7 +750,7 @@ void GbaPpu::RenderBitmapMode()
 				_layerData[2].YPos = (_layerData[2].TransformY >> 8);
 			}
 
-			_memoryAccess[cycle+gap] |= GbaPpuMemAccess::Vram;
+			_memoryAccess[cycle + gap] |= GbaPpuMemAccess::Vram;
 
 			if(_layerData[2].YPos < screenHeight && _layerData[2].XPos < screenWidth) {
 				uint32_t addr = _layerData[2].YPos * screenWidth + _layerData[2].XPos;
@@ -815,7 +825,7 @@ void GbaPpu::InitSpriteEvaluation()
 			}
 		}
 	}
-	
+
 	_oamHasWindowModeSprite = false;
 
 	std::swap(_oamWriteOutput, _oamReadOutput);
@@ -928,7 +938,7 @@ void GbaPpu::RenderSprites()
 		cycle++;
 	}
 	GbaSpriteRendererData& spr = _objData[0];
-	for(; cycle <= ppuCycle; cycle+=2) {
+	for(; cycle <= ppuCycle; cycle += 2) {
 		if(cycle == 41) {
 			//start oam evaluation/fetching
 			InitSpriteEvaluation();
@@ -996,7 +1006,7 @@ void GbaPpu::RenderSprites()
 				_loadOamAttr01 = false;
 				continue;
 			}
-			
+
 			if(!_state.ObjLayerEnabled) {
 				continue;
 			}
@@ -1291,7 +1301,7 @@ void GbaPpu::WriteRegister(uint32_t addr, uint8_t value)
 			_state.HblankIrqEnabled = value & 0x10;
 			_state.ScanlineIrqEnabled = value & 0x20;
 			break;
-		
+
 		case 0x05:
 			if(_state.Lyc != value) {
 				_state.Lyc = value;
@@ -1304,7 +1314,10 @@ void GbaPpu::WriteRegister(uint32_t addr, uint8_t value)
 			}
 			break;
 
-		case 0x08: case 0x0A: case 0x0C: case 0x0E: {
+		case 0x08:
+		case 0x0A:
+		case 0x0C:
+		case 0x0E: {
 			GbaBgConfig& cfg = _state.BgLayers[(addr & 0x06) >> 1];
 			BitUtilities::SetBits<0>(cfg.Control, value);
 			cfg.Priority = value & 0x03;
@@ -1315,7 +1328,10 @@ void GbaPpu::WriteRegister(uint32_t addr, uint8_t value)
 			break;
 		}
 
-		case 0x09: case 0x0B: case 0x0D: case 0x0F: {
+		case 0x09:
+		case 0x0B:
+		case 0x0D:
+		case 0x0F: {
 			uint8_t layer = (addr & 0x06) >> 1;
 			GbaBgConfig& cfg = _state.BgLayers[layer];
 			if(layer < 2) {
@@ -1332,56 +1348,125 @@ void GbaPpu::WriteRegister(uint32_t addr, uint8_t value)
 			break;
 		}
 
-		case 0x10: case 0x14: case 0x18: case 0x1C:
+		case 0x10:
+		case 0x14:
+		case 0x18:
+		case 0x1C:
 			BitUtilities::SetBits<0>(_state.BgLayers[(addr & 0x0C) >> 2].ScrollX, value);
 			break;
 
-		case 0x11: case 0x15: case 0x19: case 0x1D:
+		case 0x11:
+		case 0x15:
+		case 0x19:
+		case 0x1D:
 			BitUtilities::SetBits<8>(_state.BgLayers[(addr & 0x0C) >> 2].ScrollX, value);
 			break;
 
-		case 0x12: case 0x16: case 0x1A: case 0x1E:
+		case 0x12:
+		case 0x16:
+		case 0x1A:
+		case 0x1E:
 			BitUtilities::SetBits<0>(_state.BgLayers[(addr & 0x0C) >> 2].ScrollY, value);
 			break;
 
-		case 0x13: case 0x17: case 0x1B: case 0x1F:
+		case 0x13:
+		case 0x17:
+		case 0x1B:
+		case 0x1F:
 			BitUtilities::SetBits<8>(_state.BgLayers[(addr & 0x0C) >> 2].ScrollY, value);
 			break;
 
-		case 0x20: case 0x22: case 0x24: case 0x26:
-		case 0x30: case 0x32: case 0x34: case 0x36:
+		case 0x20:
+		case 0x22:
+		case 0x24:
+		case 0x26:
+		case 0x30:
+		case 0x32:
+		case 0x34:
+		case 0x36:
 			BitUtilities::SetBits<0>(_state.Transform[(addr & 0x10) >> 4].Matrix[(addr & 0x06) >> 1], value);
 			break;
 
-		case 0x21: case 0x23: case 0x25: case 0x27:
-		case 0x31: case 0x33: case 0x35: case 0x37:
+		case 0x21:
+		case 0x23:
+		case 0x25:
+		case 0x27:
+		case 0x31:
+		case 0x33:
+		case 0x35:
+		case 0x37:
 			BitUtilities::SetBits<8>(_state.Transform[(addr & 0x10) >> 4].Matrix[(addr & 0x06) >> 1], value);
 			break;
-		
-		case 0x28: case 0x38: SetTransformOrigin<0>((addr & 0x10) >> 4, value, false); break;
-		case 0x29: case 0x39: SetTransformOrigin<8>((addr & 0x10) >> 4, value, false);  break;
-		case 0x2A: case 0x3A: SetTransformOrigin<16>((addr & 0x10) >> 4, value, false);  break;
-		case 0x2B: case 0x3B: SetTransformOrigin<24>((addr & 0x10) >> 4, value & 0x0F, false); break;
 
-		case 0x2C: case 0x3C: SetTransformOrigin<0>((addr & 0x10) >> 4, value, true);  break;
-		case 0x2D: case 0x3D: SetTransformOrigin<8>((addr & 0x10) >> 4, value, true);  break;
-		case 0x2E: case 0x3E: SetTransformOrigin<16>((addr & 0x10) >> 4, value, true);  break;
-		case 0x2F: case 0x3F: SetTransformOrigin<24>((addr & 0x10) >> 4, value & 0x0F, true);  break;
+		case 0x28:
+		case 0x38:
+			SetTransformOrigin<0>((addr & 0x10) >> 4, value, false);
+			break;
+
+		case 0x29:
+		case 0x39:
+			SetTransformOrigin<8>((addr & 0x10) >> 4, value, false);
+			break;
+
+		case 0x2A:
+		case 0x3A:
+			SetTransformOrigin<16>((addr & 0x10) >> 4, value, false);
+			break;
+
+		case 0x2B:
+		case 0x3B:
+			SetTransformOrigin<24>((addr & 0x10) >> 4, value & 0x0F, false);
+			break;
+
+		case 0x2C:
+		case 0x3C:
+			SetTransformOrigin<0>((addr & 0x10) >> 4, value, true);
+			break;
+
+		case 0x2D:
+		case 0x3D:
+			SetTransformOrigin<8>((addr & 0x10) >> 4, value, true);
+			break;
+
+		case 0x2E:
+		case 0x3E:
+			SetTransformOrigin<16>((addr & 0x10) >> 4, value, true);
+			break;
+
+		case 0x2F:
+		case 0x3F:
+			SetTransformOrigin<24>((addr & 0x10) >> 4, value & 0x0F, true);
+			break;
 
 		case 0x40: SetWindowX(_state.Window[0].RightX, value); break;
 		case 0x41: SetWindowX(_state.Window[0].LeftX, value); break;
 		case 0x42: SetWindowX(_state.Window[1].RightX, value); break;
 		case 0x43: SetWindowX(_state.Window[1].LeftX, value); break;
-		
+
 		case 0x44: _state.Window[0].BottomY = value; break;
 		case 0x45: _state.Window[0].TopY = value; break;
 		case 0x46: _state.Window[1].BottomY = value; break;
 		case 0x47: _state.Window[1].TopY = value; break;
 
-		case 0x48: _state.Window0Control = value & 0x3F; SetWindowActiveLayers(0, value & 0x3F); break;
-		case 0x49: _state.Window1Control = value & 0x3F; SetWindowActiveLayers(1, value & 0x3F); break;
-		case 0x4A: _state.OutWindowControl = value & 0x3F; SetWindowActiveLayers(3, value & 0x3F);  break;
-		case 0x4B: _state.ObjWindowControl = value & 0x3F; SetWindowActiveLayers(2, value & 0x3F);  break;
+		case 0x48:
+			_state.Window0Control = value & 0x3F;
+			SetWindowActiveLayers(0, value & 0x3F);
+			break;
+
+		case 0x49:
+			_state.Window1Control = value & 0x3F;
+			SetWindowActiveLayers(1, value & 0x3F);
+			break;
+
+		case 0x4A:
+			_state.OutWindowControl = value & 0x3F;
+			SetWindowActiveLayers(3, value & 0x3F);
+			break;
+
+		case 0x4B:
+			_state.ObjWindowControl = value & 0x3F;
+			SetWindowActiveLayers(2, value & 0x3F);
+			break;
 
 		case 0x4C:
 			_state.BgMosaicSizeX = value & 0x0F;
@@ -1417,7 +1502,7 @@ void GbaPpu::WriteRegister(uint32_t addr, uint8_t value)
 		case 0x52: _state.BlendMainCoefficient = value & 0x1F; break;
 		case 0x53: _state.BlendSubCoefficient = value & 0x1F; break;
 		case 0x54: _state.Brightness = value & 0x1F; break;
-		
+
 		default:
 			LogDebug("Write unimplemented LCD register: " + HexUtilities::ToHex32(addr) + " = " + HexUtilities::ToHex(value));
 			break;
@@ -1464,18 +1549,23 @@ uint8_t GbaPpu::ReadRegister(uint32_t addr)
 				(scanline >= 160 && scanline != _lastScanline ? 0x01 : 0) |
 				(_state.Cycle >= 1007 ? 0x02 : 0) |
 				(IsScanlineMatch() ? 0x04 : 0) |
-				_state.DispStat
-			);
+				_state.DispStat);
 		}
 
 		case 0x05: return _state.Lyc;
 		case 0x06: return GetCurrentScanline();
 		case 0x07: return 0;
 
-		case 0x08: case 0x0A: case 0x0C: case 0x0E:
+		case 0x08:
+		case 0x0A:
+		case 0x0C:
+		case 0x0E:
 			return (uint8_t)_state.BgLayers[(addr & 0x06) >> 1].Control;
 
-		case 0x09: case 0x0B: case 0x0D: case 0x0F:
+		case 0x09:
+		case 0x0B:
+		case 0x0D:
+		case 0x0F:
 			return (uint8_t)(_state.BgLayers[(addr & 0x06) >> 1].Control >> 8);
 
 		case 0x48: return _state.Window0Control;
@@ -1503,7 +1593,7 @@ void GbaPpu::DebugProcessMemoryAccessView()
 	//Skip vblank scanlines (except last scanline) to avoid issues with overclock
 	if(_state.Scanline < 160) {
 		ppuTools->SetMemoryAccessData(_state.Scanline, _memoryAccess);
-	} else  if(_state.Scanline == _lastScanline) {
+	} else if(_state.Scanline == _lastScanline) {
 		ppuTools->SetMemoryAccessData(227, _memoryAccess);
 	}
 }
@@ -1563,7 +1653,7 @@ void GbaPpu::Serialize(Serializer& s)
 		SVI(_state.BgLayers[i].DisableTimer);
 		SVI(_state.BgLayers[i].StereoMode);
 	}
-	
+
 	for(int i = 0; i < 2; i++) {
 		SVI(_state.Transform[i].OriginX);
 		SVI(_state.Transform[i].OriginY);

@@ -11,6 +11,7 @@
 #include "Utilities/FastString.h"
 #include "Shared/MemoryType.h"
 
+// clang-format off
 static constexpr uint8_t _opSize[22] = {
 	1, 1, 1, 2, 2,
 	2, 3, 2, 2,
@@ -61,8 +62,8 @@ static constexpr PceAddrMode _opMode[] = {
 	M::Rel,	M::IndY,		M::ZInd,	M::Block,	M::Imp,		M::ZeroX,	M::ZeroX,	M::Zero,		M::Imp,	M::AbsY,	M::Imp,	M::Imp,	M::Imp,		M::AbsX,	M::AbsX,	M::ZeroRel,	//D
 	M::Imm,	M::IndX,		M::Imp,	M::Block,	M::Zero,		M::Zero,		M::Zero,		M::Zero,		M::Imp,	M::Imm,	M::Imp,	M::Imp,	M::Abs,		M::Abs,	M::Abs,	M::ZeroRel,	//E
 	M::Rel,	M::IndY,		M::ZInd,	M::Block,	M::Imp,		M::ZeroX,	M::ZeroX,	M::Zero,		M::Imp,	M::AbsY,	M::Imp,	M::Imp,	M::Imp,		M::AbsX,	M::AbsX,	M::ZeroRel,	//F
-
 };
+// clang-format on
 
 void PceDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
@@ -91,7 +92,7 @@ void PceDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 	switch(addrMode) {
 		case PceAddrMode::Acc: str.Write('A'); break;
 		case PceAddrMode::Imm: str.WriteAll("#$", HexUtilities::ToHex(byteCode[1])); break;
-		
+
 		case PceAddrMode::Ind:
 			str.Write('(');
 			writeLabelOrAddr(byteCode[1] | (byteCode[2] << 8));
@@ -116,7 +117,7 @@ void PceDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 			str.Write(",X)");
 			break;
 
-		case PceAddrMode::AbsXInd: 
+		case PceAddrMode::AbsXInd:
 			str.WriteAll('(');
 			writeLabelOrAddr(byteCode[1] | (byteCode[2] << 8));
 			str.Write(",X)");
@@ -127,11 +128,25 @@ void PceDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 
 		case PceAddrMode::Rel: writeLabelOrAddr(((int8_t)byteCode[1] + memoryAddr + 2) & 0xFFFF); break;
 
-		case PceAddrMode::AbsX: writeLabelOrAddr(byteCode[1] | (byteCode[2] << 8)); str.Write(",X"); break;
-		case PceAddrMode::AbsY: writeLabelOrAddr(byteCode[1] | (byteCode[2] << 8)); str.Write(",Y"); break;
+		case PceAddrMode::AbsX:
+			writeLabelOrAddr(byteCode[1] | (byteCode[2] << 8));
+			str.Write(",X");
+			break;
 
-		case PceAddrMode::ZeroX: writeZeroAddr(byteCode[1]); str.Write(",X"); break;
-		case PceAddrMode::ZeroY: writeZeroAddr(byteCode[1]); str.Write(",Y"); break;
+		case PceAddrMode::AbsY:
+			writeLabelOrAddr(byteCode[1] | (byteCode[2] << 8));
+			str.Write(",Y");
+			break;
+
+		case PceAddrMode::ZeroX:
+			writeZeroAddr(byteCode[1]);
+			str.Write(",X");
+			break;
+
+		case PceAddrMode::ZeroY:
+			writeZeroAddr(byteCode[1]);
+			str.Write(",Y");
+			break;
 
 		case PceAddrMode::ZeroRel:
 			writeZeroAddr(byteCode[1]);
@@ -150,12 +165,12 @@ void PceDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 			str.WriteAll("#$", HexUtilities::ToHex(byteCode[1]), ",");
 			writeZeroAddr(byteCode[2]);
 			break;
-		
+
 		case PceAddrMode::ImAbs:
 			str.WriteAll("#$", HexUtilities::ToHex(byteCode[1]), ",");
 			writeLabelOrAddr((uint16_t)(byteCode[2] | (byteCode[3] << 8)));
 			break;
-		
+
 		case PceAddrMode::ImZeroX:
 			str.WriteAll("#$", HexUtilities::ToHex(byteCode[1]), ",");
 			writeZeroAddr(byteCode[2]);
@@ -179,7 +194,7 @@ EffectiveAddressInfo PceDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Pce
 	bool isJump = PceDisUtils::IsUnconditionalJump(info.GetOpCode()) || PceDisUtils::IsConditionalJump(info.GetOpCode());
 	if(isJump) {
 		//For jumps, show no address/value
-		return { };
+		return {};
 	}
 
 	bool showEffectiveAddress = false;
@@ -277,12 +292,24 @@ bool PceDisUtils::IsConditionalJump(uint8_t opCode)
 		case 0xF0: //BEQ
 
 		//BBR
-		case 0x0F: case 0x1F: case 0x2F: case 0x3F:
-		case 0x4F: case 0x5F: case 0x6F: case 0x7F:
+		case 0x0F:
+		case 0x1F:
+		case 0x2F:
+		case 0x3F:
+		case 0x4F:
+		case 0x5F:
+		case 0x6F:
+		case 0x7F:
 
 		//BBS
-		case 0x8F: case 0x9F: case 0xAF: case 0xBF:
-		case 0xCF: case 0xDF: case 0xEF: case 0xFF:
+		case 0x8F:
+		case 0x9F:
+		case 0xAF:
+		case 0xBF:
+		case 0xCF:
+		case 0xDF:
+		case 0xEF:
+		case 0xFF:
 			return true;
 
 		default:
@@ -310,10 +337,27 @@ CdlFlags::CdlFlags PceDisUtils::GetOpFlags(uint8_t opCode, uint16_t pc, uint16_t
 		case 0xB0: //BCS
 		case 0xD0: //BNE
 		case 0xF0: //BEQ
-		case 0x0F: case 0x1F: case 0x2F: case 0x3F: //BBR
-		case 0x4F: case 0x5F: case 0x6F: case 0x7F: //BBR
-		case 0x8F: case 0x9F: case 0xAF: case 0xBF: //BBS
-		case 0xCF: case 0xDF: case 0xEF: case 0xFF: //BBS
+
+		//BBR
+		case 0x0F:
+		case 0x1F:
+		case 0x2F:
+		case 0x3F:
+		//BBR
+		case 0x4F:
+		case 0x5F:
+		case 0x6F:
+		case 0x7F:
+		//BBS
+		case 0x8F:
+		case 0x9F:
+		case 0xAF:
+		case 0xBF:
+		//BBS
+		case 0xCF:
+		case 0xDF:
+		case 0xEF:
+		case 0xFF:
 			return pc != prevPc + PceDisUtils::GetOpSize(opCode) ? CdlFlags::JumpTarget : CdlFlags::None;
 
 		default:

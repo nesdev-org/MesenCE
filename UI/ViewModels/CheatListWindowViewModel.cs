@@ -1,21 +1,21 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Controls.Selection;
+using Avalonia.Input;
+using Avalonia.VisualTree;
+using DataBoxControl;
+using Mesen.Config;
+using Mesen.Debugger;
+using Mesen.Debugger.Utilities;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.Windows;
+using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Linq;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Mesen.Windows;
-using Avalonia.Collections;
-using Mesen.Interop;
-using Avalonia.Controls.Selection;
-using DataBoxControl;
 using System.ComponentModel;
-using Mesen.Utilities;
-using Avalonia.VisualTree;
-using Mesen.Debugger;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
@@ -110,7 +110,7 @@ namespace Mesen.ViewModels
 							newCheat.Enabled = false;
 							newCheat.Type = GetCheatType(consoleType, cheatEntry.Code);
 							newCheat.Codes = string.Join(Environment.NewLine, cheatEntry.Code.Split(";", StringSplitOptions.RemoveEmptyEntries));
-							
+
 							string key = newCheat.Description + newCheat.Codes + newCheat.Type.ToString();
 							if(!existingCheats.Contains(key)) {
 								newCheats.Add(newCheat);

@@ -16,13 +16,19 @@ private:
 
 protected:
 	bool HasCoordinates() override { return true; }
-	enum Buttons { Left = 0, Right };
+	enum Buttons
+	{
+		Left = 0,
+		Right
+	};
 
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
 		SVArray(_packetBytes, 3);
-		SV(_stateBuffer); SV(_packetPos); SV(_packetSize);
+		SV(_stateBuffer);
+		SV(_packetPos);
+		SV(_packetSize);
 	}
 
 	void InternalSetStateFromInput() override
@@ -68,7 +74,7 @@ public:
 		}
 
 		MouseMovement mov = GetMovement();
-		
+
 		uint32_t upFlag = mov.dy < 0 ? 0x80 : 0;
 		uint32_t leftFlag = mov.dx < 0 ? 0x80 : 0;
 

@@ -23,7 +23,7 @@ bool GameClient::Connected()
 	return _connected;
 }
 
-void GameClient::Connect(ClientConnectionData &connectionData)
+void GameClient::Connect(ClientConnectionData& connectionData)
 {
 	Disconnect();
 
@@ -74,14 +74,13 @@ void GameClient::ProcessNotification(ConsoleNotificationType type, void* paramet
 	}
 
 	if(type == ConsoleNotificationType::GameLoaded &&
-		std::this_thread::get_id() != _clientThread->get_id() && 
-		!_emu->IsEmulationThread()
-	) {
+		std::this_thread::get_id() != _clientThread->get_id() &&
+		!_emu->IsEmulationThread()) {
 		//Disconnect if the client tried to manually load a game
 		//A deadlock occurs if this is called from the emulation thread while a network message is being processed
 		Disconnect();
 	}
-	
+
 	if(_connection) {
 		_connection->ProcessNotification(type, parameter);
 	}

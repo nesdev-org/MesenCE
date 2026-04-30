@@ -30,14 +30,14 @@ private:
 	PceTimer* _timer = nullptr;
 	IPceMapper* _mapper = nullptr;
 
-	typedef void(PceMemoryManager::*Func)();
+	typedef void (PceMemoryManager::*Func)();
 	Func _exec = nullptr;
 	Func _fastExec = nullptr;
 
 	PceMemoryManagerState _state = {};
 	uint8_t* _prgRom = nullptr;
 	uint32_t _prgRomSize = 0;
-	
+
 	uint8_t* _readBanks[0x100] = {};
 	uint8_t* _writeBanks[0x100] = {};
 	MemoryType _bankMemType[0x100] = {};
@@ -53,7 +53,7 @@ private:
 	uint8_t* _unmappedBank = nullptr;
 	uint8_t* _saveRam = nullptr;
 	uint8_t* _cdromRam = nullptr;
-	
+
 	bool _cdromUnitEnabled = false;
 
 public:
@@ -67,7 +67,7 @@ public:
 	void UpdateCdRomBanks();
 
 	void UpdateExecCallback();
-	
+
 	template<bool hasCdRom, bool isSuperGrafx> void ExecTemplate();
 
 	void ExecSlow();

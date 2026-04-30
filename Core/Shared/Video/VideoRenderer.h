@@ -61,7 +61,7 @@ private:
 
 	void RenderThread();
 	bool DrawScriptHud(RenderedFrame& frame);
-	
+
 	FrameInfo GetEmuHudSize(FrameInfo baseFrameSize);
 
 	void ProcessAviRecording(RenderedFrame& frame);
@@ -72,7 +72,7 @@ public:
 
 	FrameInfo GetRendererSize();
 	void SetRendererSize(uint32_t width, uint32_t height);
-	
+
 	void SetScriptHudScale(uint32_t scale) { _scriptHudScale = scale; }
 	std::pair<FrameInfo, OverscanDimensions> GetScriptHudSize();
 
@@ -81,8 +81,8 @@ public:
 
 	void UpdateFrame(RenderedFrame& frame);
 	void ClearFrame();
-	void RegisterRenderingDevice(IRenderingDevice *renderer);
-	void UnregisterRenderingDevice(IRenderingDevice *renderer);
+	void RegisterRenderingDevice(IRenderingDevice* renderer);
+	void UnregisterRenderingDevice(IRenderingDevice* renderer);
 
 	void StartRecording(string filename, RecordAviOptions options);
 	void AddRecordingSound(int16_t* soundBuffer, uint32_t sampleCount, uint32_t sampleRate);

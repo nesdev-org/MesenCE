@@ -119,7 +119,7 @@ LoadRomResult GbaConsole::LoadRom(VirtualFile& romFile)
 	_cpu->Init(_emu, _memoryManager.get(), _prefetch.get());
 	_serial->Init(_emu, _memoryManager.get());
 	_controlManager->Init(_memoryManager.get());
-	
+
 	LoadBattery();
 
 	_cpu->PowerOn();
@@ -138,7 +138,7 @@ void GbaConsole::InitCart(VirtualFile& romFile, vector<uint8_t>& romData)
 	MessageManager::Log("Title: " + title);
 	MessageManager::Log("Game Code: " + gameCode);
 	MessageManager::Log("Maker Code: " + makerCode);
-	
+
 	if(gameCode.size() > 0 && gameCode[0] == 'F') {
 		MessageManager::Log("Classic series game detected.");
 		if(romData.size() == 0x100000) {
@@ -384,7 +384,7 @@ PpuFrameInfo GbaConsole::GetPpuFrame()
 	frame.FrameBufferSize = frame.Width * frame.Height * sizeof(uint16_t);
 	frame.FirstScanline = 0;
 	frame.ScanlineCount = 228;
-	frame.CycleCount = 308*4;
+	frame.CycleCount = 308 * 4;
 	return frame;
 }
 
@@ -404,7 +404,7 @@ AddressInfo GbaConsole::GetRelativeAddress(AddressInfo& absAddress, CpuType cpuT
 	if(addr >= 0) {
 		return { (int32_t)_memoryManager->GetRelativeAddress(absAddress), MemoryType::GbaMemory };
 	}
-	
+
 	return { -1, MemoryType::None };
 }
 

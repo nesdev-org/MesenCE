@@ -21,7 +21,7 @@ Profiler::~Profiler()
 {
 }
 
-void Profiler::StackFunction(AddressInfo &addr, StackFrameFlags stackFlag)
+void Profiler::StackFunction(AddressInfo& addr, StackFrameFlags stackFlag)
 {
 	if(addr.Address >= 0) {
 		uint32_t key = addr.Address | ((uint8_t)addr.Type << 24);
@@ -56,12 +56,12 @@ void Profiler::StackFunction(AddressInfo &addr, StackFrameFlags stackFlag)
 void Profiler::UpdateCycles()
 {
 	uint64_t masterClock = _cpuDebugger->GetCpuCycleCount(true);
-	
+
 	ProfiledFunction& func = _functions[_currentFunction];
 	uint64_t clockGap = masterClock - _prevMasterClock;
 	func.ExclusiveCycles += clockGap;
 	func.InclusiveCycles += clockGap;
-	
+
 	int32_t len = (int32_t)_functionStack.size();
 	for(int32_t i = len - 1; i >= 0; i--) {
 		_functions[_functionStack[i]].InclusiveCycles += clockGap;
@@ -114,7 +114,7 @@ void Profiler::ResetState()
 void Profiler::InternalReset()
 {
 	ResetState();
-	
+
 	_functions.clear();
 	_functions[ResetFunctionIndex] = ProfiledFunction();
 	_functions[ResetFunctionIndex].Address = { ResetFunctionIndex, MemoryType::None };
@@ -123,7 +123,7 @@ void Profiler::InternalReset()
 void Profiler::GetProfilerData(ProfiledFunction* profilerData, uint32_t& functionCount)
 {
 	DebugBreakHelper helper(_debugger);
-	
+
 	UpdateCycles();
 
 	functionCount = 0;

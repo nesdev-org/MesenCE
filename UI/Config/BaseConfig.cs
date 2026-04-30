@@ -7,7 +7,7 @@ namespace Mesen.Config
 {
 	public class BaseConfig<T> : ReactiveObject where T : class
 	{
-		public T Clone() 
+		public T Clone()
 		{
 			if(this is T obj) {
 				return JsonHelper.Clone<T>(obj);

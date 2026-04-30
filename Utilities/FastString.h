@@ -12,13 +12,13 @@ private:
 
 public:
 #ifdef _MSC_VER
-#pragma warning(disable : 26495)
+	#pragma warning(disable : 26495)
 #endif
 	FastString(bool lowerCase = false) { _lowerCase = lowerCase; }
 	FastString(const char* str, int size) { Write(str, size); }
-	FastString(string &str) { Write(str); }
+	FastString(string& str) { Write(str); }
 #ifdef _MSC_VER
-#pragma warning(default : 26495)
+	#pragma warning(default : 26495)
 #endif
 
 	void WriteSafe(char c)
@@ -61,7 +61,7 @@ public:
 		Write(str, (uint16_t)strlen(str));
 	}
 
-	void Write(string &str, bool preserveCase = false)
+	void Write(string& str, bool preserveCase = false)
 	{
 		if(_lowerCase && !preserveCase) {
 			for(size_t i = 0; i < str.size(); i++) {
@@ -73,7 +73,7 @@ public:
 		_pos += (uint16_t)str.size();
 	}
 
-	void Write(FastString &str)
+	void Write(FastString& str)
 	{
 		memcpy(_buffer + _pos, str._buffer, str._pos);
 		_pos += str._pos;

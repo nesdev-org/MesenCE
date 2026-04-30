@@ -8,7 +8,7 @@
 #include "Shared/EmuSettings.h"
 #include "Shared/SettingTypes.h"
 
-PceVdcTools::PceVdcTools(Debugger* debugger, Emulator *emu, PceConsole* console) : PpuTools(debugger, emu)
+PceVdcTools::PceVdcTools(Debugger* debugger, Emulator* emu, PceConsole* console) : PpuTools(debugger, emu)
 {
 	_console = console;
 }
@@ -133,7 +133,7 @@ void PceVdcTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& b
 
 	uint32_t bgColor = GetSpriteBackgroundColor(options.Background, palette, false);
 	uint32_t screenWidth = std::min<uint32_t>(PceConstants::MaxScreenWidth, (state.HvLatch.HorizDisplayWidth + 1) * 8);
-	std::fill(outBuffer, outBuffer + 1024*1024, GetSpriteBackgroundColor(options.Background, palette, true));
+	std::fill(outBuffer, outBuffer + 1024 * 1024, GetSpriteBackgroundColor(options.Background, palette, true));
 	for(int i = 64; i < state.HvLatch.VertDisplayWidth + 64; i++) {
 		std::fill(outBuffer + i * 1024 + 32, outBuffer + i * 1024 + 32 + screenWidth, bgColor);
 	}
@@ -179,29 +179,28 @@ void PceVdcTools::InternalGetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* sprit
 {
 	uint16_t addr = (spriteIndex * 8);
 
-	uint16_t spriteY = (oamRam[addr] | (oamRam[addr+1] << 8)) & 0x3FF;
+	uint16_t spriteY = (oamRam[addr] | (oamRam[addr + 1] << 8)) & 0x3FF;
 	uint16_t spriteX = (oamRam[addr + 2] | (oamRam[addr + 3] << 8)) & 0x3FF;
 	uint16_t patternCode = (oamRam[addr + 4] | (oamRam[addr + 5] << 8)) & 0x7FF;
 	uint16_t tileIndex = patternCode >> 1;
 	uint16_t flags = (oamRam[addr + 6] | (oamRam[addr + 7] << 8));
-	
+
 	uint8_t width = (flags & 0x100) ? 32 : 16;
 	uint8_t height;
 	switch((flags >> 12) & 0x03) {
 		default:
 		case 0: height = 16; break;
 		case 1: height = 32; break;
-		
+
 		case 2:
 		case 3:
 			height = 64;
 			break;
 	}
 
-	bool visible = (
+	bool visible =
 		((spriteX + width) > 32 && (spriteX < 256 + 32)) ||
-		((spriteY + height) > 64 && (spriteY < 242 + 64))
-	);
+		((spriteY + height) > 64 && (spriteY < 242 + 64));
 
 	sprite.Bpp = 4; //Report 2bpp modes as 4bpp to display the right palette in UI
 	sprite.Format = format;
@@ -285,10 +284,10 @@ void PceVdcTools::InternalGetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* sprit
 				color = xOffset;
 			} else {
 				color = GetTilePixelColor<format>(vram, 0xFFFF, pixelStart * 2, xOffset);
-			}			
+			}
 
 			if(color != 0) {
-				spritePreview[outOffset] = palette[color + sprite.Palette * 16 + 16*16];
+				spritePreview[outOffset] = palette[color + sprite.Palette * 16 + 16 * 16];
 			} else {
 				spritePreview[outOffset] = 0;
 			}
@@ -310,10 +309,10 @@ void PceVdcTools::GetSpriteList(GetSpritePreviewOptions options, BaseState& base
 DebugSpritePreviewInfo PceVdcTools::GetSpritePreviewInfo(GetSpritePreviewOptions options, BaseState& baseState, BaseState& ppuToolsState)
 {
 	PceVdcState& state = ((PceVideoState&)baseState).Vdc;
-	
+
 	DebugSpritePreviewInfo info = {};
 	info.Height = 1024;
-	info.Width = 1024; 
+	info.Width = 1024;
 	info.SpriteCount = _console->IsSuperGrafx() ? 128 : 64;
 	info.CoordOffsetX = 0;
 	info.CoordOffsetY = 0;

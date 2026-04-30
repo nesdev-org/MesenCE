@@ -52,7 +52,7 @@ private:
 
 	WsModel _model = {};
 	bool _verticalMode = false;
-	
+
 	void InitPostBootRomState();
 
 public:
@@ -60,7 +60,7 @@ public:
 	~WsConsole();
 
 	static vector<string> GetSupportedExtensions() { return { ".ws", ".wsc" }; }
-	static vector<string> GetSupportedSignatures() { return { }; }
+	static vector<string> GetSupportedSignatures() { return {}; }
 
 	LoadRomResult LoadRom(VirtualFile& romFile) override;
 	void RunFrame() override;
@@ -92,7 +92,7 @@ public:
 	AddressInfo GetAbsoluteAddress(uint32_t relAddr);
 	AddressInfo GetAbsoluteAddress(AddressInfo& relAddress) override;
 	AddressInfo GetRelativeAddress(AddressInfo& absAddress, CpuType cpuType) override;
-	
+
 	WsState GetState();
 	void GetConsoleState(BaseState& state, ConsoleType consoleType) override;
 

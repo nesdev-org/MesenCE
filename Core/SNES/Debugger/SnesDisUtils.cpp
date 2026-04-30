@@ -10,7 +10,7 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/FastString.h"
 
-void SnesDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
+void SnesDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
 	FastString str(settings->GetDebugConfig().UseLowerCaseDisassembly);
 
@@ -45,13 +45,16 @@ void SnesDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t m
 		case SnesAddrMode::AbsIdxXInd: str.WriteAll('(', operand, ",X)"); break;
 		case SnesAddrMode::AbsIdxX: str.WriteAll(operand, ",X"); break;
 		case SnesAddrMode::AbsIdxY: str.WriteAll(operand, ",Y"); break;
-		case SnesAddrMode::AbsInd:  str.WriteAll('(', operand, ')'); break;
-		case SnesAddrMode::AbsIndLng:  str.WriteAll('[', operand, ']'); break;
+		case SnesAddrMode::AbsInd: str.WriteAll('(', operand, ')'); break;
+		case SnesAddrMode::AbsIndLng: str.WriteAll('[', operand, ']'); break;
 		case SnesAddrMode::AbsLngIdxX: str.WriteAll(operand, ",X"); break;
 		case SnesAddrMode::AbsLng: str.Write(operand); break;
 		case SnesAddrMode::AbsLngJmp: str.Write(operand); break;
 		case SnesAddrMode::Acc: break;
-		case SnesAddrMode::BlkMov: str.WriteAll('$', operand[1], operand[2], ','); str.WriteAll('$', operand[3], operand[4]); break;
+		case SnesAddrMode::BlkMov:
+			str.WriteAll('$', operand[1], operand[2], ',');
+			str.WriteAll('$', operand[3], operand[4]);
+			break;
 		case SnesAddrMode::DirIdxIndX: str.WriteAll('(', operand, ",X)"); break;
 		case SnesAddrMode::DirIdxX: str.WriteAll(operand, ",X"); break;
 		case SnesAddrMode::DirIdxY: str.WriteAll(operand, ",Y"); break;
@@ -61,7 +64,10 @@ void SnesDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t m
 		case SnesAddrMode::DirInd: str.WriteAll("(", operand, ")"); break;
 		case SnesAddrMode::Dir: str.Write(operand); break;
 
-		case SnesAddrMode::Imm8: case SnesAddrMode::Imm16: case SnesAddrMode::ImmX: case SnesAddrMode::ImmM:
+		case SnesAddrMode::Imm8:
+		case SnesAddrMode::Imm16:
+		case SnesAddrMode::ImmX:
+		case SnesAddrMode::ImmM:
 			str.WriteAll('#', operand);
 			break;
 
@@ -78,7 +84,7 @@ void SnesDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t m
 	out += str.ToString();
 }
 
-uint32_t SnesDisUtils::GetOperandAddress(DisassemblyInfo &info, uint32_t memoryAddr)
+uint32_t SnesDisUtils::GetOperandAddress(DisassemblyInfo& info, uint32_t memoryAddr)
 {
 	uint32_t opSize = info.GetOpSize();
 	uint32_t opAddr = 0;
@@ -103,7 +109,7 @@ uint32_t SnesDisUtils::GetOperandAddress(DisassemblyInfo &info, uint32_t memoryA
 	return opAddr;
 }
 
-EffectiveAddressInfo SnesDisUtils::GetEffectiveAddress(DisassemblyInfo &info, SnesConsole *console, SnesCpuState &state, CpuType type)
+EffectiveAddressInfo SnesDisUtils::GetEffectiveAddress(DisassemblyInfo& info, SnesConsole* console, SnesCpuState& state, CpuType type)
 {
 	SnesAddrMode opMode = SnesDisUtils::OpMode[info.GetOpCode()];
 	if(opMode == SnesAddrMode::Stk) {
@@ -338,6 +344,7 @@ bool SnesDisUtils::IsReturnInstruction(uint8_t opCode)
 	return opCode == 0x60 || opCode == 0x6B || opCode == 0x40;
 }
 
+// clang-format off
 uint8_t SnesDisUtils::OpSize[0x1F] = {
 	2, 2, 3, 0, 0, 3, 3, 3, 3, 3,
 	3, 4, 4, 3, 4, 1, 3, 2, 2, 2,
@@ -385,3 +392,4 @@ SnesAddrMode SnesDisUtils::OpMode[256] = {
 	M::ImmX,  M::DirIdxIndX, M::Imm8,     M::StkRel,        M::Dir,     M::Dir,     M::Dir,     M::DirIndLng,     M::Imp, M::ImmM,    M::Imp, M::Imp, M::Abs,        M::Abs,     M::Abs,     M::AbsLng,     // E
 	M::Rel,   M::DirIndIdxY, M::DirInd,   M::StkRelIndIdxY, M::Imm16,   M::DirIdxX, M::DirIdxX, M::DirIndLngIdxY, M::Imp, M::AbsIdxY, M::Stk, M::Imp, M::AbsIdxXInd, M::AbsIdxX, M::AbsIdxX, M::AbsLngIdxX  // F
 };
+// clang-format on

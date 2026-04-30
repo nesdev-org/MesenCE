@@ -12,16 +12,16 @@ class IAudioProvider;
 class CrossFeedFilter;
 class ReverbFilter;
 
-class SoundMixer 
+class SoundMixer
 {
 private:
-	IAudioDevice *_audioDevice;
+	IAudioDevice* _audioDevice;
 	vector<IAudioProvider*> _audioProviders;
-	Emulator *_emu;
+	Emulator* _emu;
 	unique_ptr<Equalizer> _equalizer;
 	unique_ptr<SoundResampler> _resampler;
 	safe_ptr<WaveRecorder> _waveRecorder;
-	int16_t *_sampleBuffer = nullptr;
+	int16_t* _sampleBuffer = nullptr;
 
 	HermiteResampler _pitchAdjust;
 	int16_t* _pitchAdjustBuffer = nullptr;
@@ -32,16 +32,16 @@ private:
 	unique_ptr<CrossFeedFilter> _crossFeedFilter;
 	unique_ptr<ReverbFilter> _reverbFilter;
 
-	void ProcessEqualizer(int16_t *samples, uint32_t sampleCount, uint32_t targetRate);
+	void ProcessEqualizer(int16_t* samples, uint32_t sampleCount, uint32_t targetRate);
 
 public:
-	SoundMixer(Emulator *emu);
+	SoundMixer(Emulator* emu);
 	~SoundMixer();
 
-	void PlayAudioBuffer(int16_t *samples, uint32_t sampleCount, uint32_t sourceRate);
+	void PlayAudioBuffer(int16_t* samples, uint32_t sampleCount, uint32_t sourceRate);
 	void StopAudio(bool clearBuffer = false);
 
-	void RegisterAudioDevice(IAudioDevice *audioDevice);
+	void RegisterAudioDevice(IAudioDevice* audioDevice);
 
 	void RegisterAudioProvider(IAudioProvider* provider);
 	void UnregisterAudioProvider(IAudioProvider* provider);
@@ -52,5 +52,5 @@ public:
 	void StartRecording(string filepath);
 	void StopRecording();
 	bool IsRecording();
-	void GetLastSamples(int16_t &left, int16_t &right);
+	void GetLastSamples(int16_t& left, int16_t& right);
 };

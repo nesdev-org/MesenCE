@@ -27,7 +27,9 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
-		SV(_outerChrBank); SV(_innerChrBank); SV(_lastAddress);
+		SV(_outerChrBank);
+		SV(_innerChrBank);
+		SV(_lastAddress);
 	}
 
 	void UpdateChrBanks()

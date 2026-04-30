@@ -15,8 +15,8 @@ GbEventManager::GbEventManager(Debugger* debugger, GbCpu* cpu, GbPpu* ppu)
 	_cpu = cpu;
 	_ppu = ppu;
 
-	_ppuBuffer = new uint16_t[456*GbEventManager::ScreenHeight];
-	memset(_ppuBuffer, 0, 456*GbEventManager::ScreenHeight * sizeof(uint16_t));
+	_ppuBuffer = new uint16_t[456 * GbEventManager::ScreenHeight];
+	memset(_ppuBuffer, 0, 456 * GbEventManager::ScreenHeight * sizeof(uint16_t));
 }
 
 GbEventManager::~GbEventManager()
@@ -65,7 +65,7 @@ DebugEventInfo GbEventManager::GetEvent(uint16_t y, uint16_t x)
 	}
 
 	//If no exact match, extend to the background color
-	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--){
+	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--) {
 		DebugEventInfo& evt = _sentEvents[i];
 		if(std::abs((int)evt.Cycle - (int)x) <= 1 && std::abs((int)evt.Scanline - (int)y) <= 1) {
 			return evt;
@@ -164,11 +164,11 @@ FrameInfo GbEventManager::GetDisplayBufferSize()
 
 void GbEventManager::DrawScreen(uint32_t* buffer)
 {
-	uint16_t *src = _ppuBuffer;
-	for(uint32_t y = 0, len = GbEventManager::ScreenHeight*2; y < len; y++) {
+	uint16_t* src = _ppuBuffer;
+	for(uint32_t y = 0, len = GbEventManager::ScreenHeight * 2; y < len; y++) {
 		for(uint32_t x = 0; x < GbEventManager::ScanlineWidth; x++) {
 			int srcOffset = (y >> 1) * 456 + (x >> 1);
-			buffer[y*GbEventManager::ScanlineWidth + x] = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
+			buffer[y * GbEventManager::ScanlineWidth + x] = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
 		}
 	}
 }

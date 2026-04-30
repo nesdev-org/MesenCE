@@ -12,7 +12,7 @@ namespace Mesen.Config
 		[Reactive] public bool RefreshOnBreakPause { get; set; } = true;
 		[Reactive] public bool AutoRefresh { get; set; } = true;
 		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
-		
+
 		[Reactive] public List<int> ColumnWidths { get; set; } = new();
 
 		[Reactive] public bool ShowToolbar { get; set; } = true;

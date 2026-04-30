@@ -74,7 +74,7 @@ protected:
 				break;
 			case 0xD000:
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
-				_irqEnabled = _irqEnableOnAck;				
+				_irqEnabled = _irqEnableOnAck;
 				break;
 			case 0xF000: SelectPrgPage(0, value & 0x07); break;
 		}

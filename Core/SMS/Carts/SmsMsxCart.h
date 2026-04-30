@@ -33,10 +33,25 @@ public:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr) {
-			case 0: _prgBanks[2] = value; _memoryManager->RefreshMappings(); break;
-			case 1: _prgBanks[3] = value; _memoryManager->RefreshMappings(); break;
-			case 2: _prgBanks[0] = value; _memoryManager->RefreshMappings(); break;
-			case 3: _prgBanks[1] = value; _memoryManager->RefreshMappings(); break;
+			case 0:
+				_prgBanks[2] = value;
+				_memoryManager->RefreshMappings();
+				break;
+
+			case 1:
+				_prgBanks[3] = value;
+				_memoryManager->RefreshMappings();
+				break;
+
+			case 2:
+				_prgBanks[0] = value;
+				_memoryManager->RefreshMappings();
+				break;
+
+			case 3:
+				_prgBanks[1] = value;
+				_memoryManager->RefreshMappings();
+				break;
 		}
 	}
 

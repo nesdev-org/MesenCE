@@ -254,7 +254,7 @@ namespace Mesen.Utilities
 			if(!_mouseCaptured && AllowMouseCapture) {
 				PixelPoint topLeft = _renderer.PointToScreen(new Point());
 				PixelRect rendererScreenRect = new PixelRect(topLeft, PixelSize.FromSize(_renderer.Bounds.Size, LayoutHelper.GetLayoutScale(_wnd)));
-				
+
 				if(InputApi.CaptureMouse(topLeft.X, topLeft.Y, rendererScreenRect.Width, rendererScreenRect.Height, GetRendererHandle())) {
 					DisplayMessageHelper.DisplayMessage("Input", ResourceHelper.GetMessage("MouseModeEnabled"));
 					_mouseCaptured = true;

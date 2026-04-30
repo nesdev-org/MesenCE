@@ -414,7 +414,7 @@ namespace Mesen.Debugger.Views
 				_parentModel = parentModel;
 				_parentModel.Selected += Parent_Selected;
 			}
-			
+
 			_model?.SetViewer(_viewer);
 			FocusViewer();
 		}

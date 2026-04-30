@@ -1,11 +1,11 @@
 using Avalonia;
 using Avalonia.Controls;
-using System;
-using System.Linq;
-using Avalonia.Styling;
 using Avalonia.Data;
 using Avalonia.Interactivity;
+using Avalonia.Styling;
 using Mesen.Localization;
+using System;
+using System.Linq;
 
 namespace Mesen.Controls
 {

@@ -17,7 +17,7 @@ namespace Mesen.Config
 		[Reactive] public EventViewerCategoryCfg VdcMemoryWidthWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC6, 0x29, 0xC6));
 		[Reactive] public EventViewerCategoryCfg VdcScrollWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC6, 0xC6, 0x29));
 		[Reactive] public EventViewerCategoryCfg VdcDmaWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x93, 0x29, 0xC9));
-		
+
 		[Reactive] public EventViewerCategoryCfg CdRomWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xDA, 0xB4, 0x7A));
 		[Reactive] public EventViewerCategoryCfg CdRomReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x44, 0x53, 0xD7));
 		[Reactive] public EventViewerCategoryCfg AdpcmWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xD7, 0x7A, 0xDA));
@@ -27,10 +27,10 @@ namespace Mesen.Config
 
 		[Reactive] public EventViewerCategoryCfg VceWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));
 		[Reactive] public EventViewerCategoryCfg VceReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x53, 0xD7, 0x44));
-		
+
 		[Reactive] public EventViewerCategoryCfg PsgWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xE2, 0x51, 0xF7));
 		[Reactive] public EventViewerCategoryCfg PsgReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xF9, 0xFE, 0xAC));
-		
+
 		[Reactive] public EventViewerCategoryCfg TimerWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xD1, 0xDD, 0x42));
 		[Reactive] public EventViewerCategoryCfg TimerReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x00, 0x75, 0x97));
 

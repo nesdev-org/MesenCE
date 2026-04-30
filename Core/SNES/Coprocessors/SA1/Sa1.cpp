@@ -28,18 +28,18 @@ Sa1::Sa1(SnesConsole* console)
 	_openBus = 0;
 	_cart = _console->GetCartridge();
 	_snesCpu = _console->GetCpu();
-	
+
 	_iRam = new uint8_t[Sa1::InternalRamSize];
 	_emu->RegisterMemory(MemoryType::Sa1InternalRam, _iRam, Sa1::InternalRamSize);
 	_iRamHandlerSa1.reset(new Sa1IRamHandler(&_state.Sa1IRamWriteProtect, _iRam));
 	_iRamHandlerCpu.reset(new Sa1IRamHandler(&_state.CpuIRamWriteProtect, _iRam));
 	_console->InitializeRam(_iRam, 0x800);
-	
+
 	//Register the SA1 in the CPU's memory space ($22xx-$23xx registers)
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 	_mappings.RegisterHandler(0x00, 0x3F, 0x2000, 0x2FFF, this);
 	_mappings.RegisterHandler(0x80, 0xBF, 0x2000, 0x2FFF, this);
-	
+
 	cpuMappings->RegisterHandler(0x00, 0x3F, 0x3000, 0x3FFF, _iRamHandlerCpu.get());
 	cpuMappings->RegisterHandler(0x80, 0xBF, 0x3000, 0x3FFF, _iRamHandlerCpu.get());
 
@@ -61,8 +61,8 @@ Sa1::Sa1(SnesConsole* console)
 		}
 	}
 
-	vector<unique_ptr<IMemoryHandler>> &saveRamHandlers = _cart->GetSaveRamHandlers();
-	for(unique_ptr<IMemoryHandler> &handler : saveRamHandlers) {
+	vector<unique_ptr<IMemoryHandler>>& saveRamHandlers = _cart->GetSaveRamHandlers();
+	for(unique_ptr<IMemoryHandler>& handler : saveRamHandlers) {
 		_cpuBwRamHandlers.push_back(unique_ptr<IMemoryHandler>(new CpuBwRamHandler((RamHandler*)handler.get(), &_state, this)));
 	}
 	cpuMappings->RegisterHandler(0x40, 0x4F, 0x0000, 0xFFFF, _cpuBwRamHandlers);
@@ -81,7 +81,7 @@ Sa1::~Sa1()
 void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 {
 	switch(addr) {
-		case 0x2209: 
+		case 0x2209:
 			//SCNT (SNES CPU Control)
 			_state.CpuMessageReceived = value & 0x0F;
 			_state.UseCpuNmiVector = (value & 0x10) != 0;
@@ -91,7 +91,7 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 			ProcessInterrupts();
 			break;
 
-		case 0x220A: 
+		case 0x220A:
 			//CIE (SA-1 CPU Interrupt Enable)
 			_state.Sa1NmiEnabled = (value & 0x10) != 0;
 			_state.DmaIrqEnabled = (value & 0x20) != 0;
@@ -101,7 +101,7 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 			ProcessInterrupts();
 			break;
 
-		case 0x220B: 
+		case 0x220B:
 			//CIC (SA-1 CPU Interrupt Clear)
 			if(value & 0x80) {
 				_state.Sa1IrqRequested = false;
@@ -113,15 +113,15 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 				_state.Sa1NmiRequested = false;
 			}
 			ProcessInterrupts();
-			break; 
-		
+			break;
+
 		case 0x220C: _state.CpuNmiVector = (_state.CpuNmiVector & 0xFF00) | value; break; //SNV (SNES CPU NMI Vector - Low)
 		case 0x220D: _state.CpuNmiVector = (_state.CpuNmiVector & 0xFF) | (value << 8); break; //SNV (SNES CPU NMI Vector - High)
 
 		case 0x220E: _state.CpuIrqVector = (_state.CpuIrqVector & 0xFF00) | value; break; //SNV (SNES CPU IRQ Vector - Low)
 		case 0x220F: _state.CpuIrqVector = (_state.CpuIrqVector & 0xFF) | (value << 8); break; //SIV (SNES CPU IRQ Vector - High)
 
-		case 0x2210: 
+		case 0x2210:
 			//TMC (H/V Timer Control)
 			_state.HorizontalTimerEnabled = (value & 0x01) != 0;
 			_state.VerticalTimerEnabled = (value & 0x02) != 0;
@@ -129,21 +129,39 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 			if(value) {
 				LogDebug("Using timer");
 			}
-			break; 
+			break;
 
 		case 0x2211:
 			//CTR (CPU Timer restart)
 			_state.LinearTimerValue = 0;
 			LogDebug("Reset timer");
-			break; 
-		
-		case 0x2212: _state.HTimer = (_state.HTimer & 0x0100) | value; LogDebug("Set timer"); break; //HCNT (Timer H-Count - Low)
-		case 0x2213: _state.HTimer = (_state.HTimer & 0xFF) | ((value & 0x01) << 8); LogDebug("Set timer"); break; //HCNT (Timer H-Count - High)
+			break;
 
-		case 0x2214: _state.VTimer = (_state.VTimer & 0x0100) | value; LogDebug("Set timer"); break; //VCNT (Timer V-Count - Low)
-		case 0x2215: _state.VTimer = (_state.VTimer & 0xFF) | ((value & 0x01) << 8); LogDebug("Set timer"); break; //VCNT (Timer V-Count - High)
+		case 0x2212:
+			//HCNT (Timer H-Count - Low)
+			_state.HTimer = (_state.HTimer & 0x0100) | value;
+			LogDebug("Set timer");
+			break;
 
-		case 0x2225: 
+		case 0x2213:
+			//HCNT (Timer H-Count - High)
+			_state.HTimer = (_state.HTimer & 0xFF) | ((value & 0x01) << 8);
+			LogDebug("Set timer");
+			break;
+
+		case 0x2214:
+			//VCNT (Timer V-Count - Low)
+			_state.VTimer = (_state.VTimer & 0x0100) | value;
+			LogDebug("Set timer");
+			break;
+
+		case 0x2215:
+			//VCNT (Timer V-Count - High)
+			_state.VTimer = (_state.VTimer & 0xFF) | ((value & 0x01) << 8);
+			LogDebug("Set timer");
+			break;
+
+		case 0x2225:
 			//BMAP (SA-1 BW-RAM Address Mapping)
 			if(_state.Sa1BwBank != (value & 0x7F) || _state.Sa1BwMode != (value & 0x80)) {
 				_state.Sa1BwBank = value & 0x7F;
@@ -151,7 +169,7 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 				UpdateSaveRamMappings();
 			}
 			break;
-			
+
 		case 0x2227: _state.Sa1BwWriteEnabled = (value & 0x80) != 0; break; //CBWE (SA-1 CPU BW-RAM Write Enable)
 		case 0x222A: _state.Sa1IRamWriteProtect = value; break; //CIWP (SA-1 CPU I-RAM Write Protection)
 
@@ -167,18 +185,30 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 				_state.CharConvCounter = 0;
 			}
 			break;
-		
-		case 0x2231: case 0x2232: case 0x2233: case 0x2234: case 0x2235: case 0x2236: case 0x2237:
+
+		case 0x2231:
+		case 0x2232:
+		case 0x2233:
+		case 0x2234:
+		case 0x2235:
+		case 0x2236:
+		case 0x2237:
 			WriteSharedRegisters(addr, value);
 			break;
 
 		case 0x2238: _state.DmaSize = (_state.DmaSize & 0xFF00) | value; break; //DTC (DMA terminal counter - Low)
 		case 0x2239: _state.DmaSize = (_state.DmaSize & 0x00FF) | (value << 8); break; //DTC (DMA terminal counter - High)
-		
+
 		case 0x223F: _state.BwRam2BppMode = (value & 0x80) != 0; break; //BBF (Bitmap format)
-		
-		case 0x2240: case 0x2241: case 0x2242: case 0x2243:
-		case 0x2244: case 0x2245: case 0x2246: case 0x2247:
+
+		case 0x2240:
+		case 0x2241:
+		case 0x2242:
+		case 0x2243:
+		case 0x2244:
+		case 0x2245:
+		case 0x2246:
+		case 0x2247:
 			//BRF (Bitmap register file)
 			_state.BitmapRegister1[addr & 0x07] = value;
 			if(addr == 0x2247 && _state.DmaEnabled && _state.DmaCharConv && !_state.DmaCharConvAuto) {
@@ -186,16 +216,22 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 			}
 			break;
 
-		case 0x2248: case 0x2249: case 0x224A: case 0x224B:
-		case 0x224C: case 0x224D: case 0x224E: case 0x224F:
+		case 0x2248:
+		case 0x2249:
+		case 0x224A:
+		case 0x224B:
+		case 0x224C:
+		case 0x224D:
+		case 0x224E:
+		case 0x224F:
 			//BRF (Bitmap register file)
 			_state.BitmapRegister2[addr & 0x07] = value;
 			if(addr == 0x224F && _state.DmaEnabled && _state.DmaCharConv && !_state.DmaCharConvAuto) {
 				RunCharConvertType2();
 			}
-			break; 
+			break;
 
-		case 0x2250: 
+		case 0x2250:
 			//MCNT (Arithmetic Control)
 			ProcessMathOp();
 			_state.MathOp = (Sa1MathOp)(value & 0x03);
@@ -204,10 +240,26 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 				_state.MathOpResult = 0;
 			}
 			break;
-		case 0x2251: ProcessMathOp(); _state.MultiplicandDividend = (_state.MultiplicandDividend & 0xFF00) | value; break; //MA (Arithmetic parameters - Multiplicand/Dividend - Low)
-		case 0x2252: ProcessMathOp(); _state.MultiplicandDividend = (_state.MultiplicandDividend & 0x00FF) | (value << 8); break; //MA (Arithmetic parameters - Multiplicand/Dividend - High)
-		case 0x2253: ProcessMathOp(); _state.MultiplierDivisor = (_state.MultiplierDivisor & 0xFF00) | value; break; //MB (Arithmetic parameters - Multiplier/Divisor - Low)
-		case 0x2254: 
+
+		case 0x2251:
+			//MA (Arithmetic parameters - Multiplicand/Dividend - Low)
+			ProcessMathOp();
+			_state.MultiplicandDividend = (_state.MultiplicandDividend & 0xFF00) | value;
+			break;
+
+		case 0x2252:
+			//MA (Arithmetic parameters - Multiplicand/Dividend - High)
+			ProcessMathOp();
+			_state.MultiplicandDividend = (_state.MultiplicandDividend & 0x00FF) | (value << 8);
+			break;
+
+		case 0x2253:
+			//MB (Arithmetic parameters - Multiplier/Divisor - Low)
+			ProcessMathOp();
+			_state.MultiplierDivisor = (_state.MultiplierDivisor & 0xFF00) | value;
+			break;
+
+		case 0x2254:
 			ProcessMathOp();
 
 			//MB (Arithmetic parameters - Multiplier/Divisor - High)
@@ -215,9 +267,9 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 
 			//"Writing to 2254h starts the operation."
 			_state.MathStartClock = _cpu->GetCycleCount();
-			break; 
-		
-		case 0x2258: 
+			break;
+
+		case 0x2258:
 			//VBD (Variable length bit processing)
 			_state.VarLenAutoInc = (value & 0x80) != 0;
 			_state.VarLenBitCount = value == 0 ? 16 : (value & 0x0F);
@@ -229,9 +281,9 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 
 		case 0x2259: _state.VarLenAddress = (_state.VarLenAddress & 0xFFFF00) | value; break; //VDA (Variable length data address - Low)
 		case 0x225A: _state.VarLenAddress = (_state.VarLenAddress & 0xFF00FF) | (value << 8); break; //VDA (Variable length data address - Mid)
-		case 0x225B: 
+		case 0x225B:
 			//VDA (Variable length data address - High)
-			_state.VarLenAddress = (_state.VarLenAddress & 0x00FFFF) | (value << 16); 
+			_state.VarLenAddress = (_state.VarLenAddress & 0x00FFFF) | (value << 16);
 			_state.VarLenCurrentBit = 0;
 			break;
 	}
@@ -240,7 +292,7 @@ void Sa1::Sa1RegisterWrite(uint16_t addr, uint8_t value)
 void Sa1::CpuRegisterWrite(uint16_t addr, uint8_t value)
 {
 	switch(addr) {
-		case 0x2200: 
+		case 0x2200:
 			//CCNT (SA-1 CPU Control)
 			if(!(value & 0x20) && _state.Sa1Reset) {
 				//Reset the CPU, and sync cycle count
@@ -266,7 +318,7 @@ void Sa1::CpuRegisterWrite(uint16_t addr, uint8_t value)
 			ProcessInterrupts();
 			break;
 
-		case 0x2202: 
+		case 0x2202:
 			//SIC (SNES CPU Interrupt Clear)
 			if(value & 0x80) {
 				_state.CpuIrqRequested = false;
@@ -291,7 +343,7 @@ void Sa1::CpuRegisterWrite(uint16_t addr, uint8_t value)
 		case 0x2222: UpdateBank(2, value); break; //EXB (MMC Bank E)
 		case 0x2223: UpdateBank(3, value); break; //FXB (MMC Bank F)
 
-		case 0x2224: 
+		case 0x2224:
 			//BMAPS (SNES CPU BW-RAM Address Mapping)
 			if(_state.CpuBwBank != (value & 0x1F)) {
 				_state.CpuBwBank = value & 0x1F;
@@ -300,12 +352,18 @@ void Sa1::CpuRegisterWrite(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x2226: _state.CpuBwWriteEnabled = (value & 0x80) != 0; break; //SBWE (SNES CPU BW-RAM Write Enable)
-			
+
 		case 0x2228: _state.BwWriteProtectedArea = (value & 0x0F); break; //BWPA (SNES CPU BW-RAM Write Protected Area)
 
 		case 0x2229: _state.CpuIRamWriteProtect = value; break; //SIWP (SNES CPU I-RAM Write Protection)
 
-		case 0x2231: case 0x2232: case 0x2233: case 0x2234: case 0x2235: case 0x2236: case 0x2237:
+		case 0x2231:
+		case 0x2232:
+		case 0x2233:
+		case 0x2234:
+		case 0x2235:
+		case 0x2236:
+		case 0x2237:
 			WriteSharedRegisters(addr, value);
 			break;
 	}
@@ -335,7 +393,7 @@ void Sa1::WriteSharedRegisters(uint16_t addr, uint8_t value)
 		case 0x2234: _state.DmaSrcAddr = (_state.DmaSrcAddr & 0x00FFFF) | (value << 16); break; //SDA (DMA source start address - High) (Shared with SNES CPU)
 
 		case 0x2235: _state.DmaDestAddr = (_state.DmaDestAddr & 0xFFFF00) | value; break; //DDA (DMA dest start address - Low) (Shared with SNES CPU)
-		case 0x2236: 
+		case 0x2236:
 			//DDA (DMA dest start address - Mid) (Shared with SNES CPU)
 			_state.DmaDestAddr = (_state.DmaDestAddr & 0xFF00FF) | (value << 8);
 			if(_state.DmaEnabled && !_state.DmaCharConv && _state.DmaDestDevice == Sa1DmaDestDevice::InternalRam) {
@@ -345,7 +403,7 @@ void Sa1::WriteSharedRegisters(uint16_t addr, uint8_t value)
 				_state.CharConvIrqFlag = true;
 				ProcessInterrupts();
 			}
-			break; 
+			break;
 
 		case 0x2237:
 			//DDA (DMA dest start address - High) (Shared with SNES CPU)
@@ -360,29 +418,43 @@ void Sa1::WriteSharedRegisters(uint16_t addr, uint8_t value)
 uint8_t Sa1::Sa1RegisterRead(uint16_t addr)
 {
 	switch(addr) {
-		case 0x2301: 
+		case 0x2301:
 			//CFR (SA-1 Status Flags)
 			return (
 				_state.Sa1MessageReceived |
 				(_state.Sa1NmiRequested << 4) |
 				(_state.DmaIrqFlag << 5) |
 				//TODO: Timer irq flag
-				(_state.Sa1IrqRequested << 7)
-			);
-			
+				(_state.Sa1IrqRequested << 7));
+
 		case 0x2302: break; //HCR (SA-1 H Counter read - Low)
 		case 0x2303: break; //HCR (SA-1 H Counter read - High)
-			
+
 		case 0x2304: break; //VCR (SA-1 V Counter read - Low)
 		case 0x2305: break; //VCR (SA-1 V Counter read - High)
-			
+
 		case 0x2306: ProcessMathOp(); return _state.MathOpResult & 0xFF; //MR (Arithmetic result)
 		case 0x2307: ProcessMathOp(); return (_state.MathOpResult >> 8) & 0xFF; //MR (Arithmetic result)
-		case 0x2308: ProcessMathOp(); return (_state.MathOpResult >> 16) & 0xFF; break; //MR (Arithmetic result)
-		case 0x2309: ProcessMathOp(); return (_state.MathOpResult >> 24) & 0xFF; break; //MR (Arithmetic result)
-		case 0x230A: ProcessMathOp(); return (_state.MathOpResult >> 32) & 0xFF; break; //MR (Arithmetic result)
 
-		case 0x230B: ProcessMathOp(); return _state.MathOverflow; break; //OF (Arithmetic overflow flag)
+		case 0x2308:
+			//MR (Arithmetic result)
+			ProcessMathOp();
+			return (_state.MathOpResult >> 16) & 0xFF;
+
+		case 0x2309:
+			//MR (Arithmetic result)
+			ProcessMathOp();
+			return (_state.MathOpResult >> 24) & 0xFF;
+
+		case 0x230A:
+			//MR (Arithmetic result)
+			ProcessMathOp();
+			return (_state.MathOpResult >> 32) & 0xFF;
+
+		case 0x230B:
+			//OF (Arithmetic overflow flag)
+			ProcessMathOp();
+			return _state.MathOverflow;
 
 		case 0x230C: {
 			//VDP (Variable length data port - Low)
@@ -409,15 +481,14 @@ uint8_t Sa1::Sa1RegisterRead(uint16_t addr)
 uint8_t Sa1::CpuRegisterRead(uint16_t addr)
 {
 	switch(addr) {
-		case 0x2300: 
+		case 0x2300:
 			//SFR (SNES CPU Status Flags)
 			return (
 				_state.CpuMessageReceived |
 				(_state.UseCpuNmiVector << 4) |
 				(_state.CharConvIrqFlag << 5) |
 				(_state.UseCpuIrqVector << 6) |
-				(_state.CpuIrqRequested << 7)
-			);
+				(_state.CpuIrqRequested << 7));
 
 		case 0x230E: break; //VC (Version code register)
 	}
@@ -449,7 +520,7 @@ void Sa1::ProcessInterrupts()
 void Sa1::WriteSa1(uint32_t addr, uint8_t value, MemoryOperationType type)
 {
 	if(_emu->ProcessMemoryWrite<CpuType::Sa1>(addr, value, type)) {
-		IMemoryHandler *handler = _mappings.GetHandler(addr);
+		IMemoryHandler* handler = _mappings.GetHandler(addr);
 		if(handler) {
 			_lastAccessMemType = handler->GetMemoryType();
 			_openBus = value;
@@ -462,7 +533,7 @@ void Sa1::WriteSa1(uint32_t addr, uint8_t value, MemoryOperationType type)
 
 uint8_t Sa1::ReadSa1(uint32_t addr, MemoryOperationType type)
 {
-	IMemoryHandler *handler = _mappings.GetHandler(addr);
+	IMemoryHandler* handler = _mappings.GetHandler(addr);
 	uint8_t value;
 	if(handler) {
 		value = handler->Read(addr);
@@ -487,7 +558,7 @@ uint8_t Sa1::Peek(uint32_t addr)
 	return 0;
 }
 
-void Sa1::PeekBlock(uint32_t addr, uint8_t *output)
+void Sa1::PeekBlock(uint32_t addr, uint8_t* output)
 {
 	memset(output, 0, 0x1000);
 }
@@ -531,7 +602,7 @@ void Sa1::RunDma()
 {
 	if(_state.DmaSize > 0) {
 		_state.DmaSize--;
-		
+
 		if(_state.DmaSrcDevice == Sa1DmaSrcDevice::PrgRom && _state.DmaDestDevice == Sa1DmaDestDevice::InternalRam) {
 			_cpu->IncreaseCycleCount<1>();
 
@@ -545,7 +616,7 @@ void Sa1::RunDma()
 			WriteInternalRam(_state.DmaDestAddr, ReadSa1(_state.DmaSrcAddr));
 		} else if(_state.DmaSrcDevice == Sa1DmaSrcDevice::PrgRom && _state.DmaDestDevice == Sa1DmaDestDevice::BwRam) {
 			_cpu->IncreaseCycleCount<2>();
-			
+
 			if(GetSnesCpuMemoryType() == MemoryType::SnesSaveRam) {
 				_cpu->IncreaseCycleCount<2>();
 			}
@@ -553,7 +624,7 @@ void Sa1::RunDma()
 			WriteBwRam(_state.DmaDestAddr, ReadSa1(_state.DmaSrcAddr));
 		} else if(_state.DmaSrcDevice == Sa1DmaSrcDevice::BwRam && _state.DmaDestDevice == Sa1DmaDestDevice::InternalRam) {
 			_cpu->IncreaseCycleCount<2>();
-				
+
 			if(GetSnesCpuMemoryType() == MemoryType::SnesSaveRam || GetSnesCpuMemoryType() == MemoryType::Sa1InternalRam) {
 				_cpu->IncreaseCycleCount<1>();
 				if(GetSnesCpuMemoryType() == MemoryType::SnesSaveRam) {
@@ -596,7 +667,7 @@ void Sa1::UpdateBank(uint8_t index, uint8_t value)
 
 void Sa1::UpdatePrgRomMappings()
 {
-	vector<unique_ptr<IMemoryHandler>> &prgRomHandlers = _cart->GetPrgRomHandlers();
+	vector<unique_ptr<IMemoryHandler>>& prgRomHandlers = _cart->GetPrgRomHandlers();
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 
 	for(int i = 0; i < 2; i++) {
@@ -624,7 +695,7 @@ void Sa1::UpdateVectorMappings()
 
 void Sa1::UpdateSaveRamMappings()
 {
-	vector<unique_ptr<IMemoryHandler>> &saveRamHandlers = _cpuBwRamHandlers;
+	vector<unique_ptr<IMemoryHandler>>& saveRamHandlers = _cpuBwRamHandlers;
 	if(saveRamHandlers.size() > 0) {
 		MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 		uint32_t bank1 = (_state.CpuBwBank * 2) % saveRamHandlers.size();
@@ -664,7 +735,7 @@ void Sa1::ProcessMathOp()
 	if(sumMode) {
 		uint64_t result = _state.MathOpResult + ((int16_t)_state.MultiplicandDividend * (int16_t)_state.MultiplierDivisor);
 		_state.MathOverflow = (result >> 33) & 0x80;
-		
+
 		//Keep 40 bits
 		_state.MathOpResult = result & 0xFFFFFFFFFF;
 		_state.MultiplierDivisor = 0;
@@ -700,7 +771,7 @@ void Sa1::ProcessMathOp()
 uint8_t Sa1::ReadCharConvertType1(uint32_t addr)
 {
 	uint8_t mask = (_state.CharConvBpp * 8) - 1;
-	
+
 	if((addr & mask) == 0) {
 		//Trying to read the first byte of a new tile, convert it and write its contents to IRAM
 		uint8_t* bwRam = _cart->DebugGetSaveRam();
@@ -854,29 +925,95 @@ void Sa1::SaveBattery()
 	}
 }
 
-
-void Sa1::Serialize(Serializer &s)
+void Sa1::Serialize(Serializer& s)
 {
 	SV(_cpu);
 
-	SV(_state.Sa1ResetVector); SV(_state.Sa1IrqVector); SV(_state.Sa1NmiVector); SV(_state.Sa1IrqRequested); SV(_state.Sa1IrqEnabled); SV(_state.Sa1NmiRequested); SV(_state.Sa1NmiEnabled);
-	SV(_state.Sa1Wait); SV(_state.Sa1Reset); SV(_state.DmaIrqEnabled); SV(_state.TimerIrqEnabled); SV(_state.Sa1MessageReceived); SV(_state.CpuMessageReceived); SV(_state.CpuIrqVector);
-	SV(_state.CpuNmiVector); SV(_state.UseCpuIrqVector); SV(_state.UseCpuNmiVector); SV(_state.CpuIrqRequested); SV(_state.CpuIrqEnabled); SV(_state.CharConvIrqFlag); SV(_state.CharConvIrqEnabled);
-	SV(_state.CpuBwBank); SV(_state.CpuBwWriteEnabled); SV(_state.Sa1BwBank); SV(_state.Sa1BwMode); SV(_state.Sa1BwWriteEnabled); SV(_state.BwWriteProtectedArea); SV(_state.BwRam2BppMode);
-	SV(_state.CpuIRamWriteProtect); SV(_state.Sa1IRamWriteProtect); SV(_state.DmaSrcAddr); SV(_state.DmaDestAddr); SV(_state.DmaSize); SV(_state.DmaEnabled); SV(_state.DmaPriority);
-	SV(_state.DmaCharConv); SV(_state.DmaCharConvAuto); SV(_state.DmaDestDevice); SV(_state.DmaSrcDevice); SV(_state.DmaRunning); SV(_state.DmaIrqFlag); SV(_state.HorizontalTimerEnabled);
-	SV(_state.VerticalTimerEnabled); SV(_state.UseLinearTimer); SV(_state.HTimer); SV(_state.VTimer); SV(_state.LinearTimerValue); SV(_state.MathOp); SV(_state.MultiplicandDividend);
-	SV(_state.MultiplierDivisor); SV(_state.MathOpResult); SV(_state.MathOverflow); SV(_state.VarLenAutoInc); SV(_state.VarLenBitCount); SV(_state.VarLenAddress);
-	SV(_state.Banks[0]); SV(_state.Banks[1]); SV(_state.Banks[2]); SV(_state.Banks[3]);
-	SV(_state.BitmapRegister1[0]); SV(_state.BitmapRegister1[1]); SV(_state.BitmapRegister1[2]); SV(_state.BitmapRegister1[3]);
-	SV(_state.BitmapRegister1[4]); SV(_state.BitmapRegister1[5]); SV(_state.BitmapRegister1[6]); SV(_state.BitmapRegister1[7]);
-	SV(_state.BitmapRegister2[0]); SV(_state.BitmapRegister2[1]); SV(_state.BitmapRegister2[2]); SV(_state.BitmapRegister2[3]);
-	SV(_state.BitmapRegister2[4]); SV(_state.BitmapRegister2[5]); SV(_state.BitmapRegister2[6]); SV(_state.BitmapRegister2[7]);
-	SV(_state.CharConvDmaActive); SV(_state.CharConvBpp); SV(_state.CharConvFormat); SV(_state.CharConvWidth); SV(_state.CharConvCounter);
+	SV(_state.Sa1ResetVector);
+	SV(_state.Sa1IrqVector);
+	SV(_state.Sa1NmiVector);
+	SV(_state.Sa1IrqRequested);
+	SV(_state.Sa1IrqEnabled);
+	SV(_state.Sa1NmiRequested);
+	SV(_state.Sa1NmiEnabled);
+	SV(_state.Sa1Wait);
+	SV(_state.Sa1Reset);
+	SV(_state.DmaIrqEnabled);
+	SV(_state.TimerIrqEnabled);
+	SV(_state.Sa1MessageReceived);
+	SV(_state.CpuMessageReceived);
+	SV(_state.CpuIrqVector);
+	SV(_state.CpuNmiVector);
+	SV(_state.UseCpuIrqVector);
+	SV(_state.UseCpuNmiVector);
+	SV(_state.CpuIrqRequested);
+	SV(_state.CpuIrqEnabled);
+	SV(_state.CharConvIrqFlag);
+	SV(_state.CharConvIrqEnabled);
+	SV(_state.CpuBwBank);
+	SV(_state.CpuBwWriteEnabled);
+	SV(_state.Sa1BwBank);
+	SV(_state.Sa1BwMode);
+	SV(_state.Sa1BwWriteEnabled);
+	SV(_state.BwWriteProtectedArea);
+	SV(_state.BwRam2BppMode);
+	SV(_state.CpuIRamWriteProtect);
+	SV(_state.Sa1IRamWriteProtect);
+	SV(_state.DmaSrcAddr);
+	SV(_state.DmaDestAddr);
+	SV(_state.DmaSize);
+	SV(_state.DmaEnabled);
+	SV(_state.DmaPriority);
+	SV(_state.DmaCharConv);
+	SV(_state.DmaCharConvAuto);
+	SV(_state.DmaDestDevice);
+	SV(_state.DmaSrcDevice);
+	SV(_state.DmaRunning);
+	SV(_state.DmaIrqFlag);
+	SV(_state.HorizontalTimerEnabled);
+	SV(_state.VerticalTimerEnabled);
+	SV(_state.UseLinearTimer);
+	SV(_state.HTimer);
+	SV(_state.VTimer);
+	SV(_state.LinearTimerValue);
+	SV(_state.MathOp);
+	SV(_state.MultiplicandDividend);
+	SV(_state.MultiplierDivisor);
+	SV(_state.MathOpResult);
+	SV(_state.MathOverflow);
+	SV(_state.VarLenAutoInc);
+	SV(_state.VarLenBitCount);
+	SV(_state.VarLenAddress);
+	SV(_state.Banks[0]);
+	SV(_state.Banks[1]);
+	SV(_state.Banks[2]);
+	SV(_state.Banks[3]);
+	SV(_state.BitmapRegister1[0]);
+	SV(_state.BitmapRegister1[1]);
+	SV(_state.BitmapRegister1[2]);
+	SV(_state.BitmapRegister1[3]);
+	SV(_state.BitmapRegister1[4]);
+	SV(_state.BitmapRegister1[5]);
+	SV(_state.BitmapRegister1[6]);
+	SV(_state.BitmapRegister1[7]);
+	SV(_state.BitmapRegister2[0]);
+	SV(_state.BitmapRegister2[1]);
+	SV(_state.BitmapRegister2[2]);
+	SV(_state.BitmapRegister2[3]);
+	SV(_state.BitmapRegister2[4]);
+	SV(_state.BitmapRegister2[5]);
+	SV(_state.BitmapRegister2[6]);
+	SV(_state.BitmapRegister2[7]);
+	SV(_state.CharConvDmaActive);
+	SV(_state.CharConvBpp);
+	SV(_state.CharConvFormat);
+	SV(_state.CharConvWidth);
+	SV(_state.CharConvCounter);
 	SV(_state.VarLenCurrentBit);
 	SV(_state.MathStartClock);
 
-	SV(_lastAccessMemType); SV(_openBus);
+	SV(_lastAccessMemType);
+	SV(_openBus);
 	SVArray(_iRam, Sa1::InternalRamSize);
 
 	if(!s.IsSaving()) {

@@ -202,7 +202,7 @@ namespace Mesen.Debugger.ViewModels
 		private void UpdatePreviewPanel()
 		{
 			PreviewPanel = GetPreviewPanel(SelectedPalette, PreviewPanel);
-			
+
 			if(ViewerTooltip != null && ViewerMouseOverPalette >= 0) {
 				GetPreviewPanel(ViewerMouseOverPalette, ViewerTooltip);
 			}

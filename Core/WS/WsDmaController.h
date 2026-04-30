@@ -15,7 +15,7 @@ private:
 
 public:
 	void Init(WsMemoryManager* memoryManager, WsApu* apu);
-	
+
 	void RunGeneralDma();
 	void ProcessSoundDma();
 

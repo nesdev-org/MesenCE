@@ -189,7 +189,8 @@ uint8_t PceAdpcm::GetClocksToNextSlot(bool forRead)
 	uint8_t slotType = slotIndex & 0x03;
 	uint8_t gap;
 	switch(slotType) {
-		default: case 0: gap = forRead ? 3 : 1; break; //Refresh slot (ADPCM uses DRAM - needs periodic refresh)
+		default:
+		case 0: gap = forRead ? 3 : 1; break; //Refresh slot (ADPCM uses DRAM - needs periodic refresh)
 		case 1: gap = forRead ? 2 : 1; break; //Write slot
 		case 2: gap = forRead ? 1 : 3; break; //Write slot
 		case 3: gap = forRead ? 4 : 2; break; //Read slot
@@ -282,8 +283,7 @@ uint8_t PceAdpcm::Read(uint16_t addr)
 				(_state.EndReached ? 0x01 : 0) |
 				(_state.WriteClockCounter ? 0x04 : 0) |
 				(_state.Playing ? 0x08 : 0) |
-				(_state.ReadClockCounter ? 0x80 : 0)
-			);
+				(_state.ReadClockCounter ? 0x80 : 0));
 
 		case 0x0D:
 			return _state.Control;
@@ -334,7 +334,7 @@ void PceAdpcm::PlaySample()
 
 	int16_t adjustment = _stepSize[(_magnitude << 3) | value] * sign;
 	_currentOutput = (_currentOutput + adjustment) & 0xFFF;
-	
+
 	_magnitude = std::clamp(_magnitude + _stepFactor[value], 0, 48);
 
 	SetHalfReached(_state.AdpcmLength <= 0x8000);

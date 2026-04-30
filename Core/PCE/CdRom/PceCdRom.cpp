@@ -203,8 +203,13 @@ void PceCdRom::Write(uint16_t addr, uint8_t value)
 			break;
 		}
 
-		case 0x08: case 0x09: case 0x0A: case 0x0B:
-		case 0x0C: case 0x0D: case 0x0E:
+		case 0x08:
+		case 0x09:
+		case 0x0A:
+		case 0x0B:
+		case 0x0C:
+		case 0x0D:
+		case 0x0E:
 			_adpcm.Write(addr, value);
 			break;
 
@@ -235,7 +240,7 @@ uint8_t PceCdRom::Read(uint16_t addr)
 
 		case 0x05: return (uint8_t)_state.AudioSampleLatch;
 		case 0x06: return (uint8_t)(_state.AudioSampleLatch >> 8);
-			
+
 		case 0x07: {
 			uint32_t sector = _audioPlayer.GetSubcodeSector();
 			uint8_t position = _audioPlayer.GetSubcodePosition();
@@ -258,13 +263,20 @@ uint8_t PceCdRom::Read(uint16_t addr)
 			return val;
 		}
 
-		case 0x09: case 0x0A: case 0x0B:
-		case 0x0C: case 0x0D: case 0x0E:
+		case 0x09:
+		case 0x0A:
+		case 0x0B:
+		case 0x0C:
+		case 0x0D:
+		case 0x0E:
 			return _adpcm.Read(addr);
 
 		case 0x0F: return _audioFader.Read();
 
-		case 0xC0: case 0xC1: case 0xC2: case 0xC3: 
+		case 0xC0:
+		case 0xC1:
+		case 0xC2:
+		case 0xC3:
 			if(_emu->GetSettings()->GetPcEngineConfig().CdRomType == PceCdRomType::CdRom) {
 				return 0xFF;
 			} else {

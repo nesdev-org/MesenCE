@@ -2,16 +2,16 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using System.Linq;
-using Mesen.ViewModels;
+using DataBoxControl;
+using Mesen.Config;
 using Mesen.Debugger;
+using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Debugger.Windows;
 using Mesen.Utilities;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
+using Mesen.ViewModels;
 using System;
-using DataBoxControl;
+using System.Linq;
 
 namespace Mesen.Debugger.Views
 {

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Reflection;
+﻿using Avalonia.Controls;
 using Mesen.Interop;
-using System.Diagnostics;
 using Mesen.Utilities;
-using Avalonia.Controls;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
@@ -21,7 +21,7 @@ namespace Mesen.Config
 
 		public static string DefaultPortableFolder { get { return Path.GetDirectoryName(Program.ExePath) ?? "./"; } }
 		public static string DefaultDocumentsFolder => Path.Combine(BaseDocumentsFolder, "MesenCE");
-		
+
 		private static string BaseDocumentsFolder
 		{
 			get
@@ -66,7 +66,7 @@ namespace Mesen.Config
 			_homeFolder = homeFolder;
 			Config.Save();
 		}
-		
+
 		public static void LoadConfig()
 		{
 			if(_config == null) {
@@ -185,7 +185,8 @@ namespace Mesen.Config
 			_homeFolder = null;
 		}
 
-		public static string HomeFolder {
+		public static string HomeFolder
+		{
 			get
 			{
 				if(_homeFolder == null) {
@@ -263,7 +264,7 @@ namespace Mesen.Config
 
 		public static Configuration Config
 		{
-			get 
+			get
 			{
 				LoadConfig();
 				return _config!;

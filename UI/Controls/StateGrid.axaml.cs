@@ -1,14 +1,14 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Mesen.ViewModels;
-using System;
 using Avalonia.Interactivity;
-using ReactiveUI;
-using System.Collections.Generic;
-using Mesen.Interop;
-using Mesen.Config;
+using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Mesen.Config;
+using Mesen.Interop;
+using Mesen.ViewModels;
+using ReactiveUI;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Mesen.Controls
@@ -16,7 +16,7 @@ namespace Mesen.Controls
 	public class StateGrid : UserControl
 	{
 		public static readonly StyledProperty<List<RecentGameInfo>> EntriesProperty = AvaloniaProperty.Register<StateGrid, List<RecentGameInfo>>(nameof(Entries));
-		
+
 		public static readonly StyledProperty<string> TitleProperty = AvaloniaProperty.Register<StateGrid, string>(nameof(Title));
 		public static readonly StyledProperty<int> SelectedPageProperty = AvaloniaProperty.Register<StateGrid, int>(nameof(SelectedPage));
 		public static readonly StyledProperty<bool> ShowArrowsProperty = AvaloniaProperty.Register<StateGrid, bool>(nameof(ShowArrows));
@@ -99,7 +99,7 @@ namespace Mesen.Controls
 				return;
 			} else {
 				Grid grid = this.GetControl<Grid>("Grid");
-				int startIndex = ElementsPerPage * SelectedPage; 
+				int startIndex = ElementsPerPage * SelectedPage;
 				for(int i = 0; i < grid.Children.Count; i++) {
 					if(grid.Children[i] is StateGridEntry entry) {
 						entry.IsActiveEntry = startIndex + i == SelectedIndex;

@@ -11,13 +11,13 @@ class GbaTraceLogger : public BaseTraceLogger<GbaTraceLogger, GbaCpuState>
 {
 private:
 	GbaPpu* _ppu = nullptr;
-	
+
 protected:
 	RowDataType GetFormatTagType(string& tag) override;
 
 public:
 	GbaTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, GbaPpu* ppu);
-	
+
 	void GetTraceRow(string& output, GbaCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
 

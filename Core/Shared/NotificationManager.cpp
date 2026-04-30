@@ -20,15 +20,10 @@ void NotificationManager::CleanupNotificationListeners()
 {
 	auto lock = _lock.AcquireSafe();
 
+	auto predicate = [](weak_ptr<INotificationListener> ptr) { return ptr.expired(); };
+
 	//Remove expired listeners
-	_listeners.erase(
-		std::remove_if(
-			_listeners.begin(),
-			_listeners.end(),
-			[](weak_ptr<INotificationListener> ptr) { return ptr.expired(); }
-		),
-		_listeners.end()
-	);
+	_listeners.erase(std::remove_if(_listeners.begin(), _listeners.end(), predicate), _listeners.end());
 }
 
 void NotificationManager::SendNotification(ConsoleNotificationType type, void* parameter)

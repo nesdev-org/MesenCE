@@ -16,7 +16,7 @@ namespace Mesen.Controls
 	{
 		public static readonly StyledProperty<Enum[]?> AvailableValuesProperty = AvaloniaProperty.Register<EnumComboBox, Enum[]?>(nameof(AvailableValues), null);
 		public static readonly StyledProperty<Enum?> SelectedItemProperty = AvaloniaProperty.Register<EnumComboBox, Enum?>(nameof(SelectedItem), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
-		
+
 		public static readonly StyledProperty<IEnumerable?> InternalItemsProperty = AvaloniaProperty.Register<EnumComboBox, IEnumerable?>(nameof(InternalItems));
 		public static readonly StyledProperty<Enum?> InternalSelectedItemProperty = AvaloniaProperty.Register<EnumComboBox, Enum?>(nameof(InternalSelectedItem));
 
@@ -82,7 +82,7 @@ namespace Mesen.Controls
 			if(!IsLoaded) {
 				return;
 			}
-			
+
 			if(_enumType == null || SelectedItem == null) {
 				if(AvailableValues?.Length > 0) {
 					_enumType = AvailableValues[0].GetType();

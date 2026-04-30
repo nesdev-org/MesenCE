@@ -16,12 +16,16 @@ enum class FrameType
 class ApuFrameCounter : public INesMemoryHandler, public ISerializable
 {
 private:
-	const int32_t _stepCyclesNtsc[2][6] = { { 7457, 14913, 22371, 29828, 29829, 29830},
-														 { 7457, 14913, 22371, 29829, 37281, 37282} };
-	const int32_t _stepCyclesPal[2][6] =  { { 8313, 16627, 24939, 33252, 33253, 33254},
-														 { 8313, 16627, 24939, 33253, 41565, 41566} };
+	const int32_t _stepCyclesNtsc[2][6] = {
+		{ 7457, 14913, 22371, 29828, 29829, 29830 },
+		{ 7457, 14913, 22371, 29829, 37281, 37282 }
+	};
+	const int32_t _stepCyclesPal[2][6] = {
+		{ 8313, 16627, 24939, 33252, 33253, 33254 },
+		{ 8313, 16627, 24939, 33253, 41565, 41566 }
+	};
 	const FrameType _frameType[2][6] = { { FrameType::QuarterFrame, FrameType::HalfFrame, FrameType::QuarterFrame, FrameType::None, FrameType::HalfFrame, FrameType::None },
-													 { FrameType::QuarterFrame, FrameType::HalfFrame, FrameType::QuarterFrame, FrameType::None, FrameType::HalfFrame, FrameType::None } };
+		{ FrameType::QuarterFrame, FrameType::HalfFrame, FrameType::QuarterFrame, FrameType::None, FrameType::HalfFrame, FrameType::None } };
 
 	NesConsole* _console = nullptr;
 	int32_t _stepCycles[2][6] = {};
@@ -32,7 +36,7 @@ private:
 	uint8_t _blockFrameCounterTick = 0;
 	int16_t _newValue = 0;
 	int8_t _writeDelayCounter = 0;
-	
+
 	bool _irqFlag = false;
 	uint64_t _irqFlagClearClock = 0;
 
@@ -42,7 +46,7 @@ public:
 		_console = console;
 		Reset(false);
 	}
-	
+
 	void Reset(bool softReset)
 	{
 		_previousCycle = 0;
@@ -56,9 +60,8 @@ public:
 
 		_currentStep = 0;
 
-
 		//"After reset or power-up, APU acts as if $4017 were written with $00 from 9 to 12 clocks before first instruction begins."
-		//This is emulated in the CPU::Reset function 
+		//This is emulated in the CPU::Reset function
 		//Reset acts as if $00 was written to $4017
 		_newValue = _stepMode ? 0x80 : 0x00;
 		_writeDelayCounter = 3;
@@ -67,9 +70,15 @@ public:
 		_blockFrameCounterTick = 0;
 	}
 
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
-		SV(_previousCycle); SV(_currentStep); SV(_stepMode); SV(_inhibitIRQ); SV(_blockFrameCounterTick); SV(_writeDelayCounter); SV(_newValue);
+		SV(_previousCycle);
+		SV(_currentStep);
+		SV(_stepMode);
+		SV(_inhibitIRQ);
+		SV(_blockFrameCounterTick);
+		SV(_writeDelayCounter);
+		SV(_newValue);
 		SV(_irqFlag);
 		SV(_irqFlagClearClock);
 
@@ -89,17 +98,17 @@ public:
 			case ConsoleRegion::Dendy:
 				memcpy(_stepCycles, _stepCyclesNtsc, sizeof(_stepCycles));
 				break;
-				
+
 			case ConsoleRegion::Pal:
 				memcpy(_stepCycles, _stepCyclesPal, sizeof(_stepCycles));
 				break;
 		}
 	}
 
-	uint32_t Run(int32_t &cyclesToRun)
+	uint32_t Run(int32_t& cyclesToRun)
 	{
 		uint32_t cyclesRan;
-		
+
 		if(_previousCycle + cyclesToRun >= _stepCycles[_stepMode][_currentStep]) {
 			if(_stepMode == 0 && _currentStep >= 3) {
 				//Set irq on the last 3 cycles for 4-step mode
@@ -117,7 +126,7 @@ public:
 			FrameType type = _frameType[_stepMode][_currentStep];
 			if(type != FrameType::None && !_blockFrameCounterTick) {
 				_console->GetApu()->FrameCounterTick(type);
-				
+
 				//Do not allow writes to 4017 to clock the frame counter for the next cycle (i.e this odd cycle + the following even cycle)
 				_blockFrameCounterTick = 2;
 			}
@@ -128,7 +137,7 @@ public:
 			} else {
 				cyclesRan = _stepCycles[_stepMode][_currentStep] - _previousCycle;
 			}
-			
+
 			cyclesToRun -= cyclesRan;
 
 			_currentStep++;
@@ -162,7 +171,7 @@ public:
 				}
 			}
 		}
-		
+
 		if(_blockFrameCounterTick > 0) {
 			_blockFrameCounterTick--;
 		}
@@ -179,7 +188,7 @@ public:
 		return _newValue >= 0 || _blockFrameCounterTick > 0 || (_previousCycle + (int32_t)cyclesToRun >= _stepCycles[_stepMode][_currentStep] - 1);
 	}
 
-	void GetMemoryRanges(MemoryRanges &ranges) override
+	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		ranges.AddHandler(MemoryOperation::Write, 0x4017);
 	}

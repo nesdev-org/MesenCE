@@ -30,7 +30,7 @@ namespace Mesen.Debugger.ViewModels
 
 		[Reactive] public int SelectionStart { get; set; }
 		[Reactive] public int SelectionLength { get; set; }
-		
+
 		[Reactive] public string LocationText { get; private set; } = "";
 		[Reactive] public string LengthText { get; private set; } = "";
 
@@ -82,7 +82,7 @@ namespace Mesen.Debugger.ViewModels
 					if(o.length <= 1) {
 						location += $" (${o.start / 2:X2}.w)";
 					} else {
-						location += $" (${o.start / 2:X2}.w - ${(o.start + o.length - 1)/2:X2}.w)";
+						location += $" (${o.start / 2:X2}.w - ${(o.start + o.length - 1) / 2:X2}.w)";
 					}
 				}
 
@@ -222,7 +222,7 @@ namespace Mesen.Debugger.ViewModels
 			if(data == null) {
 				return false;
 			}
-			
+
 			MemoryType memType = Config.MemoryType;
 			TimingInfo timingInfo = Search.IsAccessFiltered && Search.FilterTimeSpanEnabled ? EmuApi.GetTimingInfo(memType.ToCpuType()) : new();
 

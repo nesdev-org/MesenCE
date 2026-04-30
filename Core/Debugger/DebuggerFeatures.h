@@ -26,7 +26,7 @@ struct DebuggerFeatures
 	bool ChangeProgramCounter;
 	bool CallStack;
 	bool CpuCycleStep;
-	
+
 	uint8_t IrqVectorOffset;
 	uint8_t CpuVectorCount;
 	CpuVectorDefinition CpuVectors[16];

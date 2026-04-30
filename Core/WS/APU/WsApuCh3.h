@@ -26,7 +26,7 @@ public:
 			_state->SweepScaler++;
 			if(_state->UseSweepCpuClock || _state->SweepScaler >= 0x2000) {
 				_state->SweepScaler = 0;
-				
+
 				if(_state->SweepTimer == 0) {
 					_state->SweepTimer = _state->SweepPeriod;
 					_state->Frequency = (_state->Frequency + _state->SweepValue) & 0xFFF;

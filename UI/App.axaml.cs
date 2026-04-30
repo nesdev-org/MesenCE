@@ -28,7 +28,7 @@ namespace Mesen
 			} else {
 				RequestedThemeVariant = ConfigManager.Config.Preferences.Theme == MesenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 			}
-			
+
 			Dispatcher.UIThread.UnhandledException += (s, e) => {
 				MesenMsgBox.ShowException(e.Exception);
 				e.Handled = true;

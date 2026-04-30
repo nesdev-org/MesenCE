@@ -33,7 +33,7 @@ public:
 	void Run(uint32_t targetCycle)
 	{
 		while(_timer.Run(targetCycle)) {
-			//The sequencer is clocked by the timer as long as both the linear counter and the length counter are nonzero. 
+			//The sequencer is clocked by the timer as long as both the linear counter and the length counter are nonzero.
 			if(_lengthCounter.GetStatus() && _linearCounter > 0) {
 				_sequencePosition = (_sequencePosition + 1) & 0x1F;
 
@@ -61,12 +61,16 @@ public:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_linearCounter); SV(_linearCounterReload); SV(_linearReloadFlag); SV(_linearControlFlag); SV(_sequencePosition);
+		SV(_linearCounter);
+		SV(_linearCounterReload);
+		SV(_linearReloadFlag);
+		SV(_linearControlFlag);
+		SV(_sequencePosition);
 		SV(_timer);
 		SV(_lengthCounter);
 	}
 
-	void GetMemoryRanges(MemoryRanges &ranges) override
+	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		ranges.AddHandler(MemoryOperation::Write, 0x4008, 0x400B);
 	}
@@ -76,23 +80,23 @@ public:
 		_console->GetApu()->Run();
 
 		switch(addr & 0x03) {
-			case 0:		//4008
+			case 0: //4008
 				_linearControlFlag = (value & 0x80) == 0x80;
 				_linearCounterReload = value & 0x7F;
 
 				_lengthCounter.InitializeLengthCounter(_linearControlFlag);
 				break;
 
-			case 2:		//400A
+			case 2: //400A
 				_timer.SetPeriod((_timer.GetPeriod() & 0xFF00) | value);
 				break;
 
-			case 3:		//400B
+			case 3: //400B
 				_lengthCounter.LoadLengthCounter(value >> 3);
 
 				_timer.SetPeriod((_timer.GetPeriod() & 0xFF) | ((value & 0x07) << 8));
 
-				//Side effects 	Sets the linear counter reload flag 
+				//Side effects 	Sets the linear counter reload flag
 				_linearReloadFlag = true;
 				break;
 		}
@@ -110,7 +114,7 @@ public:
 			_linearReloadFlag = false;
 		}
 	}
-	
+
 	void TickLengthCounter()
 	{
 		_lengthCounter.TickLengthCounter();

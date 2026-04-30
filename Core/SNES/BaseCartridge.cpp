@@ -41,7 +41,7 @@ BaseCartridge::~BaseCartridge()
 	delete[] _saveRam;
 }
 
-unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, VirtualFile &romFile)
+unique_ptr<BaseCartridge> BaseCartridge::CreateCartridge(SnesConsole* console, VirtualFile& romFile)
 {
 	if(romFile.IsValid()) {
 		unique_ptr<BaseCartridge> cart(new BaseCartridge());
@@ -131,7 +131,7 @@ int32_t BaseCartridge::GetHeaderScore(uint32_t addr)
 
 	SnesCartInformation cartInfo;
 	memcpy(&cartInfo, _prgRom + addr + 0x7FB0, sizeof(SnesCartInformation));
-	
+
 	uint32_t score = 0;
 	uint8_t mode = (cartInfo.MapMode & ~0x10);
 	if((mode == 0x20 || mode == 0x22) && addr < 0x8000) {
@@ -161,7 +161,7 @@ int32_t BaseCartridge::GetHeaderScore(uint32_t addr)
 	if(resetVector < 0x8000) {
 		return -1;
 	}
-	
+
 	uint8_t op = _prgRom[addr + (resetVector & 0x7FFF)];
 	if(op == 0x18 || op == 0x78 || op == 0x4C || op == 0x5C || op == 0x20 || op == 0x22 || op == 0x9C) {
 		//CLI, SEI, JMP, JML, JSR, JSl, STZ
@@ -217,7 +217,7 @@ void BaseCartridge::LoadRom()
 		_prgRomSize -= 512;
 		_headerOffset -= 512;
 	}
-	
+
 	if((flags & CartFlags::HiRom) && (_cartInfo.MapMode & 0x27) == 0x25) {
 		flags |= CartFlags::ExHiRom;
 	} else if((flags & CartFlags::LoRom) && (_cartInfo.MapMode & 0x27) == 0x22) {
@@ -274,7 +274,7 @@ CoprocessorType BaseCartridge::GetCoprocessorType()
 			case 0x03: return CoprocessorType::SA1;
 			case 0x04: return CoprocessorType::SDD1;
 			case 0x05: return CoprocessorType::RTC;
-			case 0x0E: 
+			case 0x0E:
 				switch(_cartInfo.RomType) {
 					case 0xE3: return CoprocessorType::SGB;
 					case 0xE5: return CoprocessorType::Satellaview;
@@ -284,16 +284,16 @@ CoprocessorType BaseCartridge::GetCoprocessorType()
 
 			case 0x0F:
 				switch(_cartInfo.CartridgeType) {
-					case 0x00: 
+					case 0x00:
 						_hasBattery = true;
 						_hasRtc = (_cartInfo.RomType & 0x0F) == 0x09;
 						return CoprocessorType::SPC7110;
 
-					case 0x01: 
+					case 0x01:
 						_hasBattery = true;
-						return GetSt01xVersion(); 
+						return GetSt01xVersion();
 
-					case 0x02: 
+					case 0x02:
 						_hasBattery = true;
 						return CoprocessorType::ST018;
 
@@ -323,7 +323,7 @@ CoprocessorType BaseCartridge::GetDspVersion()
 	string cartName = GetCartName();
 	if(cartName == "DUNGEON MASTER") {
 		return CoprocessorType::DSP2;
-	} if(cartName == "PILOTWINGS") {
+	} else if(cartName == "PILOTWINGS") {
 		return CoprocessorType::DSP1;
 	} else if(cartName == "SD\xB6\xDE\xDD\xC0\xDE\xD1GX") {
 		//SD Gundam GX
@@ -331,7 +331,7 @@ CoprocessorType BaseCartridge::GetDspVersion()
 	} else if(cartName == "PLANETS CHAMP TG3000" || cartName == "TOP GEAR 3000") {
 		return CoprocessorType::DSP4;
 	}
-	
+
 	//Default to DSP1B
 	return CoprocessorType::DSP1B;
 }
@@ -383,8 +383,8 @@ void BaseCartridge::LoadBattery()
 {
 	if(_saveRamSize > 0) {
 		_emu->GetBatteryManager()->LoadBattery(".srm", _saveRam, _saveRamSize);
-	} 
-	
+	}
+
 	if(_coprocessor && _hasBattery) {
 		_coprocessor->LoadBattery();
 	}
@@ -398,8 +398,8 @@ void BaseCartridge::SaveBattery()
 {
 	if(_saveRamSize > 0) {
 		_emu->GetBatteryManager()->SaveBattery(".srm", _saveRam, _saveRamSize);
-	} 
-	
+	}
+
 	if(_coprocessor && _hasBattery) {
 		_coprocessor->SaveBattery();
 	}
@@ -417,7 +417,7 @@ void BaseCartridge::SaveBattery()
 	}
 }
 
-void BaseCartridge::Init(MemoryMappings &mm)
+void BaseCartridge::Init(MemoryMappings& mm)
 {
 	_prgRomHandlers.clear();
 	_saveRamHandlers.clear();
@@ -427,7 +427,7 @@ void BaseCartridge::Init(MemoryMappings &mm)
 	}
 
 	uint32_t power = (uint32_t)std::log2(_prgRomSize);
-	if(_prgRomSize >(1u << power)) {
+	if(_prgRomSize > (1u << power)) {
 		//If size isn't a power of 2, mirror the part above the nearest (lower) power of 2 until the size reaches the next power of 2.
 		uint32_t halfSize = 1 << power;
 		uint32_t fullSize = 1 << (power + 1);
@@ -449,13 +449,13 @@ void BaseCartridge::Init(MemoryMappings &mm)
 	LoadBattery();
 }
 
-void BaseCartridge::RegisterHandlers(MemoryMappings &mm)
+void BaseCartridge::RegisterHandlers(MemoryMappings& mm)
 {
 	if(MapSpecificCarts(mm) || _coprocessorType == CoprocessorType::GSU || _coprocessorType == CoprocessorType::SDD1 || _coprocessorType == CoprocessorType::SPC7110 || _coprocessorType == CoprocessorType::CX4) {
 		MapBsxMemoryPack(mm);
 		return;
 	}
-	
+
 	bool mapSram = _coprocessorType != CoprocessorType::SA1;
 
 	if(_flags & CartFlags::LoRom) {
@@ -464,11 +464,11 @@ void BaseCartridge::RegisterHandlers(MemoryMappings &mm)
 
 		if(mapSram && _saveRamSize > 0) {
 			if(_prgRomSize >= 1024 * 1024 * 2) {
-				//For games >= 2mb in size, put ROM at 70-7D/F0-FF:0000-7FFF (e.g: Fire Emblem: Thracia 776) 
+				//For games >= 2mb in size, put ROM at 70-7D/F0-FF:0000-7FFF (e.g: Fire Emblem: Thracia 776)
 				mm.RegisterHandler(0x70, 0x7D, 0x0000, 0x7FFF, _saveRamHandlers);
 				mm.RegisterHandler(0xF0, 0xFF, 0x0000, 0x7FFF, _saveRamHandlers);
 			} else {
-				//For games < 2mb in size, put save RAM at 70-7D/F0-FF:0000-FFFF (e.g: Wanderers from Ys) 
+				//For games < 2mb in size, put save RAM at 70-7D/F0-FF:0000-FFFF (e.g: Wanderers from Ys)
 				mm.RegisterHandler(0x70, 0x7D, 0x0000, 0xFFFF, _saveRamHandlers);
 				mm.RegisterHandler(0xF0, 0xFF, 0x0000, 0xFFFF, _saveRamHandlers);
 			}
@@ -568,11 +568,11 @@ void BaseCartridge::InitCoprocessor()
 	}
 }
 
-bool BaseCartridge::MapSpecificCarts(MemoryMappings &mm)
+bool BaseCartridge::MapSpecificCarts(MemoryMappings& mm)
 {
 	string name = GetCartName();
 	string code = GetGameCode();
-	
+
 	if(_sufamiTurbo) {
 		_sufamiTurbo->InitializeMappings(mm, _prgRomHandlers, _saveRamHandlers);
 		return true;
@@ -691,7 +691,7 @@ bool BaseCartridge::LoadSufamiTurbo(VirtualFile& romFile)
 
 bool BaseCartridge::LoadGameboy(VirtualFile& romFile)
 {
-	_cartInfo = { };
+	_cartInfo = {};
 	_headerOffset = Gameboy::HeaderOffset;
 
 	GameboyConfig cfg = _emu->GetSettings()->GetGameboyConfig();
@@ -732,7 +732,7 @@ void BaseCartridge::SetupCpuHalt()
 	_emu->RegisterMemory(MemoryType::SnesPrgRom, _prgRom, _prgRomSize);
 }
 
-void BaseCartridge::Serialize(Serializer &s)
+void BaseCartridge::Serialize(Serializer& s)
 {
 	SVArray(_saveRam, _saveRamSize);
 	if(_coprocessor) {

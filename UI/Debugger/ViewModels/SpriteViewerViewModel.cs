@@ -601,7 +601,7 @@ namespace Mesen.Debugger.ViewModels
 			} else {
 				ViewerBitmap.HighlightRects = null;
 			}
-				
+
 			ViewerBitmap.Invalidate();
 
 			int selectedIndex = SelectedSprite?.SpriteIndex ?? -1;

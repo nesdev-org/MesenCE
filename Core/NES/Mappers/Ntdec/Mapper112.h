@@ -28,7 +28,7 @@ protected:
 		SelectPrgPage(3, -1);
 		UpdateState();
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
@@ -58,7 +58,7 @@ protected:
 			case 0xC000: _outerChrBank = value; break;
 			case 0xE000: SetMirroringType(value & 0x01 ? MirroringType::Horizontal : MirroringType::Vertical); break;
 		}
-	
+
 		UpdateState();
 	}
 };

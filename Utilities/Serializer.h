@@ -229,7 +229,7 @@ public:
 
 	uint32_t GetVersion() { return _version; }
 	bool IsSaving() { return _saving; }
-	
+
 	SerializeFormat GetFormat() { return _format; }
 	vector<string>& GetMapKeys() { return _mapSaveKeys; }
 	vector<SerializeMapValue>& GetMapValues() { return _mapSaveValues; }
@@ -256,10 +256,17 @@ public:
 	void RemoveKeyPrefix(string prefix);
 	void RemoveKeys(vector<string>& keys);
 
-	template <class T> struct is_unique_ptr : std::false_type {};
-	template <class T, class D> struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type {};
-	template <class T> struct is_shared_ptr : std::false_type {};
-	template <class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
+	template<class T> struct is_unique_ptr : std::false_type
+	{};
+
+	template<class T, class D> struct is_unique_ptr<std::unique_ptr<T, D>> : std::true_type
+	{};
+
+	template<class T> struct is_shared_ptr : std::false_type
+	{};
+
+	template<class T> struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
+	{};
 
 	template<typename T> void Stream(T& value, const char* name, int index = -1)
 	{
@@ -268,7 +275,7 @@ public:
 		static_assert(!std::is_pointer<T>::value, "[Serializer] Unexpected pointer");
 		static_assert(!std::is_class<T>::value || std::is_base_of<ISerializable, T>::value, "[Serializer] Object does not implement ISerializable");
 		static_assert(std::is_arithmetic<T>::value || std::is_enum<T>::value || std::is_base_of<ISerializable, T>::value, "[Serializer] Invalid value type");
-		
+
 		if constexpr(std::is_base_of<ISerializable, T>::value) {
 			Stream((ISerializable&)value, name, index);
 		} else {
@@ -478,7 +485,7 @@ public:
 
 	void PushNamePrefix(const char* name, int index = -1);
 	void PopNamePrefix();
-	void SaveTo(ostream &file, int compressionLevel = 1);
+	void SaveTo(ostream& file, int compressionLevel = 1);
 	bool LoadFrom(istream& file);
 	void LoadFromMap(unordered_map<string, SerializeMapValue>& map);
 };

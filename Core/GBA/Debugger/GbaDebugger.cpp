@@ -40,13 +40,13 @@ GbaDebugger::GbaDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 
 	_console = ((GbaConsole*)debugger->GetConsole());
-	
+
 	_cpu = _console->GetCpu();
 	_ppu = _console->GetPpu();
 	_memoryManager = _console->GetMemoryManager();
 
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_codeDataLogger.reset(new GbaCodeDataLogger(debugger, MemoryType::GbaPrgRom, _emu->GetMemory(MemoryType::GbaPrgRom).Size, CpuType::Gba, _emu->GetCrc32()));
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
@@ -60,7 +60,7 @@ GbaDebugger::GbaDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Gba, _eventManager.get()));
 	_step.reset(new StepRequest());
 	_assembler.reset(new GbaAssembler(debugger->GetLabelManager()));
-	
+
 	_dummyCpu.reset(new DummyGbaCpu());
 	_dummyCpu->Init(_emu, _memoryManager, nullptr);
 }
@@ -96,7 +96,7 @@ void GbaDebugger::ProcessInstruction()
 	GbaCpuState& state = _cpu->GetState();
 	uint32_t pc = state.Pipeline.Execute.Address;
 	uint32_t opCode = state.Pipeline.Execute.OpCode;
-	
+
 	uint8_t flags = accessWidth == 2 ? GbaCdlFlags::Thumb : 0; //thumb flag only
 
 	AddressInfo addressInfo = _memoryManager->GetAbsoluteAddress(pc);
@@ -119,7 +119,7 @@ void GbaDebugger::ProcessInstruction()
 			_step->Break(BreakSource::GbaNopLoad);
 		}
 	}
-	
+
 	_prevFlags = flags;
 	_prevOpCode = opCode;
 	_prevProgramCounter = pc;
@@ -242,8 +242,8 @@ void GbaDebugger::Step(int32_t stepCount, StepType type)
 			break;
 
 		case StepType::PpuStep: step.PpuStepCount = stepCount; break;
-		case StepType::PpuScanline: step.PpuStepCount = 308*4 * stepCount; break;
-		case StepType::PpuFrame: step.PpuStepCount = 308*4*228 * stepCount; break;
+		case StepType::PpuScanline: step.PpuStepCount = 308 * 4 * stepCount; break;
+		case StepType::PpuFrame: step.PpuStepCount = 308 * 4 * 228 * stepCount; break;
 		case StepType::SpecificScanline: step.BreakScanline = stepCount; break;
 	}
 
@@ -301,10 +301,7 @@ void GbaDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool
 	ProcessCallStackUpdates(ret, originalPc);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::Gba, *this, *_step.get(), 
-		ret, originalPc, dest, currentPc, ret, originalPc, 0, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::Gba, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, 0, forNmi);
 }
 
 void GbaDebugger::ProcessPpuCycle()

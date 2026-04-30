@@ -9,9 +9,9 @@
 PceNtscFilter::PceNtscFilter(Emulator* emu) : PceDefaultVideoFilter(emu)
 {
 	memset(&_ntscData, 0, sizeof(_ntscData));
-	_ntscSetup = { };
+	_ntscSetup = {};
 	snes_ntsc_init(&_ntscData, &_ntscSetup);
-	_ntscBuffer = new uint32_t[SNES_NTSC_OUT_WIDTH(PceConstants::InternalOutputWidth/2) * PceConstants::ScreenHeight];
+	_ntscBuffer = new uint32_t[SNES_NTSC_OUT_WIDTH(PceConstants::InternalOutputWidth / 2) * PceConstants::ScreenHeight];
 	_rgb555Buffer = new uint16_t[PceConstants::InternalOutputWidth * PceConstants::ScreenHeight];
 }
 
@@ -59,7 +59,7 @@ void PceNtscFilter::OnBeforeApplyFilter()
 	}
 }
 
-void PceNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
+void PceNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 {
 	FrameInfo frameInfo = _frameInfo;
 	FrameInfo baseFrameInfo = _baseFrameInfo;

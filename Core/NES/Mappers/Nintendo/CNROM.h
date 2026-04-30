@@ -13,9 +13,9 @@ protected:
 		SelectPrgPage(0, 0);
 		SelectChrPage(0, GetPowerOnByte());
 	}
-	
+
 	bool HasBusConflicts() override { return _romInfo.SubMapperID == 2; }
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		SelectChrPage(0, value);

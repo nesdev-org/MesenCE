@@ -1,7 +1,7 @@
-﻿using ReactiveUI.Fody.Helpers;
-using System.Reactive.Linq;
+﻿using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 using System.Reactive;
-using Mesen.ViewModels;
+using System.Reactive.Linq;
 
 namespace Mesen.Config
 {
@@ -11,7 +11,7 @@ namespace Mesen.Config
 		[Reactive] public bool BreakOnUnofficialOpCode { get; set; } = false;
 		[Reactive] public bool BreakOnUnstableOpCode { get; set; } = true;
 		[Reactive] public bool BreakOnCpuCrash { get; set; } = true;
-		
+
 		[Reactive] public bool BreakOnBusConflict { get; set; } = false;
 		[Reactive] public bool BreakOnDecayedOamRead { get; set; } = false;
 		[Reactive] public bool BreakOnPpuScrollGlitch { get; set; } = false;
