@@ -53,7 +53,7 @@ public:
 		}
 	}
 
-	void GetMemoryRanges(MemoryRanges & ranges) override
+	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 	}
 

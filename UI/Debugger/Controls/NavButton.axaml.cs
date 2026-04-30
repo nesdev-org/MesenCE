@@ -2,10 +2,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
-using Mesen.Debugger.ViewModels;
 using Avalonia.Media.Imaging;
+using Mesen.Debugger.ViewModels;
 using Mesen.Localization;
+using Mesen.Utilities;
 
 namespace Mesen.Debugger.Controls;
 

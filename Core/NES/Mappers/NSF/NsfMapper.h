@@ -31,7 +31,7 @@ private:
 	unique_ptr<FdsAudio> _fdsAudio;
 	unique_ptr<Namco163Audio> _namcoAudio;
 	unique_ptr<Sunsoft5bAudio> _sunsoftAudio;
-	
+
 	uint8_t _mmc5MultiplierValues[2] = {};
 
 	uint32_t _irqCounter = 0;
@@ -39,10 +39,10 @@ private:
 	bool _hasBankSwitching = false;
 
 	uint8_t _songNumber = 0;
-	
+
 	/*
-	
-	.org $4100	
+
+	.org $4100
 	reset:
 		CLI
 		JSR [INIT]  ;set at load time
@@ -59,10 +59,12 @@ private:
 		RTI
 	*/
 
+	// clang-format off
 	uint8_t _nsfBios[0x20] = {
 		0x58,0x20,0x00,0x00,0x8D,0x00,0x41,0x58,0x4C,0x08,0x41,0x00,0x00,0x00,0x00,0x00,
 		0x8D,0x00,0x41,0x20,0x00,0x00,0x58,0x40,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 	};
+	// clang-format on
 
 private:
 	void TriggerIrq();
@@ -87,7 +89,7 @@ protected:
 	void OnAfterResetPowerOn() override;
 
 	uint32_t GetIrqReloadValue();
-	
+
 	void ProcessCpuClock() override;
 	uint8_t ReadRegister(uint16_t addr) override;
 	void WriteRegister(uint16_t addr, uint8_t value) override;
@@ -95,7 +97,7 @@ protected:
 public:
 	NsfMapper();
 	~NsfMapper();
-	
+
 	AudioTrackInfo GetAudioTrackInfo();
 	void ProcessAudioPlayerAction(AudioPlayerActionParams p);
 

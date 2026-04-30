@@ -30,7 +30,7 @@ protected:
 		AddRegisterRange(0x8000, 0xFFFF, MemoryOperation::Any);
 
 		_flash.reset(new FlashSST39SF040(_prgRom, _prgSize));
-		
+
 		WriteRegister(0x5000, GetPowerOnByte());
 
 		_orgPrgRom = vector<uint8_t>(_prgRom, _prgRom + _prgSize);
@@ -40,10 +40,10 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
-		
+
 		SV(_flash);
 		SV(_prgReg);
-		
+
 		SerializeRomDiff(s, _orgPrgRom);
 	}
 

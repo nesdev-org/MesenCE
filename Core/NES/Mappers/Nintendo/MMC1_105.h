@@ -20,7 +20,7 @@ protected:
 		_initState = 0;
 		_irqCounter = 0;
 		_irqEnabled = false;
-		_chrReg0 |= 0x10;  //Set I bit to 1
+		_chrReg0 |= 0x10; //Set I bit to 1
 		UpdateState();
 	}
 
@@ -38,7 +38,7 @@ protected:
 
 		if(_irqEnabled) {
 			_irqCounter++;
-			
+
 			uint32_t maxCounter = 0x20000000 | (GetDipSwitches() << 25);
 			if(_irqCounter >= maxCounter) {
 				_console->GetCpu()->SetIrqSource(IRQSource::External);

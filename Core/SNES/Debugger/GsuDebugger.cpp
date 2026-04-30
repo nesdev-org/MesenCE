@@ -30,7 +30,7 @@ GsuDebugger::GsuDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_gsu = console->GetCartridge()->GetGsu();
 	_memoryManager = console->GetMemoryManager();
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_traceLogger.reset(new GsuTraceLogger(debugger, this, console->GetPpu(), _memoryManager));
 
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Gsu, debugger->GetEventManager(CpuType::Snes)));
@@ -127,7 +127,7 @@ void GsuDebugger::Step(int32_t stepCount, StepType type)
 		case StepType::StepOut:
 		case StepType::StepOver:
 		case StepType::Step: step.StepCount = stepCount; break;
-		
+
 		case StepType::SpecificScanline:
 		case StepType::PpuStep:
 			break;

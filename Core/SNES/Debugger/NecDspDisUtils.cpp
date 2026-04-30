@@ -8,10 +8,10 @@
 #include "Utilities/FastString.h"
 #include "Shared/MemoryType.h"
 
-void NecDspDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t memoryAddr, LabelManager *labelManager, EmuSettings* settings)
+void NecDspDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
-	constexpr const char* aluOperations[16] = { "NOP", "OR", "AND", "XOR", "SUB", "ADD", "SBC", "ADC", "DEC" , "INC", "CMP", "SHR1", "SHL1", "SHL2", "SHL4", "XCHG" };
-	constexpr const char* sourceNames[16] = { "TRB", "A", "B", "TR", "DP", "RP", "ROM", "SGN", "DR", "DRNF", "SR", "SIM", "SIL" ,"K", "L", "MEM" };
+	constexpr const char* aluOperations[16] = { "NOP", "OR", "AND", "XOR", "SUB", "ADD", "SBC", "ADC", "DEC", "INC", "CMP", "SHR1", "SHL1", "SHL2", "SHL4", "XCHG" };
+	constexpr const char* sourceNames[16] = { "TRB", "A", "B", "TR", "DP", "RP", "ROM", "SGN", "DR", "DRNF", "SR", "SIM", "SIL", "K", "L", "MEM" };
 	constexpr const char* destNames[16] = { "NON", "A", "B", "TR", "DP", "RP", "DR", "SR", "SOL", "SOM", "K", "KLR", "KLM", "L", "TRB", "MEM" };
 	constexpr const char* dataPointerOp[4] = { "DPL:NOP", "DPL:INC", "DPL:DEC", "DPL:CLR" };
 
@@ -40,7 +40,7 @@ void NecDspDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t
 
 			str.Write(accSelect ? "B" : "A");
 		}
-		
+
 		uint8_t dest = opCode & 0x0F;
 		if(dest) {
 			str.Delimiter(" | ");
@@ -48,7 +48,7 @@ void NecDspDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t
 			str.WriteAll(sourceNames[source], ",");
 			str.Write(destNames[dest]);
 		}
-		
+
 		uint8_t dpLow = (opCode >> 13) & 0x03;
 		if(dpLow) {
 			str.Delimiter(" | ");
@@ -80,7 +80,11 @@ void NecDspDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t
 		uint16_t target = (memoryAddr & 0x2000) | (bank << 11) | address;
 
 		switch((opCode >> 13) & 0x1FF) {
-			case 0x00: str.Write("JMPSO"); target = 0; break;
+			case 0x00:
+				str.Write("JMPSO");
+				target = 0;
+				break;
+
 			case 0x80: str.Write("JNCA"); break;
 			case 0x82: str.Write("JCA"); break;
 			case 0x84: str.Write("JNCB"); break;
@@ -115,15 +119,32 @@ void NecDspDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t
 			case 0xBA: str.Write("JSOAK"); break;
 			case 0xBC: str.Write("JNRQM"); break;
 			case 0xBE: str.Write("JRQM"); break;
-			case 0x100: str.Write("LJMP"); target &= ~0x2000; break;
-			case 0x101: str.Write("HJMP"); target |= 0x2000; break;
-			case 0x140: str.Write("LCALL"); target &= ~0x2000; break;
-			case 0x141: str.Write("HCALL"); target |= 0x2000; break;
+
+			case 0x100:
+				str.Write("LJMP");
+				target &= ~0x2000;
+				break;
+
+			case 0x101:
+				str.Write("HJMP");
+				target |= 0x2000;
+				break;
+
+			case 0x140:
+				str.Write("LCALL");
+				target &= ~0x2000;
+				break;
+
+			case 0x141:
+				str.Write("HCALL");
+				target |= 0x2000;
+				break;
+
 			default: str.Write("<unknown jump>"); break;
 		}
 		str.Write(' ');
 
-		AddressInfo absAddress = { (int32_t)target*3, MemoryType::DspProgramRom };
+		AddressInfo absAddress = { (int32_t)target * 3, MemoryType::DspProgramRom };
 		string label = labelManager ? labelManager->GetLabel(absAddress) : "";
 		if(label.empty()) {
 			str.WriteAll('$', HexUtilities::ToHex(target * 3));

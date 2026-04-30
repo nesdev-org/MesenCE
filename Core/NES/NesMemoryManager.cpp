@@ -36,7 +36,7 @@ NesMemoryManager::NesMemoryManager(NesConsole* console, BaseMapper* mapper)
 		_ramWriteHandlers[i] = &_openBusHandler;
 	}
 
-	RegisterIODevice(_internalRamHandler.get());	
+	RegisterIODevice(_internalRamHandler.get());
 }
 
 NesMemoryManager::~NesMemoryManager()
@@ -56,7 +56,7 @@ void NesMemoryManager::Reset(bool softReset)
 	_mapper->Reset(softReset);
 }
 
-void NesMemoryManager::InitializeMemoryHandlers(INesMemoryHandler** memoryHandlers, INesMemoryHandler* handler, vector<uint16_t> *addresses, bool allowOverride)
+void NesMemoryManager::InitializeMemoryHandlers(INesMemoryHandler** memoryHandlers, INesMemoryHandler* handler, vector<uint16_t>* addresses, bool allowOverride)
 {
 	for(uint16_t address : *addresses) {
 		if(!allowOverride && memoryHandlers[address] != &_openBusHandler && memoryHandlers[address] != handler) {
@@ -66,7 +66,7 @@ void NesMemoryManager::InitializeMemoryHandlers(INesMemoryHandler** memoryHandle
 	}
 }
 
-void NesMemoryManager::RegisterIODevice(INesMemoryHandler*handler)
+void NesMemoryManager::RegisterIODevice(INesMemoryHandler* handler)
 {
 	MemoryRanges ranges;
 	handler->GetMemoryRanges(ranges);
@@ -89,7 +89,7 @@ void NesMemoryManager::RegisterReadHandler(INesMemoryHandler* handler, uint32_t 
 	}
 }
 
-void NesMemoryManager::UnregisterIODevice(INesMemoryHandler*handler)
+void NesMemoryManager::UnregisterIODevice(INesMemoryHandler* handler)
 {
 	MemoryRanges ranges;
 	handler->GetMemoryRanges(ranges);
@@ -163,7 +163,7 @@ void NesMemoryManager::DebugWrite(uint16_t addr, uint8_t value, bool disableSide
 	}
 }
 
-void NesMemoryManager::Serialize(Serializer &s)
+void NesMemoryManager::Serialize(Serializer& s)
 {
 	SVArray(_internalRam, _internalRamSize);
 	SV(_openBusHandler);

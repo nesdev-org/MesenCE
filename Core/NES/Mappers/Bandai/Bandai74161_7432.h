@@ -34,7 +34,7 @@ protected:
 		if(_enableMirroringControl) {
 			SetMirroringType(mirroringBit ? MirroringType::ScreenBOnly : MirroringType::ScreenAOnly);
 		}
-		
+
 		//Biggest PRG ROM I could find for mapper 70/152 is 128kb, so the 4th bit will never be used on those
 		SelectPrgPage(0, (value >> 4) & 0x07);
 		SelectChrPage(0, value & 0x0F);
@@ -43,7 +43,7 @@ protected:
 	virtual void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
-		SV(_enableMirroringControl);		
+		SV(_enableMirroringControl);
 	}
 
 public:

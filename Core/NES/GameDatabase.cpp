@@ -14,7 +14,7 @@ bool GameDatabase::_enabled = true;
 bool GameDatabase::_initialized = false;
 SimpleLock GameDatabase::_loadLock;
 
-template<typename T> 
+template<typename T>
 T GameDatabase::ToInt(string value)
 {
 	if(value.empty()) {
@@ -37,7 +37,7 @@ T GameDatabase::ToSize(string value)
 
 void GameDatabase::LoadGameDb(vector<string> data)
 {
-	for(string &row : data) {
+	for(string& row : data) {
 		vector<string> values = StringUtilities::Split(row, ',');
 		if(values.size() >= 16) {
 			GameInfo gameInfo;
@@ -72,7 +72,7 @@ void GameDatabase::LoadGameDb(vector<string> data)
 	MessageManager::Log("[DB] Initialized - " + std::to_string(_gameDatabase.size()) + " games in DB");
 }
 
-void GameDatabase::LoadGameDb(std::istream &db)
+void GameDatabase::LoadGameDb(std::istream& db)
 {
 	vector<string> dbData;
 	while(db.good()) {
@@ -127,11 +127,11 @@ GameSystem GameDatabase::GetGameSystem(string system)
 	} else if(system.compare("Playchoice") == 0) {
 		return GameSystem::Playchoice;
 	}
-	
+
 	return GameSystem::NesNtsc;
 }
 
-uint8_t GameDatabase::GetSubMapper(GameInfo &info)
+uint8_t GameDatabase::GetSubMapper(GameInfo& info)
 {
 	if(!info.SubmapperID.empty()) {
 		return ToInt<uint8_t>(info.SubmapperID);
@@ -139,7 +139,7 @@ uint8_t GameDatabase::GetSubMapper(GameInfo &info)
 	return 0;
 }
 
-bool GameDatabase::GetDbRomSize(uint32_t romCrc, uint32_t &prgSize, uint32_t &chrSize)
+bool GameDatabase::GetDbRomSize(uint32_t romCrc, uint32_t& prgSize, uint32_t& chrSize)
 {
 	InitDatabase();
 	auto result = _gameDatabase.find(romCrc);
@@ -151,7 +151,7 @@ bool GameDatabase::GetDbRomSize(uint32_t romCrc, uint32_t &prgSize, uint32_t &ch
 	return false;
 }
 
-bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
+bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader& nesHeader)
 {
 	GameInfo info = {};
 	InitDatabase();
@@ -160,7 +160,7 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 		info = result->second;
 
 		nesHeader.Byte9 = 0;
-		if(info.PrgRomSize > 4096*1024) {
+		if(info.PrgRomSize > 4096 * 1024) {
 			uint16_t prgSize = info.PrgRomSize / 0x4000;
 			nesHeader.PrgCount = prgSize & 0xFF;
 			nesHeader.Byte9 |= (prgSize & 0xF00) >> 8;
@@ -168,14 +168,14 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 			nesHeader.PrgCount = info.PrgRomSize / 0x4000;
 		}
 
-		if(info.ChrRomSize > 2048*1024) {
+		if(info.ChrRomSize > 2048 * 1024) {
 			uint16_t chrSize = info.ChrRomSize / 0x2000;
 			nesHeader.ChrCount = chrSize & 0xFF;
 			nesHeader.Byte9 |= (chrSize & 0xF00) >> 4;
 		} else {
 			nesHeader.ChrCount = info.ChrRomSize / 0x2000;
 		}
-		
+
 		nesHeader.Byte6 = (info.MapperID & 0x0F) << 4;
 		if(info.HasBattery) {
 			nesHeader.Byte6 |= 0x02;
@@ -191,7 +191,7 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 		} else if(system == GameSystem::VsSystem) {
 			nesHeader.Byte7 |= 0x01;
 		}
-		
+
 		//Don't set this, otherwise the header will be used over the game DB data
 		//nesHeader.Byte7 |= 0x08; //NES 2.0 marker
 
@@ -209,7 +209,7 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 		if(info.ChrRamSize > 0) {
 			nesHeader.Byte11 |= ((int)log2(info.ChrRamSize) - 6);
 		}
-		
+
 		nesHeader.Byte12 = system == GameSystem::NesPal ? 0x01 : 0;
 		nesHeader.Byte13 = 0; //VS PPU variant
 
@@ -219,8 +219,8 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 	return false;
 }
 
-void GameDatabase::SetGameInfo(uint32_t romCrc, RomData &romData, bool updateRomData, bool forHeaderlessRom)
-{	
+void GameDatabase::SetGameInfo(uint32_t romCrc, RomData& romData, bool updateRomData, bool forHeaderlessRom)
+{
 	GameInfo info = {};
 
 	InitDatabase();
@@ -305,7 +305,7 @@ void GameDatabase::SetGameInfo(uint32_t romCrc, RomData &romData, bool updateRom
 	romData.Info.DatabaseInfo = info;
 }
 
-void GameDatabase::UpdateRomData(GameInfo &info, RomData &romData)
+void GameDatabase::UpdateRomData(GameInfo& info, RomData& romData)
 {
 	romData.Info.MapperID = info.MapperID;
 	romData.Info.System = GetGameSystem(info.System);

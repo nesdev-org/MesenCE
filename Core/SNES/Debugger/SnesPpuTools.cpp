@@ -8,10 +8,17 @@
 #include "Shared/MessageManager.h"
 
 static constexpr uint8_t layerBpp[8][4] = {
-	{ 2,2,2,2 }, { 4,4,2,0 }, { 4,4,0,0 }, { 8,4,0,0 }, { 8,2,0,0 }, { 4,2,0,0 }, { 4,0,0,0 }, { 8,8,0,0 }
+	{ 2, 2, 2, 2 },
+	{ 4, 4, 2, 0 },
+	{ 4, 4, 0, 0 },
+	{ 8, 4, 0, 0 },
+	{ 8, 2, 0, 0 },
+	{ 4, 2, 0, 0 },
+	{ 4, 0, 0, 0 },
+	{ 8, 8, 0, 0 }
 };
 
-SnesPpuTools::SnesPpuTools(Debugger* debugger, Emulator *emu) : PpuTools(debugger, emu)
+SnesPpuTools::SnesPpuTools(Debugger* debugger, Emulator* emu) : PpuTools(debugger, emu)
 {
 }
 
@@ -59,7 +66,7 @@ DebugTilemapInfo SnesPpuTools::GetTilemap(GetTilemapOptions options, BaseState& 
 
 	LayerConfig layer = state.Layers[options.Layer];
 
-	std::fill(outBuffer, outBuffer + outputSize.Width*outputSize.Height, palette[0]);
+	std::fill(outBuffer, outBuffer + outputSize.Width * outputSize.Height, palette[0]);
 
 	uint8_t bpp = layerBpp[state.BgMode][options.Layer];
 	if(bpp == 0) {
@@ -120,7 +127,7 @@ DebugTilemapInfo SnesPpuTools::GetTilemap(GetTilemapOptions options, BaseState& 
 
 	bool isDoubleWidthScreen = state.HiResMode || state.BgMode == 5 || state.BgMode == 6;
 	bool isDoubleHeightScreen = state.ScreenInterlace || state.BgMode == 5 || state.BgMode == 6;
-	
+
 	DebugTilemapInfo result = {};
 	result.Bpp = bpp;
 	result.Format = format;
@@ -181,10 +188,9 @@ void SnesPpuTools::RenderTilemap(GetTilemapOptions& options, int rowCount, Layer
 				uint8_t yTileOffset = (largeTileHeight ? ((y & 0x08) ? (vMirror ? 0 : 16) : (vMirror ? 16 : 0)) : 0);
 
 				for(int x = 0; x < tileWidth; x++) {
-					uint16_t tileOffset = (
+					uint16_t tileOffset =
 						yTileOffset +
-						(largeTileWidth ? ((x & 0x08) ? (hMirror ? 0 : 1) : (hMirror ? 1 : 0)) : 0)
-					);
+						(largeTileWidth ? ((x & 0x08) ? (hMirror ? 0 : 1) : (hMirror ? 1 : 0)) : 0);
 
 					uint16_t tileStart = (layer.ChrAddress << 1) + ((tileIndex + tileOffset) & 0x3FF) * 8 * bpp;
 					uint16_t pixelStart = tileStart + yOffset * 2;
@@ -214,7 +220,7 @@ void SnesPpuTools::RenderMode7Tilemap(GetTilemapOptions& options, uint8_t* vram,
 
 	for(int row = 0; row < 1024; row++) {
 		for(int column = 0; column < 128; column++) {
-			uint32_t tileIndex = vram[(row>>3) * 256 + column * 2];
+			uint32_t tileIndex = vram[(row >> 3) * 256 + column * 2];
 			uint32_t tileAddr = tileIndex * 128;
 			uint32_t pixelStart = tileAddr + (row & 0x7) * 16;
 
@@ -246,7 +252,7 @@ static constexpr uint8_t _oamSizes[8][2][2] = {
 	{ { 2, 2 }, { 8, 8 } }, //16x16 + 64x64
 	{ { 4, 4 }, { 8, 8 } }, //32x32 + 64x64
 	{ { 2, 4 }, { 4, 8 } }, //16x32 + 32x64
-	{ { 2, 4 }, { 4, 4 } }  //16x32 + 32x32
+	{ { 2, 4 }, { 4, 4 } } //16x32 + 32x32
 };
 
 void SnesPpuTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& baseState, BaseState& ppuToolsState, DebugSpriteInfo* sprites, uint32_t* spritePreviews, uint32_t* palette, uint32_t* outBuffer)
@@ -284,7 +290,7 @@ void SnesPpuTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& 
 
 			for(int x = 0; x < sprite.Width; x++) {
 				int xPos = 256 + sprite.X + x;
-				
+
 				uint32_t color = spritePreview[y * sprite.Width + x];
 				if(color != 0) {
 					if(xPos < (int)size.Width) {
@@ -352,7 +358,7 @@ void SnesPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePrevie
 
 	int tileRow = (sprite.TileIndex & 0xF0) >> 4;
 	int tileColumn = sprite.TileIndex & 0x0F;
-	
+
 	sprite.TileCount = 0;
 	for(int i = 0, rowCount = height / 8; i < rowCount; i++) {
 		int row = (i + tileRow) & 0x0F;
@@ -420,7 +426,7 @@ void SnesPpuTools::GetSpriteList(GetSpritePreviewOptions options, BaseState& bas
 		outBuffer[i].Init();
 		GetSpriteInfo(outBuffer[i], spritePreviews + (i * _spritePreviewSize), i, options, state, vram, oamRam, palette);
 	}
-	
+
 	GetSpritePreview(options, baseState, ppuToolsState, outBuffer, spritePreviews, palette, screenPreview);
 }
 
@@ -522,7 +528,7 @@ DebugTilemapTileInfo SnesPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, ui
 
 		result.TileIndex = ((vram[addr + 1] & 0x03) << 8) | vram[addr];
 		result.TileMapAddress = addr;
-		
+
 		uint16_t tileStart = (layer.ChrAddress << 1) + result.TileIndex * 8 * bpp;
 		result.AddAddress(tileStart);
 		if(largeTileWidth) {
@@ -550,7 +556,7 @@ DebugSpritePreviewInfo SnesPpuTools::GetSpritePreviewInfo(GetSpritePreviewOption
 	info.SpriteCount = 128;
 	info.CoordOffsetX = 256;
 	info.CoordOffsetY = 0;
-	
+
 	info.VisibleX = 256;
 	info.VisibleY = 0;
 	info.VisibleWidth = 256;

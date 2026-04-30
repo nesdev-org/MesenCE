@@ -44,12 +44,12 @@ GbDebugger::GbDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator())
 	} else {
 		_gameboy = ((Gameboy*)debugger->GetConsole());
 	}
-	
+
 	_cpu = _gameboy->GetCpu();
 	_ppu = _gameboy->GetPpu();
 
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::GbPrgRom, _gameboy->DebugGetMemorySize(MemoryType::GbPrgRom), CpuType::Gameboy, _emu->GetCrc32()));
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
@@ -63,7 +63,7 @@ GbDebugger::GbDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator())
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Gameboy, _eventManager.get()));
 	_step.reset(new StepRequest());
 	_assembler.reset(new GbAssembler(debugger->GetLabelManager()));
-	
+
 	_dummyCpu.reset(new DummyGbCpu());
 	_dummyCpu->Init(_emu, _gameboy, _gameboy->GetMemoryManager());
 }
@@ -111,14 +111,24 @@ void GbDebugger::ProcessInstruction()
 				}
 				break;
 
-			case 0xD3: case 0xDB: case 0xDD: case 0xE3: case 0xE4: case 0xEB: case 0xEC: case 0xED: case 0xF4: case 0xFC: case 0xFD:
+			case 0xD3:
+			case 0xDB:
+			case 0xDD:
+			case 0xE3:
+			case 0xE4:
+			case 0xEB:
+			case 0xEC:
+			case 0xED:
+			case 0xF4:
+			case 0xFC:
+			case 0xFD:
 				if(_settings->GetDebugConfig().GbBreakOnInvalidOpCode) {
 					_step->Break(BreakSource::GbInvalidOpCode);
 				}
 				break;
 		}
 	}
-	
+
 	_prevOpCode = value;
 	_prevProgramCounter = pc;
 	_prevStackPointer = state.SP;
@@ -243,7 +253,7 @@ void GbDebugger::Step(int32_t stepCount, StepType type)
 
 		case StepType::PpuStep: step.PpuStepCount = stepCount; break;
 		case StepType::PpuScanline: step.PpuStepCount = 456 * stepCount; break;
-		case StepType::PpuFrame: step.PpuStepCount = 456*154 * stepCount; break;
+		case StepType::PpuFrame: step.PpuStepCount = 456 * 154 * stepCount; break;
 		case StepType::SpecificScanline: step.BreakScanline = stepCount; break;
 	}
 
@@ -302,10 +312,7 @@ void GbDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool 
 	ProcessCallStackUpdates(ret, originalPc, originalSp);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::Gameboy, *this, *_step.get(), 
-		ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::Gameboy, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi);
 }
 
 void GbDebugger::ProcessPpuRead(uint16_t addr, uint8_t value, MemoryType memoryType)

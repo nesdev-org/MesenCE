@@ -36,7 +36,7 @@ private:
 	std::deque<uint8_t*> _screenshotHashes;
 	std::deque<uint8_t> _repetitionCount;
 	uint8_t _currentCount = 0;
-	
+
 	string _filename;
 	ofstream _file;
 

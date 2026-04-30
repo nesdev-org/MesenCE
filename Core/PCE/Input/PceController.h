@@ -70,7 +70,17 @@ protected:
 	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, Select, Run, I, II };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		Select,
+		Run,
+		I,
+		II
+	};
 
 	PceController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::PceController, port, keyMappings)
 	{

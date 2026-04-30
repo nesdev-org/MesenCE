@@ -63,7 +63,7 @@ public:
 	void PeekBlock(uint32_t addr, uint8_t* output) override;
 
 	AddressInfo GetAbsoluteAddress(uint32_t address) override;
-	
+
 	AddressInfo GetArmAbsoluteAddress(uint32_t address);
 	int GetArmRelativeAddress(AddressInfo& absoluteAddr);
 

@@ -28,7 +28,7 @@ protected:
 
 	uint8_t _duty = 0;
 	uint8_t _dutyPos = 0;
-	
+
 	bool _sweepEnabled = false;
 	uint8_t _sweepPeriod = 0;
 	bool _sweepNegate = false;
@@ -37,7 +37,7 @@ protected:
 	uint8_t _sweepDivider = 0;
 	uint32_t _sweepTargetPeriod = 0;
 	uint16_t _realPeriod = 0;
-	
+
 	bool IsMuted()
 	{
 		//A period of t < 8, either set explicitly or via a sweep period update, silences the corresponding pulse channel.
@@ -49,13 +49,13 @@ protected:
 		_sweepEnabled = (regValue & 0x80) == 0x80;
 		_sweepNegate = (regValue & 0x08) == 0x08;
 
-		//The divider's period is set to P + 1 
+		//The divider's period is set to P + 1
 		_sweepPeriod = ((regValue & 0x70) >> 4) + 1;
 		_sweepShift = (regValue & 0x07);
 
 		UpdateTargetPeriod();
 
-		//Side effects: Sets the reload flag 
+		//Side effects: Sets the reload flag
 		_reloadSweep = true;
 	}
 
@@ -113,7 +113,7 @@ public:
 		_dutyPos = 0;
 
 		_realPeriod = 0;
-	
+
 		_sweepEnabled = false;
 		_sweepPeriod = 0;
 		_sweepNegate = false;
@@ -126,12 +126,21 @@ public:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_realPeriod); SV(_duty); SV(_dutyPos); SV(_sweepEnabled); SV(_sweepPeriod); SV(_sweepNegate); SV(_sweepShift); SV(_reloadSweep); SV(_sweepDivider); SV(_sweepTargetPeriod);
+		SV(_realPeriod);
+		SV(_duty);
+		SV(_dutyPos);
+		SV(_sweepEnabled);
+		SV(_sweepPeriod);
+		SV(_sweepNegate);
+		SV(_sweepShift);
+		SV(_reloadSweep);
+		SV(_sweepDivider);
+		SV(_sweepTargetPeriod);
 		SV(_timer);
 		SV(_envelope);
 	}
 
-	void GetMemoryRanges(MemoryRanges &ranges) override
+	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		if(_isChannel1) {
 			ranges.AddHandler(MemoryOperation::Write, 0x4000, 0x4003);
@@ -144,7 +153,7 @@ public:
 	{
 		_console->GetApu()->Run();
 		switch(addr & 0x03) {
-			case 0:		//4000 & 4004
+			case 0: //4000 & 4004
 				_envelope.InitializeEnvelope(value);
 
 				_duty = (value & 0xC0) >> 6;
@@ -153,15 +162,15 @@ public:
 				}
 				break;
 
-			case 1:		//4001 & 4005
+			case 1: //4001 & 4005
 				InitializeSweep(value);
 				break;
 
-			case 2:		//4002 & 4006
+			case 2: //4002 & 4006
 				SetPeriod((_realPeriod & 0x0700) | value);
 				break;
 
-			case 3:		//4003 & 4007
+			case 3: //4003 & 4007
 				_envelope.LengthCounter.LoadLengthCounter(value >> 3);
 
 				SetPeriod((_realPeriod & 0xFF) | ((value & 0x07) << 8));
@@ -173,7 +182,7 @@ public:
 				_envelope.ResetEnvelope();
 				break;
 		}
-		
+
 		if(!_isMmc5Square) {
 			UpdateOutput();
 		}

@@ -30,7 +30,7 @@ RowDataType NesTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void NesTraceLogger::GetTraceRow(string &output, NesCpuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void NesTraceLogger::GetTraceRow(string& output, NesCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	constexpr char activeStatusLetters[8] = { 'N', 'V', '-', '-', 'D', 'I', 'Z', 'C' };
 	constexpr char inactiveStatusLetters[8] = { 'n', 'v', '-', '-', 'd', 'i', 'z', 'c' };

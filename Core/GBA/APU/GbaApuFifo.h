@@ -8,7 +8,7 @@ private:
 	uint32_t _data[7] = {};
 	uint8_t _readPos = 0;
 	uint8_t _writePos = 0;
-	
+
 	uint32_t _writeBuffer = 0;
 	uint32_t _readValue = 0;
 	uint8_t _readCount = 0;
@@ -17,8 +17,8 @@ private:
 public:
 	void Push(uint8_t value, uint8_t pos, bool commit)
 	{
-		_writeBuffer = (_writeBuffer & ~(0xFF << (pos * 8))) | (value << (pos*8));
-		
+		_writeBuffer = (_writeBuffer & ~(0xFF << (pos * 8))) | (value << (pos * 8));
+
 		if(commit) {
 			if(_size >= 7) {
 				//Writing more than 7 values clears the FIFO (fifo_5)

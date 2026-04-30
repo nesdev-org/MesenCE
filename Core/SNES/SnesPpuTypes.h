@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Shared/BaseState.h"
 
-enum class  WindowMaskLogic
+enum class WindowMaskLogic
 {
 	Or = 0,
 	And = 1,
@@ -87,7 +87,7 @@ struct Mode7Config
 	int16_t CenterY = 0;
 
 	uint8_t ValueLatch = 0;
-	
+
 	bool LargeMap = false;
 	bool FillWithTile0 = false;
 	bool HorizontalMirroring = false;
@@ -188,7 +188,6 @@ struct SnesPpuState : public BaseState
 	bool ColorMathHalveResult = false;
 	uint16_t FixedColor = 0;
 };
-
 
 enum PixelFlags
 {

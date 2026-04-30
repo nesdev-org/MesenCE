@@ -35,7 +35,7 @@ private:
 	{
 		return _volumeLut[_registers[8 + channel] & 0x0F];
 	}
-	
+
 	bool IsEnvelopeEnabled(int channel)
 	{
 		return (_registers[8 + channel] & 0x10) == 0x10;
@@ -50,7 +50,7 @@ private:
 	{
 		return ((_registers[7] >> (channel + 3)) & 0x01) == 0x00;
 	}
-	
+
 	void UpdateChannel(int channel)
 	{
 		_timer[channel]--;
@@ -81,7 +81,9 @@ protected:
 		SVArray(_timer, 3);
 		SVArray(_registers, 0x10);
 		SVArray(_toneStep, 3);
-		SV(_currentRegister); SV(_lastOutput); SV(_processTick);
+		SV(_currentRegister);
+		SV(_lastOutput);
+		SV(_processTick);
 	}
 
 	void ClockAudio() override

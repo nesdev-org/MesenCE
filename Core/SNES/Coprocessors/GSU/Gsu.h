@@ -17,10 +17,10 @@ class Gsu : public BaseCoprocessor
 {
 private:
 	Emulator* _emu;
-	SnesConsole *_console;
-	SnesMemoryManager *_memoryManager;
-	SnesCpu *_cpu;
-	EmuSettings *_settings;
+	SnesConsole* _console;
+	SnesMemoryManager* _memoryManager;
+	SnesCpu* _cpu;
+	EmuSettings* _settings;
 	uint8_t _clockMultiplier;
 
 	GsuState _state;
@@ -45,7 +45,7 @@ private:
 
 	void InitProgramCache(uint16_t cacheAddr);
 
-	uint8_t ReadOperand();	
+	uint8_t ReadOperand();
 	uint8_t ReadOpCode();
 	uint8_t ReadProgramByte(MemoryOperationType opType);
 
@@ -55,7 +55,7 @@ private:
 
 	void ResetFlags();
 	void InvalidateCache();
-	
+
 	void WaitRomOperation();
 	void WaitRamOperation();
 
@@ -73,7 +73,7 @@ private:
 	void CACHE();
 
 	void Branch(bool branch);
-	
+
 	void BRA();
 	void BLT();
 	void BGE();
@@ -112,7 +112,7 @@ private:
 	bool IsTransparentPixel();
 	void DrawPixel(uint8_t x, uint8_t y);
 	void FlushPrimaryCache(uint8_t x, uint8_t y);
-	void WritePixelCache(GsuPixelCache &cache);
+	void WritePixelCache(GsuPixelCache& cache);
 
 	uint8_t GetColor(uint8_t source);
 
@@ -148,7 +148,7 @@ private:
 	void GETB();
 
 public:
-	Gsu(SnesConsole *console, uint32_t gsuRamSize);
+	Gsu(SnesConsole* console, uint32_t gsuRamSize);
 	virtual ~Gsu();
 
 	void ProcessEndOfFrame() override;
@@ -158,17 +158,17 @@ public:
 
 	void LoadBattery() override;
 	void SaveBattery() override;
-	
+
 	void Run() override;
 	void Reset() override;
 
 	uint8_t Read(uint32_t addr) override;
 	uint8_t Peek(uint32_t addr) override;
-	void PeekBlock(uint32_t addr, uint8_t *output) override;
+	void PeekBlock(uint32_t addr, uint8_t* output) override;
 	void Write(uint32_t addr, uint8_t value) override;
 	AddressInfo GetAbsoluteAddress(uint32_t address) override;
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 
 	GsuState& GetState();
 	MemoryMappings* GetMemoryMappings();

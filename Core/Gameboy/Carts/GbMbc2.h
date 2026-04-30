@@ -14,7 +14,7 @@ public:
 	void InitCart() override
 	{
 		_memoryManager->MapRegisters(0x0000, 0x3FFF, RegisterAccess::Write);
-		
+
 		for(int i = 0; i < 512; i++) {
 			//Ensure cart RAM contains $F in the upper nibble, no matter the contents of save ram
 			_cartRam[i] |= 0xF0;
@@ -31,7 +31,7 @@ public:
 
 		if(_ramEnabled) {
 			for(int i = 0; i < 16; i++) {
-				Map(0xA000+0x200*i, 0xA1FF+0x200*i, GbMemoryType::CartRam, 0, false);
+				Map(0xA000 + 0x200 * i, 0xA1FF + 0x200 * i, GbMemoryType::CartRam, 0, false);
 			}
 			_memoryManager->MapRegisters(0xA000, 0xBFFF, RegisterAccess::Write);
 		} else {

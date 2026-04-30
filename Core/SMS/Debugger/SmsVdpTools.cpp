@@ -7,7 +7,7 @@
 #include "Debugger/MemoryDumper.h"
 #include "Shared/SettingTypes.h"
 
-SmsVdpTools::SmsVdpTools(Debugger* debugger, Emulator *emu, SmsConsole* console) : PpuTools(debugger, emu)
+SmsVdpTools::SmsVdpTools(Debugger* debugger, Emulator* emu, SmsConsole* console) : PpuTools(debugger, emu)
 {
 	_console = console;
 }
@@ -44,7 +44,7 @@ DebugTilemapInfo SmsVdpTools::GetTilemap(GetTilemapOptions options, BaseState& b
 		result.ColumnCount = 342;
 		result.Bpp = 8;
 		result.Format = TileFormat::DirectColor;
-		for(int i = 0, len = (int)(result.RowCount * result.ColumnCount); i < len; i+=2) {
+		for(int i = 0, len = (int)(result.RowCount * result.ColumnCount); i < len; i += 2) {
 			switch(_memAccess[i]) {
 				case SmsVdpMemAccess::None: outBuffer[i] = 0xFF606060; break;
 				case SmsVdpMemAccess::BgLoadTable: outBuffer[i] = 0xFF00FF00; break;
@@ -73,7 +73,7 @@ DebugTilemapInfo SmsVdpTools::GetTilemap(GetTilemapOptions options, BaseState& b
 	result.TilesetAddress = 0;
 	result.ScrollWidth = isGameGear ? 160 : 256;
 	result.ScrollHeight = isGameGear ? 144 : state.VisibleScanlineCount;
-	
+
 	uint8_t colorMask = 0xFF;
 	if(options.DisplayMode == TilemapDisplayMode::Grayscale) {
 		palette = (uint32_t*)_grayscaleColorsBpp4;
@@ -203,7 +203,7 @@ DebugTilemapTileInfo SmsVdpTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 
 	uint8_t row = y / 8;
 	uint8_t column = x / result.Width;
-	
+
 	result.Row = row;
 	result.Column = column;
 
@@ -211,7 +211,7 @@ DebugTilemapTileInfo SmsVdpTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 		uint16_t ntIndex = (row << 5) + column;
 		uint16_t entryAddr = state.EffectiveNametableAddress + (ntIndex * 2);
 		uint16_t ntData = vram[entryAddr] | (vram[entryAddr + 1] << 8);
-	
+
 		uint8_t paletteOffset = ntData & 0x800 ? 0x10 : 0;
 		uint16_t tileIndex = ntData & 0x1FF;
 
@@ -270,7 +270,7 @@ DebugTilemapTileInfo SmsVdpTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 void SmsVdpTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& baseState, DebugSpriteInfo* sprites, uint32_t* spritePreviews, uint32_t* palette, uint32_t* outBuffer)
 {
 	SmsVdpState& state = (SmsVdpState&)baseState;
-	
+
 	uint32_t bgColor = GetSpriteBackgroundColor(options.Background, palette, false);
 
 	std::fill(outBuffer, outBuffer + 256 * state.VisibleScanlineCount, bgColor);
@@ -335,7 +335,7 @@ DebugSpritePreviewInfo SmsVdpTools::GetSpritePreviewInfo(GetSpritePreviewOptions
 		info.VisibleWidth = 256;
 		info.VisibleHeight = state.VisibleScanlineCount;
 	}
-	
+
 	info.WrapBottomToTop = true;
 
 	return info;
@@ -349,11 +349,11 @@ void SmsVdpTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 	sprite.Format = state.UseMode4 ? TileFormat::SmsBpp4 : TileFormat::SmsSgBpp1;
 	sprite.SpriteIndex = i;
 	sprite.UseExtendedVram = false;
-	sprite.RawY = state.UseMode4 ? oam[i] : oam[i*4];
-	sprite.RawX = state.UseMode4 ? oam[0x80+i*2] : oam[i*4+1];
+	sprite.RawY = state.UseMode4 ? oam[i] : oam[i * 4];
+	sprite.RawX = state.UseMode4 ? oam[0x80 + i * 2] : oam[i * 4 + 1];
 	sprite.Y = sprite.RawY;
 	sprite.X = sprite.RawX;
-	
+
 	if(state.UseMode4) {
 		if(state.ShiftSpritesLeft) {
 			sprite.X -= 8;
@@ -364,13 +364,13 @@ void SmsVdpTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 		}
 	}
 
-	sprite.TileIndex = state.UseMode4 ? oam[0x80 + i * 2 + 1] : oam[i*4+2];
+	sprite.TileIndex = state.UseMode4 ? oam[0x80 + i * 2 + 1] : oam[i * 4 + 2];
 	sprite.UseSecondTable = NullableBoolean::Undefined;
 
-	sprite.Palette = state.UseMode4 ? 0 : (oam[i*4+3] & 0x0F);
+	sprite.Palette = state.UseMode4 ? 0 : (oam[i * 4 + 3] & 0x0F);
 	sprite.PaletteAddress = state.UseMode4 ? 0x10 : -1;
 	sprite.Priority = DebugSpritePriority::Undefined;
-	
+
 	bool largeSprites = state.UseLargeSprites;
 	sprite.Width = 8;
 	sprite.Height = largeSprites ? 16 : 8;
@@ -458,7 +458,7 @@ DebugPaletteInfo SmsVdpTools::GetPaletteInfo(GetPaletteInfoOptions options)
 	info.BgColorCount = 16;
 	info.SpriteColorCount = 16;
 	info.ColorsPerPalette = 16;
-	
+
 	if(state.UseMode4) {
 		info.ColorCount = 32;
 		info.SpritePaletteOffset = info.BgColorCount;

@@ -89,7 +89,7 @@ namespace Mesen.Debugger.Controls
 		public void ScrollLineToMiddle(int lineNumber)
 		{
 			if(Bounds.Height > 0) {
-				lineNumber = Math.Max(0, lineNumber - (int)(Bounds.Height / TextArea.TextView.DefaultLineHeight/ 2));
+				lineNumber = Math.Max(0, lineNumber - (int)(Bounds.Height / TextArea.TextView.DefaultLineHeight / 2));
 				VerticalScrollBarValue = lineNumber * TextArea.TextView.DefaultLineHeight;
 			}
 		}

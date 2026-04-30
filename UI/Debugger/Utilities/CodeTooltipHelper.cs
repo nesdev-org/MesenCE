@@ -1,13 +1,13 @@
-﻿using System;
-using Avalonia.Controls;
-using Mesen.Interop;
+﻿using Avalonia.Controls;
+using Avalonia.Media;
+using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Disassembly;
-using Avalonia.Media;
-using Mesen.Debugger.Labels;
-using Mesen.Localization;
-using Mesen.Config;
 using Mesen.Debugger.Integration;
+using Mesen.Debugger.Labels;
+using Mesen.Interop;
+using Mesen.Localization;
+using System;
 
 namespace Mesen.Debugger.Utilities
 {
@@ -223,7 +223,7 @@ namespace Mesen.Debugger.Utilities
 			if(relAddress >= 0 || absAddress?.Address >= 0) {
 				uint valueAddress = (uint)(absAddress?.Address >= 0 ? absAddress.Value.Address : relAddress);
 				MemoryType valueMemType = absAddress?.Address >= 0 ? absAddress.Value.Type : cpuMemType;
-				
+
 				AddressCounters counters = DebugApi.GetMemoryAccessCounts(valueAddress, 1, valueMemType)[0];
 				if(counters.ExecStamp > 0) {
 					showPreview = true;

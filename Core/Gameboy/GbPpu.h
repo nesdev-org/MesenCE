@@ -49,7 +49,7 @@ private:
 	uint8_t _spriteY[10] = {};
 	uint8_t _spriteIndexes[10] = {};
 	uint8_t _oamReadBuffer[2] = {};
-	
+
 	bool _lcdDisabled = true;
 	bool _stopOamBlocked = false;
 	bool _stopVramBlocked = false;

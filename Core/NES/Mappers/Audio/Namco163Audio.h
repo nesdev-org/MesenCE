@@ -71,7 +71,7 @@ private:
 		uint8_t baseAddr = 0x40 + channel * 0x08;
 		return _internalRam[baseAddr + SoundReg::Volume] & 0x0F;
 	}
-	
+
 	uint8_t GetNumberOfChannels()
 	{
 		return (_internalRam[0x7F] >> 4) & 0x07;
@@ -86,7 +86,7 @@ private:
 		uint8_t volume = GetVolume(channel);
 
 		phase = (phase + freq) % (length << 16);
-		
+
 		uint8_t samplePosition = ((phase >> 16) + offset) & 0xFF;
 		int8_t sample;
 		if((samplePosition & 0x01)) {
@@ -119,7 +119,12 @@ protected:
 
 		SVArray(_internalRam, 0x80);
 		SVArray(_channelOutput, 8);
-		SV(_ramPosition); SV(_autoIncrement); SV(_updateCounter); SV(_currentChannel); SV(_lastOutput); SV(_disableSound);
+		SV(_ramPosition);
+		SV(_autoIncrement);
+		SV(_updateCounter);
+		SV(_currentChannel);
+		SV(_lastOutput);
+		SV(_disableSound);
 	}
 
 	void ClockAudio() override
@@ -174,7 +179,6 @@ public:
 				_ramPosition = value & 0x7F;
 				_autoIncrement = (value & 0x80) == 0x80;
 				break;
-
 		}
 	}
 

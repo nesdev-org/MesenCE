@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include "pch.h"
 #include <thread>
 
@@ -7,10 +7,11 @@ class SimpleLock;
 class LockHandler
 {
 private:
-	SimpleLock *_lock;
+	SimpleLock* _lock;
 	bool _released = false;
+
 public:
-	LockHandler(SimpleLock *lock);
+	LockHandler(SimpleLock* lock);
 	void Release();
 	~LockHandler();
 };
@@ -23,7 +24,7 @@ private:
 	std::thread::id _holderThreadID;
 	uint32_t _lockCount;
 	atomic_flag _lock;
-	
+
 	bool WaitForAcquire(uint32_t msTimeout);
 
 public:

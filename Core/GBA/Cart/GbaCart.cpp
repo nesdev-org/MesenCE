@@ -82,7 +82,7 @@ uint8_t GbaCart::ReadRam(uint32_t addr, uint32_t readAddr)
 	} else if(_tiltSensor && addr >= 0xE008000 && addr <= 0xE008500) {
 		return _tiltSensor->Read(addr);
 	}
-	
+
 	return 0xFF;
 }
 

@@ -126,15 +126,13 @@ uint8_t GbaNoiseChannel::Read(uint16_t addr)
 			return (
 				(_state.EnvVolume << 4) |
 				(_state.EnvRaiseVolume ? 0x08 : 0) |
-				_state.EnvPeriod
-			);
+				_state.EnvPeriod);
 
 		case 3:
 			return (
 				(_state.PeriodShift << 4) |
 				(_state.ShortWidthMode ? 0x08 : 0) |
-				_state.Divisor
-			);
+				_state.Divisor);
 
 		case 4: return _state.LengthEnabled ? 0x40 : 0;
 	}
@@ -233,7 +231,19 @@ void GbaNoiseChannel::Write(uint16_t addr, uint8_t value)
 
 void GbaNoiseChannel::Serialize(Serializer& s)
 {
-	SV(_state.Volume); SV(_state.EnvVolume); SV(_state.EnvRaiseVolume); SV(_state.EnvPeriod); SV(_state.EnvTimer); SV(_state.EnvStopped);
-	SV(_state.ShiftRegister); SV(_state.PeriodShift); SV(_state.Divisor); SV(_state.ShortWidthMode);
-	SV(_state.Length); SV(_state.LengthEnabled); SV(_state.Enabled); SV(_state.Timer); SV(_state.Output);
+	SV(_state.Volume);
+	SV(_state.EnvVolume);
+	SV(_state.EnvRaiseVolume);
+	SV(_state.EnvPeriod);
+	SV(_state.EnvTimer);
+	SV(_state.EnvStopped);
+	SV(_state.ShiftRegister);
+	SV(_state.PeriodShift);
+	SV(_state.Divisor);
+	SV(_state.ShortWidthMode);
+	SV(_state.Length);
+	SV(_state.LengthEnabled);
+	SV(_state.Enabled);
+	SV(_state.Timer);
+	SV(_state.Output);
 }

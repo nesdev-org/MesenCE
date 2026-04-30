@@ -12,19 +12,19 @@ namespace Mesen.Interop
 	{
 		private const string DllPath = EmuApi.DllName;
 
-		[DllImport(DllPath)] public static extern void AviRecord([MarshalAs(UnmanagedType.LPUTF8Str)]string filename, RecordAviOptions options);
+		[DllImport(DllPath)] public static extern void AviRecord([MarshalAs(UnmanagedType.LPUTF8Str)] string filename, RecordAviOptions options);
 		[DllImport(DllPath)] public static extern void AviStop();
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool AviIsRecording();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool AviIsRecording();
 
-		[DllImport(DllPath)] public static extern void WaveRecord([MarshalAs(UnmanagedType.LPUTF8Str)]string filename);
+		[DllImport(DllPath)] public static extern void WaveRecord([MarshalAs(UnmanagedType.LPUTF8Str)] string filename);
 		[DllImport(DllPath)] public static extern void WaveStop();
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool WaveIsRecording();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool WaveIsRecording();
 
-		[DllImport(DllPath)] public static extern void MoviePlay([MarshalAs(UnmanagedType.LPUTF8Str)]string filename);
+		[DllImport(DllPath)] public static extern void MoviePlay([MarshalAs(UnmanagedType.LPUTF8Str)] string filename);
 		[DllImport(DllPath)] public static extern void MovieRecord(RecordMovieOptions options);
 		[DllImport(DllPath)] public static extern void MovieStop();
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool MoviePlaying();
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool MovieRecording();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool MoviePlaying();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool MovieRecording();
 	}
 
 	public enum RecordMovieFrom

@@ -21,7 +21,7 @@ private:
 	uint16_t* _outputBuffers[2] = {};
 	uint16_t* _currentBuffer = nullptr;
 	uint8_t* _vram = nullptr;
-	
+
 	uint8_t _spriteRam[512] = {};
 
 	struct PixelData
@@ -65,8 +65,7 @@ private:
 	__forceinline uint16_t GetPixelRgbColor(WsVideoMode mode, uint8_t color, uint8_t palette)
 	{
 		switch(mode) {
-			case WsVideoMode::Monochrome:
-			{
+			case WsVideoMode::Monochrome: {
 				uint8_t shadeValue = _state.BwPalettes[(palette << 2) | color];
 				uint8_t brightness = _state.BwShades[shadeValue] ^ 0x0F;
 				return brightness | (brightness << 4) | (brightness << 8);
@@ -74,8 +73,7 @@ private:
 
 			case WsVideoMode::Color2bpp:
 			case WsVideoMode::Color4bpp:
-			case WsVideoMode::Color4bppPacked:
-			{
+			case WsVideoMode::Color4bppPacked: {
 				uint16_t paletteAddr = 0xFE00 | (palette << 5) | (color << 1);
 				return _vram[paletteAddr] | ((_vram[paletteAddr + 1] & 0x0F) << 8);
 			}
@@ -83,7 +81,7 @@ private:
 
 		return 0;
 	}
-	
+
 	void ProcessHblank();
 
 public:

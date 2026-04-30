@@ -16,7 +16,14 @@ void FdsAudio::Serialize(Serializer& s)
 	SVArray(_waveTable, 64);
 	SV(_volume);
 	SV(_mod);
-	SV(_waveWriteEnabled); SV(_disableEnvelopes); SV(_haltWaveform); SV(_masterVolume); SV(_waveOverflowCounter); SV(_wavePitch); SV(_wavePosition); SV(_lastOutput);
+	SV(_waveWriteEnabled);
+	SV(_disableEnvelopes);
+	SV(_haltWaveform);
+	SV(_masterVolume);
+	SV(_waveOverflowCounter);
+	SV(_wavePitch);
+	SV(_wavePosition);
+	SV(_lastOutput);
 }
 
 void FdsAudio::ClockAudio()
@@ -125,7 +132,7 @@ void FdsAudio::WriteRegister(uint16_t addr, uint8_t value)
 			case 0x4084:
 			case 0x4085:
 				_mod.WriteReg(addr, value);
-				
+
 				//Update mod output (in case gain/counter were changed)
 				_mod.UpdateOutput(_volume.GetFrequency());
 				break;
@@ -165,12 +172,12 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4084.0-5", "Envelope Speed", _mod.GetSpeed(), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4084.6", "Envelope Direction", _mod.GetVolumeIncreaseFlag() ? "Increase" : "Decrease", _mod.GetVolumeIncreaseFlag()));
 	entries.push_back(MapperStateEntry("$4084.7", "Envelope Disabled", _mod.IsEnvelopeDisabled(), MapperStateValueType::Bool));
-	
+
 	int8_t modCounter = _mod.GetCounter();
 	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), modCounter < 0 ? (modCounter + 128) : modCounter));
 
 	entries.push_back(MapperStateEntry("$4086/7.0-11", "Frequency", _mod.GetFrequency(), MapperStateValueType::Number16));
-	
+
 	//todo emulation logic + this based on new info
 	//entries.push_back(MapperStateEntry("$4087.6", "???", false, MapperStateValueType::Bool));
 
@@ -181,7 +188,6 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4089-$408A", "Misc. Audio"));
 	entries.push_back(MapperStateEntry("$4089.0-2", "Master Volume", _masterVolume, MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4089.7", "Wave Write Enabled", _waveWriteEnabled, MapperStateValueType::Bool));
-	
-	entries.push_back(MapperStateEntry("$408A", "Envelope Speed Multiplier", _volume.GetMasterSpeed(), MapperStateValueType::Number8));
 
+	entries.push_back(MapperStateEntry("$408A", "Envelope Speed Multiplier", _volume.GetMasterSpeed(), MapperStateValueType::Number8));
 }

@@ -65,22 +65,22 @@ extern "C"
 		if(_softwareRenderer) {
 			_historyRenderer.reset(new SoftwareRenderer(_historyPlayer.get()));
 		} else {
-			#ifdef _WIN32
-				_historyRenderer.reset(new Renderer(_historyPlayer.get(), (HWND)viewerHandle));
-			#elif __APPLE__
-				_historyRenderer.reset(new SoftwareRenderer(_historyPlayer.get()));
-			#else
-				_historyRenderer.reset(new SdlRenderer(_historyPlayer.get(), viewerHandle));
-			#endif
+#ifdef _WIN32
+			_historyRenderer.reset(new Renderer(_historyPlayer.get(), (HWND)viewerHandle));
+#elif __APPLE__
+			_historyRenderer.reset(new SoftwareRenderer(_historyPlayer.get()));
+#else
+			_historyRenderer.reset(new SdlRenderer(_historyPlayer.get(), viewerHandle));
+#endif
 		}
 
-		#ifdef _WIN32
-			_historySoundManager.reset(new SoundManager(_historyPlayer.get(), (HWND)windowHandle));
-		#elif __APPLE__
-			_historySoundManager.reset(new SdlSoundManager(_historyPlayer.get()));
-		#else
-			_historySoundManager.reset(new SdlSoundManager(_historyPlayer.get()));
-		#endif
+#ifdef _WIN32
+		_historySoundManager.reset(new SoundManager(_historyPlayer.get(), (HWND)windowHandle));
+#elif __APPLE__
+		_historySoundManager.reset(new SdlSoundManager(_historyPlayer.get()));
+#else
+		_historySoundManager.reset(new SdlSoundManager(_historyPlayer.get()));
+#endif
 	}
 
 	DllExport HistoryViewerState __stdcall HistoryViewerGetState()

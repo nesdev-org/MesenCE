@@ -44,7 +44,7 @@ protected:
 			SetTextState(Base64::Encode(_fileData));
 			_fileData.clear();
 		}
-	}	
+	}
 
 public:
 	FamilyBasicDataRecorder(Emulator* emu) : BaseControlDevice(emu, ControllerType::None, BaseControlDevice::ExpDevicePort2)
@@ -96,7 +96,7 @@ public:
 		_isRecording = false;
 
 		vector<uint8_t> fileData;
-		
+
 		int bitPos = 0;
 		uint8_t currentByte = 0;
 		for(uint8_t bitValue : _data) {

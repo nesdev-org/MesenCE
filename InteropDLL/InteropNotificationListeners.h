@@ -6,7 +6,7 @@
 #include "Utilities/SimpleLock.h"
 #include "InteropNotificationListener.h"
 
-typedef void(__stdcall *NotificationListenerCallback)(int, void*);
+typedef void(__stdcall* NotificationListenerCallback)(int, void*);
 
 class InteropNotificationListeners
 {
@@ -23,16 +23,14 @@ public:
 		return listener.get();
 	}
 
-	void UnregisterNotificationCallback(INotificationListener *listener)
+	void UnregisterNotificationCallback(INotificationListener* listener)
 	{
 		auto lock = _externalNotificationListenerLock.AcquireSafe();
 		_externalNotificationListeners.erase(
 			std::remove_if(
 				_externalNotificationListeners.begin(),
 				_externalNotificationListeners.end(),
-				[=](shared_ptr<INotificationListener> ptr) { return ptr.get() == listener; }
-			),
-			_externalNotificationListeners.end()
-		);
+				[=](shared_ptr<INotificationListener> ptr) { return ptr.get() == listener; }),
+			_externalNotificationListeners.end());
 	}
 };

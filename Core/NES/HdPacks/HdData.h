@@ -40,11 +40,12 @@ struct HdTileKey
 		}
 	}
 
-	size_t operator() (const HdTileKey &tile) const {
+	size_t operator()(const HdTileKey& tile) const
+	{
 		return tile.GetHashCode();
 	}
 
-	bool operator==(const HdTileKey &other) const
+	bool operator==(const HdTileKey& other) const
 	{
 		if(IsChrRamTile) {
 			return memcmp((uint8_t*)&PaletteColors, (uint8_t*)&other.PaletteColors, sizeof(PaletteColors) + sizeof(TileData)) == 0;
@@ -73,8 +74,9 @@ struct HdTileKey
 	}
 };
 
-namespace std {
-	template <> struct hash<HdTileKey>
+namespace std
+{
+	template<> struct hash<HdTileKey>
 	{
 		size_t operator()(const HdTileKey& x) const
 		{
@@ -90,7 +92,7 @@ struct HdPpuTileInfo : public HdTileKey
 	bool HorizontalMirroring = false;
 	bool VerticalMirroring = false;
 	bool BackgroundPriority = false;
-	
+
 	uint8_t BgColorIndex = 0;
 	uint8_t SpriteColorIndex = 0;
 	uint8_t BgColor = 0;
@@ -103,7 +105,7 @@ struct HdPpuPixelInfo
 {
 	HdPpuTileInfo Tile = {};
 	HdPpuTileInfo Sprite[4] = {};
-	
+
 	uint16_t TmpVideoRamAddr = 0;
 	uint8_t XScroll = 0;
 	uint8_t EmphasisBits = 0;
@@ -174,7 +176,7 @@ public:
 	virtual bool IsExcludedFromFile() { return Name.size() > 0 && Name[0] == '!'; }
 	virtual string ToString() = 0;
 
-	virtual ~HdPackCondition() { }
+	virtual ~HdPackCondition() {}
 
 	void Initialize(HdScreenInfo* screenInfo, BaseHdNesPack* hdPack)
 	{
@@ -198,7 +200,6 @@ public:
 			_resultCache = result ? 1 : 0;
 		}
 		return result;
-		
 	}
 
 protected:
@@ -375,23 +376,9 @@ public:
 			for(int i = 0; i < 16; i++) {
 				out << HexUtilities::ToHex(TileData[i]);
 			}
-			out << "," <<
-				HexUtilities::ToHex(PaletteColors, true) << "," <<
-				X << "," <<
-				Y << "," <<
-				(double)Brightness / 255 << "," <<
-				(DefaultTile ? "Y" : "N") << "," <<
-				ChrBankId << "," <<
-				TileIndex;
+			out << "," << HexUtilities::ToHex(PaletteColors, true) << "," << X << "," << Y << "," << (double)Brightness / 255 << "," << (DefaultTile ? "Y" : "N") << "," << ChrBankId << "," << TileIndex;
 		} else {
-			out << "<tile>" <<
-				pngIndex << "," <<
-				HexUtilities::ToHex(TileIndex) << "," <<
-				HexUtilities::ToHex(PaletteColors, true) << "," <<
-				X << "," <<
-				Y << "," <<
-				(double)Brightness / 255 << "," <<
-				(DefaultTile ? "Y" : "N");
+			out << "<tile>" << pngIndex << "," << HexUtilities::ToHex(TileIndex) << "," << HexUtilities::ToHex(PaletteColors, true) << "," << X << "," << Y << "," << (double)Brightness / 255 << "," << (DefaultTile ? "Y" : "N");
 		}
 
 		return out.str();
@@ -438,7 +425,7 @@ struct HdBackgroundInfo
 			}
 			out << "]";
 		}
-		
+
 		out << "<background>";
 		out << Data->PngName << ",";
 		out << (Brightness / 255.0);
@@ -498,8 +485,8 @@ public:
 	uint32_t Version = 0;
 	uint32_t OptionFlags = 0;
 
-	HdPackData() { }
-	~HdPackData() { }
+	HdPackData() {}
+	~HdPackData() {}
 
 	HdPackData(const HdPackData&) = delete;
 	HdPackData& operator=(const HdPackData&) = delete;

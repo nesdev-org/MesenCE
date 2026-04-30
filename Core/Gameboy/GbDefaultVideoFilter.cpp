@@ -100,7 +100,7 @@ void GbDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	}
 
 	uint32_t* out = GetOutputBuffer();
-	
+
 	for(uint32_t i = 0; i < GbConstants::ScreenHeight; i++) {
 		for(uint32_t j = 0; j < GbConstants::ScreenWidth; j++) {
 			out[i * GbConstants::ScreenWidth + j] = GetPixel(ppuOutputBuffer, i * GbConstants::ScreenWidth + j);

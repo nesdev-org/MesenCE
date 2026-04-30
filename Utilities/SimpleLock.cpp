@@ -97,8 +97,7 @@ void SimpleLock::Release()
 	}
 }
 
-
-LockHandler::LockHandler(SimpleLock *lock)
+LockHandler::LockHandler(SimpleLock* lock)
 {
 	_lock = lock;
 	_lock->Acquire();

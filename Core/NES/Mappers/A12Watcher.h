@@ -20,7 +20,8 @@ private:
 public:
 	void Serialize(Serializer& s) override
 	{
-		SV(_lastCycle); SV(_cyclesDown);
+		SV(_lastCycle);
+		SV(_cyclesDown);
 	}
 
 	template<uint8_t minDelay = 10>

@@ -204,7 +204,11 @@ void Rainbow::SelectHighBank(uint16_t start, uint16_t size, uint8_t reg)
 void Rainbow::SelectLowBank(uint16_t start, uint16_t size, uint8_t reg)
 {
 	switch((_lowBanks[reg] & 0xC000) >> 14) {
-		case 0: case 1: SetCpuMemoryMapping(start, start + size - 1, PrgMemoryType::PrgRom, (_lowBanks[reg] & 0x7FFF) * size, MemoryAccessType::Read); break;
+		case 0:
+		case 1:
+			SetCpuMemoryMapping(start, start + size - 1, PrgMemoryType::PrgRom, (_lowBanks[reg] & 0x7FFF) * size, MemoryAccessType::Read);
+			break;
+
 		case 2: SetCpuMemoryMapping(start, start + size - 1, GetWorkRamType(), (_lowBanks[reg] & 0x3FFF) * size, MemoryAccessType::ReadWrite); break;
 		case 3: SetCpuMemoryMapping(start, start + size - 1, PrgMemoryType::MapperRam, (_lowBanks[reg] & 0x3FFF) * size, MemoryAccessType::ReadWrite); break;
 	}
@@ -560,7 +564,10 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 		case 0x4100: return _highMode | (_lowMode << 7);
 		case 0x4120: return _chrMode | ((uint8_t)_windowEnabled << 4) | ((uint8_t)_spriteExtMode << 5) | (_chrSource << 6);
 
-		case 0x412A: case 0x412B: case 0x412C: case 0x412D:
+		case 0x412A:
+		case 0x412B:
+		case 0x412C:
+		case 0x412D:
 			return _ntControl[addr - 0x412A].ToByte();
 
 		case 0x412F: return _windowControl.ToByte();
@@ -573,14 +580,12 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 			return (
 				((uint8_t)_inHBlank << 7) |
 				((uint8_t)_inFrame << 6) |
-				(uint8_t)_slIrqPending
-				);
+				(uint8_t)_slIrqPending);
 
 		case 0x4154: return _jitterCounter;
 		case 0x4157: return ((uint8_t)_parityCounter << 7);
 
-		case 0x415F:
-		{
+		case 0x415F: {
 			uint8_t value = _mapperRam[_fpgaRamAddr];
 			_fpgaRamAddr = (_fpgaRamAddr + _fpgaRamInc) & 0x1FFF;
 			return value;
@@ -591,8 +596,7 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 			return (
 				(uint8_t)_wifiIrqPending |
 				((uint8_t)_cpuIrqPending << 6) |
-				((uint8_t)_slIrqPending << 7)
-				);
+				((uint8_t)_slIrqPending << 7));
 
 		case 0x4280: GenerateOamSlowUpdate(); break;
 		case 0x4282: GenerateExtUpdate(); break;
@@ -696,7 +700,7 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value)
 			// However, behavior on the real Rainbow devcart suggest there is a 1 clock cycle delay between the write
 			// landing and the tracked parity actually being reset. We account for that here by inverting the written parity.
 			_parityCounter = true;
-			break;		
+			break;
 
 		case 0x4158: BitUtilities::SetBits<8>(_cpuIrqReloadValue, value); break;
 		case 0x4159: BitUtilities::SetBits<0>(_cpuIrqReloadValue, value); break;
@@ -758,7 +762,7 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value)
 	} else if(addr >= 0x4116 && addr <= 0x4117) {
 		BitUtilities::SetBits<0>(_lowBanks[addr - 0x4116], value);
 		UpdateState();
-	} if(addr >= 0x4108 && addr <= 0x410F) {
+	} else if(addr >= 0x4108 && addr <= 0x410F) {
 		BitUtilities::SetBits<8>(_highBanks[addr - 0x4108], value);
 		UpdateState();
 	} else if(addr >= 0x4118 && addr <= 0x411F) {
@@ -807,7 +811,8 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 	entries.push_back(MapperStateEntry("$4106/16", "RAM Bank 0", _lowBanks[0] & 0x7FFF, MapperStateValueType::Number16));
 	string source;
 	switch((_lowBanks[0] & 0xC000) >> 14) {
-		case 0: case 1: source = "PRG-ROM"; break;
+		case 0:
+		case 1: source = "PRG-ROM"; break;
 		case 2: source = "PRG-RAM"; break;
 		case 3: source = "FPGA RAM"; break;
 	}
@@ -815,7 +820,8 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 
 	entries.push_back(MapperStateEntry("$4107/17", "PRG-RAM Bank 1", _lowBanks[1], MapperStateValueType::Number16));
 	switch((_lowBanks[0] & 0xC000) >> 14) {
-		case 0: case 1: source = "PRG-ROM"; break;
+		case 0:
+		case 1: source = "PRG-ROM"; break;
 		case 2: source = "PRG-RAM"; break;
 		case 3: source = "FPGA RAM"; break;
 	}
@@ -826,14 +832,12 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 			"$" + HexUtilities::ToHex(0x4108 + i) + "/" + HexUtilities::ToHex(0x4118 + i) + ".0-14",
 			"ROM Bank " + std::to_string(i),
 			_highBanks[i] & 0x7FFF,
-			MapperStateValueType::Number16
-		));
+			MapperStateValueType::Number16));
 
 		entries.push_back(MapperStateEntry(
 			HexUtilities::ToHex(0x4118 + i) + ".7",
 			"ROM Bank " + std::to_string(i) + " Source",
-			(string)((_highBanks[i] & 0x8000) ? "RAM" : "ROM")
-		));
+			(string)((_highBanks[i] & 0x8000) ? "RAM" : "ROM")));
 	}
 
 	entries.push_back(MapperStateEntry("$4115.0", "FPGA RAM Bank", _fpgaRamBank, MapperStateValueType::Number8));
@@ -842,11 +846,16 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 	entries.push_back(MapperStateEntry("$4120.0-2", "CHR Banking Mode", _chrMode, MapperStateValueType::Number16));
 	entries.push_back(MapperStateEntry("$4120.4", "Window Split Mode", _windowEnabled));
 	entries.push_back(MapperStateEntry("$4120.5", "Sprite Extended Mode", _spriteExtMode));
-	entries.push_back(MapperStateEntry("$4120.6-7", "CHR Source", string(
-		_chrSource == 0 ? "CHR ROM" : 
-		_chrSource == 1 ? "CHR RAM" : 
-		_chrSource == 2 ? "FPGA RAM" : 
-		                  "Nametable RAM"), _chrSource));
+
+	string src;
+	switch(_chrSource) {
+		case 0: src = "CHR ROM"; break;
+		case 1: src = "CHR RAM"; break;
+		case 2: src = "FPGA RAM"; break;
+		default: src = "Nametable RAM"; break;
+	}
+
+	entries.push_back(MapperStateEntry("$4120.6-7", "CHR Source", src, _chrSource));
 	entries.push_back(MapperStateEntry("$4121.0-5", "Extended BG CHR Bank", _bgExtModeOffset, MapperStateValueType::Number8));
 
 	entries.push_back(MapperStateEntry("", "Fill Mode"));
@@ -885,8 +894,7 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 			"$" + HexUtilities::ToHex(0x4130 + i) + "/" + HexUtilities::ToHex(0x4140 + i),
 			"CHR Bank " + std::to_string(i),
 			_chrBanks[i],
-			MapperStateValueType::Number16
-		));
+			MapperStateValueType::Number16));
 	}
 
 	entries.push_back(MapperStateEntry("", "Scanline IRQ"));

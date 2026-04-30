@@ -16,7 +16,7 @@ private:
 
 	unique_ptr<FdsAudio> _audio;
 	shared_ptr<FdsInputButtons> _input;
-	
+
 	NesConfig* _settings = nullptr;
 	NesCpu* _cpu = nullptr;
 	NesMemoryManager* _memoryManager = nullptr;
@@ -31,7 +31,7 @@ private:
 	bool _soundRegEnabled = true;
 
 	uint8_t _writeDataReg = 0;
-	
+
 	bool _motorOn = false;
 	bool _resetTransfer = false;
 	bool _readMode = false;
@@ -61,14 +61,14 @@ private:
 	//Internal values
 	uint32_t _diskNumber = Fds::NoDiskInserted;
 	uint32_t _diskPosition = 0;
-	uint32_t _delay = 0;	
+	uint32_t _delay = 0;
 	uint16_t _crcAccumulator = 0;
 	bool _previousCrcControlFlag = false;
 	bool _gapEnded = true;
 	bool _scanningDisk = false;
 	bool _transferComplete = false;
 	bool _useQdFormat = false;
-	
+
 	vector<uint8_t> _fdsRawData;
 	vector<vector<uint8_t>> _fdsDiskSides;
 	vector<vector<uint8_t>> _fdsDiskHeaders;
@@ -90,7 +90,7 @@ protected:
 	bool EnableCpuClockHook() override { return true; }
 
 	void InitMapper() override;
-	void InitMapper(RomData &romData) override;
+	void InitMapper(RomData& romData) override;
 	void LoadDiskData(vector<uint8_t> ipsData = vector<uint8_t>());
 	vector<uint8_t> CreateIpsPatch();
 	void Reset(bool softReset) override;
@@ -102,7 +102,7 @@ protected:
 	void ProcessAutoDiskInsert();
 
 	void ClockIrq();
-	
+
 	void ProcessCpuClock() override;
 	void UpdateCrc(uint8_t value);
 

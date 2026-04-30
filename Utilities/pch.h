@@ -33,7 +33,7 @@ using std::optional;
 	// it fails to compile when LTO is not enabled.
 	#if !defined(__MINGW32__) && (defined(__clang__) || defined(__GNUC__)) && defined(HAVE_LTO)
 		#define __forceinline __attribute__((always_inline)) inline
-	#else 
+	#else
 		#define __forceinline inline
 	#endif
 #endif

@@ -10,7 +10,10 @@ class ArkanoidController : public BaseControlDevice
 private:
 	uint32_t _currentValue = (0xF4 - 0x54) / 2;
 	uint32_t _stateBuffer = 0;
-	enum Buttons { Fire };
+	enum Buttons
+	{
+		Fire
+	};
 
 protected:
 	bool HasCoordinates() override { return true; }
@@ -31,7 +34,8 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_stateBuffer); SV(_currentValue);
+		SV(_stateBuffer);
+		SV(_currentValue);
 	}
 
 	void RefreshStateBuffer() override

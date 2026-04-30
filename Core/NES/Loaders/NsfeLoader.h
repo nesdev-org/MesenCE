@@ -15,37 +15,37 @@ private:
 		memcpy(dest, source.c_str(), std::min(source.size(), (size_t)maxLength - 1));
 	}
 
-	void Read(uint8_t* &data, uint8_t& dest)
+	void Read(uint8_t*& data, uint8_t& dest)
 	{
 		dest = data[0];
 		data++;
 	}
 
-	void Read(uint8_t* &data, uint16_t& dest)
+	void Read(uint8_t*& data, uint16_t& dest)
 	{
 		dest = data[0] | (data[1] << 8);
 		data += 2;
 	}
 
-	void Read(uint8_t* &data, uint32_t& dest)
+	void Read(uint8_t*& data, uint32_t& dest)
 	{
 		dest = data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 		data += 4;
 	}
 
-	void Read(uint8_t* &data, int32_t& dest)
+	void Read(uint8_t*& data, int32_t& dest)
 	{
 		dest = data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24);
 		data += 4;
 	}
 
-	void Read(uint8_t* &data, char* dest, size_t len)
+	void Read(uint8_t*& data, char* dest, size_t len)
 	{
 		memcpy(dest, data, len);
 		data += len;
 	}
 
-	vector<string> ReadStrings(uint8_t* &data, uint8_t* chunkEnd)
+	vector<string> ReadStrings(uint8_t*& data, uint8_t* chunkEnd)
 	{
 		vector<string> strings;
 		stringstream ss;
@@ -63,7 +63,7 @@ private:
 		return strings;
 	}
 
-	string ReadFourCC(uint8_t* &data)
+	string ReadFourCC(uint8_t*& data)
 	{
 		stringstream ss;
 		for(int i = 0; i < 4; i++) {
@@ -73,7 +73,7 @@ private:
 		return ss.str();
 	}
 
-	bool ReadChunk(uint8_t* &data, uint8_t* dataEnd, RomData& romData, uint8_t* fileStart)
+	bool ReadChunk(uint8_t*& data, uint8_t* dataEnd, RomData& romData, uint8_t* fileStart)
 	{
 		if(data + 4 > dataEnd) {
 			return false;
@@ -110,7 +110,7 @@ private:
 			//Pad start of file to make the first block start at a multiple of 4k
 			romData.PrgRom.insert(romData.PrgRom.end(), header.LoadAddress % 4096, 0);
 
-			romData.PrgRom.insert(romData.PrgRom.end(), (uint8_t*)data, data+length);
+			romData.PrgRom.insert(romData.PrgRom.end(), (uint8_t*)data, data + length);
 
 			//Pad out the last block to be a multiple of 4k
 			if(romData.PrgRom.size() % 4096 != 0) {
@@ -173,7 +173,7 @@ public:
 
 	void LoadRom(RomData& romData, vector<uint8_t>& romFile)
 	{
-		NsfHeader &header = romData.Info.NsfInfo;
+		NsfHeader& header = romData.Info.NsfInfo;
 
 		InitHeader(header);
 

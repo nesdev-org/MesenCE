@@ -2,18 +2,18 @@
 using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Utilities;
+using Mesen.Windows;
 using ReactiveUI.Fody.Helpers;
 using System;
-using System.Security.Cryptography;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Mesen.Windows;
 
 namespace Mesen.ViewModels
 {

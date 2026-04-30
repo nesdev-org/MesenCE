@@ -16,7 +16,7 @@ private:
 	vector<vector<uint8_t>> _chunks;
 	bool _useChunks = false;
 
-	void FromStream(std::istream &input, vector<uint8_t> &output);
+	void FromStream(std::istream& input, vector<uint8_t>& output);
 
 	void LoadFile();
 
@@ -24,13 +24,13 @@ public:
 	static const std::initializer_list<string> RomExtensions;
 
 	VirtualFile();
-	VirtualFile(const string &archivePath, const string innerFile);
-	VirtualFile(const string &file);
-	VirtualFile(const void *buffer, size_t bufferSize, string fileName = "noname");
-	VirtualFile(std::istream &input, string filePath);
+	VirtualFile(const string& archivePath, const string innerFile);
+	VirtualFile(const string& file);
+	VirtualFile(const void* buffer, size_t bufferSize, string fileName = "noname");
+	VirtualFile(std::istream& input, string filePath);
 
 	operator std::string() const;
-	
+
 	bool IsValid();
 	bool IsArchive();
 	string GetFilePath();
@@ -46,13 +46,13 @@ public:
 
 	vector<uint8_t>& GetData();
 
-	bool ReadFile(vector<uint8_t> &out);
-	bool ReadFile(std::stringstream &out);
+	bool ReadFile(vector<uint8_t>& out);
+	bool ReadFile(std::stringstream& out);
 	bool ReadFile(uint8_t* out, uint32_t expectedSize);
 
 	uint8_t ReadByte(uint32_t offset);
 
-	bool ApplyPatch(VirtualFile &patch);
+	bool ApplyPatch(VirtualFile& patch);
 
 	template<typename T>
 	bool ReadChunk(T& container, int start, int length)

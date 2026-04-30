@@ -171,7 +171,7 @@ public class ElfImporterWs : ElfImporter
 			absAddr.Address = (int)((addr & 0xFFFF) | ((addr & 0xF00000) >> 4));
 			absAddr.Type = MemoryType.WsCartRam;
 		}
-		
+
 		symbolInfo = new() {
 			Address = absAddr,
 			Name = symbol.Name

@@ -55,7 +55,7 @@ protected:
 			if(!IsNes20() || _romInfo.Header.GetSaveRamSize() == 128) {
 				_extraEeprom.reset(new Eeprom24C01(_console));
 			}
-			
+
 			//All mapper 157 games have an internal 256-byte EEPROM
 			_standardEeprom.reset(new Eeprom24C02(_console));
 		} else if(_romInfo.MapperID == 159) {
@@ -64,7 +64,7 @@ protected:
 		} else if(_romInfo.MapperID == 16) {
 			//"INES Mapper 016 submapper 4: FCG-1/2 ASIC, no serial EEPROM, banked CHR-ROM"
 			//"INES Mapper 016 submapper 5: LZ93D50 ASIC and no or 256-byte serial EEPROM, banked CHR-ROM"
-			
+
 			//Add a 256 byte serial EEPROM (24C02)
 			if(_romInfo.SubMapperID == 0 || (_romInfo.SubMapperID == 5 && _saveRamSize == 256)) {
 				//Connect a 256-byte EEPROM for iNES roms, and when submapper 5 + 256 bytes of save ram in header
@@ -159,7 +159,14 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0x000F) {
-			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
+			case 0x00:
+			case 0x01:
+			case 0x02:
+			case 0x03:
+			case 0x04:
+			case 0x05:
+			case 0x06:
+			case 0x07:
 				_chrRegs[addr & 0x07] = value;
 				if(_romInfo.MapperID == 153 || GetPrgPageCount() >= 0x20) {
 					_prgBankSelect = 0;
@@ -194,7 +201,7 @@ protected:
 			case 0x0A:
 				_irqEnabled = (value & 0x01) == 0x01;
 
-				//Wiki claims there is no reload value, however this seems to be the only way to make Famicom Jump II - Saikyou no 7 Nin work properly 
+				//Wiki claims there is no reload value, however this seems to be the only way to make Famicom Jump II - Saikyou no 7 Nin work properly
 				if(_romInfo.MapperID != 16 || _romInfo.SubMapperID != 4) {
 					//"On the LZ93D50 (Submapper 5), writing to this register also copies the latch to the actual counter."
 					_irqCounter = _irqReload;

@@ -13,13 +13,13 @@ class GsuTraceLogger : public BaseTraceLogger<GsuTraceLogger, GsuState>
 private:
 	SnesPpu* _ppu = nullptr;
 	SnesMemoryManager* _memoryManager = nullptr;
-	
+
 protected:
 	RowDataType GetFormatTagType(string& tag) override;
 
 public:
 	GsuTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, SnesPpu* ppu, SnesMemoryManager* memoryManager);
-	
+
 	void GetTraceRow(string& output, GsuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
 

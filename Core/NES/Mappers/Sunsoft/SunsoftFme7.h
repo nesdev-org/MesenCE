@@ -86,7 +86,14 @@ protected:
 				break;
 			case 0xA000:
 				switch(_command) {
-					case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
 						SelectChrPage(_command, value);
 						break;
 
@@ -96,7 +103,9 @@ protected:
 						break;
 					}
 
-					case 9: case 0xA: case 0xB:
+					case 9:
+					case 0xA:
+					case 0xB:
 						SelectPrgPage(_command - 9, value & 0x3F);
 						break;
 

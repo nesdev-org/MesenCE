@@ -24,7 +24,7 @@ public:
 	{
 		_prgBank = value & 0x0F;
 		RefreshMappings();
-		
+
 		//Block all subsequent writes
 		_memoryManager->MapRegisters(0x0000, 0x7FFF, RegisterAccess::None);
 	}

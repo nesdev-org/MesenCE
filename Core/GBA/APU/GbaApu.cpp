@@ -76,7 +76,7 @@ void GbaApu::InternalRun()
 		_prevClockCount = clockCount;
 		return;
 	}
-	
+
 	uint32_t clocksToRun = (uint32_t)(clockCount - _prevClockCount);
 
 	GbaConfig& cfg = _settings->GetGbaConfig();
@@ -106,7 +106,7 @@ void GbaApu::InternalRun()
 				_square1->Exec(minTimer);
 				changed |= output != _square1->GetRawOutput();
 			}
-			
+
 			if constexpr(sq2Enabled) {
 				uint8_t output = _square2->GetRawOutput();
 				_square2->Exec(minTimer);
@@ -138,36 +138,40 @@ void GbaApu::InternalRun()
 
 			double gbVolume = _state.GbVolume ? _state.GbVolume : 0.5;
 
-			int16_t gbLeftOutput = (
+			int16_t baseGbLeftOutput =
 				(_square1->GetOutput() * (int32_t)(cfg.Square1Vol & _state.EnableLeftSq1) / 100) +
 				(_square2->GetOutput() * (int32_t)(cfg.Square2Vol & _state.EnableLeftSq2) / 100) +
 				(_wave->GetOutput() * (int32_t)(cfg.WaveVol & _state.EnableLeftWave) / 100) +
-				(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableLeftNoise) / 100)
-			) * (_state.LeftVolume + 1) * gbVolume;
+				(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableLeftNoise) / 100);
 
-			_leftSample = ((std::clamp(
+			int16_t gbLeftOutput = baseGbLeftOutput * (_state.LeftVolume + 1) * gbVolume;
+
+			int32_t leftSample =
 				_state.Bias +
 				gbLeftOutput +
 				((_state.EnableLeftA ? (_state.DmaSampleA * (int32_t)cfg.ChannelAVol / 100) : 0) << (_state.VolumeA + 1)) +
-				((_state.EnableLeftB ? (_state.DmaSampleB * (int32_t)cfg.ChannelBVol / 100) : 0) << (_state.VolumeB + 1))
-			, 0, 0x3FF) & bitRateMask) - _state.Bias) * 32;
+				((_state.EnableLeftB ? (_state.DmaSampleB * (int32_t)cfg.ChannelBVol / 100) : 0) << (_state.VolumeB + 1));
 
-			int16_t gbRightOutput = (
+			_leftSample = ((std::clamp(leftSample, 0, 0x3FF) & bitRateMask) - _state.Bias) * 32;
+
+			int16_t baseGbRightOutput =
 				(_square1->GetOutput() * (int32_t)(cfg.Square1Vol & _state.EnableRightSq1) / 100) +
 				(_square2->GetOutput() * (int32_t)(cfg.Square2Vol & _state.EnableRightSq2) / 100) +
 				(_wave->GetOutput() * (int32_t)(cfg.WaveVol & _state.EnableRightWave) / 100) +
-				(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableRightNoise) / 100)
-			) * (_state.RightVolume + 1) * gbVolume;
+				(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableRightNoise) / 100);
 
-			_rightSample = ((std::clamp(
+			int16_t gbRightOutput = baseGbRightOutput * (_state.RightVolume + 1) * gbVolume;
+
+			int32_t rightSample =
 				_state.Bias +
 				gbRightOutput +
 				((_state.EnableRightA ? (_state.DmaSampleA * (int32_t)cfg.ChannelAVol / 100) : 0) << (_state.VolumeA + 1)) +
-				((_state.EnableRightB ? (_state.DmaSampleB * (int32_t)cfg.ChannelBVol / 100) : 0) << (_state.VolumeB + 1))
-			, 0, 0x3FF) & bitRateMask) - _state.Bias) * 32;
+				((_state.EnableRightB ? (_state.DmaSampleB * (int32_t)cfg.ChannelBVol / 100) : 0) << (_state.VolumeB + 1));
+
+			_rightSample = ((std::clamp(rightSample, 0, 0x3FF) & bitRateMask) - _state.Bias) * 32;
 		}
 
-			//Use low pass filter and subtract the result to filter out DC offset
+		//Use low pass filter and subtract the result to filter out DC offset
 		_soundBuffer[_sampleCount] = _leftSample - _filterL.Process(_leftSample);
 		_soundBuffer[_sampleCount + 1] = _rightSample - _filterR.Process(_rightSample);
 		_sampleCount += 2;
@@ -203,7 +207,6 @@ void GbaApu::ClockFrameSequencer()
 
 	_state.FrameSequenceStep = (_state.FrameSequenceStep + 1) & 0x07;
 }
-
 
 uint8_t GbaApu::ReadRegister(uint32_t addr)
 {
@@ -256,8 +259,7 @@ uint8_t GbaApu::ReadRegister(uint32_t addr)
 				((_state.ApuEnabled && _noise->Enabled()) ? 0x08 : 0) |
 				((_state.ApuEnabled && _wave->Enabled()) ? 0x04 : 0) |
 				((_state.ApuEnabled && _square2->Enabled()) ? 0x02 : 0) |
-				((_state.ApuEnabled && _square1->Enabled()) ? 0x01 : 0)
-			);
+				((_state.ApuEnabled && _square1->Enabled()) ? 0x01 : 0));
 
 		case 0x85: return 0;
 		case 0x86: return 0;
@@ -268,8 +270,22 @@ uint8_t GbaApu::ReadRegister(uint32_t addr)
 		case 0x8A: return 0;
 		case 0x8B: return 0;
 
-		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
-		case 0x98: case 0x99: case 0x9A: case 0x9B: case 0x9C: case 0x9D: case 0x9E: case 0x9F:
+		case 0x90:
+		case 0x91:
+		case 0x92:
+		case 0x93:
+		case 0x94:
+		case 0x95:
+		case 0x96:
+		case 0x97:
+		case 0x98:
+		case 0x99:
+		case 0x9A:
+		case 0x9B:
+		case 0x9C:
+		case 0x9D:
+		case 0x9E:
+		case 0x9F:
 			return _wave->ReadRam(addr);
 
 		default:
@@ -419,19 +435,39 @@ void GbaApu::WriteRegister(GbaAccessModeVal mode, uint32_t addr, uint8_t value)
 		case 0x8A: break;
 		case 0x8B: break;
 
-		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
-		case 0x98: case 0x99: case 0x9A: case 0x9B: case 0x9C: case 0x9D: case 0x9E: case 0x9F:
+		case 0x90:
+		case 0x91:
+		case 0x92:
+		case 0x93:
+		case 0x94:
+		case 0x95:
+		case 0x96:
+		case 0x97:
+		case 0x98:
+		case 0x99:
+		case 0x9A:
+		case 0x9B:
+		case 0x9C:
+		case 0x9D:
+		case 0x9E:
+		case 0x9F:
 			_wave->WriteRam(addr, value);
 			break;
 
-		case 0xA0: case 0xA1: case 0xA2: case 0xA3:
+		case 0xA0:
+		case 0xA1:
+		case 0xA2:
+		case 0xA3:
 			if(_state.ApuEnabled) {
 				bool commit = (addr & 0x03) == 0x03 || (mode & GbaAccessMode::Byte) || ((mode & GbaAccessMode::HalfWord) && (addr & 0x01));
 				_fifo[0].Push(value, addr & 0x03, commit);
 			}
 			break;
 
-		case 0xA4: case 0xA5: case 0xA6: case 0xA7:
+		case 0xA4:
+		case 0xA5:
+		case 0xA6:
+		case 0xA7:
 			if(_state.ApuEnabled) {
 				bool commit = (addr & 0x03) == 0x03 || (mode & GbaAccessMode::Byte) || ((mode & GbaAccessMode::HalfWord) && (addr & 0x01));
 				_fifo[1].Push(value, addr & 0x03, commit);
@@ -475,12 +511,11 @@ void GbaApu::ClockFifo(uint8_t timerIndex)
 
 void GbaApu::UpdateEnabledChannels()
 {
-	_enabledChannels = (
+	_enabledChannels =
 		(_noise->Enabled() ? 0x08 : 0) |
 		(_wave->Enabled() ? 0x04 : 0) |
 		(_square2->Enabled() ? 0x02 : 0) |
-		(_square1->Enabled() ? 0x01 : 0)
-	);
+		(_square1->Enabled() ? 0x01 : 0);
 }
 
 void GbaApu::UpdateSampleRate()
@@ -553,7 +588,7 @@ void GbaApu::Serialize(Serializer& s)
 	SV(_state.RightVolume);
 
 	SV(_state.FrameSequenceStep);
-	
+
 	SV(_state.ApuEnabled);
 
 	SV(_state.Bias);

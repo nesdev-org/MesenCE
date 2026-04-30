@@ -1,17 +1,17 @@
-﻿using Mesen.Debugger.Labels;
+﻿using Avalonia.Controls;
+using Mesen.Debugger.Labels;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.Windows;
 using Mesen.Interop;
+using Mesen.Localization;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Linq;
-using Avalonia.Controls;
-using Mesen.Debugger.Utilities;
-using Mesen.Localization;
-using Mesen.Debugger.Windows;
 
 namespace Mesen.Debugger.ViewModels
 {

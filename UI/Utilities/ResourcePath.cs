@@ -18,7 +18,7 @@ namespace Mesen.Utilities
 
 		public string FileName { get { return Compressed ? InnerFile : System.IO.Path.GetFileName(Path); } }
 		public string Folder { get { return System.IO.Path.GetDirectoryName(Path) ?? ""; } }
-		
+
 		public string ReadablePath
 		{
 			get

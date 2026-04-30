@@ -21,7 +21,7 @@ namespace Mesen.Utilities
 			} else {
 				GameDipSwitches gameSwitches = new();
 				for(int i = 0; i < dipSwitches.DipSwitchCount; i++) {
-					DipSwitchDefinition def = new("Unknown Switch #" + (i+1));
+					DipSwitchDefinition def = new("Unknown Switch #" + (i + 1));
 					def.Options.Add("Off");
 					def.Options.Add("On");
 					gameSwitches.DipSwitches.Add(def);
@@ -59,7 +59,7 @@ namespace Mesen.Utilities
 							}
 							gameDipswitches.DipSwitches.Add(def);
 						} else {
-							DipSwitchDefinition def = new("Unknown Switch #" + (unknownCount+1));
+							DipSwitchDefinition def = new("Unknown Switch #" + (unknownCount + 1));
 							def.Options.Add("Off");
 							def.Options.Add("On");
 							unknownCount++;

@@ -26,7 +26,7 @@ protected:
 		if(_videoConfig.Hue != config.Hue || _videoConfig.Saturation != config.Saturation || _videoConfig.Contrast != config.Contrast || _videoConfig.Brightness != config.Brightness) {
 			InitLookupTable();
 		}
-		
+
 		bool blendFrames = _console->GetModel() == SmsModel::GameGear && smsConfig.GgBlendFrames && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused();
 		if(_blendFrames != blendFrames) {
 			_blendFrames = blendFrames;
@@ -82,7 +82,7 @@ public:
 	{
 		uint16_t* in = ppuOutputBuffer;
 		uint32_t* out = GetOutputBuffer();
-		
+
 		OverscanDimensions overscan = GetOverscan();
 		FrameInfo frame = _frameInfo;
 
@@ -91,7 +91,7 @@ public:
 
 		for(uint32_t y = 0; y < frame.Height; y++) {
 			if(y + overscan.Top < linesToSkip || y > linesToSkip + scanlineCount - overscan.Top) {
-				memset(out+y*frame.Width, 0, frame.Width * sizeof(uint32_t));
+				memset(out + y * frame.Width, 0, frame.Width * sizeof(uint32_t));
 			} else {
 				for(uint32_t x = 0; x < frame.Width; x++) {
 					out[(y * frame.Width) + x] = GetPixel(in, (y + overscan.Top - linesToSkip) * _baseFrameInfo.Width + x + overscan.Left);

@@ -67,7 +67,7 @@ DebugEventInfo WsEventManager::GetEvent(uint16_t y, uint16_t x)
 	}
 
 	//If no exact match, extend to the background color
-	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--){
+	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--) {
 		DebugEventInfo& evt = _sentEvents[i];
 		if(std::abs((int)evt.Cycle - (int)x) <= 1 && std::abs((int)evt.Scanline - (int)y) <= 1) {
 			return evt;
@@ -185,12 +185,12 @@ FrameInfo WsEventManager::GetDisplayBufferSize()
 
 void WsEventManager::DrawScreen(uint32_t* buffer)
 {
-	uint16_t *src = _ppuBuffer;
+	uint16_t* src = _ppuBuffer;
 	uint16_t screenWidth = _ppu->GetScreenWidth();
 	for(uint32_t y = 0, len = WsConstants::ScreenHeight * 2; y < len; y++) {
 		for(uint32_t x = 0; x < WsConstants::ScreenWidth * 2; x++) {
 			int srcOffset = (y >> 1) * screenWidth + (x >> 1);
-			buffer[(y + 2)*WsEventManager::ScanlineWidth + x] = ColorUtilities::Bgr444ToArgb(src[srcOffset]);
+			buffer[(y + 2) * WsEventManager::ScanlineWidth + x] = ColorUtilities::Bgr444ToArgb(src[srcOffset]);
 		}
 	}
 }

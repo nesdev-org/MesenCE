@@ -67,7 +67,7 @@ void SnesDefaultVideoFilter::OnBeforeApplyFilter()
 {
 	VideoConfig& config = _emu->GetSettings()->GetVideoConfig();
 	SnesConfig& snesConfig = _emu->GetSettings()->GetSnesConfig();
-	
+
 	if(_videoConfig.Hue != config.Hue || _videoConfig.Saturation != config.Saturation || _videoConfig.Contrast != config.Contrast || _videoConfig.Brightness != config.Brightness) {
 		InitLookupTable();
 	}
@@ -76,16 +76,16 @@ void SnesDefaultVideoFilter::OnBeforeApplyFilter()
 	_videoConfig = config;
 }
 
-void SnesDefaultVideoFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
+void SnesDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 {
 	if(_emu->GetRomInfo().Format == RomFormat::Spc) {
 		return;
 	}
 
-	uint32_t *out = GetOutputBuffer();
+	uint32_t* out = GetOutputBuffer();
 	FrameInfo frameInfo = _frameInfo;
 	OverscanDimensions overscan = GetOverscan();
-	
+
 	uint32_t width = _baseFrameInfo.Width;
 	uint32_t xOffset = overscan.Left;
 	uint32_t yOffset = overscan.Top * width;
@@ -99,7 +99,7 @@ void SnesDefaultVideoFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
 	} else {
 		for(uint32_t i = 0; i < frameInfo.Height; i++) {
 			for(uint32_t j = 0; j < frameInfo.Width; j++) {
-				out[i*frameInfo.Width+j] = GetPixel(ppuOutputBuffer, i * width + j + yOffset + xOffset);
+				out[i * frameInfo.Width + j] = GetPixel(ppuOutputBuffer, i * width + j + yOffset + xOffset);
 			}
 		}
 	}

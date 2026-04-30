@@ -32,8 +32,8 @@
 #include "Shared/MemoryOperationType.h"
 
 #ifdef _MSC_VER
-//TODO MSVC seems to trigger this by mistake because of the macros?
-#pragma warning ( disable : 4702 ) //unreachable code
+	//TODO MSVC seems to trigger this by mistake because of the macros?
+	#pragma warning(disable : 4702) //unreachable code
 #endif
 
 #define lua_pushintvalue(name, value) lua_pushliteral(lua, #name); lua_pushinteger(lua, (int)value); lua_settable(lua, -3);
@@ -86,7 +86,7 @@ void LuaApi::LuaPushIntValue(lua_State* lua, string name, int value)
 	lua_settable(lua, -3);
 }
 
-int LuaApi::GetLibrary(lua_State *lua)
+int LuaApi::GetLibrary(lua_State* lua)
 {
 	static const luaL_Reg apilib[] = {
 		{ "getMemorySize", LuaApi::GetMemorySize },
@@ -100,7 +100,7 @@ int LuaApi::GetLibrary(lua_State *lua)
 
 		{ "readWord", LuaApi::ReadMemory16 }, //for backward compatibility
 		{ "writeWord", LuaApi::WriteMemory16 }, //for backward compatibility
-		
+
 		{ "convertAddress", LuaApi::ConvertAddress },
 		{ "getLabelAddress", LuaApi::GetLabelAddress },
 
@@ -144,7 +144,7 @@ int LuaApi::GetLibrary(lua_State *lua)
 		{ "getAccessCounters", LuaApi::GetAccessCounters },
 		{ "resetAccessCounters", LuaApi::ResetAccessCounters },
 
-		{ "getCdlData", LuaApi::GetCdlData},
+		{ "getCdlData", LuaApi::GetCdlData },
 
 		{ "addCheat", LuaApi::AddCheat },
 		{ "clearCheats", LuaApi::ClearCheats },
@@ -160,13 +160,12 @@ int LuaApi::GetLibrary(lua_State *lua)
 		{ "getCpuCycleCount", LuaApi::GetCpuCycleCount },
 		{ "getMasterClock", LuaApi::GetMasterClock },
 
-
 		{ "selectDrawSurface", LuaApi::SelectDrawSurface },
 
 		{ "getScriptDataFolder", LuaApi::GetScriptDataFolder },
 		{ "getRomInfo", LuaApi::GetRomInfo },
 		{ "getLogWindowLog", LuaApi::GetLogWindowLog },
-		{ NULL,NULL }
+		{ NULL, NULL }
 	};
 
 	luaL_newlib(lua, apilib);
@@ -249,7 +248,7 @@ int LuaApi::GetMemorySize(lua_State* lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::ReadMemory(lua_State *lua)
+int LuaApi::ReadMemory(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(3);
@@ -266,7 +265,7 @@ int LuaApi::ReadMemory(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::WriteMemory(lua_State *lua)
+int LuaApi::WriteMemory(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	int type = l.ReadInteger();
@@ -282,7 +281,7 @@ int LuaApi::WriteMemory(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::ReadMemory16(lua_State *lua)
+int LuaApi::ReadMemory16(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(3);
@@ -316,7 +315,7 @@ int LuaApi::ReadMemory32(lua_State* lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::WriteMemory16(lua_State *lua)
+int LuaApi::WriteMemory16(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	int type = l.ReadInteger();
@@ -347,7 +346,7 @@ int LuaApi::WriteMemory32(lua_State* lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::ConvertAddress(lua_State *lua)
+int LuaApi::ConvertAddress(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(3);
@@ -403,7 +402,7 @@ int LuaApi::GetLabelAddress(lua_State* lua)
 	return 1;
 }
 
-int LuaApi::RegisterMemoryCallback(lua_State *lua)
+int LuaApi::RegisterMemoryCallback(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(6);
@@ -434,11 +433,11 @@ int LuaApi::RegisterMemoryCallback(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::UnregisterMemoryCallback(lua_State *lua)
+int LuaApi::UnregisterMemoryCallback(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(6);
-	
+
 	MemoryType memType = (MemoryType)l.ReadInteger((int)_context->GetDefaultMemType());
 	CpuType cpuType = (CpuType)l.ReadInteger((int)_context->GetDefaultCpuType());
 	int endAddr = l.ReadInteger(-1);
@@ -463,7 +462,7 @@ int LuaApi::UnregisterMemoryCallback(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::RegisterEventCallback(lua_State *lua)
+int LuaApi::RegisterEventCallback(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	EventType type = (EventType)l.ReadInteger();
@@ -476,7 +475,7 @@ int LuaApi::RegisterEventCallback(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::UnregisterEventCallback(lua_State *lua)
+int LuaApi::UnregisterEventCallback(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	EventType type = (EventType)l.ReadInteger();
@@ -504,7 +503,7 @@ int LuaApi::MeasureString(lua_State* lua)
 	return 1;
 }
 
-int LuaApi::DrawString(lua_State *lua)
+int LuaApi::DrawString(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(8);
@@ -524,7 +523,7 @@ int LuaApi::DrawString(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::DrawLine(lua_State *lua)
+int LuaApi::DrawLine(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(7);
@@ -543,7 +542,7 @@ int LuaApi::DrawLine(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::DrawPixel(lua_State *lua)
+int LuaApi::DrawPixel(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(5);
@@ -560,7 +559,7 @@ int LuaApi::DrawPixel(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::DrawRectangle(lua_State *lua)
+int LuaApi::DrawRectangle(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(8);
@@ -580,7 +579,7 @@ int LuaApi::DrawRectangle(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::ClearScreen(lua_State *lua)
+int LuaApi::ClearScreen(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -659,14 +658,14 @@ std::pair<unique_ptr<BaseVideoFilter>, FrameInfo> LuaApi::GetRenderedFrame()
 	return std::make_pair(std::move(filter), frameSize);
 }
 
-int LuaApi::GetScreenBuffer(lua_State *lua)
+int LuaApi::GetScreenBuffer(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 
 	auto [filter, frameSize] = GetRenderedFrame();
 	uint32_t* rgbBuffer = filter->GetOutputBuffer();
 
-	lua_createtable(lua, frameSize.Height*frameSize.Width, 0);
+	lua_createtable(lua, frameSize.Height * frameSize.Width, 0);
 	for(int32_t i = 0, len = frameSize.Height * frameSize.Width; i < len; i++) {
 		lua_pushinteger(lua, rgbBuffer[i] & 0xFFFFFF);
 		lua_rawseti(lua, -2, i + 1);
@@ -675,10 +674,10 @@ int LuaApi::GetScreenBuffer(lua_State *lua)
 	return 1;
 }
 
-int LuaApi::SetScreenBuffer(lua_State *lua)
+int LuaApi::SetScreenBuffer(lua_State* lua)
 {
 	LuaCallHelper l(lua);
-	
+
 	FrameInfo size = InternalGetScreenSize();
 
 	int startFrame = _emu->GetFrameCount();
@@ -686,17 +685,17 @@ int LuaApi::SetScreenBuffer(lua_State *lua)
 
 	luaL_checktype(lua, 1, LUA_TTABLE);
 	for(int i = 0, len = size.Height * size.Width; i < len; i++) {
-		lua_rawgeti(lua, 1, i+1);
+		lua_rawgeti(lua, 1, i + 1);
 		uint32_t color = (uint32_t)lua_tointeger(lua, -1);
 		lua_pop(lua, 1);
 		cmd->SetPixel(i, color ^ 0xFF000000);
 	}
-	
+
 	_emu->GetDebugHud()->AddCommand(std::move(cmd));
 	return l.ReturnCount();
 }
 
-int LuaApi::GetPixel(lua_State *lua)
+int LuaApi::GetPixel(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	int y = l.ReadInteger();
@@ -711,7 +710,7 @@ int LuaApi::GetPixel(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::GetMouseState(lua_State *lua)
+int LuaApi::GetMouseState(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	MousePosition pos = KeyManager::GetMousePosition();
@@ -721,14 +720,14 @@ int LuaApi::GetMouseState(lua_State *lua)
 	lua_pushintvalue(y, pos.Y);
 	lua_pushdoublevalue(relativeX, pos.RelativeX);
 	lua_pushdoublevalue(relativeY, pos.RelativeY);
-	
+
 	lua_pushboolvalue(left, KeyManager::IsMouseButtonPressed(MouseButton::LeftButton));
 	lua_pushboolvalue(middle, KeyManager::IsMouseButtonPressed(MouseButton::MiddleButton));
 	lua_pushboolvalue(right, KeyManager::IsMouseButtonPressed(MouseButton::RightButton));
 	return 1;
 }
 
-int LuaApi::Log(lua_State *lua)
+int LuaApi::Log(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	string text = l.ReadString();
@@ -737,7 +736,7 @@ int LuaApi::Log(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::DisplayMessage(lua_State *lua)
+int LuaApi::DisplayMessage(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	string text = l.ReadString();
@@ -747,7 +746,7 @@ int LuaApi::DisplayMessage(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::Reset(lua_State *lua)
+int LuaApi::Reset(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -765,7 +764,7 @@ int LuaApi::Stop(lua_State* lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::BreakExecution(lua_State *lua)
+int LuaApi::BreakExecution(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -774,7 +773,7 @@ int LuaApi::BreakExecution(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::Resume(lua_State *lua)
+int LuaApi::Resume(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -783,7 +782,7 @@ int LuaApi::Resume(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::Step(lua_State *lua)
+int LuaApi::Step(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(3);
@@ -802,7 +801,7 @@ int LuaApi::Step(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::Rewind(lua_State *lua)
+int LuaApi::Rewind(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	int seconds = l.ReadInteger();
@@ -813,7 +812,7 @@ int LuaApi::Rewind(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::TakeScreenshot(lua_State *lua)
+int LuaApi::TakeScreenshot(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -823,7 +822,7 @@ int LuaApi::TakeScreenshot(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::IsKeyPressed(lua_State *lua)
+int LuaApi::IsKeyPressed(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	string keyName = l.ReadString();
@@ -834,7 +833,7 @@ int LuaApi::IsKeyPressed(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::GetInput(lua_State *lua)
+int LuaApi::GetInput(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	l.ForceParamCount(2);
@@ -911,13 +910,13 @@ int LuaApi::SetInput(lua_State* lua)
 			}
 		}
 	}
-	
+
 	lua_pop(lua, 1);
 
 	return l.ReturnCount();
 }
 
-int LuaApi::GetAccessCounters(lua_State *lua)
+int LuaApi::GetAccessCounters(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	AccessCounterType counterType = (AccessCounterType)l.ReadInteger();
@@ -952,7 +951,7 @@ int LuaApi::GetAccessCounters(lua_State *lua)
 	return 1;
 }
 
-int LuaApi::ResetAccessCounters(lua_State *lua)
+int LuaApi::ResetAccessCounters(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -985,7 +984,7 @@ int LuaApi::GetCdlData(lua_State* lua)
 	return 1;
 }
 
-int LuaApi::GetScriptDataFolder(lua_State *lua)
+int LuaApi::GetScriptDataFolder(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -1001,7 +1000,7 @@ int LuaApi::GetScriptDataFolder(lua_State *lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::GetRomInfo(lua_State *lua)
+int LuaApi::GetRomInfo(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -1016,11 +1015,11 @@ int LuaApi::GetRomInfo(lua_State *lua)
 	return 1;
 }
 
-int LuaApi::GetLogWindowLog(lua_State *lua)
+int LuaApi::GetLogWindowLog(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
-	
+
 	l.Return(MessageManager::GetLog());
 	return l.ReturnCount();
 }
@@ -1068,7 +1067,7 @@ int LuaApi::LoadSavestate(lua_State* lua)
 	string savestate = l.ReadString();
 	checkparams();
 	checksavestateconditions();
-	
+
 	stringstream ss;
 	ss << savestate;
 	bool result = _emu->GetSaveStateManager()->LoadState(ss);
@@ -1076,7 +1075,7 @@ int LuaApi::LoadSavestate(lua_State* lua)
 	return l.ReturnCount();
 }
 
-int LuaApi::GetState(lua_State *lua)
+int LuaApi::GetState(lua_State* lua)
 {
 	LuaCallHelper l(lua);
 	checkparams();
@@ -1091,13 +1090,13 @@ int LuaApi::GetState(lua_State *lua)
 	uint32_t clockRate = _emu->GetMasterClockRate();
 	string consoleType = string(magic_enum::enum_name<ConsoleType>(_emu->GetConsoleType()));
 	string region = string(magic_enum::enum_name<ConsoleRegion>(_emu->GetRegion()));
-	
+
 	SV(clockRate);
 	SV(consoleType);
 	SV(region);
 	SV(frameCount);
 	SV(masterClock);
-	
+
 	GenerateStateTable(s, lua);
 
 	return 1;
@@ -1173,7 +1172,7 @@ void LuaApi::ReadStateTable(Serializer& s, lua_State* lua)
 {
 	unordered_map<string, SerializeMapValue> map;
 
-	lua_pushnil(lua);  /* first key */
+	lua_pushnil(lua); /* first key */
 	while(lua_next(lua, -2) != 0) {
 		/* uses 'key' (at index -2) and 'value' (at index -1) */
 		if(lua_type(lua, -2) == LUA_TSTRING) {
@@ -1197,7 +1196,7 @@ void LuaApi::ReadStateTable(Serializer& s, lua_State* lua)
 				}
 			}
 		}
-		
+
 		/* removes 'value'; keeps 'key' for next iteration */
 		lua_pop(lua, 1);
 	}

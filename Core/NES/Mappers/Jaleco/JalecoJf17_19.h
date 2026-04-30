@@ -43,7 +43,7 @@ protected:
 		if(!_chrFlag && (value & 0x40)) {
 			SelectChrPage(0, value & 0x0F);
 		}
-		
+
 		_prgFlag = (value & 0x80) == 0x80;
 		_chrFlag = (value & 0x40) == 0x40;
 	}

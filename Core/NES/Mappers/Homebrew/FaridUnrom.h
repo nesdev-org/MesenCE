@@ -30,7 +30,7 @@ protected:
 			_reg = 0;
 		}
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
@@ -47,7 +47,7 @@ protected:
 		_reg = (_reg & 0x78) | (value & 0x87);
 
 		uint8_t outer = _reg & 0x70;
-		
+
 		SelectPrgPage(0, (_reg & 0x07) | (outer >> 1));
 		SelectPrgPage(1, 0x07 | (outer >> 1));
 	}

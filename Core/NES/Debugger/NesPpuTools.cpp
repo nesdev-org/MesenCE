@@ -15,7 +15,7 @@
 
 static constexpr uint32_t grayscalePalette[4] = { 0xFF000000, 0xFF808080, 0xFFC0C0C0, 0xFFFFFFFF };
 
-NesPpuTools::NesPpuTools(Debugger* debugger, Emulator *emu, NesConsole* console) : PpuTools(debugger, emu)
+NesPpuTools::NesPpuTools(Debugger* debugger, Emulator* emu, NesConsole* console) : PpuTools(debugger, emu)
 {
 	_console = console;
 	_mapper = console->GetMapper();
@@ -24,7 +24,7 @@ NesPpuTools::NesPpuTools(Debugger* debugger, Emulator *emu, NesConsole* console)
 void NesPpuTools::GetPpuToolsState(BaseState& state)
 {
 	NesPpuToolsState nesState = {};
-	
+
 	IExtModeMapperDebug* exMode = dynamic_cast<IExtModeMapperDebug*>(_mapper);
 	if(exMode) {
 		nesState.ExtConfig = exMode->GetExModeConfig();
@@ -57,7 +57,7 @@ void NesPpuTools::DrawNametable(uint8_t* ntSource, uint32_t ntBaseAddr, uint8_t 
 				for(uint8_t y = 0; y < 8; y++) {
 					for(uint8_t x = 0; x < 8; x++) {
 						uint8_t color = ((x & 0x04) >> 2) + ((y & 0x04) >> 1);
-						outBuffer[(row*bufferWidth*8) + (column << 3) + (y*bufferWidth) + x] = palette[paletteBaseAddr + color];
+						outBuffer[(row * bufferWidth * 8) + (column << 3) + (y * bufferWidth) + x] = palette[paletteBaseAddr + color];
 					}
 				}
 			} else {
@@ -71,7 +71,7 @@ void NesPpuTools::DrawNametable(uint8_t* ntSource, uint32_t ntBaseAddr, uint8_t 
 						highByte = vram[tileAddr + y + 8];
 					}
 
-					uint32_t offset = (row*bufferWidth*8) + (column << 3) + (y*bufferWidth);
+					uint32_t offset = (row * bufferWidth * 8) + (column << 3) + (y * bufferWidth);
 					for(uint8_t x = 0; x < 8; x++) {
 						uint8_t color = ((lowByte >> (7 - x)) & 0x01) | (((highByte >> (7 - x)) & 0x01) << 1);
 						if(options.DisplayMode == TilemapDisplayMode::Grayscale) {
@@ -88,8 +88,8 @@ void NesPpuTools::DrawNametable(uint8_t* ntSource, uint32_t ntBaseAddr, uint8_t 
 
 DebugTilemapInfo NesPpuTools::GetWindowTilemap(GetTilemapOptions options, NesPpuState& state, IExtModeMapperDebug* exMode, ExtModeConfig& extCfg, uint8_t* vram, uint32_t* palette, uint32_t* outBuffer)
 {
-	uint16_t baseAddr = extCfg.WindowBank * 0x400;	
-	
+	uint16_t baseAddr = extCfg.WindowBank * 0x400;
+
 	DrawNametable(extCfg.ExtRam, baseAddr, 4, options, state, exMode, extCfg, vram, palette, outBuffer, 256);
 
 	DebugTilemapInfo result = {};
@@ -114,7 +114,7 @@ DebugTilemapInfo NesPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 	NesPpuState& state = (NesPpuState&)baseState;
 	ExtModeConfig& extCfg = ((NesPpuToolsState&)ppuToolsState).ExtConfig;
 
-	for(int i = 0; i < 32; i+=4) {
+	for(int i = 0; i < 32; i += 4) {
 		palette[i] = palette[0];
 	}
 
@@ -126,8 +126,8 @@ DebugTilemapInfo NesPpuTools::GetTilemap(GetTilemapOptions options, BaseState& b
 		uint16_t baseAddr = 0x2000 + nametableIndex * 0x400;
 		uint32_t bufferOffset = ((nametableIndex & 0x01) ? 256 : 0) + ((nametableIndex & 0x02) ? 512 * 240 : 0);
 
-		DrawNametable(vram, baseAddr, nametableIndex, options, state, exMode, extCfg, vram, palette, outBuffer+bufferOffset, 512);
-		
+		DrawNametable(vram, baseAddr, nametableIndex, options, state, exMode, extCfg, vram, palette, outBuffer + bufferOffset, 512);
+
 		if(options.DisplayMode != TilemapDisplayMode::AttributeView) {
 			if(options.TileHighlightMode != TilemapHighlightMode::None || options.AttributeHighlightMode != TilemapHighlightMode::None) {
 				ApplyHighlights(options, nametableIndex, vram, outBuffer);
@@ -216,13 +216,16 @@ void NesPpuTools::ApplyHighlights(GetTilemapOptions options, uint8_t nametableIn
 	auto isHighlighted = [&](uint16_t addr, TilemapHighlightMode mode) -> bool {
 		switch(mode) {
 			default:
-			case TilemapHighlightMode::None: return false;
+			case TilemapHighlightMode::None:
+				return false;
 
-				//Highlight if modified since the last update
-			case TilemapHighlightMode::Changes: return prevVram[addr] != vram[addr];
+			//Highlight if modified since the last update
+			case TilemapHighlightMode::Changes:
+				return prevVram[addr] != vram[addr];
 
-				//Highlight if modified in the last frame
-			case TilemapHighlightMode::Writes: return accessCounters && masterClock - accessCounters[addr].WriteStamp < clockRate;
+			//Highlight if modified in the last frame
+			case TilemapHighlightMode::Writes:
+				return accessCounters && masterClock - accessCounters[addr].WriteStamp < clockRate;
 		}
 	};
 
@@ -251,12 +254,11 @@ void NesPpuTools::ApplyHighlights(GetTilemapOptions options, uint8_t nametableIn
 
 					if(attrHighlighted) {
 						static constexpr uint32_t attrChangedColor = 0x80FFFF00;
-						bool isEdge = (
+						bool isEdge =
 							((column & 3) == 0 && x == 0) ||
 							((row & 3) == 0 && y == 0) ||
 							((column & 3) == 3 && x == 7) ||
-							((row & 3) == 3 && y == 7)
-						);
+							((row & 3) == 3 && y == 7);
 						if(isEdge) {
 							outBuffer[offset + x] = 0xFF000000 | attrChangedColor;
 						} else {
@@ -306,7 +308,7 @@ FrameInfo NesPpuTools::GetTilemapSize(GetTilemapOptions options, BaseState& stat
 	} else if(options.Layer == 1 && dynamic_cast<IExtModeMapperDebug*>(_mapper)) {
 		return { 256, 240 };
 	}
-	return { 0,0 };
+	return { 0, 0 };
 }
 
 DebugTilemapTileInfo NesPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uint8_t* vram, GetTilemapOptions options, BaseState& baseState, BaseState& ppuToolsState)
@@ -345,7 +347,7 @@ DebugTilemapTileInfo NesPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uin
 	} else {
 		paletteBaseAddr = ((attribute >> shift) & 0x03) << 2;
 	}
-	
+
 	result.Row = row;
 	result.Column = column;
 	result.Width = 8;
@@ -445,7 +447,7 @@ void NesPpuTools::GetSpriteList(GetSpritePreviewOptions options, BaseState& base
 	NesPpuToolsState& nesToolsState = (NesPpuToolsState&)ppuToolsState;
 	for(int i = 0; i < 64; i++) {
 		outBuffer[i].Init();
-		GetSpriteInfo(outBuffer[i], spritePreviews+i*_spritePreviewSize, i, options, state, nesToolsState, vram, oamRam, palette);
+		GetSpriteInfo(outBuffer[i], spritePreviews + i * _spritePreviewSize, i, options, state, nesToolsState, vram, oamRam, palette);
 	}
 
 	GetSpritePreview(options, baseState, outBuffer, spritePreviews, palette, screenPreview);

@@ -15,7 +15,7 @@
 #include "Utilities/Serializer.h"
 #include "Shared/MemoryOperationType.h"
 
-Gsu::Gsu(SnesConsole *console, uint32_t gsuRamSize)
+Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize)
 {
 	_emu = console->GetEmulator();
 	_console = console;
@@ -39,11 +39,11 @@ Gsu::Gsu(SnesConsole *console, uint32_t gsuRamSize)
 		_gsuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_gsuRam, i * 0x1000, _gsuRamSize, MemoryType::GsuWorkRam)));
 		_gsuCpuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRamHandler(_state, _gsuRamHandlers.back().get())));
 	}
-	
+
 	//CPU mappings
-	MemoryMappings *cpuMappings = _memoryManager->GetMemoryMappings();
-	vector<unique_ptr<IMemoryHandler>> &prgRomHandlers = _console->GetCartridge()->GetPrgRomHandlers();
-	for(unique_ptr<IMemoryHandler> &handler : prgRomHandlers) {
+	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
+	vector<unique_ptr<IMemoryHandler>>& prgRomHandlers = _console->GetCartridge()->GetPrgRomHandlers();
+	for(unique_ptr<IMemoryHandler>& handler : prgRomHandlers) {
 		_gsuCpuRomHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRomHandler(_state, handler.get())));
 	}
 
@@ -103,6 +103,7 @@ void Gsu::Exec()
 {
 	uint8_t opCode = ReadOpCode();
 
+	// clang-format off
 	switch(opCode) {
 		case 0x00: STOP(); break;
 		case 0x01: NOP(); break;
@@ -228,6 +229,7 @@ void Gsu::Exec()
 			IwtLmSm(opCode & 0x0F);
 			break;
 	}
+	// clang-format on
 
 	if(_state.SFR.Running) {
 		_emu->ProcessInstruction<CpuType::Gsu>();
@@ -242,7 +244,7 @@ void Gsu::Exec()
 
 uint8_t Gsu::ReadGsu(uint32_t addr, MemoryOperationType opType)
 {
-	IMemoryHandler *handler = _mappings.GetHandler(addr);
+	IMemoryHandler* handler = _mappings.GetHandler(addr);
 	uint8_t value;
 	if(handler) {
 		value = handler->Read(addr);
@@ -271,7 +273,7 @@ void Gsu::WriteGsu(uint32_t addr, uint8_t value, MemoryOperationType opType)
 void Gsu::InitProgramCache(uint16_t cacheAddr)
 {
 	uint16_t dest = (cacheAddr & 0x01F0);
-	
+
 	if(_state.ProgramBank <= 0x5F) {
 		WaitRomOperation();
 		WaitForRomAccess();
@@ -279,12 +281,12 @@ void Gsu::InitProgramCache(uint16_t cacheAddr)
 		WaitRamOperation();
 		WaitForRamAccess();
 	}
-	
+
 	uint32_t srcBaseAddr = (_state.ProgramBank << 16) + _state.CacheBase + dest;
 	for(int i = 0; i < 16; i++) {
 		_cache[dest + i] = ReadGsu(srcBaseAddr + i, MemoryOperationType::Read);
 	}
-	Step(_state.ClockSelect ? 5*16 : 6*16);
+	Step(_state.ClockSelect ? 5 * 16 : 6 * 16);
 
 	_cacheValid[cacheAddr >> 4] = true;
 }
@@ -312,7 +314,7 @@ uint8_t Gsu::ReadProgramByte(MemoryOperationType opType)
 		if(!_cacheValid[cacheAddr >> 4]) {
 			InitProgramCache(cacheAddr & 0xFFF0);
 		}
-		
+
 		Step(_state.ClockSelect ? 1 : 2);
 		_emu->ProcessMemoryRead<CpuType::Gsu>(_lastOpAddr, _cache[cacheAddr], opType);
 		return _cache[cacheAddr];
@@ -342,7 +344,7 @@ void Gsu::WriteDestReg(uint16_t value)
 void Gsu::WriteRegister(uint8_t reg, uint16_t value)
 {
 	_state.R[reg] = value;
-	
+
 	if(reg == 14) {
 		_state.SFR.RomReadPending = true;
 		_state.RomDelay = _state.ClockSelect ? 5 : 6;
@@ -451,7 +453,7 @@ void Gsu::Reset()
 {
 	_state = {};
 	_state.ProgramReadBuffer = 0x01; //Run a NOP on first cycle
-	
+
 	_console->InitializeRam(_cache, 512);
 	memset(_cacheValid, 0, sizeof(_cacheValid));
 	_waitForRomAccess = false;
@@ -468,6 +470,7 @@ uint8_t Gsu::Read(uint32_t addr)
 		return 0;
 	}
 
+	// clang-format off
 	switch(addr) {
 		case 0x3000: case 0x3002: case 0x3004: case 0x3006: case 0x3008: case 0x300A: case 0x300C:case 0x300E:
 		case 0x3010: case 0x3012: case 0x3014: case 0x3016: case 0x3018: case 0x301A: case 0x301C:case 0x301E:
@@ -492,7 +495,8 @@ uint8_t Gsu::Read(uint32_t addr)
 		case 0x303E: return (uint8_t)_state.CacheBase;
 		case 0x303F: return _state.CacheBase >> 8;
 	}
-	
+	// clang-format on
+
 	if(addr >= 0x3100 && addr <= 0x32FF) {
 		return _cache[(_state.CacheBase + (addr - 0x3100)) & 0x1FF];
 	}
@@ -512,6 +516,7 @@ void Gsu::Write(uint32_t addr, uint8_t value)
 	}
 
 	switch(addr) {
+			// clang-format off
 		case 0x3000: case 0x3002: case 0x3004: case 0x3006: case 0x3008: case 0x300A: case 0x300C: case 0x300E:
 		case 0x3010: case 0x3012: case 0x3014: case 0x3016: case 0x3018: case 0x301A: case 0x301C: case 0x301E:
 			_state.RegisterLatch = value;
@@ -531,6 +536,7 @@ void Gsu::Write(uint32_t addr, uint8_t value)
 			}
 			break;
 		}
+			// clang-format on
 
 		case 0x3030: {
 			bool running = _state.SFR.Running;
@@ -549,8 +555,12 @@ void Gsu::Write(uint32_t addr, uint8_t value)
 		}
 
 		case 0x3033: _state.BackupRamEnabled = (value & 0x01); break;
-		case 0x3034: _state.ProgramBank = (value & 0x7F); InvalidateCache(); break;
-		
+
+		case 0x3034:
+			_state.ProgramBank = (value & 0x7F);
+			InvalidateCache();
+			break;
+
 		case 0x3037:
 			_state.HighSpeedMode = (value & 0x20) != 0;
 			_state.IrqDisabled = (value & 0x80) != 0;
@@ -595,7 +605,7 @@ uint8_t Gsu::Peek(uint32_t addr)
 	return 0;
 }
 
-void Gsu::PeekBlock(uint32_t addr, uint8_t *output)
+void Gsu::PeekBlock(uint32_t addr, uint8_t* output)
 {
 	memset(output, 0, 0x1000);
 }
@@ -605,23 +615,65 @@ AddressInfo Gsu::GetAbsoluteAddress(uint32_t address)
 	return { -1, MemoryType::None };
 }
 
-void Gsu::Serialize(Serializer &s)
+void Gsu::Serialize(Serializer& s)
 {
-	SV(_state.CycleCount); SV(_state.RegisterLatch); SV(_state.ProgramBank); SV(_state.RomBank); SV(_state.RamBank); SV(_state.IrqDisabled);
-	SV(_state.HighSpeedMode); SV(_state.ClockSelect); SV(_state.BackupRamEnabled); SV(_state.ScreenBase); SV(_state.ColorGradient); SV(_state.PlotBpp);
-	SV(_state.ScreenHeight); SV(_state.GsuRamAccess); SV(_state.GsuRomAccess); SV(_state.CacheBase); SV(_state.PlotTransparent); SV(_state.PlotDither);
-	SV(_state.ColorHighNibble); SV(_state.ColorFreezeHigh); SV(_state.ObjMode); SV(_state.ColorReg); SV(_state.SrcReg); SV(_state.DestReg);
-	SV(_state.RomReadBuffer); SV(_state.RomDelay); SV(_state.ProgramReadBuffer); SV(_state.RamWriteAddress); SV(_state.RamWriteValue); SV(_state.RamDelay);
-	SV(_state.RamAddress); SV(_state.PrimaryCache.X); SV(_state.PrimaryCache.Y); SV(_state.PrimaryCache.ValidBits); SV(_state.SecondaryCache.X);
-	SV(_state.SecondaryCache.Y); SV(_state.SecondaryCache.ValidBits);
-	SV(_state.SFR.Alt1); SV(_state.SFR.Alt2); SV(_state.SFR.Carry); SV(_state.SFR.ImmHigh); SV(_state.SFR.ImmLow); SV(_state.SFR.Irq); SV(_state.SFR.Overflow);
-	SV(_state.SFR.Prefix); SV(_state.SFR.RomReadPending); SV(_state.SFR.Running); SV(_state.SFR.Sign); SV(_state.SFR.Zero);
+	SV(_state.CycleCount);
+	SV(_state.RegisterLatch);
+	SV(_state.ProgramBank);
+	SV(_state.RomBank);
+	SV(_state.RamBank);
+	SV(_state.IrqDisabled);
+	SV(_state.HighSpeedMode);
+	SV(_state.ClockSelect);
+	SV(_state.BackupRamEnabled);
+	SV(_state.ScreenBase);
+	SV(_state.ColorGradient);
+	SV(_state.PlotBpp);
+	SV(_state.ScreenHeight);
+	SV(_state.GsuRamAccess);
+	SV(_state.GsuRomAccess);
+	SV(_state.CacheBase);
+	SV(_state.PlotTransparent);
+	SV(_state.PlotDither);
+	SV(_state.ColorHighNibble);
+	SV(_state.ColorFreezeHigh);
+	SV(_state.ObjMode);
+	SV(_state.ColorReg);
+	SV(_state.SrcReg);
+	SV(_state.DestReg);
+	SV(_state.RomReadBuffer);
+	SV(_state.RomDelay);
+	SV(_state.ProgramReadBuffer);
+	SV(_state.RamWriteAddress);
+	SV(_state.RamWriteValue);
+	SV(_state.RamDelay);
+	SV(_state.RamAddress);
+	SV(_state.PrimaryCache.X);
+	SV(_state.PrimaryCache.Y);
+	SV(_state.PrimaryCache.ValidBits);
+	SV(_state.SecondaryCache.X);
+	SV(_state.SecondaryCache.Y);
+	SV(_state.SecondaryCache.ValidBits);
+	SV(_state.SFR.Alt1);
+	SV(_state.SFR.Alt2);
+	SV(_state.SFR.Carry);
+	SV(_state.SFR.ImmHigh);
+	SV(_state.SFR.ImmLow);
+	SV(_state.SFR.Irq);
+	SV(_state.SFR.Overflow);
+	SV(_state.SFR.Prefix);
+	SV(_state.SFR.RomReadPending);
+	SV(_state.SFR.Running);
+	SV(_state.SFR.Sign);
+	SV(_state.SFR.Zero);
 
 	SVArray(_state.R, 16);
 	SVArray(_state.PrimaryCache.Pixels, 8);
 	SVArray(_state.SecondaryCache.Pixels, 8);
 
-	SV(_waitForRamAccess); SV(_waitForRomAccess); SV(_stopped);
+	SV(_waitForRamAccess);
+	SV(_waitForRomAccess);
+	SV(_stopped);
 	SVArray(_cacheValid, 32);
 	SVArray(_cache, 512);
 	SVArray(_gsuRam, _gsuRamSize);
@@ -656,7 +708,7 @@ void Gsu::DebugSetProgramCounter(uint32_t addr)
 {
 	_state.ProgramBank = (addr >> 16) & 0xFF;
 	_state.R[15] = addr & 0xFFFF;
-	
+
 	_lastOpAddr = addr & 0xFFFFFF;
 	IMemoryHandler* handler = _mappings.GetHandler(_lastOpAddr);
 	_state.ProgramReadBuffer = handler ? handler->Read(_lastOpAddr) : 0;

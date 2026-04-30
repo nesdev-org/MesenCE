@@ -60,8 +60,7 @@ struct ArmV3CpuFlags
 
 			(IrqDisable << 7) |
 			(FiqDisable << 6) |
-			(uint8_t)Mode
-		);
+			(uint8_t)Mode);
 	}
 };
 

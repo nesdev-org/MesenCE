@@ -41,8 +41,7 @@ uint8_t PceVce::Read(uint16_t addr)
 
 		case 4: return _paletteRam[_state.PalAddr] & 0xFF;
 
-		case 5:
-		{
+		case 5: {
 			uint8_t val = (_paletteRam[_state.PalAddr] >> 8) & 0x01;
 			_state.PalAddr = (_state.PalAddr + 1) & 0x1FF;
 
@@ -64,7 +63,11 @@ void PceVce::Write(uint16_t addr, uint8_t value)
 			switch(value & 0x03) {
 				case 0: _state.ClockDivider = 4; break;
 				case 1: _state.ClockDivider = 3; break;
-				case 2: case 3: _state.ClockDivider = 2; break;
+
+				case 2:
+				case 3:
+					_state.ClockDivider = 2;
+					break;
 			}
 			//LogDebug("[Debug] VCE Clock divider: " + HexUtilities::ToHex(_state.VceClockDivider) + "  SL: " + std::to_string(_state.Scanline));
 			break;

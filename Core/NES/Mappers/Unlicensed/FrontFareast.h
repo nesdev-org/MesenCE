@@ -81,17 +81,17 @@ protected:
 				}
 				break;
 
-			case 0x4501: 
+			case 0x4501:
 				_irqEnabled = false;
-				_console->GetCpu()->ClearIrqSource(IRQSource::External); 
+				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
 
-			case 0x4502: 
+			case 0x4502:
 				_irqCounter = (_irqCounter & 0xFF00) | value;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
 
-			case 0x4503: 
+			case 0x4503:
 				_irqCounter = (_irqCounter & 0x00FF) | (value << 8);
 				_irqEnabled = true;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
@@ -113,11 +113,21 @@ protected:
 					}
 				} else {
 					switch(addr) {
-						case 0x4504: case 0x4505: case 0x4506: case 0x4507:
+						case 0x4504:
+						case 0x4505:
+						case 0x4506:
+						case 0x4507:
 							SelectPrgPage(addr - 0x4504, value);
 							break;
 
-						case 0x4510: case 0x4511: case 0x4512: case 0x4513: case 0x4514: case 0x4515: case 0x4516: case 0x4517:
+						case 0x4510:
+						case 0x4511:
+						case 0x4512:
+						case 0x4513:
+						case 0x4514:
+						case 0x4515:
+						case 0x4516:
+						case 0x4517:
 							SelectChrPage(addr - 0x4510, value);
 							break;
 					}

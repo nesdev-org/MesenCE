@@ -59,7 +59,7 @@ SnesDebugger::SnesDebugger(Debugger* debugger, CpuType cpuType) : IDebugger(debu
 	_ppu = console->GetPpu();
 	_traceLogger.reset(new SnesCpuTraceLogger(debugger, this, cpuType, _ppu, _memoryManager));
 	_ppuTools.reset(new SnesPpuTools(debugger, debugger->GetEmulator()));
-	
+
 	if(_cpuType == CpuType::Snes) {
 		_memoryMappings = _memoryManager->GetMemoryMappings();
 	} else {
@@ -76,7 +76,7 @@ SnesDebugger::SnesDebugger(Debugger* debugger, CpuType cpuType) : IDebugger(debu
 	} else {
 		_cdl = (SnesCodeDataLogger*)_debugger->GetCdlManager()->GetCodeDataLogger(MemoryType::SnesPrgRom);
 	}
-	
+
 	_stepBackManager.reset(new StepBackManager(_emu, this));
 	_eventManager.reset(new SnesEventManager(debugger, _cpu, console->GetPpu(), _memoryManager, console->GetDmaController()));
 	_callstackManager.reset(new CallstackManager(debugger, this));
@@ -120,11 +120,10 @@ void SnesDebugger::ProcessConfigChange()
 	_predictiveBreakpoints = _settings->GetDebugConfig().UsePredictiveBreakpoints;
 
 	_runSpc = _spcTraceLogger->IsEnabled() || _settings->CheckDebuggerFlag(DebuggerFlags::SpcDebuggerEnabled);
-	_runCoprocessors = (
-		(_dspTraceLogger && _dspTraceLogger->IsEnabled()) || 
+	_runCoprocessors =
+		(_dspTraceLogger && _dspTraceLogger->IsEnabled()) ||
 		_settings->CheckDebuggerFlag(DebuggerFlags::NecDspDebuggerEnabled) ||
-		_settings->CheckDebuggerFlag(DebuggerFlags::GbDebuggerEnabled)
-	);
+		_settings->CheckDebuggerFlag(DebuggerFlags::GbDebuggerEnabled);
 	_needCoprocessors = _runSpc || _runCoprocessors;
 }
 
@@ -179,13 +178,32 @@ void SnesDebugger::ProcessInstruction()
 	if(_debuggerEnabled) {
 		//Break on BRK/STP/WDM/COP
 		switch(opCode) {
-			case 0x00: if(_settings->GetDebugConfig().SnesBreakOnBrk) { _step->Break(BreakSource::BreakOnBrk); } break;
-			case 0x02: if(_settings->GetDebugConfig().SnesBreakOnCop) { _step->Break(BreakSource::BreakOnCop); } break;
-			case 0x42: if(_settings->GetDebugConfig().SnesBreakOnWdm) { _step->Break(BreakSource::BreakOnWdm); } break;
-			case 0xDB: if(_settings->GetDebugConfig().SnesBreakOnStp) { _step->Break(BreakSource::BreakOnStp); } break;
+			case 0x00:
+				if(_settings->GetDebugConfig().SnesBreakOnBrk) {
+					_step->Break(BreakSource::BreakOnBrk);
+				}
+				break;
+
+			case 0x02:
+				if(_settings->GetDebugConfig().SnesBreakOnCop) {
+					_step->Break(BreakSource::BreakOnCop);
+				}
+				break;
+
+			case 0x42:
+				if(_settings->GetDebugConfig().SnesBreakOnWdm) {
+					_step->Break(BreakSource::BreakOnWdm);
+				}
+				break;
+
+			case 0xDB:
+				if(_settings->GetDebugConfig().SnesBreakOnStp) {
+					_step->Break(BreakSource::BreakOnStp);
+				}
+				break;
 		}
 	}
-	
+
 	if(_step->StepCount != 0 && _breakpointManager->HasBreakpoints() && _predictiveBreakpoints) {
 		_dummyCpu->SetDummyState(state);
 		_dummyCpu->Exec();
@@ -217,7 +235,7 @@ void SnesDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType
 			DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, state.PS, _cpuType);
 			_traceLogger->Log(state, disInfo, operation, addressInfo);
 		}
-		
+
 		_memoryAccessCounter->ProcessMemoryExec(addressInfo, _memoryManager->GetMasterClock());
 		if(_step->ProcessCpuCycle()) {
 			_debugger->SleepUntilResume(_cpuType, BreakSource::CpuStep, &operation);
@@ -252,7 +270,7 @@ void SnesDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType
 				_step->Break(BreakSource::BreakOnUninitMemoryRead);
 			}
 		}
-		
+
 		if(type != MemoryOperationType::DmaRead) {
 			_step->ProcessCpuCycle();
 		}
@@ -388,10 +406,7 @@ void SnesDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, boo
 	ProcessCallStackUpdates(ret, originalPc, GetCpuState().PS, originalSp);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		_cpuType, *this, *_step.get(),
-		ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi
-	);
+	_debugger->InternalProcessInterrupt(_cpuType, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi);
 }
 
 void SnesDebugger::ProcessPpuRead(uint16_t addr, uint8_t value, MemoryType memoryType)
@@ -483,7 +498,7 @@ void SnesDebugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly)
 		GetCpuState().PC = (uint16_t)addr;
 		GetCpuState().K = (uint8_t)(addr >> 16);
 	}
-	
+
 	_prevOpCode = _memoryMappings->Peek(addr);
 	_prevProgramCounter = addr;
 	_prevStackPointer = GetCpuState().SP;
@@ -557,7 +572,7 @@ void SnesDebugger::SetPpuState(BaseState& srcState)
 bool SnesDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption)
 {
 	vector<uint8_t> output;
-	
+
 	uint8_t* prgRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::SnesPrgRom);
 	uint32_t prgRomSize = _debugger->GetMemoryDumper()->GetMemorySize(MemoryType::SnesPrgRom);
 	vector<uint8_t> rom = vector<uint8_t>(prgRom, prgRom + prgRomSize);

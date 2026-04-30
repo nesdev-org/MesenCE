@@ -52,7 +52,7 @@ protected:
 			}
 
 			_frameDivider = frameDivider;
-			
+
 			//Refresh overscan left/right values after _frameDivider is updated
 			overscan = BaseVideoFilter::GetOverscan();
 
@@ -136,13 +136,12 @@ protected:
 		VideoConfig& config = _emu->GetSettings()->GetVideoConfig();
 		PcEngineConfig& pceConfig = _emu->GetSettings()->GetPcEngineConfig();
 
-		bool optionsChanged = (
+		bool optionsChanged =
 			_videoConfig.Hue != config.Hue ||
 			_videoConfig.Saturation != config.Saturation ||
 			_videoConfig.Contrast != config.Contrast ||
 			_videoConfig.Brightness != config.Brightness ||
-			memcmp(_pceConfig.Palette, pceConfig.Palette, sizeof(pceConfig.Palette)) != 0
-		);
+			memcmp(_pceConfig.Palette, pceConfig.Palette, sizeof(pceConfig.Palette)) != 0;
 
 		if(optionsChanged) {
 			InitLookupTable();
@@ -175,7 +174,7 @@ public:
 		uint32_t rowCount = PceConstants::ScreenHeight - overscan.Top - overscan.Bottom;
 
 		uint32_t verticalScale = baseFrameInfo.Height / PceConstants::ScreenHeight;
-		
+
 		if(verticalScale != PceConstants::InternalResMultipler) {
 			//Invalid data
 			return;

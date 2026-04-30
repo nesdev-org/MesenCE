@@ -2,26 +2,28 @@
 #include "UPnPPortMapper.h"
 
 #ifdef _WIN32
-#include <winsock2.h>
-#include <natupnp.h>
-#include <ws2tcpip.h>
+	#include <winsock2.h>
+	#include <natupnp.h>
+	#include <ws2tcpip.h>
+#endif
 
-bool UPnPPortMapper::AddNATPortMapping(uint16_t internalPort, uint16_t externalPort, IPProtocol protocol) 
+#ifdef _WIN32
+bool UPnPPortMapper::AddNATPortMapping(uint16_t internalPort, uint16_t externalPort, IPProtocol protocol)
 {
 	bool result = false;
-		
+
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
-	IUPnPNAT *nat = nullptr;
+	IUPnPNAT* nat = nullptr;
 	HRESULT hResult = CoCreateInstance(__uuidof(UPnPNAT), nullptr, CLSCTX_ALL, __uuidof(IUPnPNAT), (void**)&nat);
 
 	BSTR proto = SysAllocString((protocol == IPProtocol::TCP) ? L"TCP" : L"UDP");
 
 	if(SUCCEEDED(hResult) && nat) {
-		IStaticPortMappingCollection *spmc = nullptr;
+		IStaticPortMappingCollection* spmc = nullptr;
 		hResult = nat->get_StaticPortMappingCollection(&spmc);
 		if(SUCCEEDED(hResult) && spmc) {
-			IStaticPortMapping *spm = nullptr;
+			IStaticPortMapping* spm = nullptr;
 			hResult = spmc->get_Item(externalPort, proto, &spm);
 			if(spm != nullptr) {
 				//An identical mapping already exists, remove it
@@ -66,16 +68,16 @@ bool UPnPPortMapper::AddNATPortMapping(uint16_t internalPort, uint16_t externalP
 	}
 
 	SysFreeString(proto);
-	
+
 	CoUninitialize();
 
 	return result;
 }
 
-bool UPnPPortMapper::RemoveNATPortMapping(uint16_t externalPort, IPProtocol protocol) 
+bool UPnPPortMapper::RemoveNATPortMapping(uint16_t externalPort, IPProtocol protocol)
 {
-	IUPnPNAT *nat = nullptr;
-	IStaticPortMappingCollection *spmc;
+	IUPnPNAT* nat = nullptr;
+	IStaticPortMappingCollection* spmc;
 	bool result = false;
 
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
@@ -104,8 +106,8 @@ bool UPnPPortMapper::RemoveNATPortMapping(uint16_t externalPort, IPProtocol prot
 vector<wstring> UPnPPortMapper::GetLocalIPs()
 {
 	vector<wstring> localIPs;
-	ADDRINFOW *result = nullptr;
-	ADDRINFOW *current = nullptr;
+	ADDRINFOW* result = nullptr;
+	ADDRINFOW* current = nullptr;
 	ADDRINFOW hints;
 
 	ZeroMemory(&hints, sizeof(hints));
@@ -137,13 +139,13 @@ vector<wstring> UPnPPortMapper::GetLocalIPs()
 }
 
 #else
-	
-bool UPnPPortMapper::AddNATPortMapping(uint16_t internalPort, uint16_t externalPort, IPProtocol protocol) 
+
+bool UPnPPortMapper::AddNATPortMapping(uint16_t internalPort, uint16_t externalPort, IPProtocol protocol)
 {
 	return false;
 }
 
-bool UPnPPortMapper::RemoveNATPortMapping(uint16_t externalPort, IPProtocol protocol) 
+bool UPnPPortMapper::RemoveNATPortMapping(uint16_t externalPort, IPProtocol protocol)
 {
 	return false;
 }
@@ -151,6 +153,6 @@ bool UPnPPortMapper::RemoveNATPortMapping(uint16_t externalPort, IPProtocol prot
 vector<wstring> UPnPPortMapper::GetLocalIPs()
 {
 	return vector<wstring>();
-}	
-	
+}
+
 #endif

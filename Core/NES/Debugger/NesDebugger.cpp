@@ -42,7 +42,7 @@ NesDebugger::NesDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator()
 	_debugger = debugger;
 	_emu = debugger->GetEmulator();
 	NesConsole* console = (NesConsole*)debugger->GetConsole();
-	
+
 	_console = console;
 	_cpu = console->GetCpu();
 	_mapper = console->GetMapper();
@@ -204,7 +204,7 @@ void NesDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType 
 		} else if(operation.Type != MemoryOperationType::DummyRead && addressInfo.Type == MemoryType::NesPrgRom && addressInfo.Address >= 0) {
 			_codeDataLogger->SetData(addressInfo.Address);
 		}
-		
+
 		if(_traceLogger->IsEnabled()) {
 			_traceLogger->LogNonExec(operation, addressInfo);
 		}
@@ -332,10 +332,7 @@ void NesDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool
 	ProcessCallStackUpdates(ret, originalPc, originalSp);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::Nes, *this, *_step.get(),
-		ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::Nes, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi);
 }
 
 void NesDebugger::ProcessPpuRead(uint16_t addr, uint8_t value, MemoryType memoryType, MemoryOperationType opType)
@@ -494,7 +491,7 @@ bool NesDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption 
 	uint8_t* prgRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::NesPrgRom);
 	uint32_t prgRomSize = _debugger->GetMemoryDumper()->GetMemorySize(MemoryType::NesPrgRom);
 	vector<uint8_t> rom = vector<uint8_t>(prgRom, prgRom + prgRomSize);
-	
+
 	uint8_t* chrRom = _debugger->GetMemoryDumper()->GetMemoryBuffer(MemoryType::NesChrRom);
 	uint32_t chrRomSize = _debugger->GetMemoryDumper()->GetMemorySize(MemoryType::NesChrRom);
 	if(chrRomSize > 0 && chrRom) {
@@ -503,7 +500,7 @@ bool NesDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption 
 
 	NesHeader header = _mapper->GetRomInfo().Header;
 	rom.insert(rom.begin(), (uint8_t*)&header, (uint8_t*)&header + sizeof(NesHeader));
-	
+
 	if(saveAsIps) {
 		vector<uint8_t> originalRom;
 		_emu->GetRomInfo().RomFile.ReadFile(originalRom);

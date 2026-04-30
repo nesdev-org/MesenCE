@@ -8,7 +8,7 @@
 
 class Rambo1 : public BaseMapper
 {
-protected:	
+protected:
 	const uint8_t PpuIrqDelay = 2;
 	const uint8_t CpuIrqDelay = 1;
 	bool _irqEnabled = false;
@@ -18,14 +18,14 @@ protected:
 	uint8_t _irqReloadValue = 0;
 	uint8_t _cpuClockCounter = 0;
 	A12Watcher _a12Watcher;
-	
+
 	uint8_t _prgMode = 0;
 	uint8_t _chrMode = 0;
 	uint8_t _currentRegister = 0;
 	uint8_t _registers[16] = {};
 	uint8_t _needIrqDelay = 0;
 	bool _forceClock = false;
-	
+
 	struct Rambo1State
 	{
 		uint8_t Reg8000;
@@ -47,9 +47,9 @@ protected:
 
 		_chrMode = GetPowerOnByte() & 0x01;
 		_prgMode = GetPowerOnByte() & 0x01;
-		
+
 		_currentRegister = GetPowerOnByte();
-		
+
 		// First 8 are shared with MMC3
 		memset(_registers, 0, sizeof(_registers));
 		_registers[0] = GetPowerOnByte(0);
@@ -60,11 +60,11 @@ protected:
 		_registers[5] = GetPowerOnByte(7);
 		_registers[6] = GetPowerOnByte(0);
 		_registers[7] = GetPowerOnByte(1);
-		
+
 		// RAMBO-1 exclusive
 		_registers[8] = GetPowerOnByte(8);
 		_registers[9] = GetPowerOnByte(9);
-		
+
 		// Police Academy prototype relies on initial $C000 bank selection
 		_registers[15] = GetPowerOnByte(2);
 
@@ -72,7 +72,7 @@ protected:
 		_irqReloadValue = GetPowerOnByte();
 		_needReload = GetPowerOnByte() & 0x01;
 		_irqEnabled = GetPowerOnByte() & 0x01;
-		
+
 		UpdateState();
 		UpdateMirroring();
 	}
@@ -151,7 +151,7 @@ protected:
 			SelectPrgPage(1, _registers[7]);
 			SelectPrgPage(2, _registers[15]);
 			SelectPrgPage(3, -1);
-		} else if(_prgMode == 1){
+		} else if(_prgMode == 1) {
 			SelectPrgPage(0, _registers[15]);
 			SelectPrgPage(1, _registers[7]);
 			SelectPrgPage(2, _registers[6]);
@@ -190,7 +190,7 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0xE001) {
-			case 0x8000: 
+			case 0x8000:
 				_state.Reg8000 = value;
 				UpdateState();
 				break;
@@ -199,14 +199,14 @@ protected:
 				_registers[_currentRegister] = value;
 				UpdateState();
 				break;
-			
-			case 0xA000: 
+
+			case 0xA000:
 				_state.RegA000 = value;
 				UpdateMirroring();
 				break;
 
-			case 0xC000: 
-				_irqReloadValue = value; 
+			case 0xC000:
+				_irqReloadValue = value;
 				break;
 
 			case 0xC001:
@@ -226,7 +226,7 @@ protected:
 				_irqEnabled = false;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
-			
+
 			case 0xE001:
 				_irqEnabled = true;
 				break;

@@ -14,9 +14,9 @@ private:
 	IMemoryHandler* _cpuRegisterHandler;
 
 public:
-	Sdd1(SnesConsole *console);
+	Sdd1(SnesConsole* console);
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 	uint8_t Read(uint32_t addr) override;
 	uint8_t Peek(uint32_t addr) override;
 	void PeekBlock(uint32_t addr, uint8_t* output) override;

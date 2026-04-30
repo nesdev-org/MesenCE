@@ -1,15 +1,15 @@
 ﻿using Dock.Avalonia.Controls;
+using Dock.Model.Controls;
 using Dock.Model.Core;
+using Dock.Model.Mvvm;
+using Dock.Model.Mvvm.Controls;
+using Dock.Model.Mvvm.Core;
+using Mesen.Debugger.StatusViews;
 using Mesen.Debugger.ViewModels;
 using Mesen.Debugger.ViewModels.DebuggerDock;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dock.Model.Controls;
-using Mesen.Debugger.StatusViews;
-using Dock.Model.Mvvm;
-using Dock.Model.Mvvm.Controls;
-using Dock.Model.Mvvm.Core;
 
 namespace Mesen.Debugger
 {
@@ -198,7 +198,7 @@ namespace Mesen.Debugger
 				case DockEntryType.Splitter: return CreateProportionalDockSplitter();
 				case DockEntryType.Root: dockable = CreateRootDock(); break;
 				case DockEntryType.ToolDock: dockable = CreateToolDock(); break;
-				
+
 				case DockEntryType.ProportionalDock: {
 					IProportionalDock propDock = CreateProportionalDock();
 					propDock.Orientation = def.Orientation;

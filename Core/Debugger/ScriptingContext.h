@@ -85,7 +85,7 @@ public:
 
 	CpuType GetDefaultCpuType() { return _defaultCpuType; }
 	MemoryType GetDefaultMemType() { return _defaultMemType; }
-	
+
 	void RefreshMemoryCallbackFlags();
 
 	void RegisterMemoryCallback(CallbackType type, int startAddr, int endAddr, MemoryType memType, CpuType cpuType, int reference);

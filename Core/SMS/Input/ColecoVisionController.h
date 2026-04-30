@@ -28,14 +28,46 @@ protected:
 	}
 
 	void RefreshStateBuffer() override
-	{}
+	{
+	}
 
 	static constexpr uint8_t _keypadLookup[12] = {
-		0xD, 0x7, 0xC, 0x2, 0x3, 0xE, 0x5, 0x1, 0xB, 0xA, 0x9, 0x6
+		0xD,
+		0x7,
+		0xC,
+		0x2,
+		0x3,
+		0xE,
+		0x5,
+		0x1,
+		0xB,
+		0xA,
+		0x9,
+		0x6
 	};
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, L, R, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9, Num0, Star, Pound };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		L,
+		R,
+		Num1,
+		Num2,
+		Num3,
+		Num4,
+		Num5,
+		Num6,
+		Num7,
+		Num8,
+		Num9,
+		Num0,
+		Star,
+		Pound
+	};
 
 	ColecoVisionController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::ColecoVisionController, port, keyMappings)
 	{
@@ -47,13 +79,12 @@ public:
 		if(addr == _port) {
 			if(_modeSelect) {
 				return (
-					0x30 | 
+					0x30 |
 					(IsPressed(Buttons::L) ? 0 : 0x40) |
 					(IsPressed(Buttons::Up) ? 0 : 0x01) |
 					(IsPressed(Buttons::Right) ? 0 : 0x02) |
 					(IsPressed(Buttons::Down) ? 0 : 0x04) |
-					(IsPressed(Buttons::Left) ? 0 : 0x08)
-				);
+					(IsPressed(Buttons::Left) ? 0 : 0x08));
 			} else {
 				uint8_t rightButton = IsPressed(Buttons::R) ? 0 : 0x40;
 

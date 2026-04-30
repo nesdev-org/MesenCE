@@ -6,7 +6,7 @@
 #define SPNG_USE_MINIZ
 #include "spng.h"
 
-bool PNGHelper::WritePNG(std::stringstream &stream, uint32_t* buffer, uint32_t xSize, uint32_t ySize, uint32_t bitsPerPixel)
+bool PNGHelper::WritePNG(std::stringstream& stream, uint32_t* buffer, uint32_t xSize, uint32_t ySize, uint32_t bitsPerPixel)
 {
 	size_t pngSize = 0;
 
@@ -57,7 +57,7 @@ bool PNGHelper::WritePNG(string filename, uint32_t* buffer, uint32_t xSize, uint
 }
 
 template<typename T>
-bool PNGHelper::ReadPNG(vector<uint8_t> input, vector<T> &output, uint32_t &pngWidth, uint32_t &pngHeight)
+bool PNGHelper::ReadPNG(vector<uint8_t> input, vector<T>& output, uint32_t& pngWidth, uint32_t& pngHeight)
 {
 	unsigned long width = 0;
 	unsigned long height = 0;
@@ -66,7 +66,7 @@ bool PNGHelper::ReadPNG(vector<uint8_t> input, vector<T> &output, uint32_t &pngW
 	pngHeight = 0;
 
 	if(DecodePNG(output, width, height, input.data(), input.size()) == 0) {
-		uint32_t *pngDataPtr = (uint32_t*)output.data();
+		uint32_t* pngDataPtr = (uint32_t*)output.data();
 		for(size_t i = 0, len = output.size() * sizeof(T) / 4; i < len; i++) {
 			//ABGR to ARGB
 			pngDataPtr[i] = (pngDataPtr[i] & 0xFF00FF00) | ((pngDataPtr[i] & 0xFF0000) >> 16) | ((pngDataPtr[i] & 0xFF) << 16);
@@ -78,9 +78,9 @@ bool PNGHelper::ReadPNG(vector<uint8_t> input, vector<T> &output, uint32_t &pngW
 	} else {
 		return false;
 	}
-} 
+}
 
-bool PNGHelper::ReadPNG(string filename, vector<uint8_t> &pngData, uint32_t &pngWidth, uint32_t &pngHeight)
+bool PNGHelper::ReadPNG(string filename, vector<uint8_t>& pngData, uint32_t& pngWidth, uint32_t& pngHeight)
 {
 	pngWidth = 0;
 	pngHeight = 0;
@@ -119,7 +119,7 @@ int PNGHelper::DecodePNG(vector<T>& out_image, unsigned long& image_width, unsig
 		spng_ctx_free(ctx);
 		return r;
 	}
-	
+
 	struct spng_ihdr ihdr;
 	if((r = spng_get_ihdr(ctx, &ihdr))) {
 		spng_ctx_free(ctx);
@@ -137,7 +137,7 @@ int PNGHelper::DecodePNG(vector<T>& out_image, unsigned long& image_width, unsig
 	}
 
 	out_image.resize(out_size / sizeof(T));
-	
+
 	if((r = spng_decode_image(ctx, (unsigned char*)out_image.data(), out_size, fmt, SPNG_DECODE_TRNS))) {
 		spng_ctx_free(ctx);
 		return r;

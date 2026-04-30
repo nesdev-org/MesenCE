@@ -119,7 +119,7 @@ void BaseEventManager::DrawEvent(DebugEventInfo& evt, bool drawBackground, uint3
 {
 	EventViewerCategoryCfg evtCfg = GetEventConfig(evt);
 	uint32_t color = evtCfg.Color;
-	
+
 	int32_t y = evt.Scanline;
 	int32_t x = evt.Cycle;
 	ConvertScanlineCycleToRowColumn(x, y);
@@ -140,7 +140,7 @@ void BaseEventManager::DrawEvents(uint32_t* buffer, FrameInfo size)
 	for(DebugEventInfo& evt : _sentEvents) {
 		DrawEvent(evt, false, buffer);
 	}
-	
+
 	//Draw dot over current pixel
 	if(!_forAutoRefresh) {
 		int32_t y = _snapshotScanline + _snapshotScanlineOffset;

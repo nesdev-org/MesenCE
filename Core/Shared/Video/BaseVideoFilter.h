@@ -30,7 +30,7 @@ protected:
 	void RgbToYiq(double r, double g, double b, double& y, double& i, double& q);
 	void YiqToRgb(double y, double i, double q, double& r, double& g, double& b);
 
-	virtual void ApplyFilter(uint16_t *ppuOutputBuffer) = 0;
+	virtual void ApplyFilter(uint16_t* ppuOutputBuffer) = 0;
 	virtual void OnBeforeApplyFilter();
 	bool IsOddFrame();
 	uint32_t GetVideoPhase();
@@ -47,9 +47,9 @@ public:
 	template<typename T> static void InitNtscFilter(T& ntscSetup, VideoConfig& cfg);
 
 	uint32_t* GetOutputBuffer();
-	FrameInfo SendFrame(uint16_t *ppuOutputBuffer, uint32_t frameNumber, uint32_t videoPhase, void* frameData, bool enableOverscan = true);
+	FrameInfo SendFrame(uint16_t* ppuOutputBuffer, uint32_t frameNumber, uint32_t videoPhase, void* frameData, bool enableOverscan = true);
 	void TakeScreenshot(string romName, VideoFilterType filterType);
-	void TakeScreenshot(VideoFilterType filterType, string filename, std::stringstream *stream = nullptr);
+	void TakeScreenshot(VideoFilterType filterType, string filename, std::stringstream* stream = nullptr);
 
 	virtual HudScaleFactors GetScaleFactor() { return { 1.0, 1.0 }; }
 	virtual OverscanDimensions GetOverscan();
