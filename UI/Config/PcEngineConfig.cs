@@ -17,7 +17,7 @@ namespace Mesen.Config
 		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 		[Reactive] public ControllerConfig Port1 { get; set; } = new();
-		
+
 		[Reactive] public ControllerConfig Port1A { get; set; } = new();
 		[Reactive] public ControllerConfig Port1B { get; set; } = new();
 		[Reactive] public ControllerConfig Port1C { get; set; } = new();
@@ -26,7 +26,7 @@ namespace Mesen.Config
 
 		[Reactive] public bool AllowInvalidInput { get; set; } = false;
 		[Reactive] public bool PreventSelectRunReset { get; set; } = true;
-		
+
 		[Reactive] public PceConsoleType ConsoleType { get; set; } = PceConsoleType.Auto;
 		[Reactive] public PceCdRomType CdRomType { get; set; } = PceCdRomType.Arcade;
 		[Reactive] public bool EnableCdRomForHuCardGames { get; set; } = false;

@@ -205,7 +205,7 @@ namespace Mesen.Debugger.ViewModels
 						DebugPaletteInfo pal = _data.Palette.Value;
 						int paletteOffset = (int)(pal.SpritePaletteOffset / pal.ColorsPerPalette);
 						TileEditorWindow.OpenAtTile(
-							sprite.TileAddresses.Select(x => new AddressInfo() { Address = (int)x, Type = CpuType.GetVramMemoryType(sprite.UseExtendedVram) }).ToList(),
+							sprite.TileAddresses.Select(x => new TileAddressInfo() { Address = new AddressInfo() { Address = (int)x, Type = CpuType.GetVramMemoryType(sprite.UseExtendedVram) } }).ToList(),
 							sprite.RealWidth / size.Width,
 							sprite.Format,
 							sprite.Palette + paletteOffset,
@@ -601,7 +601,7 @@ namespace Mesen.Debugger.ViewModels
 			} else {
 				ViewerBitmap.HighlightRects = null;
 			}
-				
+
 			ViewerBitmap.Invalidate();
 
 			int selectedIndex = SelectedSprite?.SpriteIndex ?? -1;

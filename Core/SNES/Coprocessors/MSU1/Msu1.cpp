@@ -132,10 +132,21 @@ void Msu1::LoadTrack(uint32_t startOffset)
 	_trackMissing = !_pcmReader.Init(_trackPath + "-" + std::to_string(_trackSelect) + ".pcm", _repeat, startOffset);
 }
 
-void Msu1::Serialize(Serializer &s)
+void Msu1::Serialize(Serializer& s)
 {
 	uint32_t offset = _pcmReader.GetOffset();
-	SV(_trackSelect); SV(_audioResumeTrack); SV(_audioResumeOffset); SV(_tmpDataPointer); SV(_dataPointer); SV(_repeat); SV(_paused); SV(_volume); SV(_trackMissing); SV(_audioBusy); SV(_dataBusy); SV(offset);
+	SV(_trackSelect);
+	SV(_audioResumeTrack);
+	SV(_audioResumeOffset);
+	SV(_tmpDataPointer);
+	SV(_dataPointer);
+	SV(_repeat);
+	SV(_paused);
+	SV(_volume);
+	SV(_trackMissing);
+	SV(_audioBusy);
+	SV(_dataBusy);
+	SV(offset);
 	if(!s.IsSaving()) {
 		_dataFile.seekg(_dataPointer, ios::beg);
 		LoadTrack(offset);

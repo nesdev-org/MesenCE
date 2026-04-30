@@ -45,14 +45,14 @@ private:
 
 	SimpleLock _updateShortcutsLock;
 
-	void ProcessString(string &str, const char** strPointer);
+	void ProcessString(string& str, const char** strPointer);
 
 	void ClearShortcutKeys();
 	void SetShortcutKey(EmulatorShortcut shortcut, KeyCombination keyCombination, int keySetIndex);
 
 public:
 	EmuSettings(Emulator* emu);
-	
+
 	void CopySettings(EmuSettings& src);
 
 	void Serialize(Serializer& s) override;
@@ -101,7 +101,7 @@ public:
 
 	void SetPreferences(PreferencesConfig& config);
 	PreferencesConfig& GetPreferences();
-	
+
 	void SetAudioPlayerConfig(AudioPlayerConfig& config);
 	AudioPlayerConfig& GetAudioPlayerConfig();
 

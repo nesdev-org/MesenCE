@@ -30,7 +30,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public int PaletteAddress { get; set; }
 		[Reactive] public SpriteVisibility Visibility { get; set; }
 		[Reactive] public string? Flags { get; set; }
-		
+
 		[Reactive] public NullableBoolean HorizontalMirror { get; set; }
 		[Reactive] public NullableBoolean VerticalMirror { get; set; }
 		[Reactive] public NullableBoolean MosaicEnabled { get; set; }
@@ -39,13 +39,13 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public sbyte TransformParamIndex { get; set; }
 		[Reactive] public bool UseExtendedVram { get; set; }
 		[Reactive] public NullableBoolean UseSecondTable { get; set; }
-		
+
 		public UInt32 TileCount { get; set; }
 		public UInt32 WrapWidth { get; set; }
 		public UInt32 WrapHeight { get; set; }
 		public UInt32[] TileAddresses { get; set; } = Array.Empty<UInt32>();
 
-		private UInt32[] _rawPreview = new UInt32[128*128];
+		private UInt32[] _rawPreview = new UInt32[128 * 128];
 
 		[Reactive] public DynamicBitmap? SpritePreview { get; set; }
 		[Reactive] public double SpritePreviewZoom { get; set; }
@@ -57,7 +57,7 @@ namespace Mesen.Debugger.ViewModels
 		public unsafe void Init(ref DebugSpriteInfo sprite, UInt32[] spritePreviews, DebugSpritePreviewInfo previewInfo)
 		{
 			SpriteIndex = sprite.SpriteIndex;
-			
+
 			X = sprite.X;
 			Y = sprite.Y;
 			RawX = sprite.RawX;
@@ -95,7 +95,7 @@ namespace Mesen.Debugger.ViewModels
 				bool needUpdate = false;
 
 				UInt32* spritePreview = p + (sprite.SpriteIndex * 128 * 128);
-				
+
 				if(SpritePreview == null || SpritePreview.PixelSize.Width != sprite.Width || SpritePreview.PixelSize.Height != sprite.Height) {
 					SpritePreview = new DynamicBitmap(new PixelSize(Width, Height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
 					needUpdate = true;
@@ -145,7 +145,7 @@ namespace Mesen.Debugger.ViewModels
 			Flags = flags;
 		}
 
-		public ValueTuple<Rect,Rect,Rect,Rect> GetPreviewRect()
+		public ValueTuple<Rect, Rect, Rect, Rect> GetPreviewRect()
 		{
 			Rect mainRect = new Rect(PreviewX, PreviewY, Width, Height);
 			Rect wrapTopRect = default;

@@ -21,7 +21,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 	[Reactive] public bool IsBatteryCheckboxEnabled { get; private set; }
 	[Reactive] public bool IsVsSystemVisible { get; private set; }
 	[Reactive] public bool IsNes20 { get; private set; }
-	
+
 	[Reactive] public Enum[]? AvailableSystemTypes { get; private set; } = null;
 	[Reactive] public Enum[]? AvailableTimings { get; private set; } = null;
 
@@ -55,7 +55,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		Header = NesHeader.FromBytes(headerBytes);
 
 		AddDisposable(this.WhenAnyValue(x => x.Header.SaveRam, x => x.Header.ChrRamBattery).Subscribe(x => {
-			IsBatteryCheckboxEnabled = Header.SaveRam == MemorySizes.None  && Header.ChrRamBattery == MemorySizes.None;
+			IsBatteryCheckboxEnabled = Header.SaveRam == MemorySizes.None && Header.ChrRamBattery == MemorySizes.None;
 			if(!IsBatteryCheckboxEnabled) {
 				Header.HasBattery = true;
 			}
@@ -228,14 +228,14 @@ public class NesHeaderEditViewModel : DisposableViewModel
 			UInt64 chrRomValue = ChrRom / 8;
 
 			if(FileType == NesFileType.Nes2_0) {
-				if((prgRomSize % 16384) != 0 || prgRomSize > 61424*1024) {
+				if((prgRomSize % 16384) != 0 || prgRomSize > 61424 * 1024) {
 					if(_validSizeValues.ContainsKey(prgRomSize)) {
 						//This value is a valid exponent+multiplier combo (NES 2.0 only)
 						prgRomValue = ((uint)_validSizeValues[prgRomSize] & 0xFF) | 0xF00;
 					}
 				}
 
-				if((chrRomSize % 8192) != 0 || chrRomSize > 30712*1024) {
+				if((chrRomSize % 8192) != 0 || chrRomSize > 30712 * 1024) {
 					if(_validSizeValues.ContainsKey(chrRomSize)) {
 						//This value is a valid exponent+multiplier combo (NES 2.0 only)
 						chrRomValue = ((uint)_validSizeValues[chrRomSize] & 0xFF) | 0xF00;
@@ -372,7 +372,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		{
 			return GetSize(PrgRom, PrgRomUnit);
 		}
-		
+
 		public UInt64 GetChrSize()
 		{
 			return GetSize(ChrRom, ChrRomUnit);

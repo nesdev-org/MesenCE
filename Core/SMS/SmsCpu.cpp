@@ -38,9 +38,9 @@ void SmsCpu::Exec()
 		_emu->ProcessHaltedCpu<CpuType::Sms>();
 		ExecCycles(4);
 	} else {
-		#ifndef DUMMYCPU
+#ifndef DUMMYCPU
 		_emu->ProcessInstruction<CpuType::Sms>();
-		#endif
+#endif
 		opCode = ReadOpCode();
 		ExecOpCode<0>(opCode);
 	}
@@ -82,7 +82,7 @@ void SmsCpu::Exec()
 template<uint8_t prefix>
 void SmsCpu::ExecOpCode(uint8_t opCode)
 {
-	auto getHl = [this]() constexpr -> Register16& { 
+	auto getHl = [this]() constexpr -> Register16& {
 		switch(prefix) {
 			default: return _regHL;
 			case 0xDD: return _regIX;
@@ -133,13 +133,16 @@ void SmsCpu::ExecOpCode(uint8_t opCode)
 		case 0x07: RLCA(); break;
 		case 0x08: ExchangeAf(); break;
 		case 0x09: ADD(getHl(), _regBC); break;
-		case 0x0A: LD(_state.A, Read(_regBC)); _state.WZ = _regBC + 1;  break;
+		case 0x0A:
+			LD(_state.A, Read(_regBC));
+			_state.WZ = _regBC + 1;
+			break;
 		case 0x0B: DEC(_regBC); break;
 		case 0x0C: INC(_state.C); break;
 		case 0x0D: DEC(_state.C); break;
 		case 0x0E: LD(_state.C, ReadCode()); break;
 		case 0x0F: RRCA(); break;
-		case 0x10: DJNZ();  break;
+		case 0x10: DJNZ(); break;
 		case 0x11: LD(_regDE, ReadCodeWord()); break;
 		case 0x12: LD_Indirect_A(_regDE); break;
 		case 0x13: INC(_regDE); break;
@@ -149,7 +152,10 @@ void SmsCpu::ExecOpCode(uint8_t opCode)
 		case 0x17: RLA(); break;
 		case 0x18: JR(ReadCode()); break;
 		case 0x19: ADD(getHl(), _regDE); break;
-		case 0x1A: LD(_state.A, Read(_regDE)); _state.WZ = _regDE + 1;  break;
+		case 0x1A:
+			LD(_state.A, Read(_regDE));
+			_state.WZ = _regDE + 1;
+			break;
 		case 0x1B: DEC(_regDE); break;
 		case 0x1C: INC(_state.E); break;
 		case 0x1D: DEC(_state.E); break;
@@ -372,7 +378,10 @@ void SmsCpu::ExecOpCode(uint8_t opCode)
 		case 0xF6: OR(ReadCode()); break;
 		case 0xF7: RST(0x30); break;
 		case 0xF8: RET((_state.Flags & SmsCpuFlags::Sign) != 0); break;
-		case 0xF9: LD(_state.SP, getHl()); ExecCycles(2); break;
+		case 0xF9:
+			LD(_state.SP, getHl());
+			ExecCycles(2);
+			break;
 		case 0xFA: JP((_state.Flags & SmsCpuFlags::Sign) != 0, ReadCodeWord()); break;
 		case 0xFB: EI(); break;
 		case 0xFC: CALL((_state.Flags & SmsCpuFlags::Sign) != 0, ReadCodeWord()); break;
@@ -391,8 +400,11 @@ void SmsCpu::PREFIX_ED()
 		case 0x43: LD_Indirect16(ReadCodeWord(), _regBC); break;
 		case 0x44: NEG(); break;
 		case 0x45: RETI(); break;
-		case 0x46: IM(0); break; 
-		case 0x47: LD(_state.I, _state.A); ExecCycles(1); break;
+		case 0x46: IM(0); break;
+		case 0x47:
+			LD(_state.I, _state.A);
+			ExecCycles(1);
+			break;
 		case 0x48: IN(_state.C, _state.C); break;
 		case 0x49: OUT(_state.C, _state.C); break;
 		case 0x4A: ADC16(_regBC); break;
@@ -400,7 +412,10 @@ void SmsCpu::PREFIX_ED()
 		case 0x4C: NEG(); break;
 		case 0x4D: RETI(); break;
 		case 0x4E: IM(0); break;
-		case 0x4F: LD(_state.R, _state.A); ExecCycles(1); break;
+		case 0x4F:
+			LD(_state.R, _state.A);
+			ExecCycles(1);
+			break;
 		case 0x50: IN(_state.D, _state.C); break;
 		case 0x51: OUT(_state.D, _state.C); break;
 		case 0x52: SBC16(_regDE); break;
@@ -488,7 +503,7 @@ void SmsCpu::ExchangeAf()
 void SmsCpu::ExchangeSp(Register16& reg)
 {
 	uint8_t lo = Read(_state.SP);
-	uint8_t hi = Read(_state.SP+1);
+	uint8_t hi = Read(_state.SP + 1);
 
 	uint16_t regValue = reg;
 	reg.Write(lo | (hi << 8));
@@ -572,7 +587,7 @@ template<bool forInc>
 void SmsCpu::CPD()
 {
 	uint8_t value = Read(_regHL);
-	
+
 	ExecCycles(5);
 
 	uint8_t result = (uint8_t)((int)_state.A - value);
@@ -637,7 +652,7 @@ void SmsCpu::LDD()
 		_regDE.Dec();
 	}
 	_regBC.Dec();
-	
+
 	ExecCycles(2);
 
 	ClearFlag(SmsCpuFlags::AddSub);
@@ -1270,7 +1285,6 @@ void SmsCpu::CP(uint8_t value)
 
 void SmsCpu::NOP()
 {
-
 }
 
 void SmsCpu::HALT()
@@ -1726,7 +1740,7 @@ void SmsCpu::CCF()
 	SetFlagState(SmsCpuFlags::HalfCarry, CheckFlag(SmsCpuFlags::Carry));
 	_state.Flags ^= SmsCpuFlags::Carry;
 	ClearFlag(SmsCpuFlags::AddSub);
-	
+
 	//Check if the previous instruction is an instruction that affects the flags
 	if(_state.FlagsChanged & 0x02) {
 		SetStandardFlags<0x28>(_state.A);

@@ -8,14 +8,14 @@ private:
 	NetplayControllerInfo _controller = {};
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
 		SV(_controller.Port);
 		SV(_controller.SubPort);
 	}
 
 public:
-	SelectControllerMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) { }
+	SelectControllerMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
 
 	SelectControllerMessage(NetplayControllerInfo controller) : NetMessage(MessageType::SelectController)
 	{

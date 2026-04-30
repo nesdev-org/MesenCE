@@ -1,19 +1,19 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using System;
+using Avalonia.Threading;
+using Mesen.Config;
 using Mesen.Debugger.Controls;
+using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
-using System.ComponentModel;
-using Avalonia.Interactivity;
-using Mesen.Debugger.Utilities;
 using Mesen.Utilities;
+using System;
 using System.Collections.Generic;
-using Avalonia.Threading;
+using System.ComponentModel;
 using System.Linq;
-using Mesen.Config;
-using Avalonia.Input;
 
 namespace Mesen.Debugger.Windows
 {
@@ -120,7 +120,7 @@ namespace Mesen.Debugger.Windows
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		public static void OpenAtTile(List<AddressInfo> tileAddresses, int columnCount, TileFormat tileFormat, int selectedPalette, Window parent, CpuType cpuType, int scanline, int cycle)
+		public static void OpenAtTile(List<TileAddressInfo> tileAddresses, int columnCount, TileFormat tileFormat, int selectedPalette, Window parent, CpuType cpuType, int scanline, int cycle)
 		{
 			if(EmuApi.IsPaused()) {
 				//If paused, use the current state - this might mismatch if viewer doesn't have "refresh on pause" enabled
@@ -135,16 +135,16 @@ namespace Mesen.Debugger.Windows
 			}
 		}
 
-		private static void InternalOpenAtTile(List<AddressInfo> tileAddresses, int columnCount, TileFormat tileFormat, int selectedPalette, Window parent)
+		private static void InternalOpenAtTile(List<TileAddressInfo> tileAddresses, int columnCount, TileFormat tileFormat, int selectedPalette, Window parent)
 		{
 			for(int i = 0; i < tileAddresses.Count; i++) {
-				AddressInfo addr = tileAddresses[i];
+				AddressInfo addr = tileAddresses[i].Address;
 				if(addr.Type.IsRelativeMemory()) {
-					tileAddresses[i] = DebugApi.GetAbsoluteAddress(addr);
+					tileAddresses[i].Address = DebugApi.GetAbsoluteAddress(addr);
 				}
 			}
 
-			if(tileAddresses.Any(x => x.Address < 0)) {
+			if(tileAddresses.Any(x => x.Address.Address < 0)) {
 				return;
 			}
 

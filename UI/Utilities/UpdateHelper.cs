@@ -80,7 +80,7 @@ namespace Mesen.Utilities
 			try {
 				//Backup current version 
 				File.Copy(destFile, backupFile, true);
-				
+
 				//Update with downloaded version
 				File.Copy(srcFile, destFile, true);
 

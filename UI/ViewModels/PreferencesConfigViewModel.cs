@@ -77,7 +77,7 @@ namespace Mesen.ViewModels
 				EmulatorShortcut.ToggleSprites1,
 				EmulatorShortcut.ToggleSprites2,
 				EmulatorShortcut.EnableAllLayers,
-				
+
 				EmulatorShortcut.ToggleLagCounter,
 				EmulatorShortcut.ResetLagCounter,
 
@@ -93,7 +93,7 @@ namespace Mesen.ViewModels
 				EmulatorShortcut.DecreaseSpeed,
 
 				EmulatorShortcut.OpenFile,
-				
+
 				EmulatorShortcut.InputBarcode,
 				EmulatorShortcut.LoadTape,
 				EmulatorShortcut.RecordTape,
@@ -160,10 +160,10 @@ namespace Mesen.ViewModels
 				return;
 			}
 
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { 
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
 				Config.ApplyConfig();
 				PreferencesConfig.UpdateTheme();
 			}));
 		}
-   }
+	}
 }

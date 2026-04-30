@@ -8,12 +8,12 @@
 class RegisterHandlerA : public IMemoryHandler
 {
 private:
-	SnesDmaController *_dmaController;
-	InternalRegisters *_regs;
-	SnesControlManager *_controlManager;
+	SnesDmaController* _dmaController;
+	InternalRegisters* _regs;
+	SnesControlManager* _controlManager;
 
 public:
-	RegisterHandlerA(SnesDmaController *dmaController, InternalRegisters *regs, SnesControlManager *controlManager) : IMemoryHandler(MemoryType::SnesRegister)
+	RegisterHandlerA(SnesDmaController* dmaController, InternalRegisters* regs, SnesControlManager* controlManager) : IMemoryHandler(MemoryType::SnesRegister)
 	{
 		_regs = regs;
 		_dmaController = dmaController;
@@ -45,7 +45,7 @@ public:
 		}
 	}
 
-	void PeekBlock(uint32_t addr, uint8_t *output) override
+	void PeekBlock(uint32_t addr, uint8_t* output) override
 	{
 		//Avoid side effects for now
 		memset(output, 0, 0x1000);

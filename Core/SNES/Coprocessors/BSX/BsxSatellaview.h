@@ -24,7 +24,7 @@ private:
 	void ProcessClocks();
 
 public:
-	BsxSatellaview(SnesConsole* console, IMemoryHandler *bBusHandler);
+	BsxSatellaview(SnesConsole* console, IMemoryHandler* bBusHandler);
 
 	void Reset();
 

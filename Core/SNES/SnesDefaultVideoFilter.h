@@ -26,7 +26,7 @@ protected:
 
 public:
 	SnesDefaultVideoFilter(Emulator* emu);
-	
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 	OverscanDimensions GetOverscan() override;
 };

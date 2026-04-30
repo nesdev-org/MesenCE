@@ -35,7 +35,7 @@ public:
 		output.resize(decompressedSize, 0);
 
 		unsigned long decompSize = decompressedSize;
-		if(uncompress(output.data(), &decompSize, input.data() + sizeof(uint32_t)*2, (unsigned long)input.size() - sizeof(uint32_t) * 2) != MZ_OK) {
+		if(uncompress(output.data(), &decompSize, input.data() + sizeof(uint32_t) * 2, (unsigned long)input.size() - sizeof(uint32_t) * 2) != MZ_OK) {
 			return false;
 		}
 

@@ -51,14 +51,14 @@ public:
 	virtual void Step(int32_t stepCount, StepType type) = 0;
 	virtual void Reset() = 0;
 	virtual void Run() = 0;
-	
+
 	virtual void Init() {}
 	virtual void ProcessConfigChange() {}
 
 	virtual void ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi) {}
 	virtual void ProcessInputOverrides(DebugControllerState inputOverrides[8]) {}
 
-	virtual void DrawPartialFrame() { }
+	virtual void DrawPartialFrame() {}
 
 	virtual DebuggerFeatures GetSupportedFeatures() { return {}; }
 	virtual uint64_t GetCpuCycleCount(bool forProfiler = false) { return 0; }

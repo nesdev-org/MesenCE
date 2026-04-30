@@ -31,7 +31,7 @@ namespace Mesen.ViewModels
 		[Reactive] public Size RendererSize { get; set; }
 
 		[Reactive] public bool IsMenuVisible { get; set; }
-		
+
 		[Reactive] public bool IsNativeRendererVisible { get; set; }
 		[Reactive] public bool IsSoftwareRendererVisible { get; set; }
 
@@ -60,7 +60,7 @@ namespace Mesen.ViewModels
 				IsNativeRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface == null;
 				IsSoftwareRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface != null;
 			});
-			
+
 			this.WhenAnyValue(x => x.RomInfo).Subscribe(x => {
 				bool showAudioPlayer = x.Format == RomFormat.Nsf || x.Format == RomFormat.Spc || x.Format == RomFormat.Gbs || x.Format == RomFormat.PceHes;
 				if(AudioPlayer == null && showAudioPlayer) {

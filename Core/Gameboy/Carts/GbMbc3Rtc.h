@@ -81,7 +81,7 @@ public:
 				_tickCounter -= 32768;
 			}
 		}
-		
+
 		uint64_t remainder = elaspedClocks % clocksPerTick;
 		_lastMasterClock = _emu->GetMasterClock() - remainder;
 	}

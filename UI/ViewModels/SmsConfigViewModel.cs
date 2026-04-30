@@ -19,7 +19,7 @@ namespace Mesen.ViewModels
 		[Reactive] public SmsConfigTab SelectedTab { get; set; } = 0;
 
 		public SmsInputConfigViewModel Input { get; private set; }
-		
+
 		public Enum[] AvailableRegionsSms => new Enum[] {
 			ConsoleRegion.Auto,
 			ConsoleRegion.Ntsc,

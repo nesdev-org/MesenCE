@@ -1,14 +1,14 @@
 #if (defined(DUMMYCPU) && !defined(__DUMMYCPU__H)) || (!defined(DUMMYCPU) && !defined(__CPU__H))
-#ifdef DUMMYCPU
-#define __DUMMYCPU__H
-#else
-#define __CPU__H
-#endif
+	#ifdef DUMMYCPU
+		#define __DUMMYCPU__H
+	#else
+		#define __CPU__H
+	#endif
 
-#include "pch.h"
-#include "SNES/SnesCpuTypes.h"
-#include "Utilities/ISerializable.h"
-#include "Shared/MemoryOperationType.h"
+	#include "pch.h"
+	#include "SNES/SnesCpuTypes.h"
+	#include "Utilities/ISerializable.h"
+	#include "Shared/MemoryOperationType.h"
 
 class MemoryMappings;
 class SnesMemoryManager;
@@ -30,12 +30,12 @@ private:
 	static constexpr uint32_t LegacyIrqVector = 0xFFFE;
 	static constexpr uint32_t LegacyCoprocessorVector = 0x00FFF4;
 
-	typedef void(SnesCpu::*Func)();
-	
-	SnesMemoryManager *_memoryManager = nullptr;
-	SnesDmaController *_dmaController = nullptr;
-	Emulator *_emu = nullptr;
-	SnesConsole *_console = nullptr;
+	typedef void (SnesCpu::*Func)();
+
+	SnesMemoryManager* _memoryManager = nullptr;
+	SnesDmaController* _dmaController = nullptr;
+	Emulator* _emu = nullptr;
+	SnesConsole* _console = nullptr;
 
 	bool _immediateMode = false;
 	uint32_t _readWriteMask = 0xFFFFFF;
@@ -52,9 +52,9 @@ private:
 	uint16_t GetDirectAddressIndirectWord(uint16_t offset);
 	uint16_t GetDirectAddressIndirectWordWithPageWrap(uint16_t offset);
 	uint32_t GetDirectAddressIndirectLong(uint16_t offset);
-	
+
 	uint8_t GetOpCode();
-	
+
 	uint16_t GetResetVector();
 
 	void ProcessCpuCycle();
@@ -64,7 +64,7 @@ private:
 	void IdleOrRead();
 	void IdleEndJump();
 	void IdleTakeBranch();
-	
+
 	uint8_t ReadOperandByte();
 	uint16_t ReadOperandWord();
 	uint32_t ReadOperandLong();
@@ -77,9 +77,9 @@ private:
 	__forceinline void RestrictStackPointerValue();
 	void SetPS(uint8_t ps);
 
-	void SetRegister(uint8_t &reg, uint8_t value);
-	void SetRegister(uint16_t &reg, uint16_t value, bool eightBitMode);
-	
+	void SetRegister(uint8_t& reg, uint8_t value);
+	void SetRegister(uint16_t& reg, uint16_t value, bool eightBitMode);
+
 	void SetZeroNegativeFlags(uint16_t value);
 	void SetZeroNegativeFlags(uint8_t value);
 
@@ -116,7 +116,7 @@ private:
 	void Sub8(uint8_t value);
 	void Sub16(uint16_t value);
 	void SBC();
-	
+
 	//Branch instructions
 	void BCC();
 	void BCS();
@@ -129,7 +129,7 @@ private:
 	void BVC();
 	void BVS();
 	void BranchRelative(bool branch);
-	
+
 	//Set/clear flag instructions
 	void CLC();
 	void CLD();
@@ -153,7 +153,7 @@ private:
 	void DEC_Acc();
 	void INC_Acc();
 
-	void IncDecReg(uint16_t & reg, int8_t offset);
+	void IncDecReg(uint16_t& reg, int8_t offset);
 	void IncDec(int8_t offset);
 
 	//Compare instructions
@@ -223,10 +223,10 @@ private:
 	void PLY();
 
 	void PushRegister(uint16_t reg, bool eightBitMode);
-	void PullRegister(uint16_t &reg, bool eightBitMode);
+	void PullRegister(uint16_t& reg, bool eightBitMode);
 
 	//Store/load instructions
-	void LoadRegister(uint16_t &reg, bool eightBitMode);
+	void LoadRegister(uint16_t& reg, bool eightBitMode);
 	void StoreRegister(uint16_t val, bool eightBitMode);
 
 	void LDA();
@@ -237,7 +237,7 @@ private:
 	void STX();
 	void STY();
 	void STZ();
-		
+
 	//Test bits
 	template<typename T> void TestBits(T value, bool alterZeroFlagOnly);
 	void BIT();
@@ -291,7 +291,7 @@ private:
 	void AddrMode_BlkMov();
 
 	uint8_t ReadDirectOperandByte();
-	
+
 	//Direct: d
 	void AddrMode_Dir();
 	//Direct Indexed: d,x
@@ -300,7 +300,7 @@ private:
 	void AddrMode_DirIdxY();
 	//Direct Indirect: (d)
 	void AddrMode_DirInd();
-	
+
 	//Direct Indexed Indirect: (d,x)
 	void AddrMode_DirIdxIndX();
 	//Direct Indirect Indexed: (d),y
@@ -322,17 +322,17 @@ private:
 
 	void AddrMode_StkRel();
 	void AddrMode_StkRelIndIdxY();
-	
+
 	__forceinline void RunOp();
 	__noinline void ProcessHaltedState();
 	__forceinline void CheckForInterrupts();
 
 public:
-#ifndef DUMMYCPU
-	SnesCpu(SnesConsole *console);
-#else
+	#ifndef DUMMYCPU
+	SnesCpu(SnesConsole* console);
+	#else
 	DummySnesCpu(SnesConsole* console, CpuType type);
-#endif
+	#endif
 
 	virtual ~SnesCpu();
 
@@ -355,9 +355,9 @@ public:
 	void ClearIrqSource(SnesIrqSource source);
 
 	// Inherited via ISerializable
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 
-#ifdef DUMMYCPU
+	#ifdef DUMMYCPU
 private:
 	MemoryMappings* _memoryMappings = nullptr;
 
@@ -367,12 +367,12 @@ private:
 	void LogMemoryOperation(uint32_t addr, uint8_t value, MemoryOperationType type);
 
 public:
-	void SetDummyState(SnesCpuState &state);
+	void SetDummyState(SnesCpuState& state);
 	int32_t GetLastOperand();
 
 	uint32_t GetOperationCount();
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
-#endif
+	#endif
 };
 
 template<uint64_t count>

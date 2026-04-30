@@ -115,9 +115,9 @@ uint8_t GbSquareChannel::GetRawOutput()
 
 double GbSquareChannel::GetOutput()
 {
-	//"If a DAC is enabled, the digital range $0 to $F is linearly translated to the analog range -1 to 1, 
-	//in arbitrary units. Importantly, the slope is negative: “digital 0” maps to “analog 1”, not “analog -1”."	
-	
+	//"If a DAC is enabled, the digital range $0 to $F is linearly translated to the analog range -1 to 1,
+	//in arbitrary units. Importantly, the slope is negative: “digital 0” maps to “analog 1”, not “analog -1”."
+
 	//Return -7 to 7 "analog" range (higher digital value = lower analog value)
 	return (7 - (int8_t)_state.Output) * (double)_dac.GetDacVolume() / 100;
 }
@@ -135,7 +135,7 @@ void GbSquareChannel::Exec(uint32_t clocksToRun)
 			_state.SweepUpdateDelay -= clocksToRun;
 		} else {
 			_state.SweepUpdateDelay = 0;
-			
+
 			//"If the new frequency is 2047 or less and the sweep shift is not zero, this new frequency is written back to the shadow frequency and square 1's frequency in NR13 and NR14,"
 			if(_state.SweepShift) {
 				uint16_t newFreq = GetSweepTargetFrequency();
@@ -167,21 +167,19 @@ uint8_t GbSquareChannel::Read(uint16_t addr)
 	uint8_t value = 0;
 	switch(addr) {
 		case 0:
-			value = (
+			value =
 				(_state.SweepPeriod << 4) |
 				(_state.SweepNegate ? 0x08 : 0) |
-				_state.SweepShift
-			);
+				_state.SweepShift;
 			break;
 
 		case 1: value = _state.Duty << 6; break;
 
 		case 2:
-			value = (
+			value =
 				(_state.EnvVolume << 4) |
 				(_state.EnvRaiseVolume ? 0x08 : 0) |
-				_state.EnvPeriod
-			);
+				_state.EnvPeriod;
 			break;
 
 		case 4: value = _state.LengthEnabled ? 0x40 : 0; break;
@@ -301,10 +299,27 @@ void GbSquareChannel::Write(uint16_t addr, uint8_t value)
 
 void GbSquareChannel::Serialize(Serializer& s)
 {
-	SV(_state.SweepPeriod); SV(_state.SweepNegate); SV(_state.SweepShift); SV(_state.SweepTimer); SV(_state.SweepEnabled); SV(_state.SweepFreq);
-	SV(_state.Volume); SV(_state.EnvVolume); SV(_state.EnvRaiseVolume); SV(_state.EnvPeriod); SV(_state.EnvTimer); SV(_state.Duty); SV(_state.Frequency);
-	SV(_state.Length); SV(_state.LengthEnabled); SV(_state.Enabled); SV(_state.Timer); SV(_state.DutyPos); SV(_state.Output);
-	SV(_state.SweepNegateCalcDone); SV(_state.EnvStopped);
+	SV(_state.SweepPeriod);
+	SV(_state.SweepNegate);
+	SV(_state.SweepShift);
+	SV(_state.SweepTimer);
+	SV(_state.SweepEnabled);
+	SV(_state.SweepFreq);
+	SV(_state.Volume);
+	SV(_state.EnvVolume);
+	SV(_state.EnvRaiseVolume);
+	SV(_state.EnvPeriod);
+	SV(_state.EnvTimer);
+	SV(_state.Duty);
+	SV(_state.Frequency);
+	SV(_state.Length);
+	SV(_state.LengthEnabled);
+	SV(_state.Enabled);
+	SV(_state.Timer);
+	SV(_state.DutyPos);
+	SV(_state.Output);
+	SV(_state.SweepNegateCalcDone);
+	SV(_state.EnvStopped);
 	SV(_state.SweepUpdateDelay);
 	SV(_state.FirstStep);
 	SV(_dac);

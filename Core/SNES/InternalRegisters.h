@@ -41,7 +41,7 @@ private:
 	uint8_t _autoReadPort2Value = 0;
 
 	void SetIrqFlag(bool irqFlag);
-	
+
 	uint8_t ReadControllerData(uint8_t port, bool getMsb);
 
 	__forceinline void UpdateIrqLevel();
@@ -67,7 +67,7 @@ public:
 	bool IsFastRomEnabled() { return _state.EnableFastRom; }
 	uint16_t GetHorizontalTimer() { return _state.HorizontalTimer; }
 	uint16_t GetVerticalTimer() { return _state.VerticalTimer; }
-	
+
 	uint8_t Peek(uint16_t addr);
 	uint8_t Read(uint16_t addr);
 	void Write(uint16_t addr, uint8_t value);
@@ -75,7 +75,7 @@ public:
 	InternalRegisterState GetState();
 	AluState GetAluState();
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 };
 
 void InternalRegisters::UpdateIrqLevel()
@@ -85,10 +85,9 @@ void InternalRegisters::UpdateIrqLevel()
 		return;
 	}
 
-	bool irqLevel = (
+	bool irqLevel =
 		(!_state.EnableHorizontalIrq || _state.HorizontalTimer == _hCounter) &&
-		(!_state.EnableVerticalIrq || _state.VerticalTimer == _vCounter)
-	);
+		(!_state.EnableVerticalIrq || _state.VerticalTimer == _vCounter);
 
 	if(!_irqLevel && irqLevel) {
 		if(_state.EnableHorizontalIrq && _memoryManager->GetHClock() == 6) {

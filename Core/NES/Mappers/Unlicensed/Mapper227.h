@@ -27,7 +27,7 @@ protected:
 				SelectPrgPage(1, prgBank);
 			}
 		} else {
-			if(sFlag){
+			if(sFlag) {
 				if(lFlag) {
 					SelectPrgPage(0, prgBank & 0x3E);
 					SelectPrgPage(1, prgBank | 0x07);

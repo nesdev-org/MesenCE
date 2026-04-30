@@ -323,7 +323,11 @@ void PceVdc::ProcessSpriteEvaluation()
 			default:
 			case 0: height = 16; break;
 			case 1: height = 32; break;
-			case 2: case 3: height = 64; break;
+
+			case 2:
+			case 3:
+				height = 64;
+				break;
 		}
 
 		if(_spriteRow >= y + height) {
@@ -359,7 +363,7 @@ void PceVdc::ProcessSpriteEvaluation()
 		}
 		uint16_t spriteTileY = tileIndex | (rowOffset << 1);
 
-		for(int x = 0; x < width; x+=16) {
+		for(int x = 0; x < width; x += 16) {
 			if(_spriteCount >= 16) {
 				_hasSpriteOverflow = true;
 				if(!removeSpriteLimit) {
@@ -415,7 +419,12 @@ void PceVdc::LoadBackgroundTiles()
 			} else {
 				switch(i & 0x07) {
 					//CPU can access VRAM
-					case 0: case 2: case 4: case 6: _allowVramAccess = true; break;
+					case 0:
+					case 2:
+					case 4:
+					case 6:
+						_allowVramAccess = true;
+						break;
 
 					case 1: LoadBatEntry(scrollOffset, columnMask, row); break;
 					case 3: _allowVramAccess = false; break; //Unused BAT read?
@@ -517,7 +526,11 @@ void PceVdc::LoadSpriteTiles()
 		//Modes 0/2/3 load 4 words over 4, 8 or 16 VDC clocks
 		uint16_t clocksPerSprite;
 		switch(_state.HvLatch.SpriteAccessMode) {
-			default: case 0: clocksPerSprite = 4; break;
+			default:
+			case 0:
+				clocksPerSprite = 4;
+				break;
+
 			case 2: clocksPerSprite = 8; break;
 			case 3: clocksPerSprite = 16; break;
 		}
@@ -755,8 +768,8 @@ void PceVdc::ProcessEndOfScanline()
 		//Could be incorrect in some scenarios, needs more testing
 		_loadSpriteStart = DotsToClocks(36);
 	}
-	
-	//VCE sets HBLANK to low every 1365 clocks, interrupting what 
+
+	//VCE sets HBLANK to low every 1365 clocks, interrupting what
 	//the VDC was doing and starting a HSW phase
 	if(_hMode != PceVdcModeH::Hsw) {
 		_hMode = PceVdcModeH::Hsw;
@@ -823,8 +836,7 @@ uint8_t PceVdc::GetSpritePixelColor(const uint16_t chrData[4], const uint8_t shi
 		((chrData[0] >> shift) & 0x01) |
 		(((chrData[1] >> shift) & 0x01) << 1) |
 		(((chrData[2] >> shift) & 0x01) << 2) |
-		(((chrData[3] >> shift) & 0x01) << 3)
-	);
+		(((chrData[3] >> shift) & 0x01) << 3));
 }
 
 void PceVdc::DrawScanline()
@@ -917,7 +929,7 @@ void PceVdc::InternalDrawScanline()
 											outColor = PceVpc::SpritePixelFlag | _vce->GetPalette(256 + _drawSprites[i].Palette * 16 + sprColor);
 										}
 									}
-								
+
 									if(_drawSprites[i].Index == 0) {
 										checkSprite0Hit = true;
 									} else {
@@ -1021,7 +1033,12 @@ void PceVdc::ProcessVramAccesses()
 			uint16_t dotCount = clockCount / GetClockDivider();
 			uint16_t clocksPerSprite;
 			switch(_state.HvLatch.SpriteAccessMode) {
-				default: case 0: case 1: clocksPerSprite = 4; break;
+				default:
+				case 0:
+				case 1:
+					clocksPerSprite = 4;
+					break;
+
 				case 2: clocksPerSprite = 8; break;
 				case 3: clocksPerSprite = 16; break;
 			}
@@ -1112,7 +1129,9 @@ uint8_t PceVdc::ReadRegister(uint16_t addr)
 			return result;
 		}
 
-		case 1: return 0; //Unused, reads return 0
+		case 1:
+			//Unused, reads return 0
+			return 0;
 
 		//Reads to 2/3 will always return the read buffer, but the
 		//read address will only increment when register 2 is selected
@@ -1200,7 +1219,7 @@ void PceVdc::WriteRegister(uint16_t addr, uint8_t value)
 						_state.EnableOverflowIrq = (value & 0x02) != 0;
 						_state.EnableScanlineIrq = (value & 0x04) != 0;
 						_state.EnableVerticalBlankIrq = (value & 0x08) != 0;
-						
+
 						_state.OutputVerticalSync = ((value & 0x30) >> 4) >= 2;
 						_state.OutputHorizontalSync = ((value & 0x30) >> 4) >= 1;
 
@@ -1239,7 +1258,11 @@ void PceVdc::WriteRegister(uint16_t addr, uint8_t value)
 						switch((value >> 4) & 0x03) {
 							case 0: _state.HvReg.ColumnCount = 32; break;
 							case 1: _state.HvReg.ColumnCount = 64; break;
-							case 2: case 3: _state.HvReg.ColumnCount = 128; break;
+
+							case 2:
+							case 3:
+								_state.HvReg.ColumnCount = 128;
+								break;
 						}
 
 						_state.HvReg.RowCount = (value & 0x40) ? 64 : 32;
@@ -1266,7 +1289,7 @@ void PceVdc::WriteRegister(uint16_t addr, uint8_t value)
 					}
 					break;
 
-				case 0x0C: 
+				case 0x0C:
 					if(msb) {
 						_state.HvReg.VertDisplayStart = value;
 					} else {
@@ -1278,7 +1301,7 @@ void PceVdc::WriteRegister(uint16_t addr, uint8_t value)
 					UpdateReg<0x1FF>(_state.HvReg.VertDisplayWidth, value, msb);
 					break;
 
-				case 0x0E: 
+				case 0x0E:
 					if(!msb) {
 						_state.HvReg.VertEndPosVcr = value;
 					}

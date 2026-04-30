@@ -50,7 +50,7 @@ shared_ptr<BaseControlDevice> SnesControlManager::CreateControllerDevice(Control
 		case ControllerType::SnesMouse: device.reset(new SnesMouse(_emu, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys)); break;
 
 		case ControllerType::SuperScope: device.reset(new SuperScope(_console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys)); break;
-		
+
 		case ControllerType::Multitap: {
 			ControllerConfig controllers[4];
 			if(port == 0) {
@@ -101,7 +101,7 @@ uint8_t SnesControlManager::Read(uint16_t addr, bool forAutoRead)
 	}
 
 	uint8_t value = _console->GetMemoryManager()->GetOpenBus() & (addr == 0x4016 ? 0xFC : 0xE0);
-	for(shared_ptr<BaseControlDevice> &device : _controlDevices) {
+	for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
 		value |= device->ReadRam(addr);
 	}
 
@@ -141,7 +141,7 @@ void SnesControlManager::SetAutoReadStrobe(bool strobe)
 	}
 }
 
-void SnesControlManager::Serialize(Serializer &s)
+void SnesControlManager::Serialize(Serializer& s)
 {
 	if(!s.IsSaving()) {
 		UpdateControlDevices();

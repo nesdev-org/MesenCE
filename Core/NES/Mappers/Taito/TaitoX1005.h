@@ -52,14 +52,14 @@ protected:
 		switch(addr) {
 			case 0x7EF0:
 				SelectChrPage(0, value);
-				SelectChrPage(1, value  + 1);
+				SelectChrPage(1, value + 1);
 				if(_alternateMirroring) {
 					SetNametable(0, value >> 7);
 					SetNametable(1, value >> 7);
 				}
 				break;
 			case 0x7EF1:
-				SelectChrPage(2, value );
+				SelectChrPage(2, value);
 				SelectChrPage(3, value + 1);
 				if(_alternateMirroring) {
 					SetNametable(2, value >> 7);
@@ -72,26 +72,31 @@ protected:
 			case 0x7EF4: SelectChrPage(6, value); break;
 			case 0x7EF5: SelectChrPage(7, value); break;
 
-			case 0x7EF6: case 0x7EF7:
+			case 0x7EF6:
+			case 0x7EF7:
 				if(!_alternateMirroring) {
 					SetMirroringType((value & 0x01) == 0x01 ? MirroringType::Vertical : MirroringType::Horizontal);
 				}
 				break;
 
-			case 0x7EF8: case 0x7EF9:
-				_ramPermission = value; 
+			case 0x7EF8:
+			case 0x7EF9:
+				_ramPermission = value;
 				UpdateRamAccess();
 				break;
 
-			case 0x7EFA: case 0x7EFB:
+			case 0x7EFA:
+			case 0x7EFB:
 				SelectPrgPage(0, value);
 				break;
 
-			case 0x7EFC: case 0x7EFD:
+			case 0x7EFC:
+			case 0x7EFD:
 				SelectPrgPage(1, value);
 				break;
 
-			case 0x7EFE: case 0x7EFF:
+			case 0x7EFE:
+			case 0x7EFF:
 				SelectPrgPage(2, value);
 				break;
 		}
@@ -101,7 +106,7 @@ protected:
 	{
 		BaseMapper::Serialize(s);
 		SV(_ramPermission);
-		
+
 		if(!s.IsSaving()) {
 			UpdateRamAccess();
 		}

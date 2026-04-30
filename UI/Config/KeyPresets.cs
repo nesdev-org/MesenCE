@@ -50,7 +50,7 @@ namespace Mesen.Config
 				m.A = InputApi.GetKeyCode("Z");
 				m.GenericKey1 = InputApi.GetKeyCode("Q");
 				m.Start = InputApi.GetKeyCode("E");
-				
+
 				m.U = InputApi.GetKeyCode("A");
 				m.D = InputApi.GetKeyCode("D");
 				m.L = InputApi.GetKeyCode("S");

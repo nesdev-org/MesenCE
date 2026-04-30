@@ -47,7 +47,7 @@ uint8_t BsxSatellaview::Read(uint32_t addr)
 			case 0x218B: return _stream[0].GetPrefix();
 			case 0x218C: return _stream[0].GetData();
 			case 0x218D: return _stream[0].GetStatus((_streamReg & 0x01) != 0);
-			
+
 			case 0x218E: return _stream[1].GetChannel() & 0xFF;
 			case 0x218F: return (_stream[1].GetChannel()) >> 8;
 			case 0x2190: return _stream[1].GetPrefixCount();
@@ -63,8 +63,8 @@ uint8_t BsxSatellaview::Read(uint32_t addr)
 			case 0x2199: return 0x01; //Serial IO (???)
 			case 0x219A: return 0x10; //Unknown
 		}
-	} 
-	
+	}
+
 	//Use regular B-bus handler for everything else
 	return _bBusHandler->Read(addr);
 }
@@ -134,7 +134,10 @@ AddressInfo BsxSatellaview::GetAbsoluteAddress(uint32_t address)
 
 void BsxSatellaview::Serialize(Serializer& s)
 {
-	SV(_extOutput); SV(_streamReg); SV(_customDate); SV(_prevMasterClock);
+	SV(_extOutput);
+	SV(_streamReg);
+	SV(_customDate);
+	SV(_prevMasterClock);
 	SV(_stream[0]);
 	SV(_stream[1]);
 }

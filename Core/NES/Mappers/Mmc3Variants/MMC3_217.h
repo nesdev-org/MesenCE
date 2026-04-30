@@ -6,7 +6,7 @@ class MMC3_217 : public MMC3
 {
 private:
 	uint8_t _exRegs[4] = {};
-	static constexpr uint8_t _lut[8] = { 0,6,3,7,5,2,4,1 };
+	static constexpr uint8_t _lut[8] = { 0, 6, 3, 7, 5, 2, 4, 1 };
 
 protected:
 	void InitMapper() override
@@ -87,7 +87,7 @@ protected:
 			}
 		} else {
 			switch(addr & 0xE001) {
-				case 0x8000: 
+				case 0x8000:
 					MMC3::WriteRegister(_exRegs[2] ? 0xC000 : 0x8000, value);
 					break;
 

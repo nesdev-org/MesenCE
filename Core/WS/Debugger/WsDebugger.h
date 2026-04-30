@@ -63,7 +63,7 @@ public:
 	void Reset() override;
 
 	void ProcessInstruction();
-	
+
 	template<uint8_t accessWidth> void ProcessRead(uint32_t addr, uint16_t value, MemoryOperationType type);
 	template<uint8_t accessWidth> void ProcessWrite(uint32_t addr, uint16_t value, MemoryOperationType type);
 

@@ -21,7 +21,7 @@ private:
 	int16_t _dspOutput[0x2000] = {};
 
 	void UpdateCounter();
-	
+
 	int32_t CalculateFir(int index, int ch);
 
 	void EchoStep22();
@@ -53,7 +53,7 @@ public:
 	void Write(uint8_t reg, uint8_t value);
 
 	uint8_t ReadReg(DspGlobalRegs reg) { return _state.Regs[(int)reg]; }
-	
+
 	void WriteGlobalReg(DspGlobalRegs reg, uint8_t value)
 	{
 		_state.ExternalRegs[(int)reg] = value;

@@ -25,9 +25,9 @@ protected:
 				for(int j = 0; j < 4; j++) {
 					if(_isSideB) {
 						//Invert the order of each row
-						SetPressedState(i*4+j, keyMapping.CustomKeys[i*4+(3-j)]);
+						SetPressedState(i * 4 + j, keyMapping.CustomKeys[i * 4 + (3 - j)]);
 					} else {
-						SetPressedState(i*4+j, keyMapping.CustomKeys[i*4+j]);
+						SetPressedState(i * 4 + j, keyMapping.CustomKeys[i * 4 + j]);
 					}
 				}
 			}
@@ -51,7 +51,8 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_stateBufferL); SV(_stateBufferH);
+		SV(_stateBufferL);
+		SV(_stateBufferH);
 	}
 
 public:

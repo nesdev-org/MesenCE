@@ -40,8 +40,7 @@ struct WsCpuFlags
 			((uint8_t)Direction << 10) |
 			((uint8_t)Overflow << 11) |
 			((uint8_t)Mode << 15) |
-			0x7002
-		);
+			0x7002);
 	}
 
 	void Set(uint16_t f)
@@ -182,7 +181,7 @@ struct WsPpuState : BaseState
 
 	uint8_t BgColor;
 	uint8_t IrqScanline;
-	
+
 	bool LcdEnabled;
 	bool HighContrast;
 	bool SleepEnabled;
@@ -234,7 +233,7 @@ struct WsMemoryManagerState
 	bool ColorEnabled;
 	bool Enable4bpp;
 	bool Enable4bppPacked;
-	
+
 	bool BootRomDisabled;
 	bool CartWordBus = true;
 	bool SlowRom;
@@ -313,7 +312,8 @@ struct BaseWsApuState
 	}
 };
 
-struct WsApuCh1State : public BaseWsApuState {};
+struct WsApuCh1State : public BaseWsApuState
+{};
 
 struct WsApuCh2State : public BaseWsApuState
 {
@@ -401,7 +401,7 @@ struct WsApuState
 	bool ForceOutput2;
 	bool ForceOutput4;
 	bool ForceOutputCh2Voice;
-	
+
 	uint8_t SoundTest;
 };
 

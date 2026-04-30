@@ -80,15 +80,26 @@ protected:
 					_autoDetectVariant = true;
 				}
 				break;
-			case 210: 
+			case 210:
 				switch(_romInfo.SubMapperID) {
-					case 0: _variant = NamcoVariant::Unknown; _autoDetectVariant = true; break;
-					case 1: _variant = NamcoVariant::Namco175; _autoDetectVariant = false; break;
-					case 2: _variant = NamcoVariant::Namco340; _autoDetectVariant = false; break;
+					case 0:
+						_variant = NamcoVariant::Unknown;
+						_autoDetectVariant = true;
+						break;
+
+					case 1:
+						_variant = NamcoVariant::Namco175;
+						_autoDetectVariant = false;
+						break;
+
+					case 2:
+						_variant = NamcoVariant::Namco340;
+						_autoDetectVariant = false;
+						break;
 				}
 				break;
 		}
-		
+
 		_notNamco340 = false;
 
 		_writeProtect = 0;
@@ -110,7 +121,7 @@ protected:
 			memcpy(_audio->GetInternalRam(), batteryContent.data() + _saveRamSize, Namco163Audio::AudioRamSize);
 		}
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
@@ -173,7 +184,7 @@ protected:
 			case 0x4800: return _audio->ReadRegister(addr);
 			case 0x5000: return _irqCounter & 0xFF;
 			case 0x5800: return (_irqCounter >> 8);
-			default:	return BaseMapper::ReadRegister(addr);
+			default: return BaseMapper::ReadRegister(addr);
 		}
 	}
 
@@ -199,7 +210,10 @@ protected:
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
 
-			case 0x8000: case 0x8800: case 0x9000: case 0x9800: {
+			case 0x8000:
+			case 0x8800:
+			case 0x9000:
+			case 0x9800: {
 				uint8_t bankNumber = (addr - 0x8000) >> 11;
 				if(!_lowChrNtMode && value >= 0xE0 && _variant == NamcoVariant::Namco163) {
 					SelectChrPage(bankNumber, value & 0x01, ChrMemoryType::NametableRam);
@@ -209,7 +223,10 @@ protected:
 				break;
 			}
 
-			case 0xA000: case 0xA800: case 0xB000: case 0xB800: {
+			case 0xA000:
+			case 0xA800:
+			case 0xB000:
+			case 0xB800: {
 				uint8_t bankNumber = ((addr - 0xA000) >> 11) + 4;
 				if(!_highChrNtMode && value >= 0xE0 && _variant == NamcoVariant::Namco163) {
 					SelectChrPage(bankNumber, value & 0x01, ChrMemoryType::NametableRam);
@@ -219,7 +236,10 @@ protected:
 				break;
 			}
 
-			case 0xC000: case 0xC800: case 0xD000: case 0xD800:
+			case 0xC000:
+			case 0xC800:
+			case 0xD000:
+			case 0xD800:
 				if(addr >= 0xC800) {
 					SetVariant(NamcoVariant::Namco163);
 				} else if(_variant != NamcoVariant::Namco163) {

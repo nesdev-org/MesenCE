@@ -18,7 +18,7 @@ struct HesFileData;
 struct DiscInfo;
 enum class PceConsoleType;
 
-class PceConsole final: public IConsole
+class PceConsole final : public IConsole
 {
 private:
 	Emulator* _emu;
@@ -46,7 +46,7 @@ private:
 public:
 	PceConsole(Emulator* emu);
 	virtual ~PceConsole();
-	
+
 	static vector<string> GetSupportedExtensions() { return { ".pce", ".cue", ".sgx", ".hes" }; }
 	static vector<string> GetSupportedSignatures() { return { "HESM" }; }
 
@@ -55,7 +55,7 @@ public:
 	void InitializeRam(void* data, uint32_t length);
 
 	void Reset() override;
-	
+
 	LoadRomResult LoadRom(VirtualFile& romFile) override;
 
 	void RunFrame() override;
@@ -77,7 +77,7 @@ public:
 	PceMemoryManager* GetMemoryManager();
 
 	bool IsSuperGrafx() { return _vdc2 != nullptr; }
-	
+
 	uint64_t GetMasterClock() override;
 	uint32_t GetMasterClockRate() override;
 	double GetFps() override;

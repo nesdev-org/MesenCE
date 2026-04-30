@@ -49,22 +49,22 @@
 #include "Shared/MemoryOperationType.h"
 #include "Shared/EventType.h"
 
-Emulator::Emulator() :
-	_settings(new EmuSettings(this)),
-	_debugHud(new DebugHud()),
-	_scriptHud(new DebugHud()),
-	_notificationManager(new NotificationManager()),
-	_batteryManager(new BatteryManager()),
-	_soundMixer(new SoundMixer(this)),
-	_videoRenderer(new VideoRenderer(this)),
-	_videoDecoder(new VideoDecoder(this)),
-	_saveStateManager(new SaveStateManager(this)),
-	_cheatManager(new CheatManager(this)),
-	_movieManager(new MovieManager(this)),
-	_historyViewer(new HistoryViewer(this)),
-	_gameServer(new GameServer(this)),
-	_gameClient(new GameClient(this)),
-	_rewindManager(new RewindManager(this))
+Emulator::Emulator()
+	: _settings(new EmuSettings(this)),
+	  _debugHud(new DebugHud()),
+	  _scriptHud(new DebugHud()),
+	  _notificationManager(new NotificationManager()),
+	  _batteryManager(new BatteryManager()),
+	  _soundMixer(new SoundMixer(this)),
+	  _videoRenderer(new VideoRenderer(this)),
+	  _videoDecoder(new VideoDecoder(this)),
+	  _saveStateManager(new SaveStateManager(this)),
+	  _cheatManager(new CheatManager(this)),
+	  _movieManager(new MovieManager(this)),
+	  _historyViewer(new HistoryViewer(this)),
+	  _gameServer(new GameServer(this)),
+	  _gameClient(new GameClient(this)),
+	  _rewindManager(new RewindManager(this))
 {
 	_paused = false;
 	_pauseOnNextFrame = false;
@@ -338,7 +338,7 @@ void Emulator::Reset()
 void Emulator::ReloadRom(bool forPowerCycle)
 {
 	RomInfo info = GetRomInfo();
-	
+
 	//Cast RomFile/PatchFile to string to make sure the file is reloaded from the disk
 	//In some scenarios, the file might be in memory already, which will prevent the reload
 	//from actually reloading the rom from the disk.
@@ -399,13 +399,13 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 	//Once emulation is stopped, warn the UI that a game is about to be loaded
 	//This allows the UI to finish processing pending calls to the debug tools, etc.
 	_notificationManager->SendNotification(ConsoleNotificationType::BeforeGameLoad);
-	
+
 	bool wasPaused = IsPaused();
 
 	//Keep a reference to the original debugger
 	shared_ptr<Debugger> debugger = _debugger.lock();
 	bool debuggerActive = debugger != nullptr;
-	
+
 	//Unset _debugger to ensure nothing calls the debugger while initializing the new rom
 	ResetDebugger();
 
@@ -438,7 +438,7 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 	//Try loading the rom, give priority to file extension, then trying to check for file signatures if extension is unknown
 	TryLoadRom(romFile, result, console, false);
 	TryLoadRom(romFile, result, console, true);
-	
+
 	if(result != LoadRomResult::Success) {
 		MessageManager::DisplayMessage("Error", "CouldNotLoadFile", romFile.GetFileName());
 		if(debugger) {
@@ -510,7 +510,7 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 	//deadlocks with DebugBreakHelper if GameLoaded event starts the debugger
 	_blockDebuggerRequestCount--;
 	dbgLock.Release();
-	
+
 	_threadPaused = true;
 	bool needPause = wasPaused && _debugger;
 	if(needPause) {
@@ -518,7 +518,7 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 		//(must be done after setting _threadPaused to true)
 		_debugger->Step(GetCpuTypes()[0], 1, StepType::Step, BreakSource::Pause);
 	}
-	
+
 	GameLoadedEventParams params = { needPause, forPowerCycle };
 	_notificationManager->SendNotification(ConsoleNotificationType::GameLoaded, &params);
 	_threadPaused = false;
@@ -654,7 +654,7 @@ ConsoleType Emulator::GetConsoleType()
 vector<CpuType> Emulator::GetCpuTypes()
 {
 	shared_ptr<IConsole> console = GetConsole();
-	return console ? console->GetCpuTypes() : vector<CpuType>{};
+	return console ? console->GetCpuTypes() : vector<CpuType> {};
 }
 
 TimingInfo Emulator::GetTimingInfo(CpuType cpuType)
@@ -840,7 +840,7 @@ void Emulator::WaitForPauseEnd()
 	PlatformUtilities::DisableScreensaver();
 	PlatformUtilities::EnableHighResolutionTimer();
 
-	while(!_stopFlag && !_runLock.TryAcquire(50)) { }
+	while(!_stopFlag && !_runLock.TryAcquire(50)) {}
 
 	if(!_stopFlag) {
 		_notificationManager->SendNotification(ConsoleNotificationType::GameResumed);

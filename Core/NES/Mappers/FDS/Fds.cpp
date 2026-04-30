@@ -42,7 +42,7 @@ void Fds::InitMapper()
 	SelectChrPage(0, 0);
 }
 
-void Fds::InitMapper(RomData &romData)
+void Fds::InitMapper(RomData& romData)
 {
 	_audio.reset(new FdsAudio(_console));
 	_fdsDiskSides = romData.FdsDiskData;
@@ -53,7 +53,7 @@ void Fds::InitMapper(RomData &romData)
 
 	FdsLoader loader(_useQdFormat);
 	loader.LoadDiskData(_fdsRawData, _orgDiskSides, _orgDiskHeaders);
-	
+
 	//Apply save data (saved as an IPS file), if found
 	vector<uint8_t> ipsData = _emu->GetBatteryManager()->LoadBattery(".ips");
 	LoadDiskData(ipsData);
@@ -70,7 +70,7 @@ void Fds::LoadDiskData(vector<uint8_t> ipsData)
 {
 	_fdsDiskSides.clear();
 	_fdsDiskHeaders.clear();
-	
+
 	FdsLoader loader(_useQdFormat);
 	if(_settings->OverwriteOriginalRom) {
 		loader.LoadDiskData(_fdsRawData, _fdsDiskSides, _fdsDiskHeaders);
@@ -493,9 +493,9 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				//These 5 pins are open bus
 				value &= 0xF8;
 
-				value |= !IsDiskInserted() ? 0x01 : 0x00;  //Disk not in drive
-				value |= (!IsDiskInserted() || !_scanningDisk) ? 0x02 : 0x00;  //Disk not ready
-				value |= !IsDiskInserted() ? 0x04 : 0x00;  //Disk not writable
+				value |= !IsDiskInserted() ? 0x01 : 0x00; //Disk not in drive
+				value |= (!IsDiskInserted() || !_scanningDisk) ? 0x02 : 0x00; //Disk not ready
+				value |= !IsDiskInserted() ? 0x04 : 0x00; //Disk not writable
 
 				if(IsAutoInsertDiskEnabled()) {
 					if(_emu->GetFrameCount() - _lastDiskCheckFrame < 100) {
@@ -534,11 +534,40 @@ void Fds::Serialize(Serializer& s)
 
 	SV(_audio);
 
-	SV(_irqReloadValue); SV(_irqCounter); SV(_irqEnabled); SV(_irqRepeatEnabled); SV(_diskRegEnabled); SV(_soundRegEnabled); SV(_writeDataReg); SV(_motorOn); SV(_resetTransfer);
-	SV(_readMode); SV(_crcControl); SV(_diskReady); SV(_diskIrqEnabled); SV(_extConWriteReg); SV(_badCrc); SV(_endOfHead); SV(_readWriteEnabled); SV(_readDataReg); SV(_diskWriteProtected);
-	SV(_diskNumber); SV(_diskPosition); SV(_delay); SV(_previousCrcControlFlag); SV(_gapEnded); SV(_scanningDisk); SV(_transferComplete);
-	SV(_autoDiskEjectCounter); SV(_autoDiskSwitchCounter); SV(_restartAutoInsertCounter); SV(_previousFrame); SV(_lastDiskCheckFrame);
-	SV(_successiveChecks); SV(_previousDiskNumber); SV(_crcAccumulator);
+	SV(_irqReloadValue);
+	SV(_irqCounter);
+	SV(_irqEnabled);
+	SV(_irqRepeatEnabled);
+	SV(_diskRegEnabled);
+	SV(_soundRegEnabled);
+	SV(_writeDataReg);
+	SV(_motorOn);
+	SV(_resetTransfer);
+	SV(_readMode);
+	SV(_crcControl);
+	SV(_diskReady);
+	SV(_diskIrqEnabled);
+	SV(_extConWriteReg);
+	SV(_badCrc);
+	SV(_endOfHead);
+	SV(_readWriteEnabled);
+	SV(_readDataReg);
+	SV(_diskWriteProtected);
+	SV(_diskNumber);
+	SV(_diskPosition);
+	SV(_delay);
+	SV(_previousCrcControlFlag);
+	SV(_gapEnded);
+	SV(_scanningDisk);
+	SV(_transferComplete);
+	SV(_autoDiskEjectCounter);
+	SV(_autoDiskSwitchCounter);
+	SV(_restartAutoInsertCounter);
+	SV(_previousFrame);
+	SV(_lastDiskCheckFrame);
+	SV(_successiveChecks);
+	SV(_previousDiskNumber);
+	SV(_crcAccumulator);
 
 	if(s.IsSaving()) {
 		for(int i = 0; i < (int)_fdsDiskSides.size(); i++) {

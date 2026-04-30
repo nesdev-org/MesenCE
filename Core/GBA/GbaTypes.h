@@ -54,7 +54,7 @@ struct GbaCpuFlags
 	bool Carry;
 	bool Zero;
 	bool Negative;
-	
+
 	uint32_t ToInt32()
 	{
 		return (
@@ -62,12 +62,11 @@ struct GbaCpuFlags
 			(Zero << 30) |
 			(Carry << 29) |
 			(Overflow << 28) |
-			
+
 			(IrqDisable << 7) |
 			(FiqDisable << 6) |
 			(Thumb << 5) |
-			(uint8_t)Mode
-		);
+			(uint8_t)Mode);
 	}
 };
 
@@ -107,7 +106,7 @@ struct GbaCpuState : BaseState
 	GbaCpuFlags SupervisorSpsr;
 	GbaCpuFlags AbortSpsr;
 	GbaCpuFlags UndefinedSpsr;
-	
+
 	uint64_t CycleCount;
 };
 
@@ -251,9 +250,9 @@ struct GbaMemoryManagerState
 	uint16_t NewIF;
 
 	uint16_t WaitControl; //204-205
-	uint8_t PrgWaitStates0[2] = { 5,3 };
-	uint8_t PrgWaitStates1[2] = { 5,5 };
-	uint8_t PrgWaitStates2[2] = { 5,9 };
+	uint8_t PrgWaitStates0[2] = { 5, 3 };
+	uint8_t PrgWaitStates1[2] = { 5, 5 };
+	uint8_t PrgWaitStates2[2] = { 5, 9 };
 	uint8_t SramWaitStates = 5;
 	bool PrefetchEnabled;
 	uint8_t IME; //208-20B
@@ -439,7 +438,7 @@ struct GbaApuState
 	uint8_t GbVolume;
 	uint8_t VolumeA;
 	uint8_t VolumeB;
-	
+
 	uint8_t DmaSoundControl;
 	bool EnableRightA;
 	bool EnableLeftA;
@@ -477,7 +476,7 @@ struct GbaSerialState
 	uint64_t IrqMasterClock;
 
 	uint16_t Data[4]; //120-127
-	
+
 	uint16_t Control; //128-129
 	bool InternalShiftClock;
 	bool InternalShiftClockSpeed2MHz;
@@ -588,6 +587,6 @@ public:
 	static constexpr uint32_t ScreenWidth = 240;
 	static constexpr uint32_t ScreenHeight = 160;
 	static constexpr uint32_t PixelCount = GbaConstants::ScreenWidth * GbaConstants::ScreenHeight;
-	
+
 	static constexpr uint32_t ScanlineCount = 228;
 };

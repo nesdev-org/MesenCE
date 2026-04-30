@@ -86,7 +86,7 @@ private:
 	DebugControllerState _inputOverrides[8] = {};
 
 	bool _waitForBreakResume = false;
-	
+
 	void Reset();
 
 	__noinline bool ProcessStepBack(IDebugger* debugger);
@@ -95,7 +95,7 @@ private:
 	template<CpuType type> uint64_t GetCpuCycleCount();
 	template<CpuType type, typename T> void ProcessScripts(uint32_t addr, T& value, MemoryOperationType opType);
 	template<CpuType type, typename T> void ProcessScripts(uint32_t addr, T& value, MemoryType memType, MemoryOperationType opType);
-	
+
 	bool IsDebugWindowOpened(CpuType cpuType);
 	bool IsBreakOptionEnabled(BreakSource src);
 	template<CpuType type> void SleepOnBreakRequest();
@@ -129,7 +129,7 @@ public:
 	void ProcessConfigChange();
 
 	void GetTokenList(CpuType cpuType, char* tokenList);
-	int64_t EvaluateExpression(string expression, CpuType cpuType, EvalResultType &resultType, bool useCache);
+	int64_t EvaluateExpression(string expression, CpuType cpuType, EvalResultType& resultType, bool useCache);
 
 	void Run();
 	void PauseOnNextFrame();
@@ -174,7 +174,7 @@ public:
 
 	void SetInputOverrides(uint32_t index, DebugControllerState state);
 	void GetAvailableInputOverrides(uint8_t* availableIndexes);
-	
+
 	void Log(string message);
 	string GetLog();
 
@@ -182,7 +182,7 @@ public:
 
 	void ClearExecutionTrace();
 	uint32_t GetExecutionTrace(TraceRow output[], uint32_t startOffset, uint32_t maxLineCount);
-	
+
 	CpuType GetMainCpuType() { return _mainCpuType; }
 	IDebugger* GetCpuDebugger(CpuType cpuType);
 	IDebugger* GetMainDebugger();

@@ -50,7 +50,7 @@ struct GbEventViewerConfig : public BaseEventViewerConfig
 class GbEventManager final : public BaseEventManager
 {
 private:
-	static constexpr int ScanlineWidth = 456*2;
+	static constexpr int ScanlineWidth = 456 * 2;
 	static constexpr int ScreenHeight = 154;
 	static constexpr int VBlankScanline = 144;
 

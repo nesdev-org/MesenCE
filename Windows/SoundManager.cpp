@@ -32,7 +32,7 @@ SoundManager::~SoundManager()
 
 bool CALLBACK SoundManager::DirectSoundEnumProc(LPGUID lpGUID, LPCWSTR lpszDesc, LPCSTR lpszDrvName, LPVOID lpContext)
 {
-	vector<SoundDeviceInfo> *devices = (vector<SoundDeviceInfo>*)lpContext;
+	vector<SoundDeviceInfo>* devices = (vector<SoundDeviceInfo>*)lpContext;
 
 	SoundDeviceInfo deviceInfo;
 	deviceInfo.description = utf8::utf8::encode(lpszDesc);
@@ -83,7 +83,7 @@ bool SoundManager::InitializeDirectSound(uint32_t sampleRate, bool isStereo)
 	HRESULT result;
 	DSBUFFERDESC bufferDesc;
 	WAVEFORMATEX waveFormat;
-	
+
 	// Initialize the direct sound interface pointer for the default sound device.
 	result = DirectSoundCreate8(&_audioDeviceID, &_directSound, NULL);
 	if(FAILED(result)) {
@@ -189,7 +189,7 @@ void SoundManager::Release()
 		_primaryBuffer->Release();
 		_primaryBuffer = nullptr;
 	}
-	
+
 	if(_directSound) {
 		_directSound->Release();
 		_directSound = nullptr;
@@ -208,7 +208,7 @@ void SoundManager::ClearSecondaryBuffer()
 	_lastWriteOffset = 0;
 }
 
-void SoundManager::CopyToSecondaryBuffer(uint8_t *data, uint32_t size)
+void SoundManager::CopyToSecondaryBuffer(uint8_t* data, uint32_t size)
 {
 	uint8_t* bufferPtrA;
 	uint8_t* bufferPtrB;
@@ -287,7 +287,7 @@ void SoundManager::ProcessEndOfFrame()
 	}
 }
 
-void SoundManager::PlayBuffer(int16_t *soundBuffer, uint32_t sampleCount, uint32_t sampleRate, bool isStereo)
+void SoundManager::PlayBuffer(int16_t* soundBuffer, uint32_t sampleCount, uint32_t sampleRate, bool isStereo)
 {
 	uint32_t bytesPerSample = 2 * (isStereo ? 2 : 1);
 	uint32_t latency = _emu->GetSettings()->GetAudioConfig().AudioLatency;
@@ -304,7 +304,7 @@ void SoundManager::PlayBuffer(int16_t *soundBuffer, uint32_t sampleCount, uint32
 
 	uint32_t soundBufferSize = sampleCount * bytesPerSample;
 	CopyToSecondaryBuffer((uint8_t*)soundBuffer, soundBufferSize);
-	
+
 	if(!_playing) {
 		DWORD byteLatency = (int32_t)((float)(sampleRate * latency) / 1000.0f * bytesPerSample);
 		if(_lastWriteOffset >= byteLatency / 2) {

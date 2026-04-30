@@ -4,13 +4,13 @@
 #include "SNES/SnesMemoryManager.h"
 #include "SNES/SpcFileData.h"
 #ifndef DUMMYSPC
-#include "SNES/DSP/Dsp.h"
+	#include "SNES/DSP/Dsp.h"
 #else
-#undef Spc
-#undef DUMMYSPC
-#include "SNES/DSP/Dsp.h"
-#define Spc DummySpc
-#define DUMMYSPC
+	#undef Spc
+	#undef DUMMYSPC
+	#include "SNES/DSP/Dsp.h"
+	#define Spc DummySpc
+	#define DUMMYSPC
 #endif
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
@@ -93,7 +93,7 @@ void Spc::Reset()
 
 	//Clear P (and other flags) - if P is set after reset, the IPL ROM doesn't work properly
 	_state.PS = 0;
-	
+
 	_opCode = 0;
 	_opStep = SpcOpStep::ReadOpCode;
 	_opSubStep = 0;
@@ -126,7 +126,7 @@ void Spc::UpdateClockRatio()
 	_clockRatio = (double)(_spcSampleRate * 64) / _console->GetMasterClockRate();
 
 	//If the target cycle is off by more than 20 cycles, reset the counter to match what was expected
-	//This can happen due to overclocking (which disables the SPC for some scanlines) or if the SPC's 
+	//This can happen due to overclocking (which disables the SPC for some scanlines) or if the SPC's
 	//internal sample rate is changed between versions (e.g 32000hz -> 32040hz)
 	uint64_t targetCycle = (uint64_t)(_memoryManager->GetMasterClock() * _clockRatio);
 	if(std::abs((int64_t)targetCycle - (int64_t)_state.Cycle) > 20) {
@@ -236,12 +236,12 @@ uint8_t Spc::Read(uint16_t addr, MemoryOperationType type)
 			case 0xF1: value = 0; break;
 
 			case 0xF2: value = _state.DspReg; break;
-			case 0xF3: 
-				#ifndef DUMMYSPC
+			case 0xF3:
+#ifndef DUMMYSPC
 				value = _dsp->Read(_state.DspReg & 0x7F);
-				#else
+#else
 				value = 0;
-				#endif
+#endif
 				break;
 
 			case 0xF4: value = _state.CpuRegs[0]; break;
@@ -266,7 +266,7 @@ uint8_t Spc::Read(uint16_t addr, MemoryOperationType type)
 
 #ifndef DUMMYSPC
 	_emu->ProcessMemoryRead<CpuType::Spc>(addr, value, type);
-#else 
+#else
 	LogMemoryOperation(addr, value, type);
 #endif
 
@@ -289,7 +289,7 @@ void Spc::Write(uint16_t addr, uint8_t value, MemoryOperationType type)
 	}
 
 	switch(addr) {
-		case 0xF0: 
+		case 0xF0:
 			if(!CheckFlag(SpcFlags::DirectPage)) {
 				_state.InternalSpeed = (value >> 6) & 0x03;
 				_state.ExternalSpeed = (value >> 4) & 0x03;
@@ -322,7 +322,7 @@ void Spc::Write(uint16_t addr, uint8_t value, MemoryOperationType type)
 			break;
 
 		case 0xF2: _state.DspReg = value; break;
-		case 0xF3: 
+		case 0xF3:
 			if(_state.DspReg < 128) {
 				_dsp->Write(_state.DspReg, value);
 			}
@@ -358,7 +358,7 @@ void Spc::CpuWriteRegister(uint32_t addr, uint8_t value)
 	if(_state.NewCpuRegs[addr & 0x03] != value) {
 		_state.NewCpuRegs[addr & 0x03] = value;
 
-		//If the CPU's write lands in the first half of the SPC cycle (each cycle is 2 clocks) then the SPC 
+		//If the CPU's write lands in the first half of the SPC cycle (each cycle is 2 clocks) then the SPC
 		//can see the new value immediately, otherwise it only sees the new value on the following cycle.
 		//The delay is needed for Kishin Kishin Douji Zenki to boot.
 		//However, always delaying to the next SPC cycle causes Kawasaki Superbike Challenge to freeze on boot.
@@ -425,7 +425,7 @@ AddressInfo Spc::GetAbsoluteAddress(uint16_t addr)
 	return AddressInfo { addr & 0x3F, MemoryType::SpcRom };
 }
 
-int Spc::GetRelativeAddress(AddressInfo &absAddress)
+int Spc::GetRelativeAddress(AddressInfo& absAddress)
 {
 	if(absAddress.Type == MemoryType::SpcRom) {
 		if(_state.RomEnabled) {
@@ -449,19 +449,38 @@ uint8_t* Spc::GetSpcRom()
 	return _spcBios;
 }
 
-void Spc::Serialize(Serializer &s)
+void Spc::Serialize(Serializer& s)
 {
 	if(s.IsSaving() && s.GetFormat() != SerializeFormat::Map) {
 		//Catch up SPC to main CPU before creating the state
 		Run();
 	}
 
-	SV(_state.A); SV(_state.Cycle); SV(_state.PC); SV(_state.PS); SV(_state.SP); SV(_state.X); SV(_state.Y);
-	SV(_state.CpuRegs[0]); SV(_state.CpuRegs[1]); SV(_state.CpuRegs[2]); SV(_state.CpuRegs[3]);
-	SV(_state.OutputReg[0]); SV(_state.OutputReg[1]); SV(_state.OutputReg[2]); SV(_state.OutputReg[3]);
-	SV(_state.RamReg[0]); SV(_state.RamReg[1]);
-	SV(_state.ExternalSpeed); SV(_state.InternalSpeed); SV(_state.WriteEnabled); SV(_state.TimersEnabled);
-	SV(_state.DspReg); SV(_state.RomEnabled); SV(_clockRatio); SV(_state.TimersDisabled);
+	SV(_state.A);
+	SV(_state.Cycle);
+	SV(_state.PC);
+	SV(_state.PS);
+	SV(_state.SP);
+	SV(_state.X);
+	SV(_state.Y);
+	SV(_state.CpuRegs[0]);
+	SV(_state.CpuRegs[1]);
+	SV(_state.CpuRegs[2]);
+	SV(_state.CpuRegs[3]);
+	SV(_state.OutputReg[0]);
+	SV(_state.OutputReg[1]);
+	SV(_state.OutputReg[2]);
+	SV(_state.OutputReg[3]);
+	SV(_state.RamReg[0]);
+	SV(_state.RamReg[1]);
+	SV(_state.ExternalSpeed);
+	SV(_state.InternalSpeed);
+	SV(_state.WriteEnabled);
+	SV(_state.TimersEnabled);
+	SV(_state.DspReg);
+	SV(_state.RomEnabled);
+	SV(_clockRatio);
+	SV(_state.TimersDisabled);
 
 	s.PushNamePrefix("timer0", -1);
 	_state.Timer0.Serialize(s);
@@ -484,7 +503,15 @@ void Spc::Serialize(Serializer &s)
 			UpdateClockRatio();
 		}
 
-		SV(_operandA); SV(_operandB); SV(_tmp1); SV(_tmp2); SV(_tmp3); SV(_opCode); SV(_opStep); SV(_opSubStep); SV(_enabled);
+		SV(_operandA);
+		SV(_operandB);
+		SV(_tmp1);
+		SV(_tmp2);
+		SV(_tmp3);
+		SV(_opCode);
+		SV(_opStep);
+		SV(_opSubStep);
+		SV(_enabled);
 
 		SVArray(_state.NewCpuRegs, 4);
 		SV(_pendingCpuRegUpdate);
@@ -583,7 +610,7 @@ void Spc::LoadSpcFile(SpcFileData* data)
 				if(data->SpcExtraRam[i] != 0 && data->SpcExtraRam[i] != 0xFF) {
 					isExtraRamEmpty = false;
 				}
-				if(data->SpcRam[i+0xFFC0] != 0 && data->SpcRam[i + 0xFFC0] != 0xFF) {
+				if(data->SpcRam[i + 0xFFC0] != 0 && data->SpcRam[i + 0xFFC0] != 0xFF) {
 					isSpcRamEmpty = false;
 				}
 			}
@@ -611,7 +638,7 @@ void Spc::LoadSpcFile(SpcFileData* data)
 	_state.CpuRegs[1] = data->CpuRegs[1];
 	_state.CpuRegs[2] = data->CpuRegs[2];
 	_state.CpuRegs[3] = data->CpuRegs[3];
-	
+
 	_state.RamReg[0] = data->RamRegs[0];
 	_state.RamReg[1] = data->RamRegs[1];
 

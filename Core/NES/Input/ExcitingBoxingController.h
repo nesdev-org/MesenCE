@@ -9,7 +9,17 @@ class ExcitingBoxingController : public BaseControlDevice
 {
 private:
 	uint8_t _selectedSensors = 0;
-	enum Buttons { LeftHook = 0, MoveRight, MoveLeft, RightHook, LeftJab, HitBody, RightJab, Straight };
+	enum Buttons
+	{
+		LeftHook = 0,
+		MoveRight,
+		MoveLeft,
+		RightHook,
+		LeftJab,
+		HitBody,
+		RightJab,
+		Straight
+	};
 
 protected:
 	void Serialize(Serializer& s) override
@@ -41,14 +51,12 @@ public:
 	{
 		if(addr == 0x4017) {
 			if(_selectedSensors == 0) {
-				return
-					(IsPressed(ExcitingBoxingController::Buttons::LeftHook) ? 0 : 0x02) |
+				return (IsPressed(ExcitingBoxingController::Buttons::LeftHook) ? 0 : 0x02) |
 					(IsPressed(ExcitingBoxingController::Buttons::MoveRight) ? 0 : 0x04) |
 					(IsPressed(ExcitingBoxingController::Buttons::MoveLeft) ? 0 : 0x08) |
 					(IsPressed(ExcitingBoxingController::Buttons::RightHook) ? 0 : 0x10);
 			} else {
-				return
-					(IsPressed(ExcitingBoxingController::Buttons::LeftJab) ? 0 : 0x02) |
+				return (IsPressed(ExcitingBoxingController::Buttons::LeftJab) ? 0 : 0x02) |
 					(IsPressed(ExcitingBoxingController::Buttons::HitBody) ? 0 : 0x04) |
 					(IsPressed(ExcitingBoxingController::Buttons::RightJab) ? 0 : 0x08) |
 					(IsPressed(ExcitingBoxingController::Buttons::Straight) ? 0 : 0x10);

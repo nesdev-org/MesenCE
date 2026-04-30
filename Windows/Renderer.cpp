@@ -65,8 +65,7 @@ void Renderer::SetScreenSize(uint32_t width, uint32_t height)
 			_newFullscreen != _fullscreen ||
 			_useSrgbTextureFormat != cfg.UseSrgbTextureFormat ||
 			(_fullscreen && _fullscreenRefreshRate != refreshRate) ||
-			(_fullscreen && (_realScreenHeight != _monitorHeight || _realScreenWidth != _monitorWidth))
-		);
+			(_fullscreen && (_realScreenHeight != _monitorHeight || _realScreenWidth != _monitorWidth)));
 	};
 
 	if(needUpdate()) {
@@ -85,7 +84,7 @@ void Renderer::SetScreenSize(uint32_t width, uint32_t height)
 					MessageManager::Log("SetFullscreenState(FALSE) failed - Error:" + std::to_string(hr));
 				}
 			}
-			
+
 			if(_useSrgbTextureFormat != cfg.UseSrgbTextureFormat) {
 				_useSrgbTextureFormat = cfg.UseSrgbTextureFormat;
 				needReset = true;
@@ -129,7 +128,7 @@ void Renderer::SetScreenSize(uint32_t width, uint32_t height)
 			_leftMargin = (_realScreenWidth - _screenWidth) / 2;
 			_topMargin = (_realScreenHeight - _screenHeight) / 2;
 
-			_screenBufferSize = _realScreenHeight*_realScreenWidth;
+			_screenBufferSize = _realScreenHeight * _realScreenWidth;
 
 			if(!_pSwapChain || needReset) {
 				Reset();
@@ -256,10 +255,10 @@ HRESULT Renderer::CreateEmuTextureBuffers()
 	vp.TopLeftY = 0;
 	_pDeviceContext->RSSetViewports(1, &vp);
 
-	_textureBuffer[0] = new uint8_t[_emuFrameWidth*_emuFrameHeight * 4];
-	_textureBuffer[1] = new uint8_t[_emuFrameWidth*_emuFrameHeight * 4];
-	memset(_textureBuffer[0], 0, _emuFrameWidth*_emuFrameHeight * 4);
-	memset(_textureBuffer[1], 0, _emuFrameWidth*_emuFrameHeight * 4);
+	_textureBuffer[0] = new uint8_t[_emuFrameWidth * _emuFrameHeight * 4];
+	_textureBuffer[1] = new uint8_t[_emuFrameWidth * _emuFrameHeight * 4];
+	memset(_textureBuffer[0], 0, _emuFrameWidth * _emuFrameHeight * 4);
+	memset(_textureBuffer[1], 0, _emuFrameWidth * _emuFrameHeight * 4);
 
 	_pTexture = CreateTexture(_emuFrameWidth, _emuFrameHeight);
 	if(!_pTexture) {
@@ -288,16 +287,14 @@ HRESULT Renderer::InitDevice()
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	D3D_DRIVER_TYPE driverTypes[] =
-	{
+	D3D_DRIVER_TYPE driverTypes[] = {
 		D3D_DRIVER_TYPE_HARDWARE,
 		D3D_DRIVER_TYPE_WARP,
 		D3D_DRIVER_TYPE_REFERENCE,
 	};
 	UINT numDriverTypes = ARRAYSIZE(driverTypes);
 
-	D3D_FEATURE_LEVEL featureLevels[] =
-	{
+	D3D_FEATURE_LEVEL featureLevels[] = {
 		D3D_FEATURE_LEVEL_11_1,
 		D3D_FEATURE_LEVEL_11_0,
 		D3D_FEATURE_LEVEL_10_1,
@@ -341,7 +338,7 @@ HRESULT Renderer::InitDevice()
 			break;
 		}
 	}
-		
+
 	if(FAILED(hr)) {
 		MessageManager::Log("D3D11CreateDeviceAndSwapChain() failed - Error:" + std::to_string(hr));
 		return hr;
@@ -369,10 +366,8 @@ HRESULT Renderer::InitDevice()
 
 			if(_monitorHeight != monitorHeight || _monitorWidth != monitorWidth) {
 				MessageManager::Log(
-					"Requested resolution (" + std::to_string(_monitorWidth) + "x" + std::to_string(_monitorHeight) 
-					+ ") is not available. Resetting to nearest match instead: " +
-					std::to_string(monitorWidth) + "x" + std::to_string(monitorHeight)
-				);
+					"Requested resolution (" + std::to_string(_monitorWidth) + "x" + std::to_string(_monitorHeight) + ") is not available. Resetting to nearest match instead: " +
+					std::to_string(monitorWidth) + "x" + std::to_string(monitorHeight));
 				_monitorWidth = monitorWidth;
 				_monitorHeight = monitorHeight;
 
@@ -423,7 +418,7 @@ ID3D11Texture2D* Renderer::CreateTexture(uint32_t width, uint32_t height)
 
 ID3D11ShaderResourceView* Renderer::GetShaderResourceView(ID3D11Texture2D* texture)
 {
-	ID3D11ShaderResourceView *shaderResourceView = nullptr;
+	ID3D11ShaderResourceView* shaderResourceView = nullptr;
 	HRESULT hr = _pd3dDevice->CreateShaderResourceView(texture, nullptr, &shaderResourceView);
 	if(FAILED(hr)) {
 		MessageManager::Log("D3DDevice::CreateShaderResourceView() failed - Error:" + std::to_string(hr));
@@ -452,7 +447,7 @@ void Renderer::UpdateFrame(RenderedFrame& frame)
 	auto lock = _textureLock.AcquireSafe();
 	if(_textureBuffer[0]) {
 		//_textureBuffer[0] may be null if directx failed to initialize properly
-		memcpy(_textureBuffer[0], frame.FrameBuffer, frame.Width*frame.Height*sizeof(uint32_t));
+		memcpy(_textureBuffer[0], frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
 		_needFlip = true;
 		_frameChanged = true;
 	}
@@ -498,8 +493,8 @@ void Renderer::DrawScreen()
 	RECT destRect;
 	destRect.left = _leftMargin;
 	destRect.top = _topMargin;
-	destRect.right = _screenWidth+_leftMargin;
-	destRect.bottom = _screenHeight+_topMargin;
+	destRect.right = _screenWidth + _leftMargin;
+	destRect.bottom = _screenHeight + _topMargin;
 
 	_spriteBatch->Draw(_pTextureSrv, destRect);
 }
@@ -570,7 +565,7 @@ void Renderer::DrawHud(HudRenderInfo& hud, RenderSurfaceInfo& hudSurface)
 		}
 		_pDeviceContext->Unmap(hud.Texture, 0);
 	}
-	
+
 	RECT destRect;
 	destRect.left = _leftMargin;
 	destRect.top = _topMargin;
@@ -598,7 +593,7 @@ void Renderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud)
 
 	VideoConfig cfg = _emu->GetSettings()->GetVideoConfig();
 
-	// Clear the back buffer 
+	// Clear the back buffer
 	_pDeviceContext->ClearRenderTargetView(_pRenderTargetView, Colors::Black);
 
 	//Draw screen

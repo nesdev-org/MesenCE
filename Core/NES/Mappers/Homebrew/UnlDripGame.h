@@ -62,7 +62,7 @@ protected:
 		SV(_irqEnabled);
 		SV(_extAttributesEnabled);
 		SV(_wramWriteEnabled);
-		
+
 		if(!s.IsSaving()) {
 			UpdateWorkRamState();
 		}
@@ -93,7 +93,7 @@ protected:
 	{
 		SetCpuMemoryMapping(0x6000, 0x7FFF, 0, PrgMemoryType::WorkRam, _wramWriteEnabled ? MemoryAccessType::ReadWrite : MemoryAccessType::Read);
 	}
-	
+
 	uint8_t MapperReadVram(uint16_t addr, MemoryOperationType memoryOperationType) override
 	{
 		if(_extAttributesEnabled && memoryOperationType == MemoryOperationType::PpuRenderingRead) {
@@ -110,7 +110,7 @@ protected:
 					case MirroringType::Horizontal: bank = (addr & 0x800) ? 1 : 0; break;
 					case MirroringType::Vertical: bank = (addr & 0x400) ? 1 : 0; break;
 				}
-				
+
 				//Return a byte containing the same palette 4 times - this allows the PPU to select the right palette no matter the shift value
 				uint8_t value = _extendedAttributes[bank][_lastNametableFetchAddr & 0x3FF] & 0x03;
 				return (value << 6) | (value << 4) | (value << 2) | value;
@@ -133,11 +133,17 @@ protected:
 	{
 		if(addr <= 0xBFFF) {
 			switch(addr & 0x800F) {
-				case 0x8000: case 0x8001: case 0x8002: case 0x8003:
+				case 0x8000:
+				case 0x8001:
+				case 0x8002:
+				case 0x8003:
 					_audioChannels[0]->WriteRegister(addr, value);
 					break;
 
-				case 0x8004: case 0x8005: case 0x8006: case 0x8007:
+				case 0x8004:
+				case 0x8005:
+				case 0x8006:
+				case 0x8007:
 					_audioChannels[1]->WriteRegister(addr, value);
 					break;
 

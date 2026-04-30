@@ -66,7 +66,7 @@ public:
 	{
 		return ReadBigEndian(_cartridge.RomSize);
 	}
-	
+
 	uint32_t GetRamSize()
 	{
 		return ReadBigEndian(_cartridge.RamSize);

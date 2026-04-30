@@ -31,11 +31,11 @@ protected:
 			case 0x6003: SelectChrPage(3, value); break;
 			case 0x7000: SelectPrgPage(0, value & 0x0F); break;
 			case 0x7001: SelectPrgPage(1, value & 0x0F); break;
-			case 0x7002: 
-				MMC3::WriteRegister(0xE000, value); 
+			case 0x7002:
+				MMC3::WriteRegister(0xE000, value);
 				break;
-			case 0x7003: 
-				MMC3::WriteRegister(0xC000, 0x07); 
+			case 0x7003:
+				MMC3::WriteRegister(0xC000, 0x07);
 				MMC3::WriteRegister(0xC001, value);
 				MMC3::WriteRegister(0xE001, value);
 				break;

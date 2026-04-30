@@ -95,10 +95,25 @@ protected:
 		string mirroringType;
 		int64_t mirValue = 0;
 		switch(GetMirroringType()) {
-			case MirroringType::Horizontal: mirroringType = "Horizontal"; mirValue = 3; break;
-			case MirroringType::Vertical: mirroringType = "Vertical"; mirValue = 2; break;
-			case MirroringType::ScreenBOnly: mirroringType = "Screen B"; mirValue = 1; break;
-			case MirroringType::ScreenAOnly: mirroringType = "Screen A"; mirValue = 0; break;
+			case MirroringType::Horizontal:
+				mirroringType = "Horizontal";
+				mirValue = 3;
+				break;
+
+			case MirroringType::Vertical:
+				mirroringType = "Vertical";
+				mirValue = 2;
+				break;
+
+			case MirroringType::ScreenBOnly:
+				mirroringType = "Screen B";
+				mirValue = 1;
+				break;
+
+			case MirroringType::ScreenAOnly:
+				mirroringType = "Screen A";
+				mirValue = 0;
+				break;
 		}
 		entries.push_back(MapperStateEntry("$8000.0-1", "Mirroring", mirroringType, mirValue));
 		entries.push_back(MapperStateEntry("$8000.2-3", "PRG Mode", ((uint8_t)_prgMode << 1) | (uint8_t)_slotSelect, MapperStateValueType::Number8));
@@ -108,7 +123,7 @@ protected:
 		entries.push_back(MapperStateEntry("$C000.0-4", "CHR Bank ($1000)", _chrReg1, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$E000.0-3", "PRG Bank", _prgReg, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$E000.4", "WRAM Disabled", _wramDisable));
-		
+
 		entries.push_back(MapperStateEntry("", "Shift Register", _writeBuffer, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("", "Write Count", _shiftCount, MapperStateValueType::Number8));
 		return entries;
@@ -180,7 +195,17 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
-		SV(_writeBuffer); SV(_shiftCount); SV(_wramDisable); SV(_chrMode); SV(_prgMode); SV(_slotSelect); SV(_chrReg0); SV(_chrReg1); SV(_prgReg); SV(_lastWriteCycle); SV(_lastChrReg);
+		SV(_writeBuffer);
+		SV(_shiftCount);
+		SV(_wramDisable);
+		SV(_chrMode);
+		SV(_prgMode);
+		SV(_slotSelect);
+		SV(_chrReg0);
+		SV(_chrReg1);
+		SV(_prgReg);
+		SV(_lastWriteCycle);
+		SV(_lastChrReg);
 	}
 
 	void InitMapper() override

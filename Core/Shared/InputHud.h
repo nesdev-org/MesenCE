@@ -23,7 +23,7 @@ private:
 	void DrawController(ControllerData& data, BaseControlManager* controlManager);
 
 public:
-	InputHud(Emulator *emu, DebugHud* hud);
+	InputHud(Emulator* emu, DebugHud* hud);
 
 	void DrawMousePosition(MousePosition pos);
 	void DrawOutline(int width, int height);

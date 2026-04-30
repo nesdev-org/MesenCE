@@ -1,7 +1,7 @@
 ﻿using Mesen.Interop;
 using ReactiveUI.Fody.Helpers;
-using System.Runtime.InteropServices;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Mesen.Config
 {

@@ -56,6 +56,7 @@ void Dsp::Reset()
 
 bool Dsp::CheckCounter(int32_t rate)
 {
+	// clang-format off
 	static uint16_t const rates[32] =
 	{
 		UINT16_MAX,
@@ -88,6 +89,7 @@ bool Dsp::CheckCounter(int32_t rate)
 		0,
 		0
 	};
+	// clang-format on
 
 	return (((uint16_t)_state.Counter + offsets[rate]) % rates[rate]) == 0;
 }
@@ -105,6 +107,8 @@ void Dsp::Write(uint8_t reg, uint8_t value)
 {
 	_state.Regs[reg] = value;
 	_state.ExternalRegs[reg] = value;
+
+	// clang-format off
 	switch(reg & 0x0F) {
 		case (int)DspVoiceRegs::Envelope: _state.EnvRegBuffer = value; break;
 		case (int)DspVoiceRegs::Out: _state.OutRegBuffer = value; break;
@@ -120,6 +124,7 @@ void Dsp::Write(uint8_t reg, uint8_t value)
 			}
 			break;
 	}
+	// clang-format on
 }
 
 int32_t Dsp::CalculateFir(int index, int ch)
@@ -134,17 +139,15 @@ int32_t Dsp::CalculateFir(int index, int ch)
 						+ S(x-3) * FFC4 >> 6
 						+ S(x-2) * FFC5 >> 6
 						+ S(x-1) * FFC6 >> 6);
-		
+
 		We have overflow detection when adding the most recent sample only:
 		FIR = clamp16(FIR + S(x-0) * FFC7 >> 6); // newest sample
-		
+
 		Finally, mask of the LSbit to get the final 16-bit result:
 		FIR = FIR & ~1;"
 	*/
-	return (
-		_state.EchoHistory[(_state.EchoHistoryPos + index + 1) & 0x07][ch] *
-		(int8_t)_state.Regs[(int)DspGlobalRegs::EchoFilterCoeff0 + (index << 4)]
-	) >> 6;
+	int16_t echoHistory = _state.EchoHistory[(_state.EchoHistoryPos + index + 1) & 0x07][ch];
+	return (echoHistory * (int8_t)_state.Regs[(int)DspGlobalRegs::EchoFilterCoeff0 + (index << 4)]) >> 6;
 }
 
 void Dsp::EchoStep22()
@@ -201,8 +204,7 @@ void Dsp::EchoStep26()
 	//"Load and apply MVOLL. Load and apply EVOLL."
 	_state.OutSamples[0] = Dsp::Clamp16(
 		((_state.OutSamples[0] * (int8_t)ReadReg(DspGlobalRegs::MasterVolLeft)) >> 7) +
-		((_state.EchoIn[0] * (int8_t)ReadReg(DspGlobalRegs::EchoVolLeft)) >> 7)
-	);
+		((_state.EchoIn[0] * (int8_t)ReadReg(DspGlobalRegs::EchoVolLeft)) >> 7));
 
 	//"Load and apply EFB."
 	int32_t leftEcho = _state.EchoOut[0] + (int16_t)((_state.EchoIn[0] * (int8_t)ReadReg(DspGlobalRegs::EchoFeedbackVol)) >> 7);
@@ -216,8 +218,7 @@ void Dsp::EchoStep27()
 	//"Load and apply MVOLR. Load and apply EVOLR."
 	_state.OutSamples[1] = Dsp::Clamp16(
 		((_state.OutSamples[1] * (int8_t)ReadReg(DspGlobalRegs::MasterVolRight)) >> 7) +
-		((_state.EchoIn[1] * (int8_t)ReadReg(DspGlobalRegs::EchoVolRight)) >> 7)
-	);
+		((_state.EchoIn[1] * (int8_t)ReadReg(DspGlobalRegs::EchoVolRight)) >> 7));
 }
 
 void Dsp::EchoStep28()
@@ -269,6 +270,7 @@ void Dsp::Exec()
 	uint8_t step = _state.Step;
 	_state.Step = (_state.Step + 1) & 0x1F;
 
+	// clang-format off
 	switch(step) {
 		case  0: _voices[0].Step5(); _voices[1].Step2(); break;
 		case  1: _voices[0].Step6(); _voices[1].Step3(); break;
@@ -368,6 +370,7 @@ void Dsp::Exec()
 
 		case 31: _voices[0].Step4(); _voices[2].Step1(); break;
 	}
+	// clang-format on
 }
 
 void Dsp::Serialize(Serializer& s)
@@ -407,9 +410,9 @@ void Dsp::Serialize(Serializer& s)
 
 	SVArray(_state.EchoIn, 2);
 	SVArray(_state.EchoOut, 2);
-	
+
 	int16_t* echoHistory = &_state.EchoHistory[0][0];
-	SVArray(echoHistory, 8*2);
+	SVArray(echoHistory, 8 * 2);
 
 	SV(_state.EchoPointer);
 	SV(_state.EchoLength);

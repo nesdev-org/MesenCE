@@ -34,7 +34,7 @@ namespace Mesen.Utilities
 						}
 
 						await MessageBox.Show(null, msg, "", MessageBoxButtons.OK, result.State == RomTestState.Failed ? MessageBoxIcon.Error : MessageBoxIcon.Info);
-						
+
 						MainWindowViewModel.Instance.RecentGames.Visible = ConfigManager.Config.Preferences.GameSelectionScreenMode != GameSelectionMode.Disabled;
 					});
 				});
@@ -67,7 +67,7 @@ namespace Mesen.Utilities
 					RomTestResult result = results[entry];
 					string msg = "[Test] " + result.State.ToString() + ": " + entry;
 					if(result.State != RomTestState.Passed) {
-						msg +=" (" + result.ErrorCode.ToString() + ")";
+						msg += " (" + result.ErrorCode.ToString() + ")";
 					}
 					EmuApi.WriteLogEntry(msg);
 
@@ -154,7 +154,7 @@ namespace Mesen.Utilities
 
 				Regex regex = new Regex("dmg08_(cgb04c_){0,1}out([a-f0-9]+)[.]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 				string folder = @"C:\Code\gambatte-tests\";
-				List<string> testFiles = Directory.EnumerateFiles(folder, "*.gb*", SearchOption.AllDirectories).Where(x=>x.Contains("dmg08_") && regex.IsMatch(x)).ToList();
+				List<string> testFiles = Directory.EnumerateFiles(folder, "*.gb*", SearchOption.AllDirectories).Where(x => x.Contains("dmg08_") && regex.IsMatch(x)).ToList();
 				Parallel.ForEach(testFiles, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount - 2 }, (string testFile) => {
 					string entryName = testFile.Substring(folder.Length);
 					results[entryName] = TestApi.RunTest(testFile, 0x1800, MemoryType.GbVideoRam);

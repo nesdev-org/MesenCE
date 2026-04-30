@@ -1,91 +1,85 @@
-using System;
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Styling;
 using DataBoxControl.Primitives.Layout;
+using System;
+using System.Collections.Generic;
 
 namespace DataBoxControl.Primitives;
 
 public class DataBoxColumnHeadersPresenter : Panel
 {
-    private List<IDisposable>? _columnActualWidthDisposables;
-    private List<DataBoxColumnHeader>? _columnHeaders;
+	private List<IDisposable>? _columnActualWidthDisposables;
+	private List<DataBoxColumnHeader>? _columnHeaders;
 
 	protected override Type StyleKeyOverride => typeof(DataBoxColumnHeadersPresenter);
-        
-    internal DataBox? DataBox { get; set; }
 
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnDetachedFromVisualTree(e);
+	internal DataBox? DataBox { get; set; }
 
-        Detach();
-    }
+	protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+	{
+		base.OnDetachedFromVisualTree(e);
 
-    internal void Attach()
-    {
-        if (DataBox is null)
-        {
-            return;
-        }
+		Detach();
+	}
 
-        _columnHeaders = new List<DataBoxColumnHeader>();
-        _columnActualWidthDisposables = new List<IDisposable>();
-
-        for (var c = 0; c < DataBox.Columns.Count; c++)
-        {
-            var column = DataBox.Columns[c];
-
-            var columnHeader = new DataBoxColumnHeader
-            {
-                [!ContentControl.ContentProperty] = column[!DataBoxColumn.HeaderProperty],
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                Column = column,
-                ColumnHeaders = _columnHeaders,
-                DataBox = DataBox
-            };
-
-            Children.Add(columnHeader);
-            _columnHeaders.Add(columnHeader);
-
-            var disposable = column.GetObservable(DataBoxColumn.MeasureWidthProperty).Subscribe(_ =>
-            {
-                InvalidateMeasure();
-                InvalidateVisual();
-            });
-            _columnActualWidthDisposables.Add(disposable);
-        }
-
-			DataBox.SortState.UpdateColumnHeaders(_columnHeaders);
+	internal void Attach()
+	{
+		if(DataBox is null) {
+			return;
 		}
 
-    internal void Detach()
-    {
-        if (_columnActualWidthDisposables is { })
-        {
-            foreach (var disposable in _columnActualWidthDisposables)
-            {
-                disposable.Dispose();
-            }
+		_columnHeaders = new List<DataBoxColumnHeader>();
+		_columnActualWidthDisposables = new List<IDisposable>();
 
-            _columnActualWidthDisposables.Clear();
-            _columnActualWidthDisposables = null;
-        }
+		for(var c = 0; c < DataBox.Columns.Count; c++) {
+			var column = DataBox.Columns[c];
 
-        _columnHeaders?.Clear();
-        _columnHeaders = null;
-    }
+			var columnHeader = new DataBoxColumnHeader {
+				[!ContentControl.ContentProperty] = column[!DataBoxColumn.HeaderProperty],
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				VerticalAlignment = VerticalAlignment.Stretch,
+				Column = column,
+				ColumnHeaders = _columnHeaders,
+				DataBox = DataBox
+			};
 
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        return DataBoxCellsLayout.Measure(availableSize, DataBox, Children);
-    }
+			Children.Add(columnHeader);
+			_columnHeaders.Add(columnHeader);
 
-    protected override Size ArrangeOverride(Size arrangeSize)
-    {
-        return DataBoxCellsLayout.Arrange(arrangeSize, DataBox, Children);
-    }
+			var disposable = column.GetObservable(DataBoxColumn.MeasureWidthProperty).Subscribe(_ => {
+				InvalidateMeasure();
+				InvalidateVisual();
+			});
+			_columnActualWidthDisposables.Add(disposable);
+		}
+
+		DataBox.SortState.UpdateColumnHeaders(_columnHeaders);
+	}
+
+	internal void Detach()
+	{
+		if(_columnActualWidthDisposables is { }) {
+			foreach(var disposable in _columnActualWidthDisposables) {
+				disposable.Dispose();
+			}
+
+			_columnActualWidthDisposables.Clear();
+			_columnActualWidthDisposables = null;
+		}
+
+		_columnHeaders?.Clear();
+		_columnHeaders = null;
+	}
+
+	protected override Size MeasureOverride(Size availableSize)
+	{
+		return DataBoxCellsLayout.Measure(availableSize, DataBox, Children);
+	}
+
+	protected override Size ArrangeOverride(Size arrangeSize)
+	{
+		return DataBoxCellsLayout.Arrange(arrangeSize, DataBox, Children);
+	}
 }

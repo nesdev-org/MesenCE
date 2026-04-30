@@ -25,14 +25,14 @@ class Disassembler
 private:
 	friend class DisassemblySearch;
 
-	IConsole *_console;
+	IConsole* _console;
 	EmuSettings* _settings;
-	Debugger *_debugger;
+	Debugger* _debugger;
 	LabelManager* _labelManager;
-	MemoryDumper *_memoryDumper;
+	MemoryDumper* _memoryDumper;
 
 	DisassemblerSource _sources[DebugUtilities::GetMemoryTypeCount()] = {};
-	
+
 	void InitSource(MemoryType type);
 	DisassemblerSource& GetSource(MemoryType type);
 
@@ -40,11 +40,11 @@ private:
 	int32_t GetMatchingRow(vector<DisassemblyResult>& rows, uint32_t address, bool returnFirstRow);
 	vector<DisassemblyResult> Disassemble(CpuType cpuType, uint16_t bank);
 	uint16_t GetMaxBank(CpuType cpuType);
-	
+
 public:
 	Disassembler(IConsole* console, Debugger* debugger);
 
-	uint32_t BuildCache(AddressInfo &addrInfo, uint8_t cpuFlags, CpuType type);
+	uint32_t BuildCache(AddressInfo& addrInfo, uint8_t cpuFlags, CpuType type);
 	void ResetPrgCache();
 	void InvalidateCache(AddressInfo addrInfo, CpuType type);
 

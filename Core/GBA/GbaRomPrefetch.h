@@ -16,7 +16,7 @@ private:
 	{
 		return _state.ReadAddr == _state.PrefetchAddr;
 	}
-	
+
 	__forceinline bool IsFull()
 	{
 		return _state.PrefetchAddr - _state.ReadAddr >= 16;
@@ -170,7 +170,7 @@ public:
 					if(mode & GbaAccessMode::Word) {
 						//If fetching a 32-bit value, add the time it'll take to read the next half-word (non sequential)
 						totalTime += _waitStates->GetPrefetchWaitStates(GbaAccessMode::HalfWord, addr);
-						
+
 						//The previous read counts as the first non-sequential read, next one should be sequential
 						_console->SetCpuSequentialFlag();
 					}
@@ -198,7 +198,7 @@ public:
 				return totalTime;
 			}
 		}
-		
+
 		_state.ReadAddr += 2;
 		if(mode & GbaAccessMode::Word) {
 			//Need to read another half-word
@@ -233,7 +233,7 @@ public:
 			return 1;
 		}
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		if(s.GetFormat() == SerializeFormat::Map) {

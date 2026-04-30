@@ -13,8 +13,8 @@ namespace Mesen.Config
 {
 	public class InputConfig : BaseConfig<InputConfig>
 	{
-		[Reactive] [MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
-		[Reactive] [MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;
+		[Reactive][MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
+		[Reactive][MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;
 		[Reactive] public bool HidePointerForLightGuns { get; set; } = false;
 		[Reactive][MinMax(0, 10)] public UInt32 ForceFeedbackIntensity { get; set; } = 5;
 
@@ -320,7 +320,7 @@ namespace Mesen.Config
 		public UInt16 TurboR;
 		public UInt16 TurboSelect;
 		public UInt16 TurboStart;
-		
+
 		public UInt16 GenericKey1;
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 100)]

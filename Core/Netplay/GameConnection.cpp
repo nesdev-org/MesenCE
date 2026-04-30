@@ -31,7 +31,7 @@ void GameConnection::ReadSocket()
 	}
 }
 
-bool GameConnection::ExtractMessage(void *buffer, uint32_t &messageLength)
+bool GameConnection::ExtractMessage(void* buffer, uint32_t& messageLength)
 {
 	messageLength = _readBuffer[0] | (_readBuffer[1] << 8) | (_readBuffer[2] << 16) | (_readBuffer[3] << 24);
 
@@ -44,7 +44,7 @@ bool GameConnection::ExtractMessage(void *buffer, uint32_t &messageLength)
 	int packetLength = messageLength + sizeof(messageLength);
 
 	if(_readPosition >= packetLength) {
-		memcpy(buffer, _readBuffer+sizeof(messageLength), messageLength);
+		memcpy(buffer, _readBuffer + sizeof(messageLength), messageLength);
 		memmove(_readBuffer, _readBuffer + packetLength, _readPosition - packetLength);
 		_readPosition -= packetLength;
 		return true;
@@ -75,7 +75,7 @@ NetMessage* GameConnection::ReadMessage()
 	return nullptr;
 }
 
-void GameConnection::SendNetMessage(NetMessage &message)
+void GameConnection::SendNetMessage(NetMessage& message)
 {
 	auto lock = _socketLock.AcquireSafe();
 	message.Send(*_socket.get());
@@ -100,5 +100,5 @@ void GameConnection::ProcessMessages()
 		message->Initialize();
 		ProcessMessage(message);
 		delete message;
-	}		
+	}
 }

@@ -50,7 +50,7 @@ void GbControlManager::UpdateControlDevices()
 	}
 
 	auto lock = _deviceLock.AcquireSafe();
-	
+
 	ClearDevices();
 
 	shared_ptr<BaseControlDevice> device(CreateControllerDevice(ControllerType::GameboyController, 0));

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.LogicalTree;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using DataBoxControl.Primitives.Layout;
+using System;
+using System.Linq;
 
 namespace DataBoxControl.Controls;
 
@@ -14,7 +14,7 @@ public class DataBoxPanel : VirtualizingStackPanel
 	protected override Type StyleKeyOverride => typeof(DataBoxPanel);
 
 	internal DataBox? DataBox { get; set; }
-	
+
 	public override void ApplyTemplate()
 	{
 		base.ApplyTemplate();

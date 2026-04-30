@@ -21,7 +21,6 @@ HdVideoFilter::HdVideoFilter(NesConsole* console, Emulator* emu, HdPackData* hdD
 		case 9: _hdNesPack.reset(new HdNesPack<9>(console, emu->GetSettings(), hdData)); break;
 		case 10: _hdNesPack.reset(new HdNesPack<10>(console, emu->GetSettings(), hdData)); break;
 	}
-	
 }
 
 FrameInfo HdVideoFilter::GetFrameInfo()
@@ -44,7 +43,7 @@ OverscanDimensions HdVideoFilter::GetOverscan()
 	}
 }
 
-void HdVideoFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
+void HdVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 {
 	if(_frameData == nullptr) {
 		//_frameData can be null when loading a save state

@@ -15,7 +15,7 @@ private:
 
 public:
 	PceControlManager(Emulator* emu);
-	
+
 	PceControlManagerState& GetState();
 
 	shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override;

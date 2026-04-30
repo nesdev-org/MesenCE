@@ -4,7 +4,7 @@
 #include "UpsPatcher.h"
 #include "CRC32.h"
 
-int64_t UpsPatcher::ReadBase128Number(std::istream &file)
+int64_t UpsPatcher::ReadBase128Number(std::istream& file)
 {
 	int64_t result = 0;
 	int shift = 0;
@@ -25,7 +25,7 @@ int64_t UpsPatcher::ReadBase128Number(std::istream &file)
 	return result;
 }
 
-bool UpsPatcher::PatchBuffer(string upsFilepath, vector<uint8_t> &input, vector<uint8_t> &output)
+bool UpsPatcher::PatchBuffer(string upsFilepath, vector<uint8_t>& input, vector<uint8_t>& output)
 {
 	ifstream upsFile(upsFilepath, std::ios::in | std::ios::binary);
 	if(upsFile) {
@@ -34,7 +34,7 @@ bool UpsPatcher::PatchBuffer(string upsFilepath, vector<uint8_t> &input, vector<
 	return false;
 }
 
-bool UpsPatcher::PatchBuffer(std::istream &upsFile, vector<uint8_t> &input, vector<uint8_t> &output)
+bool UpsPatcher::PatchBuffer(std::istream& upsFile, vector<uint8_t>& input, vector<uint8_t>& output)
 {
 	upsFile.seekg(0, std::ios::end);
 	size_t fileSize = (size_t)upsFile.tellg();

@@ -73,7 +73,7 @@ struct CdlStatistics
 	uint32_t CodeBytes;
 	uint32_t DataBytes;
 	uint32_t TotalBytes;
-	
+
 	uint32_t JumpTargetCount;
 	uint32_t FunctionCount;
 
@@ -317,7 +317,7 @@ enum class BreakSource
 	BreakOnWdm,
 	BreakOnStp,
 	BreakOnUninitMemoryRead,
-	
+
 	GbInvalidOamAccess,
 	GbInvalidVramAccess,
 	GbDisableLcdOutsideVblank,
@@ -337,7 +337,7 @@ enum class BreakSource
 	NesDmaInputRead,
 
 	PceBreakOnInvalidVramAddress,
-	
+
 	SmsNopLoad,
 
 	GbaInvalidOpCode,
@@ -390,7 +390,7 @@ struct StepRequest
 	int32_t CpuCycleStepCount = -1;
 	int32_t BreakScanline = INT32_MIN;
 	StepType Type = StepType::Step;
-	
+
 	bool HasRequest = false;
 
 	BreakType BreakNeeded = BreakType::None;

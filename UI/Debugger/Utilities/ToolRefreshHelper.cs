@@ -1,16 +1,16 @@
 ﻿using Avalonia.Controls;
-using System;
-using Mesen.Interop;
-using Mesen.Config;
-using System.Collections.Generic;
-using System.Threading;
 using Avalonia.Threading;
-using System.Linq;
+using Mesen.Config;
 using Mesen.Debugger.ViewModels;
 using Mesen.Debugger.Windows;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
+using Mesen.Interop;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mesen.Debugger.Utilities
@@ -73,7 +73,7 @@ namespace Mesen.Debugger.Utilities
 						break;
 				}
 			};
-			
+
 			DebugApi.SetViewerUpdateTiming(viewerId, scanline, cycle, cpuType);
 
 			Task.Run(async () => {

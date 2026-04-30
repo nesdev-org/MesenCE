@@ -3,7 +3,7 @@
 #include "pch.h"
 #include "NES/Mappers/Nintendo/MMC3.h"
 
-class MMC3_187: public MMC3
+class MMC3_187 : public MMC3
 {
 private:
 	uint8_t _exRegs[2] = {};
@@ -40,9 +40,9 @@ protected:
 				if(_exRegs[0] & 0x40) {
 					exPage &= 0xFC;
 					BaseMapper::SelectPrgPage(0, exPage);
-					BaseMapper::SelectPrgPage(1, exPage +1);
-					BaseMapper::SelectPrgPage(2, exPage +2);
-					BaseMapper::SelectPrgPage(3, exPage +3);
+					BaseMapper::SelectPrgPage(1, exPage + 1);
+					BaseMapper::SelectPrgPage(2, exPage + 2);
+					BaseMapper::SelectPrgPage(3, exPage + 3);
 				} else {
 					exPage &= 0xFE;
 					BaseMapper::SelectPrgPage(0, (exPage << 1));
@@ -61,7 +61,7 @@ protected:
 
 	uint8_t ReadRegister(uint16_t addr) override
 	{
-		uint8_t security[4] = { 0x83,0x83,0x42,0x00 };
+		uint8_t security[4] = { 0x83, 0x83, 0x42, 0x00 };
 		return security[_exRegs[1] & 0x03];
 	}
 

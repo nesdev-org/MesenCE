@@ -25,7 +25,7 @@ private:
 			}
 		}
 	}
-	
+
 	void TriggerUpdate(GbaTimerState& timer);
 
 public:
@@ -43,10 +43,10 @@ public:
 
 	void WriteRegister(uint32_t addr, uint8_t value);
 	uint8_t ReadRegister(uint32_t addr);
-	
+
 	bool HasPendingTimers() { return _hasPendingTimers; }
 	bool HasPendingWrites() { return _hasPendingWrites; }
-	
+
 	void ProcessPendingTimers();
 	void ProcessPendingWrites();
 

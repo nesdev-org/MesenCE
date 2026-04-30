@@ -55,10 +55,23 @@ protected:
 	}
 
 	void RefreshStateBuffer() override
-	{}
+	{
+	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, Start, Select, B, A, L, R };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		Start,
+		Select,
+		B,
+		A,
+		L,
+		R
+	};
 
 	GbaController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::GbaController, port, keyMappings)
 	{
@@ -71,7 +84,8 @@ public:
 	}
 
 	void WriteRam(uint16_t addr, uint8_t value) override
-	{}
+	{
+	}
 
 	void InternalDrawController(InputHud& hud) override
 	{

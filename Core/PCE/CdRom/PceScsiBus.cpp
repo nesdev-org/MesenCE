@@ -33,7 +33,7 @@ void PceScsiBus::SetPhase(ScsiPhase phase)
 	_needExec = true;
 	_state.Phase = phase;
 	ClearSignals(Bsy, Cd, Io, Msg, Req);
-	
+
 	//LogDebug("[SCSI] Phase changed: " + string(magic_enum::enum_name(phase)));
 
 	switch(_state.Phase) {
@@ -288,7 +288,7 @@ uint32_t PceScsiBus::GetAudioLbaPos()
 			return sector >= 0 ? sector : 0;
 		}
 	}
-	
+
 	LogDebug("[SCSI] CMD: Audio pos - invalid param");
 	return 0;
 }
@@ -308,8 +308,7 @@ void PceScsiBus::CmdAudioStartPos()
 		uint32_t seekTime = PceCdSeekDelay::GetSeekTimeMs(_cdrom->GetCurrentSector(), startSector);
 		LogCommand(
 			"Audio Start Position - " + std::to_string(startSector) +
-			" - Seek time (" + std::to_string(fromSector) + "->" + std::to_string(startSector) + "): " + std::to_string(seekTime) + " ms"
-		);
+			" - Seek time (" + std::to_string(fromSector) + "->" + std::to_string(startSector) + "): " + std::to_string(seekTime) + " ms");
 	}
 
 	PceCdAudioPlayer& player = _cdrom->GetAudioPlayer();
@@ -373,18 +372,17 @@ void PceScsiBus::CmdReadSubCodeQ()
 	if(_emu->IsDebugging()) {
 		LogCommand("Read Sub Code Q");
 	}
-	
+
 	_dataBuffer.clear();
 
 	PceCdAudioPlayer& player = _cdrom->GetAudioPlayer();
-	
+
 	CdAudioStatus audioStatus = player.GetStatus();
 	uint32_t sector = _cdrom->GetCurrentSector();
 	int32_t track = _disc->GetTrack(sector);
 
 	bool isData = track >= 0 ? _disc->Tracks[track].Format != TrackFormat::Audio : false;
-	uint8_t adrControl = (
-		0x01 | //ADR - 1 = "sub-channel Q encodes current position data"
+	uint8_t adrControl = (0x01 | //ADR - 1 = "sub-channel Q encodes current position data"
 		(isData ? 0x40 : 0x00) //Control field - Bit 2: clear = audio track, set = data track
 	);
 
@@ -394,7 +392,7 @@ void PceScsiBus::CmdReadSubCodeQ()
 
 	_dataBuffer.push_back((uint8_t)audioStatus);
 
-	_dataBuffer.push_back(adrControl); //ADR + Control 
+	_dataBuffer.push_back(adrControl); //ADR + Control
 	_dataBuffer.push_back(CdReader::ToBcd(track + 1)); //track number
 	_dataBuffer.push_back(1); //index number
 	_dataBuffer.push_back(CdReader::ToBcd(relPos.Minutes));
@@ -527,8 +525,7 @@ uint8_t PceScsiBus::GetStatus()
 		(_state.Signals[Cd] ? 0x10 : 0) |
 		(_state.Signals[Msg] ? 0x20 : 0) |
 		(_state.Signals[Req] ? 0x40 : 0) |
-		(_state.Signals[Bsy] ? 0x80 : 0)
-	);
+		(_state.Signals[Bsy] ? 0x80 : 0));
 }
 
 void PceScsiBus::SetDataPort(uint8_t data)
@@ -572,7 +569,7 @@ void PceScsiBus::SetAckWithAutoClear()
 	//The 21 master clocks is based on hardware measurements that
 	//show that ACK is cleared ~1 microsecond after being set
 	SetSignals(Ack);
-	_ackClearCounter = 7*3;
+	_ackClearCounter = 7 * 3;
 	_needExec = true;
 }
 
@@ -627,9 +624,9 @@ void PceScsiBus::Exec()
 			case ScsiUpdateType::SetCmdPhase: SetPhase(ScsiPhase::Command); break;
 			case ScsiUpdateType::SetReqSignal: SetSignals(Req); break;
 			case ScsiUpdateType::SetDataInPhase: SetPhase(ScsiPhase::DataIn); break;
-			
+
 			case ScsiUpdateType::SetTransferDoneIrq:
-			case ScsiUpdateType::SetGoodStatus: 
+			case ScsiUpdateType::SetGoodStatus:
 				SetStatusMessage(ScsiStatus::Good, 0);
 				break;
 		}
@@ -658,7 +655,7 @@ void PceScsiBus::Serialize(Serializer& s)
 	SV(_state.ReadDataPort);
 	SV(_state.Sector);
 	SV(_state.SectorsToRead);
-	
+
 	SV(_stateChanged);
 	SV(_readSectorCounter);
 	SV(_ackClearCounter);
