@@ -304,7 +304,7 @@ namespace Mesen.Windows
 					
 					Dispatcher.UIThread.Post(() => {
 						bool wasAudioFile = _model.AudioPlayer != null;
-						bool updateConfig = _model.RomInfo.Format != romInfo.Format;
+						bool updateConfig = _model.RomInfo.Format != romInfo.Format || _model.RomInfo.ConsoleType != romInfo.ConsoleType;
 						_model.RomInfo = romInfo;
 
 						if(updateConfig) {
