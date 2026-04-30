@@ -2,13 +2,14 @@
 #include "pch.h"
 #include <functional>
 #include "Shared/BaseControlManager.h"
+#include "Shared/Interfaces/IInputProvider.h"
 #include "Shared/SettingTypes.h"
 
 class Emulator;
 class Gameboy;
 class BaseControlDevice;
 
-class GbControlManager final : public BaseControlManager
+class GbControlManager final : public BaseControlManager, public IInputProvider
 {
 private:
 	Emulator* _emu = nullptr;
@@ -18,6 +19,7 @@ private:
 
 public:
 	GbControlManager(Emulator* emu, Gameboy* console);
+	~GbControlManager();
 
 	GbControlManagerState GetState();
 
@@ -29,6 +31,8 @@ public:
 	void ProcessInputChange(std::function<void()> inputUpdateCallback);
 
 	void UpdateInputState() override;
+	
+	bool SetInput(BaseControlDevice* device) override;
 
 	void Serialize(Serializer& s) override;
 };
