@@ -38,7 +38,7 @@ namespace Mesen.Windows
 
 		private MouseManager? _mouseManager = null;
 		private ContentControl _audioPlayer;
-		private MainMenuView _mainMenu;
+		private MainMenuView  _mainMenu;
 		private CommandLineHelper? _cmdLine;
 
 		private bool _testModeEnabled;
