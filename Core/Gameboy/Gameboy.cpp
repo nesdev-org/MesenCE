@@ -165,14 +165,14 @@ void Gameboy::Run(uint64_t runUntilClock)
 void Gameboy::LoadBattery()
 {
 	if(_hasBattery) {
-		_emu->GetBatteryManager()->LoadBattery(".srm", _cartRam, _cartRamSize);
+		_emu->GetBatteryManager()->LoadBattery(IsPrimaryConsole() ? ".srm" : ".p2.srm", _cartRam, _cartRamSize);
 	}
 }
 
 void Gameboy::SaveBattery()
 {
 	if(_hasBattery) {
-		_emu->GetBatteryManager()->SaveBattery(".srm", _cartRam, _cartRamSize);
+		_emu->GetBatteryManager()->SaveBattery(IsPrimaryConsole() ? ".srm" : ".p2.srm", _cartRam, _cartRamSize);
 	}
 	_cart->SaveBattery();
 }
@@ -489,7 +489,7 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 
 			EmuSettings* settings = _emu->GetSettings();
 			GameboyConfig cfg = settings->GetGameboyConfig();
-			if(!_mainConsole && cfg.UseLocalLinkCable) {
+			if(!_mainConsole && cfg.UseLocalLinkCable && !_allowSgb) { // Don't allow link cable with SGB for now
 				_emu->SetDebuggerDisabled(true);
 
 				// Create second console and link it with this one

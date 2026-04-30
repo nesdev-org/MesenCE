@@ -106,17 +106,21 @@
 								Content="{l:Translate btnSetup}"
 							/>
 							<TextBlock Text="{l:Translate lblPlayer2}" Grid.Row="2" />
-							<Button
-								Margin="10 0 0 0"
-								Grid.Row="2"
-								Grid.Column="1"
-								Command="{Binding SetupPlayer2}"
-								CommandParameter="{Binding $self}"
-								Content="{l:Translate btnSetup}"
-							/>
+							<WrapPanel Grid.Row="2" Grid.Column="1">
+								<Button
+									Margin="10 0 0 0"
+									Command="{Binding SetupPlayer2}"
+									CommandParameter="{Binding $self}"
+									Content="{l:Translate btnSetup}"
+								/>
+								<TextBlock
+									Margin="5 0 0 0"
+									Text="{l:Translate lblPlayer2UsedForLink}"
+									VerticalAlignment="Center"
+								/>
+							</WrapPanel>
 						</Grid>
 					</c:OptionSection>
-					<TextBlock Text="{l:Translate lblPlayer2UsedForLink}"/>
 					<c:OptionSection Header="{l:Translate grpGeneral}">
 						<c:CheckBoxWarning IsChecked="{Binding Config.AllowInvalidInput}" Text="{l:Translate chkAllowInvalidInput}" />
 					</c:OptionSection>
