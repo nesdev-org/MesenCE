@@ -15,6 +15,7 @@ private:
 
 protected:
 	void Serialize(Serializer& s) override;
+	void RefreshStateBuffer() override;
 
 public:
 	SnesRumbleController(Emulator* emu, SnesConsole* console, uint8_t port, KeyMappingSet keyMappings);

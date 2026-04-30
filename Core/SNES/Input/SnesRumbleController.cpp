@@ -23,6 +23,13 @@ void SnesRumbleController::Serialize(Serializer& s)
 	SV(_rumbleData);
 }
 
+void SnesRumbleController::RefreshStateBuffer()
+{
+	_rumbleData = 0;
+
+	SnesController::RefreshStateBuffer();
+}
+
 uint8_t SnesRumbleController::ReadRam(uint16_t addr)
 {
 	if(IsCurrentPort(addr)) {
@@ -43,8 +50,6 @@ uint8_t SnesRumbleController::ReadRam(uint16_t addr)
 			uint16_t leftRumble = (rumble & 0x0F) * 4369;
 
 			KeyManager::SetForceFeedback(rightRumble, leftRumble);
-
-			_rumbleData = 0;
 		}
 	}
 
