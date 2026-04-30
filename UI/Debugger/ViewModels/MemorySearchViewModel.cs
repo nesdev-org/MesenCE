@@ -48,11 +48,11 @@ public class MemorySearchViewModel : DisposableViewModel
 	[Reactive] public string MaxValue { get; set; } = "";
 
 	[Reactive] public int MaxAddress { get; set; } = 0;
-	
+
 	[Reactive] public bool IsUndoEnabled { get; set; } = false;
 	[Reactive] public bool IsSpecificValueEnabled { get; set; } = false;
 	[Reactive] public bool IsSpecificAddressEnabled { get; set; } = false;
-	
+
 	public int[] AddressLookup => _addressLookup;
 	public byte[] MemoryState => _memoryState;
 	public byte[] PrevMemoryState => _prevMemoryState;
@@ -60,10 +60,10 @@ public class MemorySearchViewModel : DisposableViewModel
 	private List<MemoryAddressViewModel> _innerData = new();
 
 	private int[] _addressLookup = Array.Empty<int>();
-	
+
 	private byte[] _lastSearchSnapshot = Array.Empty<byte>();
-	private HashSet<int> _hiddenAddresses = new();	
-	
+	private HashSet<int> _hiddenAddresses = new();
+
 	private List<SearchHistory> _undoHistory = new();
 
 	private byte[] _memoryState = Array.Empty<byte>();
@@ -85,7 +85,7 @@ public class MemorySearchViewModel : DisposableViewModel
 		AddDisposable(this.WhenAnyValue(x => x.MemoryType).Subscribe(x => {
 			ResetSearch();
 		}));
-		
+
 		AddDisposable(this.WhenAnyValue(x => x.Operator, x => x.CompareTo, x => x.ValueSize, x => x.Format).Subscribe(x => {
 			IsSpecificValueEnabled = CompareTo == MemorySearchCompareTo.SpecificValue;
 			IsSpecificAddressEnabled = CompareTo == MemorySearchCompareTo.SpecificAddress;
@@ -254,7 +254,7 @@ public class MemorySearchViewModel : DisposableViewModel
 	public bool IsMatch(int address)
 	{
 		long value = GetValue(address, _memoryState);
-		
+
 		long compareValue = CompareTo switch {
 			MemorySearchCompareTo.PreviousSearchValue => GetValue(address, _lastSearchSnapshot),
 			MemorySearchCompareTo.PreviousRefreshValue => GetValue(address, _prevMemoryState),

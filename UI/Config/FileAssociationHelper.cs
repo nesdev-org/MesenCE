@@ -1,13 +1,13 @@
+using Avalonia.Threading;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Avalonia.Threading;
-using Mesen.Interop;
-using Mesen.Utilities;
-using Microsoft.Win32;
 
 namespace Mesen.Config
 {
@@ -20,7 +20,7 @@ namespace Mesen.Config
 				Directory.CreateDirectory(baseFolder);
 			}
 			string filename = Path.Combine(baseFolder, mimeType + ".xml");
-			
+
 			if(addType) {
 				FileHelper.WriteAllText(filename,
 					"<?xml version=\"1.0\" encoding=\"utf-8\"?>" + Environment.NewLine +
@@ -91,7 +91,7 @@ namespace Mesen.Config
 			CreateMimeType("x-mesen-gg", "gg", "Game Gear ROM", mimeTypes, cfg.AssociateGameGearRomFiles);
 			CreateMimeType("x-mesen-sg", "sg", "SG-1000 ROM", mimeTypes, cfg.AssociateSgRomFiles);
 			CreateMimeType("x-mesen-col", "col", "ColecoVision ROM", mimeTypes, cfg.AssociateCvRomFiles);
-			
+
 			CreateMimeType("x-mesen-ws", "ws", "WonderSwan ROM", mimeTypes, cfg.AssociateWsRomFiles);
 			CreateMimeType("x-mesen-wsc", "wsc", "WonderSwan Color ROM", mimeTypes, cfg.AssociateWsRomFiles);
 
@@ -145,7 +145,7 @@ namespace Mesen.Config
 				return;
 			}
 
-			string content = 
+			string content =
 				"[Desktop Entry]" + Environment.NewLine +
 				"Type=Application" + Environment.NewLine +
 				"Name=Mesen" + Environment.NewLine +
@@ -156,7 +156,7 @@ namespace Mesen.Config
 				"NoDisplay=false" + Environment.NewLine +
 				"StartupNotify=true" + Environment.NewLine +
 				"Icon=MesenIcon" + Environment.NewLine;
-			
+
 			if(mimeTypes != null) {
 				content += "MimeType=" + string.Join(";", mimeTypes.Select(type => "application/" + type)) + Environment.NewLine;
 			}
@@ -203,7 +203,7 @@ namespace Mesen.Config
 			FileAssociationHelper.UpdateFileAssociation("gbx", cfg.AssociateGbRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("gbc", cfg.AssociateGbRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("gbs", cfg.AssociateGbMusicFiles);
-			
+
 			FileAssociationHelper.UpdateFileAssociation("gba", cfg.AssociateGbaRomFiles);
 
 			FileAssociationHelper.UpdateFileAssociation("pce", cfg.AssociatePceRomFiles);
@@ -214,7 +214,7 @@ namespace Mesen.Config
 			FileAssociationHelper.UpdateFileAssociation("gg", cfg.AssociateGameGearRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("sg", cfg.AssociateSgRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("col", cfg.AssociateCvRomFiles);
-		
+
 			FileAssociationHelper.UpdateFileAssociation("ws", cfg.AssociateWsRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("wsc", cfg.AssociateWsRomFiles);
 		}

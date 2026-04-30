@@ -14,7 +14,7 @@ namespace Mesen.Debugger.Windows
 	public class CommentEditWindow : MesenWindow
 	{
 		private CommentEditViewModel _model;
-		
+
 		[Obsolete("For designer only")]
 		public CommentEditWindow() : this(new()) { }
 
@@ -24,7 +24,7 @@ namespace Mesen.Debugger.Windows
 
 			DataContext = model;
 			_model = model;
-			
+
 			AddHandler(CommentEditWindow.KeyDownEvent, this.KeyDownHandler, RoutingStrategies.Tunnel);
 
 #if DEBUG

@@ -14,7 +14,7 @@ namespace Mesen.Debugger.Utilities
 	public class CodeCompletionHelper
 	{
 		private static Dictionary<string, DocEntryViewModel> _documentation;
-		
+
 		private static Regex _linkRegex = new Regex("emu[.](([a-zA-Z0-9]+)(\\([a-zA-Z0-9 ,]*\\)){0,1})", RegexOptions.Compiled);
 
 		static CodeCompletionHelper()
@@ -346,7 +346,7 @@ namespace Mesen.Debugger.Utilities
 		public DocEntrySubcategory? Subcategory { get; set; } = null;
 		public List<DocParam> Parameters { get; set; } = new();
 		public DocReturnValue ReturnValue { get; set; } = new();
-		
+
 		public List<DocEnumValue> EnumValues { get; set; } = new();
 
 		public int MaxWidth => SplitView ? 1000 : 550;
@@ -411,7 +411,7 @@ namespace Mesen.Debugger.Utilities
 		public string Type { get; set; } = "";
 		public string Description { get; set; } = "";
 	}
-	
+
 	public class DocEnumValue
 	{
 		public string Name { get; set; } = "";

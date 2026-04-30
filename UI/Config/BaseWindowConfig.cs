@@ -40,7 +40,7 @@ namespace Mesen.Config
 				}
 
 				PixelRect wndRect = new PixelRect(WindowLocation, WindowSize);
-				
+
 				Screen? screen = wnd.Screens.ScreenFromBounds(wndRect);
 				if(screen == null) {
 					//Window is not on any screen, move it to the top left of the first screen
@@ -96,7 +96,7 @@ namespace Mesen.Config
 						WindowLocation.Y - (wnd.Position.Y - WindowLocation.Y)
 					);
 				}
-				
+
 				if(WindowIsMaximized) {
 					//Maximize after the position is fixed, otherwise when the state goes back to normal, window position will be offset
 					wnd.WindowState = WindowState.Maximized;

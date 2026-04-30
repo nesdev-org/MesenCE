@@ -26,4 +26,4 @@ namespace Mesen.Localization
 			return ResourceHelper.GetViewLabel(contextType?.Name ?? "unknown", this.Key);
 		}
 	}
-}	
+}

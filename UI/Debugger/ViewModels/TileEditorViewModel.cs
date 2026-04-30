@@ -61,7 +61,7 @@ public class TileEditorViewModel : DisposableViewModel
 		PixelSize size = format.GetTileSize();
 		_tileBuffer = new UInt32[size.Width * size.Height];
 		ViewerBitmap = new DynamicBitmap(new PixelSize(size.Width * _columnCount, size.Height * _rowCount), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Premul);
-		
+
 		if(Design.IsDesignMode) {
 			return;
 		}
@@ -224,7 +224,7 @@ public class TileEditorViewModel : DisposableViewModel
 					TransformType.TranslateLeft => x < width - 1 ? (x + 1) : 0,
 					TransformType.TranslateRight => x > 0 ? (x - 1) : width - 1,
 					TransformType.TranslateUp => x,
-					TransformType.TranslateDown => x, 
+					TransformType.TranslateDown => x,
 					_ => x
 				};
 

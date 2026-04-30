@@ -21,9 +21,9 @@ namespace Mesen.Debugger.ViewModels
 	{
 		public HexEditorConfig Config { get; }
 		public MemoryToolsViewModel MemoryTools { get; }
-		
+
 		public int[] AvailableWidths => new int[] { 4, 8, 16, 32, 48, 64, 80, 96, 112, 128 };
-		
+
 		[Reactive] public bool ShowFrozenAddressesOption { get; set; }
 		[Reactive] public bool ShowNesPcmDataOption { get; set; }
 		[Reactive] public bool ShowNesDrawnChrRomOption { get; set; }

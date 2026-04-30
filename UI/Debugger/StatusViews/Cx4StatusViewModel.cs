@@ -34,10 +34,10 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public UInt32 RegMdr { get; set; }
 		[Reactive] public UInt32 RegMar { get; set; }
 		[Reactive] public UInt32 RegDpr { get; set; }
-		
+
 		[Reactive] public UInt32 RegA { get; set; }
 		[Reactive] public UInt64 RegMult { get; set; }
-		
+
 		[Reactive] public UInt32 RomBuffer { get; set; }
 		[Reactive] public UInt32 RamBuffer { get; set; }
 
@@ -77,7 +77,7 @@ namespace Mesen.Debugger.StatusViews
 			RegPb = cpu.PB;
 			RegP = cpu.P;
 			RegPc = cpu.PC;
-			
+
 			RegMdr = cpu.MemoryDataReg;
 			RegMar = cpu.MemoryAddressReg;
 			RegDpr = cpu.DataPointerReg;
