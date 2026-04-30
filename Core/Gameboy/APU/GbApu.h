@@ -67,7 +67,7 @@ public:
 
 	void ProcessLinkCableAudio();
 
-	void GetSoundSamples(int16_t* &samples, uint32_t& sampleCount);
+	void GetSoundSamples(int16_t*& samples, uint32_t& sampleCount);
 
 	void ClockFrameSequencer();
 

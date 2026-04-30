@@ -808,7 +808,7 @@ void GbPpu::SendFrame()
 
 	UpdatePalette();
 
-	if (_gameboy->IsPrimaryConsole()) {
+	if(_gameboy->IsPrimaryConsole()) {
 		_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::PpuFrameDone);
 	}
 

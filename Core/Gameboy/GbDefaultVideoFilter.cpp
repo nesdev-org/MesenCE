@@ -101,7 +101,7 @@ void GbDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	FrameInfo frame = _baseFrameInfo;
 
 	uint32_t* out = GetOutputBuffer();
-	
+
 	for(uint32_t i = 0; i < frame.Height; i++) {
 		for(uint32_t j = 0; j < frame.Width; j++) {
 			out[i * _baseFrameInfo.Width + j] = GetPixel(ppuOutputBuffer, i * _baseFrameInfo.Width + j);
