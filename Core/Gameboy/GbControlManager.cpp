@@ -10,7 +10,8 @@
 #include "Shared/SystemActionManager.h"
 #include <functional>
 
-GbControlManager::GbControlManager(Emulator* emu, Gameboy* console) : BaseControlManager(emu, CpuType::Gameboy)
+GbControlManager::GbControlManager(Emulator* emu, Gameboy* console)
+: BaseControlManager(emu, CpuType::Gameboy)
 {
 	_emu = emu;
 	_console = console;
