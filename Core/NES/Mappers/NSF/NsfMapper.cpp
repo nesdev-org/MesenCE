@@ -54,7 +54,7 @@ void NsfMapper::InitMapper(RomData& romData)
 		AddRegisterRange(0xA000, 0xA002, MemoryOperation::Write);
 		AddRegisterRange(0xB000, 0xB002, MemoryOperation::Write);
 	}
-	
+
 	if(_nsfHeader.SoundChips & NsfSoundChips::VRC7) {
 		AddRegisterRange(0x9010, 0x9010, MemoryOperation::Write);
 		AddRegisterRange(0x9030, 0x9030, MemoryOperation::Write);
@@ -98,7 +98,7 @@ void NsfMapper::Reset(bool softReset)
 	_vrc7Audio.reset(new Vrc7Audio(_console));
 	_fdsAudio.reset(new FdsAudio(_console));
 	_sunsoftAudio.reset(new Sunsoft5bAudio(_console));
-	
+
 	//Put the audio ram for this in "NesMapperRam" memory type,
 	//starting at offset 0x100 (first 0x100 is the "bios")
 	_namcoAudio.reset(new Namco163Audio(_console, _mapperRam + 0x100, 0x100));
@@ -281,19 +281,34 @@ void NsfMapper::WriteRegister(uint16_t addr, uint8_t value)
 				SetCpuMemoryMapping(0x7000, 0x7FFF, value, PrgMemoryType::PrgRom, MemoryAccessType::ReadWrite);
 				break;
 
-			case 0x5FF8: case 0x5FF9: case 0x5FFA: case 0x5FFB:
-			case 0x5FFC: case 0x5FFD: case 0x5FFE: case 0x5FFF:
+			case 0x5FF8:
+			case 0x5FF9:
+			case 0x5FFA:
+			case 0x5FFB:
+			case 0x5FFC:
+			case 0x5FFD:
+			case 0x5FFE:
+			case 0x5FFF:
 				SetCpuMemoryMapping(0x8000 + (addr & 0x07) * 0x1000, 0x8FFF + (addr & 0x07) * 0x1000, value, PrgMemoryType::PrgRom, (addr <= 0x5FFD && (_nsfHeader.SoundChips & NsfSoundChips::FDS)) ? MemoryAccessType::ReadWrite : MemoryAccessType::Read);
 				break;
 
-			case 0x9000: case 0x9001: case 0x9002: case 0x9003: case 0xA000: case 0xA001: case 0xA002: case 0xB000: case 0xB001: case 0xB002:
+			case 0x9000:
+			case 0x9001:
+			case 0x9002:
+			case 0x9003:
+			case 0xA000:
+			case 0xA001:
+			case 0xA002:
+			case 0xB000:
+			case 0xB001:
+			case 0xB002:
 				_vrc6Audio->WriteRegister(addr, value);
 				break;
 
-			case 0x9010: case 0x9030:
+			case 0x9010:
+			case 0x9030:
 				_vrc7Audio->WriteReg(addr, value);
 				break;
-
 		}
 	}
 }
@@ -372,5 +387,9 @@ void NsfMapper::Serialize(Serializer& s)
 	SV(_namcoAudio);
 	SV(_sunsoftAudio);
 
-	SV(_irqCounter); SV(_mmc5MultiplierValues[0]); SV(_mmc5MultiplierValues[1]); SV(_hasBankSwitching); SV(_songNumber);
+	SV(_irqCounter);
+	SV(_mmc5MultiplierValues[0]);
+	SV(_mmc5MultiplierValues[1]);
+	SV(_hasBankSwitching);
+	SV(_songNumber);
 }

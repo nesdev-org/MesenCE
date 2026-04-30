@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "HexUtilities.h"
 
+// clang-format off
 const vector<string> HexUtilities::_hexCache = { {
 	"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F",
 	"10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F",
@@ -42,6 +43,7 @@ constexpr const char* _hexCharCache[256] = {
 constexpr const char* _hexSingleChar[256] = {
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F",
 };
+// clang-format on
 
 int HexUtilities::FromHex(string hex)
 {
@@ -117,11 +119,10 @@ string HexUtilities::ToHex(uint64_t value)
 		_hexCache[(value >> 24) & 0xFF] +
 		_hexCache[(value >> 16) & 0xFF] +
 		_hexCache[(value >> 8) & 0xFF] +
-		_hexCache[value & 0xFF]
-	);
+		_hexCache[value & 0xFF]);
 }
 
-string HexUtilities::ToHex(vector<uint8_t> &data, char delimiter)
+string HexUtilities::ToHex(vector<uint8_t>& data, char delimiter)
 {
 	string result;
 	result.reserve(data.size() * 2);

@@ -11,7 +11,7 @@ class LinuxGameController
 private:
 	int _fd = -1;
 	int _deviceID = -1;
-	libevdev *_device = nullptr;
+	libevdev* _device = nullptr;
 	bool _disconnected = false;
 	std::thread _eventThread;
 	std::atomic<bool> _stopFlag;
@@ -21,7 +21,7 @@ private:
 	bool _enableForceFeedback = false;
 	int _axisDefaultValue[0x100] = {};
 
-	LinuxGameController(Emulator* emu, int deviceID, int fileDescriptor, libevdev *device);
+	LinuxGameController(Emulator* emu, int deviceID, int fileDescriptor, libevdev* device);
 	bool CheckAxis(unsigned int code, bool forPositive);
 	bool CheckButton(int btn);
 	void Calibrate();

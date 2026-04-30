@@ -1,3 +1,4 @@
+// clang-format off
 //Disable warnings
 #if defined(_MSC_VER)
 	#pragma warning(push, 0)
@@ -38,7 +39,6 @@
 #define _PI_ 3.14159265358979323846264338327950288
 
 #define OPLL_TONE_NUM 3
-/* clang-format off */
 static uint8_t default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {{
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // 0: User
 0x71,0x61,0x1e,0x17,0xd0,0x78,0x00,0x17, // 1: Violin
@@ -102,7 +102,6 @@ static uint8_t default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {{
 0x01,0x01,0x00,0x00,0xc8,0xd8,0xa7,0x68, // R: High-Hat(M) / Snare Drum(C) (identical to YM2413)
 0x05,0x01,0x00,0x00,0xf8,0xaa,0x59,0x55, // R: Tom-tom(M) / Top Cymbal(C) (identical to YM2413)
 }};
-/* clang-format on */
 
 /* phase increment counter */
 #define DP_BITS 19
@@ -132,7 +131,6 @@ static uint8_t default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {{
 #define PG_BITS 10 /* 2^10 = 1024 length sine table */
 #define PG_WIDTH (1 << PG_BITS)
 
-/* clang-format off */
 /* exp_table[x] = round((exp2((double)x / 256.0) - 1) * 1024) */
 static uint16_t exp_table[256] = {
 0,    3,    6,    8,    11,   14,   17,   20,   22,   25,   28,   31,   34,   37,   40,   42,
@@ -171,7 +169,6 @@ static uint16_t fullsin_table[PG_WIDTH] = {
 7,    7,    6,    6,    5,    5,    5,    4,    4,    4,    3,    3,    3,    2,    2,    2,
 2,    1,    1,    1,    1,    1,    1,    1,    0,    0,    0,    0,    0,    0,    0,    0,
 };
-/* clang-format on */
 
 static uint16_t halfsin_table[PG_WIDTH];
 static uint16_t *wave_table_map[2] = {fullsin_table, halfsin_table};

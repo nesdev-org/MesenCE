@@ -21,8 +21,8 @@ bool SZReader::InternalLoadArchive(void* buffer, size_t size)
 		_initialized = false;
 	}
 
-	ISzAlloc allocImp{ SzAlloc, SzFree };
-	ISzAlloc allocTempImp{ SzAllocTemp, SzFreeTemp };
+	ISzAlloc allocImp { SzAlloc, SzFree };
+	ISzAlloc allocTempImp { SzAllocTemp, SzFreeTemp };
 
 	MemBufferInit(&_memBufferStream, &_lookStream, buffer, size);
 	CrcGenerateTable();
@@ -31,14 +31,14 @@ bool SZReader::InternalLoadArchive(void* buffer, size_t size)
 	return !SzArEx_Open(&_archive, &_lookStream.s, &allocImp, &allocTempImp);
 }
 
-bool SZReader::ExtractFile(string filename, vector<uint8_t> &output)
+bool SZReader::ExtractFile(string filename, vector<uint8_t>& output)
 {
 	bool result = false;
 	if(_initialized) {
-		char16_t *utf16Filename = (char16_t*)SzAlloc(nullptr, 2000);
+		char16_t* utf16Filename = (char16_t*)SzAlloc(nullptr, 2000);
 
 		uint32_t blockIndex = 0xFFFFFFFF;
-		uint8_t *outBuffer = 0;
+		uint8_t* outBuffer = 0;
 		size_t outBufferSize = 0;
 
 		for(uint32_t i = 0; i < _archive.NumFiles; i++) {
@@ -54,7 +54,7 @@ bool SZReader::ExtractFile(string filename, vector<uint8_t> &output)
 			if(filename == entryName) {
 				WRes res = SzArEx_Extract(&_archive, &_lookStream.s, i, &blockIndex, &outBuffer, &outBufferSize, &offset, &outSizeProcessed, &_allocImp, &_allocTempImp);
 				if(res == SZ_OK) {
-					output = vector<uint8_t>(outBuffer+offset, outBuffer+offset+outSizeProcessed);
+					output = vector<uint8_t>(outBuffer + offset, outBuffer + offset + outSizeProcessed);
 					result = true;
 				}
 				IAlloc_Free(&_allocImp, outBuffer);
@@ -70,7 +70,7 @@ bool SZReader::ExtractFile(string filename, vector<uint8_t> &output)
 vector<string> SZReader::InternalGetFileList()
 {
 	vector<string> filenames;
-	char16_t *utf16Filename = (char16_t*)SzAlloc(nullptr, 2000);
+	char16_t* utf16Filename = (char16_t*)SzAlloc(nullptr, 2000);
 
 	if(_initialized) {
 		for(uint32_t i = 0; i < _archive.NumFiles; i++) {

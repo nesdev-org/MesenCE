@@ -12,7 +12,7 @@ ArchiveReader::~ArchiveReader()
 	delete[] _buffer;
 }
 
-bool ArchiveReader::GetStream(string filename, std::stringstream &stream)
+bool ArchiveReader::GetStream(string filename, std::stringstream& stream)
 {
 	if(_initialized) {
 		vector<uint8_t> fileData;
@@ -36,7 +36,7 @@ vector<string> ArchiveReader::GetFileList(std::initializer_list<string> extensio
 	for(string filename : InternalGetFileList()) {
 		string lcFilename = filename;
 		std::transform(lcFilename.begin(), lcFilename.end(), lcFilename.begin(), ::tolower);
-	
+
 		string ext = FolderUtilities::GetExtension(lcFilename);
 		if(extMap.find(ext) != extMap.end()) {
 			filenames.push_back(filename);
@@ -52,7 +52,7 @@ bool ArchiveReader::CheckFile(string filename)
 	return std::find(files.begin(), files.end(), filename) != files.end();
 }
 
-bool ArchiveReader::LoadArchive(std::istream &in)
+bool ArchiveReader::LoadArchive(std::istream& in)
 {
 	in.seekg(0, std::ios::end);
 	std::streampos filesize = in.tellg();
@@ -66,7 +66,7 @@ bool ArchiveReader::LoadArchive(std::istream &in)
 	return result;
 }
 
-bool ArchiveReader::LoadArchive(vector<uint8_t> &data)
+bool ArchiveReader::LoadArchive(vector<uint8_t>& data)
 {
 	return LoadArchive(data.data(), data.size());
 }
@@ -90,9 +90,9 @@ bool ArchiveReader::LoadArchive(string filename)
 	return false;
 }
 
-unique_ptr<ArchiveReader> ArchiveReader::GetReader(std::istream &in)
+unique_ptr<ArchiveReader> ArchiveReader::GetReader(std::istream& in)
 {
-	uint8_t header[2] = { 0,0 };
+	uint8_t header[2] = { 0, 0 };
 	in.read((char*)header, 2);
 
 	unique_ptr<ArchiveReader> reader;

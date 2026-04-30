@@ -15,7 +15,7 @@ SdlRenderer::SdlRenderer(Emulator* emu, void* windowHandle) : _windowHandle(wind
 	_frameBuffer = nullptr;
 	_requiredWidth = 256;
 	_requiredHeight = 240;
-	
+
 	_emu->GetVideoRenderer()->RegisterRenderingDevice(this);
 }
 
@@ -24,7 +24,7 @@ SdlRenderer::~SdlRenderer()
 	_emu->GetVideoRenderer()->UnregisterRenderingDevice(this);
 
 	Cleanup();
-	delete[] _frameBuffer;	
+	delete[] _frameBuffer;
 }
 
 void SdlRenderer::LogSdlError(const char* msg)
@@ -150,22 +150,22 @@ void SdlRenderer::SetScreenSize(uint32_t width, uint32_t height)
 
 		_frameHeight = height;
 		_frameWidth = width;
-		_newFrameBufferSize = width*height;
+		_newFrameBufferSize = width * height;
 
 		_screenHeight = size.Height;
 		_screenWidth = size.Width;
 
 		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, _useBilinearInterpolation ? "1" : "0");
-		_screenBufferSize = _screenHeight*_screenWidth;
+		_screenBufferSize = _screenHeight * _screenWidth;
 
 		Reset();
-	}	
+	}
 }
 
 void SdlRenderer::ClearFrame()
 {
 	auto lock = _frameLock.AcquireSafe();
-	if(_frameBuffer == nullptr) { 
+	if(_frameBuffer == nullptr) {
 		return;
 	}
 
@@ -179,14 +179,14 @@ void SdlRenderer::UpdateFrame(RenderedFrame& frame)
 	if(_frameBuffer == nullptr || _requiredWidth != frame.Width || _requiredHeight != frame.Height) {
 		_requiredWidth = frame.Width;
 		_requiredHeight = frame.Height;
-		
+
 		delete[] _frameBuffer;
-		_frameBuffer = new uint32_t[frame.Width*frame.Height];
-		memset(_frameBuffer, 0, frame.Width * frame.Height *4);
+		_frameBuffer = new uint32_t[frame.Width * frame.Height];
+		memset(_frameBuffer, 0, frame.Width * frame.Height * 4);
 	}
-	
-	memcpy(_frameBuffer, frame.FrameBuffer, frame.Width * frame.Height *_bytesPerPixel);
-	_frameChanged = true;	
+
+	memcpy(_frameBuffer, frame.FrameBuffer, frame.Width * frame.Height * _bytesPerPixel);
+	_frameChanged = true;
 }
 
 bool SdlRenderer::UpdateHudSize(HudRenderInfo& hud, uint32_t width, uint32_t height)
@@ -235,7 +235,7 @@ void SdlRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud
 		LogSdlError("SDL_RenderClear failed");
 	}
 
-	uint8_t *textureBuffer;
+	uint8_t* textureBuffer;
 	int rowPitch;
 	if(SDL_LockTexture(_sdlTexture, nullptr, (void**)&textureBuffer, &rowPitch) == 0) {
 		auto frameLock = _frameLock.AcquireSafe();
@@ -243,7 +243,7 @@ void SdlRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud
 			uint32_t* ppuFrameBuffer = _frameBuffer;
 			if(rowPitch != _frameWidth) {
 				for(uint32_t i = 0, iMax = _frameHeight; i < iMax; i++) {
-					memcpy(textureBuffer, ppuFrameBuffer, _frameWidth*_bytesPerPixel);
+					memcpy(textureBuffer, ppuFrameBuffer, _frameWidth * _bytesPerPixel);
 					ppuFrameBuffer += _frameWidth;
 					textureBuffer += rowPitch;
 				}
@@ -254,7 +254,7 @@ void SdlRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud
 	} else {
 		LogSdlError("SDL_LockTexture failed");
 	}
-	
+
 	SDL_UnlockTexture(_sdlTexture);
 
 	if(needUpdate || emuHud.IsDirty) {
@@ -264,11 +264,11 @@ void SdlRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud
 		UpdateHudTexture(_scriptHud, scriptHud.Buffer);
 	}
 
-	SDL_Rect source = {0, 0, (int)_frameWidth, (int)_frameHeight };
-	SDL_Rect dest = {0, 0, (int)_screenWidth, (int)_screenHeight };
-	
+	SDL_Rect source = { 0, 0, (int)_frameWidth, (int)_frameHeight };
+	SDL_Rect dest = { 0, 0, (int)_screenWidth, (int)_screenHeight };
+
 	if(SDL_RenderCopy(_sdlRenderer, _sdlTexture, &source, &dest) != 0) {
-		LogSdlError("SDL_RenderCopy failed");	
+		LogSdlError("SDL_RenderCopy failed");
 	}
 
 	SDL_Rect scriptHudSource = { 0, 0, (int)_scriptHud.Width, (int)_scriptHud.Height };

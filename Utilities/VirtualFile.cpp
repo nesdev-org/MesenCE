@@ -11,6 +11,7 @@
 #include "Utilities/Patches/UpsPatcher.h"
 #include "Utilities/CRC32.h"
 
+// clang-format off
 const std::initializer_list<string> VirtualFile::RomExtensions = {
 	".nes", ".fds", ".qd", ".unif", ".unf", ".nsf", ".nsfe", ".studybox",
 	".sfc", ".swc", ".fig", ".smc", ".bs", ".st", ".spc",
@@ -20,6 +21,7 @@ const std::initializer_list<string> VirtualFile::RomExtensions = {
 	".gba",
 	".ws", ".wsc"
 };
+// clang-format on
 
 VirtualFile::VirtualFile()
 {
@@ -40,7 +42,8 @@ VirtualFile::VirtualFile(const string& file)
 		if(tokens.size() > 2) {
 			try {
 				_innerFileIndex = std::stoi(tokens[2]);
-			} catch(std::exception&) {}
+			} catch(std::exception&) {
+			}
 		}
 	}
 }

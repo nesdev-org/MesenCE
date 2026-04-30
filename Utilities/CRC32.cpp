@@ -9,30 +9,30 @@ const size_t MaxSlice = 16;
 extern const uint32_t Crc32Lookup[MaxSlice][256];
 
 #ifndef __LITTLE_ENDIAN
-#define __LITTLE_ENDIAN 1234
+	#define __LITTLE_ENDIAN 1234
 #endif
 #ifndef __BIG_ENDIAN
-#define __BIG_ENDIAN    4321
+	#define __BIG_ENDIAN    4321
 #endif
 
 // define endianess and some integer data types
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__aarch64__)
-	// Windows always little endian
-#define __BYTE_ORDER __LITTLE_ENDIAN
+// Windows always little endian
+	#define __BYTE_ORDER __LITTLE_ENDIAN
 #else
-	// defines __BYTE_ORDER as __LITTLE_ENDIAN or __BIG_ENDIAN
-#if defined(__APPLE__) || defined(HAVE_LIBNX)
-#include <machine/endian.h>
-#elif defined (__FreeBSD__) || defined(__DragonFly__)
-#include <sys/endian.h>
-#else
-#include <endian.h>
-#endif
+// defines __BYTE_ORDER as __LITTLE_ENDIAN or __BIG_ENDIAN
+	#if defined(__APPLE__) || defined(HAVE_LIBNX)
+		#include <machine/endian.h>
+	#elif defined(__FreeBSD__) || defined(__DragonFly__)
+		#include <sys/endian.h>
+	#else
+		#include <endian.h>
+	#endif
 #endif
 
 #if !defined(__BYTE_ORDER)
-//Default to little endian when the symbol is not defined
-#define __BYTE_ORDER __LITTLE_ENDIAN
+	//Default to little endian when the symbol is not defined
+	#define __BYTE_ORDER __LITTLE_ENDIAN
 #endif
 
 uint32_t CRC32::GetCRC(uint8_t* buffer, std::streamoff length)
@@ -78,7 +78,7 @@ uint32_t CRC32::crc32_16bytes(const void* data, size_t length, uint32_t previous
 
 	while(length >= BytesAtOnce) {
 		for(size_t unrolling = 0; unrolling < Unroll; unrolling++) {
-		#if __BYTE_ORDER == __BIG_ENDIAN
+#if __BYTE_ORDER == __BIG_ENDIAN
 			uint32_t one = *current++ ^ swap(crc);
 			uint32_t two = *current++;
 			uint32_t three = *current++;
@@ -99,7 +99,7 @@ uint32_t CRC32::crc32_16bytes(const void* data, size_t length, uint32_t previous
 				Crc32Lookup[13][(one >> 8) & 0xFF] ^
 				Crc32Lookup[14][(one >> 16) & 0xFF] ^
 				Crc32Lookup[15][(one >> 24) & 0xFF];
-		#else
+#else
 			uint32_t one = *current++ ^ crc;
 			uint32_t two = *current++;
 			uint32_t three = *current++;
@@ -120,7 +120,7 @@ uint32_t CRC32::crc32_16bytes(const void* data, size_t length, uint32_t previous
 				Crc32Lookup[13][(one >> 16) & 0xFF] ^
 				Crc32Lookup[14][(one >> 8) & 0xFF] ^
 				Crc32Lookup[15][one & 0xFF];
-		#endif
+#endif
 		}
 
 		length -= BytesAtOnce;
@@ -128,12 +128,14 @@ uint32_t CRC32::crc32_16bytes(const void* data, size_t length, uint32_t previous
 
 	const uint8_t* currentChar = (const uint8_t*)current;
 	// remaining 1 to 63 bytes (standard algorithm)
-	while(length-- != 0)
+	while(length-- != 0) {
 		crc = (crc >> 8) ^ Crc32Lookup[0][(crc & 0xFF) ^ *currentChar++];
+	}
 
 	return ~crc; // same as crc ^ 0xFFFFFFFF
 }
 
+// clang-format off
 const uint32_t Crc32Lookup[MaxSlice][256] =
 {
 	{
@@ -693,3 +695,4 @@ const uint32_t Crc32Lookup[MaxSlice][256] =
 		0xF088C1A2,0x5EE05033,0x7728E4C1,0xD9407550,0x24B98D25,0x8AD11CB4,0xA319A846,0x0D7139D7,
 	 }
 };
+// clang-format on

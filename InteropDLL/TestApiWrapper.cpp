@@ -43,12 +43,12 @@ extern "C"
 		uint64_t result = memBuffer[address];
 		for(int i = 1; i < 8; i++) {
 			if(address + i < memInfo.Size) {
-				result |= ((uint64_t)memBuffer[address + i] << (8*i));
+				result |= ((uint64_t)memBuffer[address + i] << (8 * i));
 			} else {
 				break;
 			}
 		}
-		
+
 		emu->Stop(false);
 		emu->Release();
 
@@ -60,7 +60,7 @@ extern "C"
 		_recordedRomTest.reset(new RecordedRomTest(_emu.get(), false));
 		_recordedRomTest->Record(filename, reset);
 	}
-	
+
 	DllExport void __stdcall RomTestStop()
 	{
 		if(_recordedRomTest) {
@@ -69,5 +69,8 @@ extern "C"
 		}
 	}
 
-	DllExport bool __stdcall RomTestRecording() { return _recordedRomTest != nullptr; }
+	DllExport bool __stdcall RomTestRecording()
+	{
+		return _recordedRomTest != nullptr;
+	}
 }

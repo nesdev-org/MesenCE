@@ -141,7 +141,7 @@ EventViewerCategoryCfg SmsEventManager::GetEventConfig(DebugEventInfo& evt)
 					case 0x41: return _config.VdpHCounterRead;
 					case 0x80: return _config.VdpVramRead;
 					case 0x81: return _config.VdpControlPortRead;
-					
+
 					case 0xC0:
 					case 0xC1:
 						return _config.IoRead;
@@ -152,7 +152,7 @@ EventViewerCategoryCfg SmsEventManager::GetEventConfig(DebugEventInfo& evt)
 				switch(evt.Operation.Address & 0xC1) {
 					case 0x00: return _config.MemoryControlWrite;
 					case 0x01: return _config.IoWrite;
-					
+
 					case 0x40:
 					case 0x41:
 						return _config.PsgWrite;

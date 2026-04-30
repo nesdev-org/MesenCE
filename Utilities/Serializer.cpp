@@ -12,7 +12,10 @@ Serializer::Serializer(uint32_t version, bool forSave, SerializeFormat format)
 	if(forSave) {
 		switch(format) {
 			case SerializeFormat::Binary: _data.reserve(0x50000); break;
-			case SerializeFormat::Map: _mapSaveValues.reserve(500); _mapSaveKeys.reserve(500); break;
+			case SerializeFormat::Map:
+				_mapSaveValues.reserve(500);
+				_mapSaveKeys.reserve(500);
+				break;
 			case SerializeFormat::Text: _values.reserve(500); break;
 		}
 	}
@@ -61,7 +64,7 @@ void Serializer::RemoveKeys(vector<string>& keysToRemove)
 	}
 }
 
-bool Serializer::LoadFrom(istream &file)
+bool Serializer::LoadFrom(istream& file)
 {
 	if(_saving) {
 		return false;

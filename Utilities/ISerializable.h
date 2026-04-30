@@ -12,6 +12,6 @@ enum class DeserializeResult
 class ISerializable
 {
 public:
-	virtual void Serialize(Serializer &s) = 0;
+	virtual void Serialize(Serializer& s) = 0;
 };
 

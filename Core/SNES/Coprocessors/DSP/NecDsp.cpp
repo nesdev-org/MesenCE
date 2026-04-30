@@ -323,12 +323,12 @@ void NecDsp::RunApuOp(uint8_t aluOperation, uint16_t source)
 		case 0x05: result = acc + p; break;
 		case 0x06: result = acc - p - otherCarry; break;
 		case 0x07: result = acc + p + otherCarry; break;
-		
+
 		case 0x08:
 			result = acc - 1;
 			p = 1;
 			break;
-		
+
 		case 0x09:
 			result = acc + 1;
 			p = 1;
