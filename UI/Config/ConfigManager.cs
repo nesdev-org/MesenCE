@@ -21,7 +21,7 @@ namespace Mesen.Config
 
 		public static string DefaultPortableFolder { get { return Path.GetDirectoryName(Program.ExePath) ?? "./"; } }
 		public static string DefaultDocumentsFolder => Path.Combine(BaseDocumentsFolder, "MesenCE");
-		
+
 		private static string BaseDocumentsFolder
 		{
 			get

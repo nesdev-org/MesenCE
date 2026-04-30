@@ -1177,7 +1177,7 @@ namespace Mesen.Interop
 
 		public Int32 TileIndex;
 		public UInt32 TileCount;
-		
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 		public UInt32[] TileAddresses;
 

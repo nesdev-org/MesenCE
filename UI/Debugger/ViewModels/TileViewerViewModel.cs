@@ -592,7 +592,7 @@ namespace Mesen.Debugger.ViewModels
 			List<TileAddressInfo> addresses = new();
 			for(int row = 0; row < rowCount; row++) {
 				for(int col = 0; col < columnCount; col++) {
-					addresses.Add(new TileAddressInfo() { Address = new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + col*GridSizeX, p.Y + row*GridSizeY)), Type = Config.Source } });
+					addresses.Add(new TileAddressInfo() { Address = new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + col * GridSizeX, p.Y + row * GridSizeY)), Type = Config.Source } });
 				}
 			}
 			TileEditorWindow.OpenAtTile(

@@ -710,7 +710,7 @@ namespace Mesen.Debugger.ViewModels
 			TileFormat format = _data.TilemapInfo.Format;
 			int tileWidth = GridSizeX;
 			int tileHeight = GridSizeY;
-	
+
 			PixelSize size = format.GetTileSize();
 
 			//On the SNES, the tile size may be 8x8, but the tilemap is defined in 16x16 (or 16x8) blocks.
@@ -728,7 +728,7 @@ namespace Mesen.Debugger.ViewModels
 
 			for(int row = 0; row < rowCount; row++) {
 				for(int col = 0; col < columnCount; col++) {
-					DebugTilemapTileInfo? tile = DebugApi.GetTilemapTileInfo((uint)(p.X + tileWidth*col), (uint)(p.Y + tileHeight*row), CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
+					DebugTilemapTileInfo? tile = DebugApi.GetTilemapTileInfo((uint)(p.X + tileWidth * col), (uint)(p.Y + tileHeight * row), CpuType, GetOptions(SelectedTab), _data.Vram, _data.PpuState, _data.PpuToolsState);
 					if(tile == null) {
 						if(col == 0) {
 							rowCount = row;
