@@ -43,7 +43,7 @@ namespace Mesen.ViewModels
 				IsDefaultSpcClockSpeed = x == 40;
 			}));
 		}
-   }
+	}
 
 	public enum SnesConfigTab
 	{

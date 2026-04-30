@@ -4,9 +4,9 @@ using Mesen.Interop;
 using Mesen.Utilities;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System.Reactive.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {

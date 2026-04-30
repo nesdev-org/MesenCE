@@ -1,11 +1,11 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
-using Mesen.Config;
 using Avalonia.Interactivity;
-using System;
+using Avalonia.Markup.Xaml;
+using Mesen.Config;
+using Mesen.Utilities;
 using Mesen.ViewModels;
+using System;
 
 namespace Mesen.Views
 {
