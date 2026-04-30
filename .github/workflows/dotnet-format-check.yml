@@ -2,7 +2,7 @@ name: dotnet format check
 on: [push, pull_request]
 jobs:
   dotnet-format:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
