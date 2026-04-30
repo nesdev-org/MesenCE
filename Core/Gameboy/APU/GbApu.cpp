@@ -110,7 +110,7 @@ void GbApu::Run()
 		}
 	}
 
-	if(!_gameboy->IsSgb() && _clockCounter >= 20000) {
+	if(!_gameboy->IsSgb() && _clockCounter >= 20000 && !_gameboy->IsPrimaryConsole()) {
 		PlayQueuedAudio();
 	}
 }
@@ -158,7 +158,6 @@ void GbApu::PlayQueuedAudio()
 		return;
 	}
 
-	GameboyConfig& cfg = _emu->GetSettings()->GetGameboyConfig();
 	if(_gameboy->IsPrimaryConsole() && _gameboy->GetLinkedConsole()) {
 		ProcessLinkCableAudio();
 	}
@@ -178,9 +177,12 @@ void GbApu::ProcessLinkCableAudio()
 	}
 
 	GbApu* subApu = _gameboy->GetLinkedConsole()->GetApu();
+	subApu->Run();
+	subApu->PlayQueuedAudio();
+
 	if(cfg.LocalLinkCableAudioOutput != GbLocalLinkOutputOption::MainSystemOnly) {
 		size_t i;
-		for(i = 0; i < _sampleCount && subApu->_sampleCount; i++) {
+		for(i = 0; i < _sampleCount && i < subApu->_sampleCount; i++) {
 			_soundBuffer[i * 2] += subApu->_soundBuffer[i * 2];
 			_soundBuffer[i * 2 + 1] += subApu->_soundBuffer[i * 2 + 1];
 		}
@@ -189,6 +191,8 @@ void GbApu::ProcessLinkCableAudio()
 			size_t samplesToCopy = subApu->_sampleCount - i;
 			memmove(subApu->_soundBuffer, subApu->_soundBuffer + i * 2, samplesToCopy * 2 * sizeof(int16_t));
 			subApu->_sampleCount = samplesToCopy;
+		} else {
+			subApu->_sampleCount = 0;
 		}
 	} else {
 		subApu->_sampleCount = 0;
@@ -452,6 +456,7 @@ void GbApu::Serialize(Serializer& s)
 		Run();
 	} else {
 		_clockCounter = 0;
+		_sampleCount = 0;
 		blip_clear(_leftChannel);
 		blip_clear(_rightChannel);
 	}
