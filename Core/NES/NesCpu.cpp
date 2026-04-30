@@ -522,8 +522,8 @@ uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool en
 				}
 				break;
 
-			//TODO if test mode is enabled, handle test mode registers here (and consider making the test mode check earlier in this
-			//function check for whether test mode is actually enabled).
+				//TODO if test mode is enabled, handle test mode registers here (and consider making the test mode check earlier in this
+				//function check for whether test mode is actually enabled).
 
 			default:
 				val = _memoryManager->Read(addr, MemoryOperationType::DmaRead);
