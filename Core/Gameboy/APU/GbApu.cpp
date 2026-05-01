@@ -9,8 +9,8 @@
 
 GbApu::GbApu()
 {
-	_soundBuffer = new int16_t[GbApu::MaxSamples * 2];
-	memset(_soundBuffer, 0, GbApu::MaxSamples * 2 * sizeof(int16_t));
+	_soundBuffer = new int16_t[GbApu::MaxSamples * 2 * 2]; // *2 for stereo, then *2 as a precaution against buffer overflows
+	memset(_soundBuffer, 0, GbApu::MaxSamples * 2 * 2 * sizeof(int16_t));
 
 	_leftChannel = blip_new(GbApu::MaxSamples);
 	_rightChannel = blip_new(GbApu::MaxSamples);
@@ -153,6 +153,9 @@ void GbApu::PlayQueuedAudio()
 	size_t sampleCount = blip_read_samples(_leftChannel, out, GbApu::MaxSamples, 1);
 	blip_read_samples(_rightChannel, out + 1, GbApu::MaxSamples, 1);
 	_sampleCount += sampleCount;
+	if(_sampleCount > GbApu::MaxSamples) { // Hacky safeguard against buffer overflows
+		_sampleCount = GbApu::MaxSamples;
+	}
 	_clockCounter = 0;
 
 	if(!_gameboy->IsPrimaryConsole()) {
