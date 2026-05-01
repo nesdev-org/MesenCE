@@ -172,7 +172,12 @@ void Gameboy::LoadBattery()
 void Gameboy::SaveBattery()
 {
 	if(_hasBattery) {
-		_emu->GetBatteryManager()->SaveBattery(IsPrimaryConsole() ? ".srm" : ".p2.srm", _cartRam, _cartRamSize);
+		_emu->GetBatteryManager()->SaveBattery(".srm", _cartRam, _cartRamSize);
+
+		// SaveBattery only gets called on the primary console, so write the secondary console's save too
+		if(_secondaryConsole) {
+			_emu->GetBatteryManager()->SaveBattery(".p2.srm", _secondaryConsole->_cartRam, _secondaryConsole->_cartRamSize);
+		}
 	}
 	_cart->SaveBattery();
 }
