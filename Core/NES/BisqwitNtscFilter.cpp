@@ -31,7 +31,6 @@ BisqwitNtscFilter::BisqwitNtscFilter(Emulator* emu) : BaseVideoFilter(emu)
 	//with their respective attenuated values
 	for(int h = 0; h <= 1; h++) {
 		for(int i = 0; i <= 0x3F; i++) {
-
 			double m = signalLumaLow[h][i / 0x10];
 			double q = signalLumaHigh[h][i / 0x10];
 
@@ -80,7 +79,7 @@ BisqwitNtscFilter::~BisqwitNtscFilter()
 	_extraThread.join();
 }
 
-void BisqwitNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
+void BisqwitNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 {
 	_ppuOutputBuffer = ppuOutputBuffer;
 
@@ -90,7 +89,7 @@ void BisqwitNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
 
 	_workDone = false;
 	_waitWork.Signal();
-	DecodeFrame(GetOverscan().Top, 120, ppuOutputBuffer, GetOutputBuffer(), (GetVideoPhase() * 4) + GetOverscan().Top*341*8);
+	DecodeFrame(GetOverscan().Top, 120, ppuOutputBuffer, GetOutputBuffer(), (GetVideoPhase() * 4) + GetOverscan().Top * 341 * 8);
 	while(!_workDone) {}
 }
 
@@ -150,7 +149,7 @@ void BisqwitNtscFilter::OnBeforeApplyFilter()
 	_qb = (int)(contrast * 1.667217e-6 * saturation / _qWidth);
 }
 
-void BisqwitNtscFilter::RecursiveBlend(int iterationCount, uint64_t *output, uint64_t *currentLine, uint64_t *nextLine, int pixelsPerCycle, bool verticalBlend)
+void BisqwitNtscFilter::RecursiveBlend(int iterationCount, uint64_t* output, uint64_t* currentLine, uint64_t* nextLine, int pixelsPerCycle, bool verticalBlend)
 {
 	//Blend 2 pixels at once
 	uint32_t width = _frameInfo.Width / 2;
@@ -170,17 +169,23 @@ void BisqwitNtscFilter::RecursiveBlend(int iterationCount, uint64_t *output, uin
 	}
 }
 
-void BisqwitNtscFilter::GenerateNtscSignal(int8_t *ntscSignal, int &phase, int rowNumber)
+void BisqwitNtscFilter::GenerateNtscSignal(int8_t* ntscSignal, int& phase, int rowNumber)
 {
 	static constexpr uint16_t emphasisLut[8] = {
 		//R: 0b000000111111, G: 0b001111110000, B: 0b111100000011
-		0,              0b000000111111, 0b001111110000, 0b001111111111,
-		0b111100000011, 0b111100111111, 0b111111110011, 0b111111111111
+		0,
+		0b000000111111,
+		0b001111110000,
+		0b001111111111,
+		0b111100000011,
+		0b111100111111,
+		0b111111110011,
+		0b111111111111
 	};
 
 	for(int x = 0; x < 256; x++) {
 		uint16_t ppuData = _ppuOutputBuffer[(rowNumber << 8) | x];
-		
+
 		uint16_t pixelColor = ppuData & 0x3F;
 		uint8_t emphasis = ppuData >> 6;
 		uint8_t hue = ppuData & 0x0F;
@@ -194,7 +199,7 @@ void BisqwitNtscFilter::GenerateNtscSignal(int8_t *ntscSignal, int &phase, int r
 		uint16_t phaseBitmask = _bitmaskLut[std::abs(phase - hue) % 12];
 		for(int j = 0; j < _signalsPerPixel; j++) {
 			phaseBitmask <<= 1;
-			
+
 			uint8_t color = pixelColor | ((phaseBitmask & emphasisWave) ? 0x40 : 0);
 			int8_t voltage = _signalHigh[color];
 
@@ -213,19 +218,19 @@ void BisqwitNtscFilter::GenerateNtscSignal(int8_t *ntscSignal, int &phase, int r
 	phase += (341 - 256) * _signalsPerPixel;
 }
 
-void BisqwitNtscFilter::DecodeFrame(int startRow, int endRow, uint16_t *ppuOutputBuffer, uint32_t* outputBuffer, int startPhase)
+void BisqwitNtscFilter::DecodeFrame(int startRow, int endRow, uint16_t* ppuOutputBuffer, uint32_t* outputBuffer, int startPhase)
 {
 	int pixelsPerCycle = 8 / _resDivider;
 	int phase = startPhase;
 	constexpr int lineWidth = 256;
 	int8_t rowSignal[lineWidth * _signalsPerPixel];
 	uint32_t rowPixelGap = _frameInfo.Width * pixelsPerCycle;
-	
+
 	uint32_t* orgBuffer = outputBuffer;
 
 	for(int y = startRow; y <= endRow; y++) {
 		int startCycle = phase % 12;
-		
+
 		//Convert the PPU's output to an NTSC signal
 		GenerateNtscSignal(rowSignal, phase, y);
 
@@ -251,33 +256,33 @@ void BisqwitNtscFilter::DecodeFrame(int startRow, int endRow, uint16_t *ppuOutpu
 }
 
 /**
-* NTSC_DecodeLine(Width, Signal, Target, Phase0)
-*
-* Convert NES NTSC graphics signal into RGB using integer arithmetics only.
-*
-* Width: Number of NTSC signal samples.
-*        For a 256 pixels wide screen, this would be 256*8. 283*8 if you include borders.
-*
-* Signal: An array of Width samples.
-*         Sample values are scaled such that black = 0 and white = 100.
-*         The values are calculated from the set of terminated voltage measurements by lidnariq
-*         with the following formula:
-*                   floor(((voltage - signal_blank) / (signal_white - signal_blank)) * 100)
-*         Where:
-*                   signal_blank = unemphasized $0D = 0.312
-*                   signal_white = unemphasized $20 = 1.100
-*
-* Target: Pointer to a storage for Width RGB32 samples (00rrggbb).
-*         Note that the function will produce a RGB32 value for _every_ half-clock-cycle.
-*         This means 2264 RGB samples if you render 283 pixels per scanline (incl. borders).
-*         The caller can pick and choose those columns they want from the signal
-*         to render the picture at their desired resolution.
-*
-* Phase0: An integer in range 0-11 that describes the phase offset into colors on this scanline.
-*         Would be generated from the PPU clock cycle counter at the start of the scanline.
-*         In essence it conveys in one integer the same information that real NTSC signal
-*         would convey in the colorburst period in the beginning of each scanline.
-*/
+ * NTSC_DecodeLine(Width, Signal, Target, Phase0)
+ *
+ * Convert NES NTSC graphics signal into RGB using integer arithmetics only.
+ *
+ * Width: Number of NTSC signal samples.
+ *        For a 256 pixels wide screen, this would be 256*8. 283*8 if you include borders.
+ *
+ * Signal: An array of Width samples.
+ *         Sample values are scaled such that black = 0 and white = 100.
+ *         The values are calculated from the set of terminated voltage measurements by lidnariq
+ *         with the following formula:
+ *                   floor(((voltage - signal_blank) / (signal_white - signal_blank)) * 100)
+ *         Where:
+ *                   signal_blank = unemphasized $0D = 0.312
+ *                   signal_white = unemphasized $20 = 1.100
+ *
+ * Target: Pointer to a storage for Width RGB32 samples (00rrggbb).
+ *         Note that the function will produce a RGB32 value for _every_ half-clock-cycle.
+ *         This means 2264 RGB samples if you render 283 pixels per scanline (incl. borders).
+ *         The caller can pick and choose those columns they want from the signal
+ *         to render the picture at their desired resolution.
+ *
+ * Phase0: An integer in range 0-11 that describes the phase offset into colors on this scanline.
+ *         Would be generated from the PPU clock cycle counter at the start of the scanline.
+ *         In essence it conveys in one integer the same information that real NTSC signal
+ *         would convey in the colorburst period in the beginning of each scanline.
+ */
 void BisqwitNtscFilter::NtscDecodeLine(int width, const int8_t* signal, uint32_t* target, int phase0)
 {
 	auto Read = [=](int pos) -> char { return pos >= 0 && pos < width ? signal[pos] : 0; };
@@ -299,9 +304,9 @@ void BisqwitNtscFilter::NtscDecodeLine(int width, const int8_t* signal, uint32_t
 		qsum += Read(sq) * Sin(sq) - Read(sq - _qWidth) * Sin(sq - _qWidth);
 
 		if(s >= leftOverscan && !(s % _resDivider)) {
-			int r = std::min(255, std::max(0, (ysum*_y + isum*_ir + qsum*_qr) / 65536));
-			int g = std::min(255, std::max(0, (ysum*_y + isum*_ig + qsum*_qg) / 65536));
-			int b = std::min(255, std::max(0, (ysum*_y + isum*_ib + qsum*_qb) / 65536));
+			int r = std::min(255, std::max(0, (ysum * _y + isum * _ir + qsum * _qr) / 65536));
+			int g = std::min(255, std::max(0, (ysum * _y + isum * _ig + qsum * _qg) / 65536));
+			int b = std::min(255, std::max(0, (ysum * _y + isum * _ib + qsum * _qb) / 65536));
 
 			*target = 0xFF000000 | (r << 16) | (g << 8) | b;
 			target++;

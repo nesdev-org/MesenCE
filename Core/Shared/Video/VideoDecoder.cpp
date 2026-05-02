@@ -110,7 +110,7 @@ void VideoDecoder::DecodeFrame(bool forRewind)
 	FrameInfo frameSize = _videoFilter->SendFrame((uint16_t*)_frame.FrameBuffer, _frame.FrameNumber, _frame.VideoPhase, _frame.Data);
 
 	uint32_t* outputBuffer = _videoFilter->GetOutputBuffer();
-	
+
 	OverscanDimensions overscan = _videoFilter->GetOverscan();
 
 	if(_rotateFilter && !isAudioPlayer) {
@@ -142,7 +142,7 @@ void VideoDecoder::DecodeFrame(bool forRewind)
 	}
 	_lastAspectRatio = aspectRatio;
 	_lastFrameSize = frameSize;
-	
+
 	//Rewind manager will take care of sending the correct frame to the video renderer
 	_emu->GetRewindManager()->SendFrame(convertedFrame, forRewind);
 
@@ -215,7 +215,7 @@ void VideoDecoder::StartThread()
 		_frameChanged = false;
 		_frameCount = 0;
 		_waitForFrame.Reset();
-		
+
 		_emu->GetVideoRenderer()->ClearFrame();
 
 		_decodeThread.reset(new thread(&VideoDecoder::DecodeThread, this));
@@ -249,7 +249,7 @@ void VideoDecoder::TakeScreenshot()
 	}
 }
 
-void VideoDecoder::TakeScreenshot(std::stringstream &stream)
+void VideoDecoder::TakeScreenshot(std::stringstream& stream)
 {
 	if(_videoFilter) {
 		_videoFilter->TakeScreenshot(_videoFilterType, "", &stream);

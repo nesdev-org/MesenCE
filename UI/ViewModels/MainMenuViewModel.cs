@@ -37,7 +37,7 @@ namespace Mesen.ViewModels
 		[Reactive] public List<object> ToolsMenuItems { get; set; } = new();
 		[Reactive] public List<object> DebugMenuItems { get; set; } = new();
 		[Reactive] public List<object> HelpMenuItems { get; set; } = new();
-		
+
 		[Reactive] private List<object> _netPlayControllers { get; set; } = new();
 
 		private RomInfo RomInfo => MainWindow.RomInfo;
@@ -184,7 +184,7 @@ namespace Mesen.ViewModels
 			} else {
 				shortcut = (EmulatorShortcut)((int)EmulatorShortcut.LoadStateSlot1 + slot - 1);
 			}
-			
+
 			bool isAutoSaveSlot = slot == 11;
 
 			return new MainMenuAction(shortcut) {
@@ -223,9 +223,9 @@ namespace Mesen.ViewModels
 				new MainMenuAction(EmulatorShortcut.ReloadRom) { ActionType = ActionType.ReloadRom },
 				new ContextMenuSeparator(),
 				new MainMenuAction(EmulatorShortcut.PowerOff) { ActionType = ActionType.PowerOff },
-				
+
 				new ContextMenuSeparator() { IsVisible = () => IsGameRunning && RomInfo.ConsoleType != ConsoleType.Gameboy && RomInfo.Format != RomFormat.GameGear && RomInfo.ConsoleType != ConsoleType.Gba },
-				new MainMenuAction() { 
+				new MainMenuAction() {
 					ActionType = ActionType.GameConfig,
 					IsVisible = () => IsGameRunning && RomInfo.ConsoleType != ConsoleType.Gameboy && RomInfo.Format != RomFormat.GameGear && RomInfo.ConsoleType != ConsoleType.Gba,
 					IsEnabled = () => IsGameRunning,
@@ -250,7 +250,7 @@ namespace Mesen.ViewModels
 						GetFdsInsertDiskItem(7),
 					}
 				},
-				
+
 				new MainMenuAction(EmulatorShortcut.FdsEjectDisk) {
 					ActionType = ActionType.EjectDisk,
 					IsVisible = () => IsFdsGame,
@@ -264,7 +264,7 @@ namespace Mesen.ViewModels
 				new MainMenuAction(EmulatorShortcut.VsInsertCoin4) { ActionType = ActionType.InsertCoin4, IsVisible = () => IsVsDualSystemGame },
 
 				new ContextMenuSeparator() { IsVisible = () => EmuApi.IsShortcutAllowed(EmulatorShortcut.InputBarcode) || EmuApi.IsShortcutAllowed(EmulatorShortcut.RecordTape) || EmuApi.IsShortcutAllowed(EmulatorShortcut.StopRecordTape) },
-				
+
 				new MainMenuAction(EmulatorShortcut.InputBarcode) {
 					ActionType = ActionType.InputBarcode,
 					IsVisible = () => EmuApi.IsShortcutAllowed(EmulatorShortcut.InputBarcode)
@@ -413,7 +413,7 @@ namespace Mesen.ViewModels
 					ActionType = ActionType.Region,
 					IsEnabled = () => IsGameRunning,
 					IsVisible = () => (
-						!IsGameRunning || 
+						!IsGameRunning ||
 						MainWindow.RomInfo.ConsoleType != ConsoleType.Gameboy && MainWindow.RomInfo.ConsoleType != ConsoleType.Gba
 					),
 					SubActions = new List<object>() {
@@ -783,7 +783,7 @@ namespace Mesen.ViewModels
 				},
 
 				new ContextMenuSeparator(),
-				
+
 				new MainMenuAction() {
 					ActionType = ActionType.LogWindow,
 					OnClick = () => {
@@ -1163,7 +1163,7 @@ namespace Mesen.ViewModels
 					});
 				} else if(!silent) {
 					Dispatcher.UIThread.Post(() => {
-						 MesenMsgBox.Show(null, "MesenUpToDate", MessageBoxButtons.OK, MessageBoxIcon.Info);
+						MesenMsgBox.Show(null, "MesenUpToDate", MessageBoxButtons.OK, MessageBoxIcon.Info);
 					});
 				}
 			});

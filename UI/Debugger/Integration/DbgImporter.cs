@@ -34,7 +34,7 @@ namespace Mesen.Debugger.Integration
 		private Dictionary<int, ScopeInfo> _scopes = new Dictionary<int, ScopeInfo>();
 		private Dictionary<int, SymbolInfo> _symbols = new Dictionary<int, SymbolInfo>();
 		private Dictionary<int, CSymbolInfo> _cSymbols = new Dictionary<int, CSymbolInfo>();
-		
+
 		private List<SourceFileInfo> _sourceFiles = new List<SourceFileInfo>();
 
 		private HashSet<int> _usedFileIds = new HashSet<int>();
@@ -319,11 +319,13 @@ namespace Mesen.Debugger.Integration
 					isRam = false;
 
 					if(row.Contains("type=rw")) {
-						//TODOv2 fix this
-						//Assume a RW segment inside the .sfc file is SPC code
 						isRam = true;
-						memType = MemoryType.SpcRam;
 					}
+				}
+
+				//Assume that segments with names containing "SPC" are in audio RAM
+				if(row.Contains("SPC")) {
+					memType = MemoryType.SpcRam;
 				}
 
 				SegmentInfo segment = new SegmentInfo(id, start, size, isRam, fileOffset, memType);
@@ -501,7 +503,7 @@ namespace Mesen.Debugger.Integration
 				} else if(name.IsEqual("def")) {
 					definitions = DbgReader.ReadIntArray(data);
 				} else if(name.IsEqual("type")) {
-					type = data.ToString();					
+					type = data.ToString();
 				}
 			});
 
@@ -526,7 +528,7 @@ namespace Mesen.Debugger.Integration
 			}
 			return 1;
 		}
-		
+
 		private int GetSymbolSize(SymbolInfo symbol)
 		{
 			if(symbol.SegmentID != null && _segments.ContainsKey(symbol.SegmentID.Value)) {
@@ -916,7 +918,7 @@ namespace Mesen.Debugger.Integration
 		{
 			DbgImporter? importer = romFormat switch {
 				RomFormat.Sfc => new SnesDbgImporter(romFormat),
-				RomFormat.iNes or RomFormat.Nsf or RomFormat.VsSystem or RomFormat.VsDualSystem => new NesDbgImporter(romFormat),
+				RomFormat.iNes or RomFormat.Nsf or RomFormat.VsSystem or RomFormat.VsDualSystem or RomFormat.Fds => new NesDbgImporter(romFormat),
 				RomFormat.Pce or RomFormat.PceHes => new PceDbgImporter(romFormat),
 				_ => null
 			};
@@ -956,7 +958,7 @@ namespace Mesen.Debugger.Integration
 			LoadFileData(basePath);
 
 			BuildCdlData();
-			
+
 			int prgSize = DebugApi.GetMemorySize(_prgMemType);
 			foreach(LineInfo line in _lines.Values) {
 				SourceCodeLocation location = line.GetLocation();
@@ -997,7 +999,7 @@ namespace Mesen.Debugger.Integration
 			if(importComments) {
 				LoadComments();
 			}
-			
+
 			List<CodeLabel> labelsToImport = new List<CodeLabel>();
 			foreach(MemoryType memType in _memTypesToImport) {
 				if(_labelsByType.TryGetValue(memType, out var labels) && ConfigManager.Config.Debug.Integration.IsMemoryTypeImportEnabled(memType)) {
@@ -1100,7 +1102,7 @@ namespace Mesen.Debugger.Integration
 			public LineType Type { get; }
 			public int LineNumber { get; }
 			public SourceFileInfo SourceFile { get; }
-			
+
 			public SourceCodeLocation GetLocation() => new SourceCodeLocation(SourceFile, LineNumber, this);
 
 			public LineInfo(int id, int fileID, int lineNumber, LineType type, SourceFileInfo sourceFile, int[] spanIds)

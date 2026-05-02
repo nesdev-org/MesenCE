@@ -6,7 +6,7 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/FastString.h"
 
-void Cx4DisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t memoryAddr, LabelManager *labelManager, EmuSettings *settings)
+void Cx4DisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
 	FastString str(settings->GetDebugConfig().UseLowerCaseDisassembly);
 
@@ -14,6 +14,7 @@ void Cx4DisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t me
 	uint8_t param1 = info.GetByteCode()[1] & 0x03;
 	uint8_t param2 = info.GetByteCode()[0] & 0xFF;
 
+	// clang-format off
 	auto writeSrc = [&str, param2]() -> void {
 		switch(param2 & 0x7F) {
 			case 0x00: str.Write("A"); break;
@@ -206,6 +207,7 @@ void Cx4DisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t me
 		case 0xF8: str.Write("???"); break;
 		case 0xFC: str.Write("STOP"); break;
 	}
+	// clang-format on
 
 	out += str.ToString();
 }

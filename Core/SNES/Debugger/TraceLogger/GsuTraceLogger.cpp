@@ -59,7 +59,7 @@ RowDataType GsuTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void GsuTraceLogger::GetTraceRow(string &output, GsuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void GsuTraceLogger::GetTraceRow(string& output, GsuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	for(RowPart& rowPart : _rowParts) {
 		switch(rowPart.DataType) {

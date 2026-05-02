@@ -1,5 +1,5 @@
-﻿using ReactiveUI.Fody.Helpers;
-using Mesen.ViewModels;
+﻿using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 
 namespace Mesen.Config
 {
@@ -14,7 +14,7 @@ namespace Mesen.Config
 
 		[Reactive] public bool SpcBreakOnBrk { get; set; } = false;
 		[Reactive] public bool SpcBreakOnStpSleep { get; set; } = false;
-		
+
 		[Reactive] public bool UseAltSpcOpNames { get; set; } = false;
 		[Reactive] public bool IgnoreDspReadWrites { get; set; } = true;
 	}

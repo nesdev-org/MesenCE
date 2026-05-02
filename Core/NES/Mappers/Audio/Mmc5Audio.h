@@ -61,7 +61,11 @@ protected:
 
 		SV(_square1);
 		SV(_square2);
-		SV(_audioCounter); SV(_lastOutput); SV(_pcmReadMode); SV(_pcmIrqEnabled); SV(_pcmOutput);
+		SV(_audioCounter);
+		SV(_lastOutput);
+		SV(_pcmReadMode);
+		SV(_pcmIrqEnabled);
+		SV(_pcmOutput);
 	}
 
 	void ClockAudio() override
@@ -120,11 +124,17 @@ public:
 	void WriteRegister(uint16_t addr, uint8_t value)
 	{
 		switch(addr) {
-			case 0x5000: case 0x5001: case 0x5002: case 0x5003:
+			case 0x5000:
+			case 0x5001:
+			case 0x5002:
+			case 0x5003:
 				_square1.WriteRam(addr, value);
 				break;
 
-			case 0x5004: case 0x5005: case 0x5006: case 0x5007:
+			case 0x5004:
+			case 0x5005:
+			case 0x5006:
+			case 0x5007:
 				_square2.WriteRam(addr, value);
 				break;
 

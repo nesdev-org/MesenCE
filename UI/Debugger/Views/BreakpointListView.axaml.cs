@@ -1,19 +1,19 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using System.Linq;
-using Mesen.ViewModels;
+using DataBoxControl;
+using Mesen.Config;
 using Mesen.Debugger;
+using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Debugger.Windows;
 using Mesen.Utilities;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
+using Mesen.ViewModels;
 using System;
+using System.Linq;
 using static Mesen.Debugger.ViewModels.BreakpointListViewModel;
-using Avalonia.Input;
-using DataBoxControl;
 
 namespace Mesen.Debugger.Views
 {

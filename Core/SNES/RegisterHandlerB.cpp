@@ -10,7 +10,7 @@
 #include "Shared/CheatManager.h"
 #include "Utilities/Serializer.h"
 
-RegisterHandlerB::RegisterHandlerB(SnesConsole *console, SnesPpu * ppu, Spc * spc, uint8_t * workRam) : IMemoryHandler(MemoryType::SnesRegister)
+RegisterHandlerB::RegisterHandlerB(SnesConsole* console, SnesPpu* ppu, Spc* spc, uint8_t* workRam) : IMemoryHandler(MemoryType::SnesRegister)
 {
 	_console = console;
 	_emu = console->GetEmulator();
@@ -51,7 +51,7 @@ uint8_t RegisterHandlerB::Peek(uint32_t addr)
 	return 0;
 }
 
-void RegisterHandlerB::PeekBlock(uint32_t addr, uint8_t *output)
+void RegisterHandlerB::PeekBlock(uint32_t addr, uint8_t* output)
 {
 	//Avoid side effects for now
 	memset(output, 0, 0x1000);
@@ -94,7 +94,7 @@ uint32_t RegisterHandlerB::GetWramPosition()
 	return _wramPosition;
 }
 
-void RegisterHandlerB::Serialize(Serializer &s)
+void RegisterHandlerB::Serialize(Serializer& s)
 {
 	SV(_wramPosition);
 }

@@ -17,7 +17,7 @@ namespace Mesen.Debugger.StatusViews
 
 		[Reactive] public byte RegH { get; set; }
 		[Reactive] public byte RegL { get; set; }
-		
+
 		[Reactive] public UInt16 RegSP { get; set; }
 		[Reactive] public UInt16 RegPC { get; set; }
 

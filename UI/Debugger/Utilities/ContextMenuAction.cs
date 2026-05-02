@@ -47,7 +47,7 @@ namespace Mesen.Debugger.Utilities
 				} else {
 					label = ResourceHelper.GetEnumText(ActionType);
 				}
-				
+
 				if(HintText != null) {
 					string hint = HintText();
 					if(!string.IsNullOrWhiteSpace(hint)) {
@@ -114,7 +114,7 @@ namespace Mesen.Debugger.Utilities
 		public Func<bool>? IsEnabled { get; set; }
 		public Func<bool>? IsSelected { get; set; }
 		public Func<bool>? IsVisible { get; set; }
-		
+
 		public bool AllowedWhenHidden { get; set; }
 		public bool AlwaysShowLabel { get; set; }
 		public RoutingStrategies RoutingStrategy { get; set; } = RoutingStrategies.Bubble;
@@ -126,7 +126,7 @@ namespace Mesen.Debugger.Utilities
 		[Reactive] public Image? ActionIcon { get; set; }
 		[Reactive] public bool Enabled { get; set; }
 		[Reactive] public bool Visible { get; set; }
-		
+
 		[Reactive] public string TooltipText { get; set; } = "";
 
 		private static SimpleCommand _emptyCommand = new SimpleCommand(() => { });
@@ -313,7 +313,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("EditLabel")]
 		EditLabel,
-		
+
 		[IconFile("EditLabel")]
 		EditComment,
 
@@ -330,7 +330,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("CheatCode")]
 		MarkAsData,
-		
+
 		[IconFile("Help")]
 		MarkAsUnidentified,
 
@@ -364,7 +364,7 @@ namespace Mesen.Debugger.Utilities
 		WatchDecimalDisplay,
 		WatchHexDisplay,
 		WatchBinaryDisplay,
-		
+
 		RowDisplayFormat,
 		RowFormatBinary,
 		RowFormatHex8Bits,
@@ -408,10 +408,10 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("StepInto")]
 		StepInto,
-		
+
 		[IconFile("StepOver")]
 		StepOver,
-		
+
 		[IconFile("StepOut")]
 		StepOut,
 
@@ -473,7 +473,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("SaveFloppy")]
 		Save,
-		
+
 		SaveAs,
 
 		[IconFile("Exit")]
@@ -488,7 +488,7 @@ namespace Mesen.Debugger.Utilities
 		Refresh,
 		EnableAutoRefresh,
 		RefreshOnBreakPause,
-		
+
 		ZoomIn,
 		ZoomOut,
 
@@ -503,7 +503,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("CheatCode")]
 		ViewInMemoryViewer,
-		
+
 		LoadTblFile,
 		ResetTblMappings,
 
@@ -526,7 +526,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("LogWindow")]
 		OpenTraceLogger,
-		
+
 		[IconFile("Find")]
 		OpenMemorySearch,
 
@@ -544,7 +544,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Chip")]
 		OpenAssembler,
-		
+
 		[IconFile("LogWindow")]
 		OpenDebugLog,
 
@@ -590,7 +590,7 @@ namespace Mesen.Debugger.Utilities
 		Record,
 		[IconFile("MediaStop")]
 		Stop,
-		
+
 		[IconFile("Network")]
 		NetPlay,
 		Connect,
@@ -696,7 +696,7 @@ namespace Mesen.Debugger.Utilities
 		InsertCoin3,
 		[IconFile("Coins")]
 		InsertCoin4,
-		
+
 		SaveState,
 		LoadState,
 		[IconFile("SplitView")]
@@ -707,7 +707,7 @@ namespace Mesen.Debugger.Utilities
 		LoadStateDialog,
 		[IconFile("Folder")]
 		LoadStateFromFile,
-		
+
 		RecentFiles,
 		LoadLastSession,
 
@@ -731,10 +731,10 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Breakpoint")]
 		SetBreakpoint,
-		
+
 		[IconFile("Close")]
 		RemoveBreakpoint,
-		
+
 		[IconFile("Breakpoint")]
 		EnableBreakpoint,
 
@@ -743,7 +743,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Edit")]
 		CodeWindowEditBreakpoint,
-		
+
 		CodeDataLogger,
 		[IconFile("ResetSettings")]
 		ResetCdl,
@@ -762,12 +762,12 @@ namespace Mesen.Debugger.Utilities
 		ResetWorkspace,
 		[IconFile("TabContent")]
 		Workspace,
-		
+
 		[IconFile("Import")]
 		ImportLabels,
 		[IconFile("Export")]
 		ExportLabels,
-		
+
 		[IconFile("Import")]
 		ImportWatchEntries,
 		[IconFile("Export")]
@@ -842,7 +842,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Settings")]
 		GameConfig,
-		
+
 		[IconFile("MediaStop")]
 		FreezeMemory,
 		[IconFile("MediaPlay")]
@@ -850,7 +850,7 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("ResetSettings")]
 		ResetAccessCounters,
-		
+
 		[IconFile("HdPack")]
 		CopyToHdPackFormat,
 
@@ -867,7 +867,7 @@ namespace Mesen.Debugger.Utilities
 		FlipHorizontal,
 		[IconFile("FlipVertical")]
 		FlipVertical,
-		
+
 		[IconFile("TranslateLeft")]
 		TranslateLeft,
 		[IconFile("TranslateRight")]

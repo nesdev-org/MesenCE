@@ -156,7 +156,6 @@ void PceArcadeCard::WritePortRegister(uint8_t portNumber, uint8_t reg, uint8_t v
 		default:
 			LogDebug("[Arcade Card] Unknown port register write: Port = " + std::to_string(portNumber) + "  Reg = $" + HexUtilities::ToHex(reg) + " = $" + HexUtilities::ToHex(value));
 			break;
-
 	}
 }
 

@@ -22,7 +22,7 @@ namespace Mesen.ViewModels
 		[Reactive] public string Title { get; private set; } = "";
 		[Reactive] public GameScreenMode Mode { get; private set; }
 		[Reactive] public List<RecentGameInfo> GameEntries { get; private set; } = new List<RecentGameInfo>();
-		
+
 		public RecentGamesViewModel()
 		{
 			Visible = ConfigManager.Config.Preferences.GameSelectionScreenMode != GameSelectionMode.Disabled;
@@ -66,7 +66,7 @@ namespace Mesen.ViewModels
 				}
 
 				Title = mode == GameScreenMode.LoadState ? ResourceHelper.GetMessage("LoadStateDialog") : ResourceHelper.GetMessage("SaveStateDialog");
-				
+
 				string romName = EmuApi.GetRomInfo().GetRomName();
 				for(int i = 0; i < (mode == GameScreenMode.LoadState ? 11 : 10); i++) {
 					entries.Add(new RecentGameInfo() {

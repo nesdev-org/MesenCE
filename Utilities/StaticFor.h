@@ -7,7 +7,7 @@ struct StaticFor
 	static inline constexpr void Apply(callback const& f)
 	{
 		if constexpr(first < last) {
-			f(std::integral_constant<int, first>{});
+			f(std::integral_constant<int, first> {});
 			StaticFor<first + 1, last>::Apply(f);
 		}
 	}
@@ -16,6 +16,6 @@ struct StaticFor
 template<int n>
 struct StaticFor<n, n>
 {
-	template <typename callback>
+	template<typename callback>
 	static inline constexpr void Apply(callback const& f) {}
 };

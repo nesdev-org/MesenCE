@@ -47,23 +47,23 @@ private:
 	Emulator* _emu;
 	bool _hasCheats[CpuTypeUtilities::GetCpuTypeCount()] = {};
 	bool _bankHasCheats[CpuTypeUtilities::GetCpuTypeCount()][0x100] = {};
-	
+
 	vector<CheatCode> _cheats;
 
 	vector<InternalCheatCode> _ramRefreshCheats[CpuTypeUtilities::GetCpuTypeCount()];
 	unordered_map<uint32_t, InternalCheatCode> _cheatsByAddress[CpuTypeUtilities::GetCpuTypeCount()];
-	
+
 	optional<InternalCheatCode> TryConvertCode(CheatCode code);
-	
+
 	optional<InternalCheatCode> ConvertFromSnesGameGenie(string code);
 	optional<InternalCheatCode> ConvertFromSnesProActionReplay(string code);
-	
+
 	optional<InternalCheatCode> ConvertFromGbGameGenie(string code);
 	optional<InternalCheatCode> ConvertFromGbGameShark(string code);
 
 	optional<InternalCheatCode> ConvertFromPceRaw(string code);
 	optional<InternalCheatCode> ConvertFromPceAddress(string code);
-	
+
 	optional<InternalCheatCode> ConvertFromNesGameGenie(string code);
 	optional<InternalCheatCode> ConvertFromNesProActionRocky(string code);
 	optional<InternalCheatCode> ConvertFromNesCustomCode(string code);
@@ -96,7 +96,7 @@ public:
 	vector<CheatCode> GetCheats();
 
 	bool GetConvertedCheat(CheatCode input, InternalCheatCode& output);
-	
+
 	vector<InternalCheatCode>& GetRamRefreshCheats(CpuType cpuType);
 	void RefreshRamCheats(CpuType cpuType);
 

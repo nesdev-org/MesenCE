@@ -9,6 +9,7 @@
 #include "NES/NesMemoryManager.h"
 #include "NES/NesControlManager.h"
 #include "NES/NesConsole.h"
+#include "NES/NesTypes.h"
 #include "Shared/MessageManager.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/Emulator.h"
@@ -20,6 +21,7 @@ NesCpu::NesCpu(NesConsole* console)
 	_console = console;
 	_memoryManager = _console->GetMemoryManager();
 
+	// clang-format off
 	Func opTable[] = { 
 	//	0					1					2					3					4					5					6							7					8					9					A							B					C							D					E							F
 		&NesCpu::BRK,	&NesCpu::ORA,	&NesCpu::HLT,	&NesCpu::SLO,	&NesCpu::NOP,	&NesCpu::ORA,	&NesCpu::ASL_Memory,	&NesCpu::SLO,	&NesCpu::PHP,	&NesCpu::ORA,	&NesCpu::ASL_Acc,		&NesCpu::AAC,	&NesCpu::NOP,			&NesCpu::ORA,	&NesCpu::ASL_Memory,	&NesCpu::SLO, //0
@@ -60,7 +62,8 @@ NesCpu::NesCpu(NesConsole* console)
 		M::Imm,	M::IndX,		M::Imm,	M::IndX,		M::Zero,		M::Zero,		M::Zero,		M::Zero,		M::Imp,	M::Imm,	M::Imp,	M::Imm,	M::Abs,	M::Abs,	M::Abs,	M::Abs,	//E
 		M::Rel,	M::IndY,		M::None,	M::IndYW,	M::ZeroX,	M::ZeroX,	M::ZeroX,	M::ZeroX,	M::Imp,	M::AbsY,	M::Imp,	M::AbsYW,M::AbsX,	M::AbsX,	M::AbsXW,M::AbsXW,//F
 	};
-	
+	// clang-format on
+
 	memcpy(_opTable, opTable, sizeof(opTable));
 	memcpy(_addrMode, addrMode, sizeof(addrMode));
 
@@ -97,7 +100,7 @@ void NesCpu::Reset(bool softReset, ConsoleRegion region)
 	_hideCrashWarning = false;
 
 	//Use _memoryManager->Read() directly to prevent clocking the PPU/APU when setting PC at reset
-	_state.PC = _memoryManager->Read(NesCpu::ResetVector) | _memoryManager->Read(NesCpu::ResetVector+1) << 8;
+	_state.PC = _memoryManager->Read(NesCpu::ResetVector) | _memoryManager->Read(NesCpu::ResetVector + 1) << 8;
 
 	if(softReset) {
 		SetFlags(PSFlags::Interrupt);
@@ -174,25 +177,25 @@ void NesCpu::Exec()
 	_instAddrMode = _addrMode[opCode];
 	_operand = FetchOperand();
 	(this->*_opTable[opCode])();
-	
+
 	if(_prevRunIrq || _prevNeedNmi) {
 		IRQ();
 	}
 }
 
-void NesCpu::IRQ() 
+void NesCpu::IRQ()
 {
 #ifndef DUMMYCPU
 	uint16_t originalPc = PC();
-#endif
 
 	if(_console->GetRegion() == ConsoleRegion::Pal) {
 		//On PAL, IRQ/NMI sequence also checks for DMA on the first read
 		ProcessPendingDma(_state.PC, MemoryOperationType::ExecOpCode);
 	}
+#endif
 
-	DummyRead();  //fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
-	DummyRead();  //read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)
+	DummyPcRead(); //fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
+	DummyPcRead(); //read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)
 	Push((uint16_t)(PC()));
 
 	if(_needNmi) {
@@ -202,22 +205,23 @@ void NesCpu::IRQ()
 
 		SetPC(MemoryReadWord(NesCpu::NMIVector));
 
-		#ifndef DUMMYCPU
+#ifndef DUMMYCPU
 		_emu->ProcessInterrupt<CpuType::Nes>(originalPc, _state.PC, true);
-		#endif
+#endif
 	} else {
 		Push((uint8_t)(PS() | PSFlags::Reserved));
 		SetFlags(PSFlags::Interrupt);
 
 		SetPC(MemoryReadWord(NesCpu::IRQVector));
 
-		#ifndef DUMMYCPU
+#ifndef DUMMYCPU
 		_emu->ProcessInterrupt<CpuType::Nes>(originalPc, _state.PC, false);
-		#endif
+#endif
 	}
 }
 
-void NesCpu::BRK() {
+void NesCpu::BRK()
+{
 	Push((uint16_t)(PC() + 1));
 
 	uint8_t flags = PS() | PSFlags::Break | PSFlags::Reserved;
@@ -257,7 +261,7 @@ uint8_t NesCpu::MemoryRead(uint16_t addr, MemoryOperationType operationType)
 	uint8_t value = _memoryManager->DebugRead(addr);
 	LogMemoryOperation(addr, value, operationType);
 	return value;
-#else 
+#else
 	ProcessPendingDma(addr, operationType);
 
 	StartCpuCycle(true);
@@ -271,7 +275,7 @@ uint16_t NesCpu::FetchOperand()
 {
 	switch(_instAddrMode) {
 		case NesAddrMode::Acc:
-		case NesAddrMode::Imp: DummyRead(); return 0;
+		case NesAddrMode::Imp: DummyPcRead(); return 0;
 		case NesAddrMode::Imm:
 		case NesAddrMode::Rel: return GetImmediate();
 		case NesAddrMode::Zero: return GetZeroAddr();
@@ -300,8 +304,8 @@ void NesCpu::EndCpuCycle(bool forRead)
 	//and stays high until the NMI has been handled. "
 	_prevNeedNmi = _needNmi;
 
-	//"This edge detector polls the status of the NMI line during φ2 of each CPU cycle (i.e., during the 
-	//second half of each cycle) and raises an internal signal if the input goes from being high during 
+	//"This edge detector polls the status of the NMI line during φ2 of each CPU cycle (i.e., during the
+	//second half of each cycle) and raises an internal signal if the input goes from being high during
 	//one cycle to being low during the next"
 	if(!_prevNmiFlag && _state.NmiFlag) {
 		_needNmi = true;
@@ -450,7 +454,7 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool enableInternalRegReads, bool isNesBehavior)
 {
 	//This is to reproduce a CPU bug that can occur during DMA which can cause the 2A03 to read from
-	//its internal registers (4015, 4016, 4017) at the same time as the DMA unit reads a byte from 
+	//its internal registers (4015, 4016, 4017) at the same time as the DMA unit reads a byte from
 	//the bus. This bug occurs if the CPU is halted while it's reading a value in the $4000-$401F range.
 	//
 	//This has a number of side effects:
@@ -477,10 +481,12 @@ uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool en
 
 		switch(internalAddr) {
 			case 0x4015:
-				val = _memoryManager->Read(internalAddr, MemoryOperationType::DmaRead);
+				//Reads to $4015 don't update the value on the external bus
+				//Only the CPU's internal bus is updated
+				val = _memoryManager->Read<NesCpuBusType::Internal>(internalAddr, MemoryOperationType::DmaRead);
 				if(!isSameAddress) {
 					//Also trigger a read from the actual address the CPU was supposed to read from (external bus)
-					_memoryManager->Read(addr, MemoryOperationType::DmaRead);
+					_memoryManager->Read<NesCpuBusType::External>(addr, MemoryOperationType::DmaRead);
 				}
 				break;
 
@@ -592,7 +598,7 @@ void NesCpu::HLT()
 #endif
 }
 
-void NesCpu::Serialize(Serializer &s)
+void NesCpu::Serialize(Serializer& s)
 {
 	SV(_state.PC);
 	SV(_state.SP);

@@ -69,24 +69,24 @@ bool DirectInputManager::ProcessDevice(const DIDEVICEINSTANCE* pdidInstance)
 }
 
 //-----------------------------------------------------------------------------
-// Enum each PNP device using WMI and check each device ID to see if it contains 
+// Enum each PNP device using WMI and check each device ID to see if it contains
 // "IG_" (ex. "VID_045E&PID_028E&IG_00").  If it does, then it's an XInput device
-// Unfortunately this information can not be found by just using DirectInput 
+// Unfortunately this information can not be found by just using DirectInput
 //-----------------------------------------------------------------------------
 bool DirectInputManager::IsXInputDevice(const GUID* pGuidProductFromDirectInput)
 {
-	IWbemLocator*           pIWbemLocator = NULL;
-	IEnumWbemClassObject*   pEnumDevices = NULL;
-	IWbemClassObject*       pDevices[20] = { 0 };
-	IWbemServices*          pIWbemServices = NULL;
-	BSTR                    bstrNamespace = NULL;
-	BSTR                    bstrDeviceID = NULL;
-	BSTR                    bstrClassName = NULL;
-	DWORD                   uReturned = 0;
-	bool                    bIsXinputDevice = false;
-	UINT                    iDevice = 0;
-	VARIANT                 var;
-	HRESULT                 hr;
+	IWbemLocator* pIWbemLocator = NULL;
+	IEnumWbemClassObject* pEnumDevices = NULL;
+	IWbemClassObject* pDevices[20] = { 0 };
+	IWbemServices* pIWbemServices = NULL;
+	BSTR bstrNamespace = NULL;
+	BSTR bstrDeviceID = NULL;
+	BSTR bstrClassName = NULL;
+	DWORD uReturned = 0;
+	bool bIsXinputDevice = false;
+	UINT iDevice = 0;
+	VARIANT var;
+	HRESULT hr;
 
 	// CoInit if needed
 	hr = CoInitialize(NULL);
@@ -98,17 +98,17 @@ bool DirectInputManager::IsXInputDevice(const GUID* pGuidProductFromDirectInput)
 		goto LCleanup;
 	}
 
-	bstrNamespace = SysAllocString(L"\\\\.\\root\\cimv2"); 
+	bstrNamespace = SysAllocString(L"\\\\.\\root\\cimv2");
 	bstrClassName = SysAllocString(L"Win32_PNPEntity");
 	bstrDeviceID = SysAllocString(L"DeviceID");
 
-	// Connect to WMI 
+	// Connect to WMI
 	hr = pIWbemLocator->ConnectServer(bstrNamespace, NULL, NULL, 0L, 0L, NULL, NULL, &pIWbemServices);
 	if(FAILED(hr) || pIWbemServices == NULL) {
 		goto LCleanup;
 	}
 
-	// Switch security level to IMPERSONATE. 
+	// Switch security level to IMPERSONATE.
 	CoSetProxyBlanket(pIWbemServices, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, NULL, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
 
 	hr = pIWbemServices->CreateInstanceEnum(bstrClassName, 0, NULL, &pEnumDevices);
@@ -117,7 +117,7 @@ bool DirectInputManager::IsXInputDevice(const GUID* pGuidProductFromDirectInput)
 	}
 
 	// Loop over all devices
-	for(;; ) {
+	for(;;) {
 		// Get 20 at a time
 		hr = pEnumDevices->Next(10000, 20, pDevices, &uReturned);
 		if(FAILED(hr) || uReturned == 0 || bIsXinputDevice) {
@@ -129,7 +129,7 @@ bool DirectInputManager::IsXInputDevice(const GUID* pGuidProductFromDirectInput)
 			hr = pDevices[iDevice]->Get(bstrDeviceID, 0L, &var, NULL, NULL);
 			if(SUCCEEDED(hr) && var.vt == VT_BSTR && var.bstrVal != NULL) {
 				// Check if the device ID contains "IG_".  If it does, then it's an XInput device
-				// This information can not be found from DirectInput 
+				// This information can not be found from DirectInput
 				if(wcsstr(var.bstrVal, L"IG_")) {
 					// If it does, then get the VID/PID from var.bstrVal
 					DWORD dwPid = 0, dwVid = 0;
@@ -203,12 +203,12 @@ void DirectInputManager::UpdateDeviceList()
 	if(SUCCEEDED(hr = _directInput->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, nullptr, DIEDFL_ALLDEVICES))) {
 		if(!_joysticksToAdd.empty()) {
 			//Sleeping apparently lets us read accurate "default" values, otherwise a PS4 controller returns all 0s, despite not doing so normally
-			for(DirectInputData &joystick : _joysticksToAdd) {
+			for(DirectInputData& joystick : _joysticksToAdd) {
 				UpdateInputState(joystick);
 			}
 			std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(100));
 
-			for(DirectInputData &joystick : _joysticksToAdd) {
+			for(DirectInputData& joystick : _joysticksToAdd) {
 				UpdateInputState(joystick);
 				joystick.defaultState = joystick.state;
 			}
@@ -241,10 +241,10 @@ int DirectInputManager::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstan
 		if(SUCCEEDED(hr)) {
 			DIJOYSTATE2 state;
 			memset(&state, 0, sizeof(state));
-			DirectInputData data{ pJoystick, state, state, false };
+			DirectInputData data { pJoystick, state, state, false };
 			memcpy(&data.instanceInfo, pdidInstance, sizeof(DIDEVICEINSTANCE));
 
-			// Set the data format to "simple joystick" - a predefined data format 
+			// Set the data format to "simple joystick" - a predefined data format
 			// A data format specifies which controls on a device we are interested in, and how they should be reported.
 			// This tells DInput that we will be passing a DIJOYSTATE2 structure to IDirectInputDevice::GetDeviceState().
 			if(SUCCEEDED(hr = data.joystick->SetDataFormat(&c_dfDIJoystick2))) {
@@ -271,7 +271,7 @@ int DirectInputManager::EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstan
 
 //-----------------------------------------------------------------------------
 // Name: EnumObjectsCallback()
-// Desc: Callback function for enumerating objects (axes, buttons, POVs) on a 
+// Desc: Callback function for enumerating objects (axes, buttons, POVs) on a
 //       joystick. This function enables user interface elements for objects
 //       that are found to exist, and scales axes min/max values.
 //-----------------------------------------------------------------------------
@@ -298,18 +298,17 @@ int DirectInputManager::EnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdidoi
 	return DIENUM_CONTINUE;
 }
 
-
 void DirectInputManager::RefreshState()
 {
 	if(_needToUpdate) {
 		vector<DirectInputData> joysticks;
 		//Keep exisiting joysticks, if they still work, otherwise remove them from the list
-		for(DirectInputData &joystick : _joysticks) {
+		for(DirectInputData& joystick : _joysticks) {
 			if(joystick.stateValid) {
 				joysticks.push_back(joystick);
 			} else {
 				MessageManager::Log("[DInput] Device lost, trying to reacquire...");
-				
+
 				//Release the joystick, we'll try to initialize it again if it still exists
 				const GUID* deviceGuid = &joystick.instanceInfo.guidInstance;
 
@@ -319,7 +318,7 @@ void DirectInputManager::RefreshState()
 						guid.Data3 == deviceGuid->Data3 &&
 						memcmp(guid.Data4, deviceGuid->Data4, sizeof(guid.Data4)) == 0;
 				};
-				_processedGuids.erase(std::remove_if(_processedGuids.begin(), _processedGuids.end(), comp), _processedGuids.end());				
+				_processedGuids.erase(std::remove_if(_processedGuids.begin(), _processedGuids.end(), comp), _processedGuids.end());
 
 				joystick.joystick->Unacquire();
 				joystick.joystick->Release();
@@ -327,7 +326,7 @@ void DirectInputManager::RefreshState()
 		}
 
 		//Add the newly-found joysticks
-		for(DirectInputData &joystick : _joysticksToAdd) {
+		for(DirectInputData& joystick : _joysticksToAdd) {
 			joysticks.push_back(joystick);
 		}
 
@@ -336,7 +335,7 @@ void DirectInputManager::RefreshState()
 		_needToUpdate = false;
 	}
 
-	for(DirectInputData &joystick : _joysticks) {
+	for(DirectInputData& joystick : _joysticks) {
 		UpdateInputState(joystick);
 	}
 }
@@ -376,7 +375,7 @@ bool DirectInputManager::IsPressed(int port, int button)
 		case 0x0D: return !povCentered && (povDirection >= 3 && povDirection <= 5);
 		case 0x0E: return !povCentered && (povDirection >= 1 && povDirection <= 3);
 		case 0x0F: return !povCentered && (povDirection >= 5 && povDirection <= 7);
-		default: 
+		default:
 			if(button < 128 + 16) {
 				return state.rgbButtons[button - 0x10] != 0;
 			}
@@ -404,7 +403,7 @@ optional<int16_t> DirectInputManager::GetAxisPosition(int port, int axis)
 	}
 }
 
-void DirectInputManager::UpdateInputState(DirectInputData &data)
+void DirectInputManager::UpdateInputState(DirectInputData& data)
 {
 	DIJOYSTATE2 newState;
 	HRESULT hr;
@@ -419,8 +418,8 @@ void DirectInputManager::UpdateInputState(DirectInputData &data)
 			hr = data.joystick->Acquire();
 		}
 
-		// hr may be DIERR_OTHERAPPHASPRIO or other errors.  This may occur when the app is minimized or in the process of 
-		// switching, so just try again later 
+		// hr may be DIERR_OTHERAPPHASPRIO or other errors.  This may occur when the app is minimized or in the process of
+		// switching, so just try again later
 		if(FAILED(hr)) {
 			data.stateValid = false;
 			_requestUpdate = true;
@@ -440,7 +439,6 @@ void DirectInputManager::UpdateInputState(DirectInputData &data)
 	data.stateValid = true;
 }
 
-
 DirectInputManager::DirectInputManager(Emulator* emu, HWND hWnd)
 {
 	_emu = emu;
@@ -450,7 +448,7 @@ DirectInputManager::DirectInputManager(Emulator* emu, HWND hWnd)
 
 DirectInputManager::~DirectInputManager()
 {
-	for(DirectInputData &data: _joysticks) {
+	for(DirectInputData& data : _joysticks) {
 		data.joystick->Unacquire();
 		data.joystick->Release();
 	}

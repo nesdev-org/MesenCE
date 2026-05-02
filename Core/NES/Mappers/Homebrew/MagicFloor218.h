@@ -25,7 +25,7 @@ protected:
 		}
 
 		for(int i = 0; i < 8; i++) {
-			SetPpuMemoryMapping(i*0x400, i*0x400+0x3FF, ((i * 0x400) & mask) ? 1 : 0, ChrMemoryType::NametableRam);
+			SetPpuMemoryMapping(i * 0x400, i * 0x400 + 0x3FF, ((i * 0x400) & mask) ? 1 : 0, ChrMemoryType::NametableRam);
 		}
 	}
 };

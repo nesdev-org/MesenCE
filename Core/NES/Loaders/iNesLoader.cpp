@@ -2,13 +2,14 @@
 #include "NES/Loaders/iNesLoader.h"
 #include "Utilities/CRC32.h"
 #include "Utilities/HexUtilities.h"
+#include "Utilities/StringUtilities.h"
 #include "NES/MapperFactory.h"
 #include "NES/NesHeader.h"
 #include "NES/RomData.h"
 #include "NES/GameDatabase.h"
 #include "Shared/RomInfo.h"
 
-void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *preloadedHeader, bool databaseEnabled)
+void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader* preloadedHeader, bool databaseEnabled)
 {
 	NesHeader header;
 	uint8_t* buffer = romFile.data();
@@ -65,7 +66,7 @@ void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *
 	uint32_t prgSize = 0;
 	uint32_t chrSize = 0;
 
-	if(!databaseEnabled || !GameDatabase::GetDbRomSize(romData.Info.Hash.PrgChrCrc32, prgSize, chrSize)) {
+	if(!databaseEnabled || romData.Info.IsNes20Header || !GameDatabase::GetDbRomSize(romData.Info.Hash.PrgChrCrc32, prgSize, chrSize)) {
 		//Fallback on header sizes when game is not in DB (or DB is disabled)
 		prgSize = header.GetPrgSize();
 		chrSize = header.GetChrSize();
@@ -103,7 +104,7 @@ void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *
 		Log("[iNes] NES 2.0 file: Yes");
 	}
 	Log("[iNes] Mapper: " + std::to_string(romData.Info.MapperID) + " Sub: " + std::to_string(romData.Info.SubMapperID));
-	
+
 	if(romData.Info.System == GameSystem::VsSystem) {
 		string type = "Vs-UniSystem";
 		switch(romData.Info.VsType) {
@@ -118,21 +119,30 @@ void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *
 		Log("[iNes] System: " + type);
 	}
 
-	Log("[iNes] PRG ROM: " + std::to_string(prgSize/1024) + " KB");
-	Log("[iNes] CHR ROM: " + std::to_string(chrSize/1024) + " KB");
+	Log("[iNes] PRG ROM: " + StringUtilities::SizeToString(prgSize));
+	Log("[iNes] CHR ROM: " + StringUtilities::SizeToString(chrSize));
 	if(romData.ChrRamSize > 0 || romData.Info.IsNes20Header) {
-		Log("[iNes] CHR RAM: " + std::to_string(romData.ChrRamSize / 1024) + " KB");
+		Log("[iNes] CHR RAM: " + StringUtilities::SizeToString(romData.ChrRamSize));
 	} else if(chrSize == 0) {
 		Log("[iNes] CHR RAM: 8 KB");
 	}
 	if(romData.WorkRamSize > 0 || romData.Info.IsNes20Header) {
-		Log("[iNes] Work RAM: " + std::to_string(romData.WorkRamSize / 1024) + " KB");
+		Log("[iNes] Work RAM: " + StringUtilities::SizeToString(romData.WorkRamSize));
 	}
 	if(romData.SaveRamSize > 0 || romData.Info.IsNes20Header) {
-		Log("[iNes] Save RAM: " + std::to_string(romData.SaveRamSize / 1024) + " KB");
+		Log("[iNes] Save RAM: " + StringUtilities::SizeToString(romData.SaveRamSize));
 	}
 
-	Log("[iNes] Mirroring: " + string(romData.Info.Mirroring == MirroringType::Horizontal ? "Horizontal" : romData.Info.Mirroring == MirroringType::Vertical ? "Vertical" : "Four Screens"));
+	string mirroringType = "";
+	switch(romData.Info.Mirroring) {
+		case MirroringType::Horizontal: mirroringType = "Horizontal"; break;
+		case MirroringType::Vertical: mirroringType = "Vertical"; break;
+		case MirroringType::ScreenAOnly: mirroringType = "1-Screen (A)"; break;
+		case MirroringType::ScreenBOnly: mirroringType = "1-Screen (B)"; break;
+		case MirroringType::FourScreens: mirroringType = "Four Screens"; break;
+	}
+	Log("[iNes] Mirroring: " + mirroringType);
+
 	Log("[iNes] Battery: " + string(romData.Info.HasBattery ? "Yes" : "No"));
 	if(romData.Info.HasTrainer) {
 		Log("[iNes] Trainer: Yes");

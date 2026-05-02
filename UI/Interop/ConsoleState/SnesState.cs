@@ -523,6 +523,7 @@ public struct Cx4Suspend
 public struct Cx4Cache
 {
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
+	[MarshalAs(UnmanagedType.I1)] public bool Preload;
 	public byte Page;
 
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]

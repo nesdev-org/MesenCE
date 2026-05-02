@@ -72,8 +72,8 @@ uint8_t GbWaveChannel::GetRawOutput()
 
 double GbWaveChannel::GetOutput()
 {
-	//"If a DAC is enabled, the digital range $0 to $F is linearly translated to the analog range -1 to 1, 
-	//in arbitrary units. Importantly, the slope is negative: “digital 0” maps to “analog 1”, not “analog -1”."	
+	//"If a DAC is enabled, the digital range $0 to $F is linearly translated to the analog range -1 to 1,
+	//in arbitrary units. Importantly, the slope is negative: “digital 0” maps to “analog 1”, not “analog -1”."
 
 	//Return -7 to 7 "analog" range (higher digital value = lower analog value)
 	return (7 - (int8_t)_state.Output) * (double)_dac.GetDacVolume() / 100;
@@ -118,7 +118,7 @@ void GbWaveChannel::Exec(uint32_t clocksToRun)
 			_state.SampleBuffer = _state.Ram[_state.Position >> 1] >> 4;
 		}
 
-		//The DAC receives the current value from the upper/lower nibble of the sample buffer, shifted right by the volume control. 
+		//The DAC receives the current value from the upper/lower nibble of the sample buffer, shifted right by the volume control.
 		UpdateOutput();
 
 		_allowRamAccess = true;
@@ -175,7 +175,7 @@ void GbWaveChannel::Write(uint16_t addr, uint8_t value)
 
 				//Channel is enabled, if DAC is enabled
 				_state.Enabled = _state.DacEnabled;
-				
+
 				if(_state.Enabled) {
 					UpdateOutput();
 				}
@@ -246,8 +246,17 @@ void GbWaveChannel::TriggerWaveRamCorruption()
 
 void GbWaveChannel::Serialize(Serializer& s)
 {
-	SV(_state.DacEnabled); SV(_state.SampleBuffer); SV(_state.Position); SV(_state.Volume); SV(_state.Frequency);
-	SV(_state.Length); SV(_state.LengthEnabled); SV(_state.Enabled); SV(_state.Timer); SV(_state.Output);
-	SVArray(_state.Ram, 0x10); SV(_allowRamAccess);
+	SV(_state.DacEnabled);
+	SV(_state.SampleBuffer);
+	SV(_state.Position);
+	SV(_state.Volume);
+	SV(_state.Frequency);
+	SV(_state.Length);
+	SV(_state.LengthEnabled);
+	SV(_state.Enabled);
+	SV(_state.Timer);
+	SV(_state.Output);
+	SVArray(_state.Ram, 0x10);
+	SV(_allowRamAccess);
 	SV(_dac);
 }

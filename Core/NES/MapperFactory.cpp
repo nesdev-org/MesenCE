@@ -276,8 +276,9 @@
 #include "NES/Mappers/Whirlwind/Mapper40.h"
 #include "NES/Mappers/Whirlwind/Smb2j.h"
 
-BaseMapper* MapperFactory::GetMapperFromID(RomData &romData)
+BaseMapper* MapperFactory::GetMapperFromID(RomData& romData)
 {
+	// clang-format off
 	switch(romData.Info.MapperID) {
 		case 0: return new NROM();
 		case 1: return new MMC1();
@@ -640,6 +641,7 @@ BaseMapper* MapperFactory::GetMapperFromID(RomData &romData)
 		case MapperFactory::NsfMapperID: return new NsfMapper();
 		case MapperFactory::FdsMapperID: return new Fds();
 	}
+	// clang-format on
 
 	if(romData.Info.MapperID != UnifBoards::UnknownBoard) {
 		MessageManager::DisplayMessage("Error", "UnsupportedMapper", "iNES #" + std::to_string(romData.Info.MapperID));
@@ -647,7 +649,7 @@ BaseMapper* MapperFactory::GetMapperFromID(RomData &romData)
 	return nullptr;
 }
 
-unique_ptr<BaseMapper> MapperFactory::InitializeFromFile(NesConsole* console, VirtualFile &romFile, RomData &romData, LoadRomResult& result)
+unique_ptr<BaseMapper> MapperFactory::InitializeFromFile(NesConsole* console, VirtualFile& romFile, RomData& romData, LoadRomResult& result)
 {
 	romData = {};
 	bool databaseEnabled = !console->GetNesConfig().DisableGameDatabase;

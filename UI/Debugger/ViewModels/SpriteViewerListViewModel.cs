@@ -26,7 +26,7 @@ namespace Mesen.Debugger.ViewModels
 		public ICommand SortCommand { get; }
 		public SpriteViewerViewModel SpriteViewer { get; }
 		public SpriteViewerConfig Config { get; }
-		
+
 		private DateTime _lastRefresh = DateTime.MinValue;
 
 		public SpriteViewerListViewModel(SpriteViewerViewModel viewer)

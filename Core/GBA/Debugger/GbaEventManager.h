@@ -56,8 +56,8 @@ struct GbaEventViewerConfig : public BaseEventViewerConfig
 class GbaEventManager final : public BaseEventManager
 {
 private:
-	static constexpr int ScanlineWidth = 308*4;
-	
+	static constexpr int ScanlineWidth = 308 * 4;
+
 	GbaEventViewerConfig _config = {};
 
 	GbaPpu* _ppu = nullptr;

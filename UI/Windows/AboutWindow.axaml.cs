@@ -1,15 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using System;
-using System.ComponentModel;
-using Avalonia.Data;
 using Mesen.Interop;
-using System.Collections.Generic;
-using Avalonia.Input;
 using Mesen.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Mesen.Windows
@@ -30,7 +30,7 @@ namespace Mesen.Windows
 			BuildDate = EmuApi.GetMesenBuildDate();
 			RuntimeVersion = ".NET " + Environment.Version;
 			RuntimeVersion += RuntimeFeature.IsDynamicCodeSupported ? " (JIT)" : " (AOT)";
-			
+
 			string? commitHash = UpdateHelper.GetCommitHash();
 			BuildSha = commitHash ?? "";
 			BuildShortSha = commitHash?.Substring(0, 7) ?? "";
@@ -86,7 +86,7 @@ namespace Mesen.Windows
 
 			InitializeComponent();
 
-			this.GetControl<TextBlock>("lblCopyright").Text = $"Copyright 2014-{DateTime.Now.Year} Sour";
+			this.GetControl<TextBlock>("lblCopyright").Text = $"Copyright 2014-2025 Sour, 2026-{DateTime.Now.Year} contributors";
 		}
 
 		private void InitializeComponent()
@@ -108,12 +108,12 @@ namespace Mesen.Windows
 
 		private void OnMesenLinkTapped(object? sender, TappedEventArgs e)
 		{
-			ApplicationHelper.OpenBrowser("https://www.mesen.ca");
+			ApplicationHelper.OpenBrowser("https://github.com/nesdev-org/MesenCE");
 		}
 
 		private void OnCommitLinkTapped(object? sender, TappedEventArgs e)
 		{
-			ApplicationHelper.OpenBrowser("https://github.com/SourMesen/Mesen2/commit/" + BuildSha);
+			ApplicationHelper.OpenBrowser("https://github.com/nesdev-org/MesenCE/commit/" + BuildSha);
 		}
 	}
 

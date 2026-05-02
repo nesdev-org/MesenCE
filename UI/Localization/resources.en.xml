@@ -269,7 +269,7 @@
 			<Control ID="tpgVideo">Video</Control>
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
 
-			<Control ID="chkBlendHighResolutionModes">Blend high resolution modes</Control>
+			<Control ID="lblHighResBlendMode">High resolution blend mode: </Control>
 			<Control ID="chkHideBgLayer1">Hide background layer 1</Control>
 			<Control ID="chkHideBgLayer2">Hide background layer 2</Control>
 			<Control ID="chkHideBgLayer3">Hide background layer 3</Control>
@@ -839,10 +839,10 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		<Form ID="AboutWindow">
-			<Control ID="wndTitle">About - Mesen</Control>
-			<Control ID="lblName">Mesen</Control>
+			<Control ID="wndTitle">About - MesenCE</Control>
+			<Control ID="lblName">Mesen Community Edition</Control>
 			<Control ID="lblWebsite">Website:</Control>
-			<Control ID="lblLink">www.mesen.ca</Control>
+			<Control ID="lblLink">github.com/nesdev-org/MesenCE</Control>
 			<Control ID="lblVersion">Version:</Control>
 			<Control ID="lblBuildDate">Build Date:</Control>
 			<Control ID="lblCommitId">Commit ID:</Control>
@@ -878,7 +878,7 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		<Form ID="UpdatePromptWindow">
-			<Control ID="wndTitle">Mesen Updater</Control>
+			<Control ID="wndTitle">MesenCE Updater</Control>
 			<Control ID="lblLatestVersion">Latest version:</Control>
 			<Control ID="lblInstalledVersion">Installed version:</Control>
 			<Control ID="lblNewVersionAvailable">A new version of Mesen is available</Control>
@@ -887,8 +887,8 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		<Form ID="SetupWizardWindow">
-			<Control ID="wndTitle">Mesen</Control>
-			<Control ID="lblMesen">Mesen - Emulator</Control>
+			<Control ID="wndTitle">MesenCE</Control>
+			<Control ID="lblMesen">MesenCE - Emulator</Control>
 			<Control ID="lblConfigWizard">Configuration</Control>
 			<Control ID="lblInitialSetup">Please take a moment to perform Mesen's initial setup.</Control>
 			<Control ID="lblStorageLocation">Data Storage Location</Control>
@@ -2472,6 +2472,11 @@ E
 			<Value ID="Light">Light</Value>
 			<Value ID="Dark">Dark</Value>
 		</Enum>
+		<Enum ID="SnesHighResBlendMode">
+			<Value ID="None">None (default)</Value>
+			<Value ID="BlendAll">Blend entire screen</Value>
+			<Value ID="BlendEvenOdd">Blend even/odd columns (fake transparency)</Value>
+		</Enum>
 		<Enum ID="PceConsoleType">
 			<Value ID="Auto">Auto (recommended)</Value>
 			<Value ID="PcEngine">PC Engine (JP)</Value>
@@ -2621,6 +2626,11 @@ E
 			<Value ID="Horizontal">Horizontal</Value>
 			<Value ID="Vertical">Vertical</Value>
 			<Value ID="FourScreens">Four Screens</Value>
+		</Enum>
+		<Enum ID="RomSizeUnit">
+			<Value ID="Bytes">bytes</Value>
+			<Value ID="KB">KB</Value>
+			<Value ID="MB">MB</Value>
 		</Enum>
 		<Enum ID="VsPpuType">
 			<Value ID="RP2C03B">RP2C03B</Value>
@@ -2854,6 +2864,7 @@ E
 			<Value ID="None">None</Value>
 		</Enum>
 		<Enum ID="GameboyModel">
+			<Value ID="AutoFavorBest">Auto (prefer best)</Value>
 			<Value ID="AutoFavorGbc">Auto (prefer Game Boy Color)</Value>
 			<Value ID="AutoFavorSgb">Auto (prefer Super Game Boy)</Value>
 			<Value ID="AutoFavorGb">Auto (prefer Game Boy)</Value>
@@ -2899,6 +2910,7 @@ E
 			<Value ID="Normal">Normal</Value>
 			<Value ID="SingleLine8x16">8x16 (same line)</Value>
 			<Value ID="SingleLine16x16">16x16 (same line)</Value>
+			<Value ID="Vertical">Vertical</Value>
 		</Enum>
 		<Enum ID="TileFilter">
 			<Value ID="None">None</Value>

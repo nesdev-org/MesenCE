@@ -63,15 +63,29 @@ void Msu1::Write(uint16_t addr, uint8_t value)
 		case 0x2004: _trackSelect = (_trackSelect & 0xFF00) | value; break;
 		case 0x2005:
 			_trackSelect = (_trackSelect & 0xFF) | (value << 8);
-			LoadTrack();
+			if(_trackSelect == _audioResumeTrack) {
+				LoadTrack(_audioResumeOffset);
+				_audioResumeTrack = -1;
+				_audioResumeOffset = DefaultStartOffset;
+			} else {
+				LoadTrack();
+			}
 			break;
 
 		case 0x2006: _volume = value; break;
 		case 0x2007:
 			if(!_audioBusy) {
+				const bool resume = (value & 0x04);
 				_repeat = (value & 0x02) != 0;
 				_paused = (value & 0x01) == 0;
 				_pcmReader.SetLoopFlag(_repeat);
+				// qwertymodo's SMSU-1 revision 2 spec says the resume bit is ignored if it is set at the same time as bits 1 or 0,
+				// but implementations of MSU-1 only seem to check bit 0. To avoid breaking compatibility with software that may
+				// set bit 1, we'll just check bit 0.
+				if(_paused && resume) {
+					_audioResumeTrack = _trackSelect;
+					_audioResumeOffset = _pcmReader.GetOffset();
+				}
 			}
 			break;
 	}
@@ -82,7 +96,7 @@ uint8_t Msu1::Read(uint16_t addr)
 	switch(addr) {
 		case 0x2000:
 			//status
-			return (_dataBusy << 7) | (_audioBusy << 6) | (_repeat << 5) | ((!_paused) << 4) | (_trackMissing << 3) | 0x01;
+			return (_dataBusy << 7) | (_audioBusy << 6) | (_repeat << 5) | ((!_paused) << 4) | (_trackMissing << 3) | 0x02;
 
 		case 0x2001:
 			//data
@@ -118,10 +132,21 @@ void Msu1::LoadTrack(uint32_t startOffset)
 	_trackMissing = !_pcmReader.Init(_trackPath + "-" + std::to_string(_trackSelect) + ".pcm", _repeat, startOffset);
 }
 
-void Msu1::Serialize(Serializer &s)
+void Msu1::Serialize(Serializer& s)
 {
 	uint32_t offset = _pcmReader.GetOffset();
-	SV(_trackSelect); SV(_tmpDataPointer); SV(_dataPointer); SV(_repeat); SV(_paused); SV(_volume); SV(_trackMissing); SV(_audioBusy); SV(_dataBusy); SV(offset);
+	SV(_trackSelect);
+	SV(_audioResumeTrack);
+	SV(_audioResumeOffset);
+	SV(_tmpDataPointer);
+	SV(_dataPointer);
+	SV(_repeat);
+	SV(_paused);
+	SV(_volume);
+	SV(_trackMissing);
+	SV(_audioBusy);
+	SV(_dataBusy);
+	SV(offset);
 	if(!s.IsSaving()) {
 		_dataFile.seekg(_dataPointer, ios::beg);
 		LoadTrack(offset);

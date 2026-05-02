@@ -35,6 +35,7 @@ public:
 	void Return(bool value);
 	void Return(int value);
 	void Return(uint32_t value);
+	void Return(uint64_t value);
 	void Return(string value);
 
 	int ReturnCount();

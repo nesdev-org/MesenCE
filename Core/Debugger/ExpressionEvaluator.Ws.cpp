@@ -30,7 +30,7 @@ unordered_map<string, int64_t>& ExpressionEvaluator::GetWsTokens()
 		{ "di", EvalValues::RegDI },
 		{ "bp", EvalValues::RegBP },
 		{ "ip", EvalValues::RegIP },
-		
+
 		{ "f", EvalValues::RegF },
 
 		{ "sp", EvalValues::RegSP },
@@ -75,7 +75,7 @@ int64_t ExpressionEvaluator::GetWsTokenValue(int64_t token, EvalResultType& resu
 		case EvalValues::RegDI: return s.DI;
 		case EvalValues::RegBP: return s.BP;
 		case EvalValues::RegIP: return s.IP;
-		
+
 		case EvalValues::RegF: return s.Flags.Get();
 
 		case EvalValues::RegSP: return s.SP;

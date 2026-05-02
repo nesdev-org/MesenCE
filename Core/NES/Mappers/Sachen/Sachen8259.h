@@ -23,7 +23,7 @@ protected:
 	uint16_t GetChrPageSize() override { return _variant == Sachen8259Variant::Sachen8259D ? 0x400 : 0x800; }
 	uint16_t RegisterStartAddress() override { return 0x4100; }
 	uint16_t RegisterEndAddress() override { return 0x7FFF; }
-	
+
 	void InitMapper() override
 	{
 		_currentReg = 0;
@@ -78,7 +78,11 @@ protected:
 	{
 		switch(addr & 0xC101) {
 			case 0x4100: _currentReg = value & 0x07; break;
-			case 0x4101: _regs[_currentReg] = value & 0x07; UpdateState(); break;
+
+			case 0x4101:
+				_regs[_currentReg] = value & 0x07;
+				UpdateState();
+				break;
 		}
 	}
 

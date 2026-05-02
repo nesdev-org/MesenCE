@@ -50,7 +50,7 @@ void GbaCpu::ThumbMoveCmpAddSub()
 	uint8_t op = (_opCode >> 11) & 0x03;
 	uint8_t rd = (_opCode >> 8) & 0x07;
 	uint8_t imm = _opCode & 0xFF;
-	
+
 	bool carry = _state.CPSR.Carry;
 	switch(op) {
 		default:
@@ -74,7 +74,7 @@ void GbaCpu::ThumbAluOperation()
 	switch(op) {
 		case 0: SetR(rd, LogicalOp(op1 & op2, carry, true)); break;
 		case 1: SetR(rd, LogicalOp(op1 ^ op2, carry, true)); break;
-		
+
 		case 2:
 			Idle();
 			SetR(rd, ShiftLsl(op1, op2, carry));
@@ -95,7 +95,7 @@ void GbaCpu::ThumbAluOperation()
 
 		case 5: SetR(rd, Add(op1, op2, carry, true)); break;
 		case 6: SetR(rd, Sub(op1, op2, carry, true)); break;
-		
+
 		case 7:
 			Idle();
 			SetR(rd, ShiftRor(op1, op2, carry));
@@ -107,7 +107,7 @@ void GbaCpu::ThumbAluOperation()
 		case 10: Sub(op1, op2, true, true); break;
 		case 11: Add(op1, op2, false, true); break;
 		case 12: SetR(rd, LogicalOp(op1 | op2, carry, true)); break;
-		
+
 		case 13: {
 			//MUL
 			MultiplicationOutput output = GbaCpuMultiply::mul(op2, op1);
@@ -130,14 +130,14 @@ void GbaCpu::ThumbHiRegBranchExch()
 	uint8_t op = (_opCode >> 8) & 0x03;
 	uint8_t rs = ((_opCode >> 3) & 0x07) | ((_opCode & 0x40) >> 3);
 	uint8_t rd = (_opCode & 0x07) | ((_opCode & 0x80) >> 4);
-	
+
 	bool carry = _state.CPSR.Carry;
 	switch(op) {
 		default:
 		case 0: SetR(rd, Add(RT(rd), RT(rs), false, false)); break; //ADD
 		case 1: Sub(RT(rd), RT(rs), true, true); break; //CMP
 		case 2: SetR(rd, LogicalOp(RT(rs), carry, false)); break; //MOV
-		
+
 		case 3:
 			//BX
 			uint32_t value = RT(rs);
@@ -321,7 +321,7 @@ void GbaCpu::ThumbMultipleLoadStore()
 
 	uint32_t base = RT(rb);
 	uint32_t addr = base;
-	
+
 	uint8_t regCount = 0;
 	for(int i = 0; i < 8; i++) {
 		if(regMask & (1 << i)) {
@@ -367,7 +367,7 @@ void GbaCpu::ThumbConditionalBranch()
 {
 	int16_t offset = ((int16_t)(int8_t)(_opCode & 0xFF)) << 1;
 	uint8_t cond = (_opCode >> 8) & 0x0F;
-	
+
 	if(CheckConditions(cond)) {
 		SetR(15, _state.R[15] + offset);
 	}
@@ -420,7 +420,7 @@ void GbaCpu::InitThumbOpTable()
 	for(int i = 0; i <= 0x7; i++) {
 		addEntry(0x18 | i, &GbaCpu::ThumbAddSubtract, GbaThumbOpCategory::AddSubtract);
 	}
-	
+
 	//Move/compare/add/subtract immediate
 	//001?_????
 	for(int i = 0; i <= 0x1F; i++) {
@@ -444,7 +444,7 @@ void GbaCpu::InitThumbOpTable()
 	for(int i = 0; i <= 0x7; i++) {
 		addEntry(0x48 | i, &GbaCpu::ThumbPcRelLoad, GbaThumbOpCategory::PcRelLoad);
 	}
-	
+
 	//Load/store with register offset
 	//0101_??0?
 	for(int i = 0; i <= 0x7; i++) {

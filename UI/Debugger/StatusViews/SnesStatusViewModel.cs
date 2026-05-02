@@ -30,7 +30,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagC { get; set; }
 
 		[Reactive] public bool FlagE { get; set; }
-		
+
 		[Reactive] public bool FlagNmi { get; set; }
 		[Reactive] public bool FlagIrqHvCounters { get; set; }
 		[Reactive] public bool FlagIrqCoprocessor { get; set; }
@@ -38,7 +38,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public int Cycle { get; private set; }
 		[Reactive] public int Scanline { get; private set; }
 		[Reactive] public int HClock { get; private set; }
-		
+
 		[Reactive] public int VramAddress { get; private set; }
 		[Reactive] public int OamAddress { get; private set; }
 		[Reactive] public int CgRamAddress { get; private set; }
@@ -117,7 +117,7 @@ namespace Mesen.Debugger.StatusViews
 			Cycle = ppu.Cycle;
 			HClock = ppu.HClock;
 			Scanline = ppu.Scanline;
-			
+
 			VramAddress = ppu.VramAddress;
 			OamAddress = ppu.InternalOamRamAddress;
 			CgRamAddress = ppu.CgramAddress;
@@ -144,7 +144,7 @@ namespace Mesen.Debugger.StatusViews
 				cpu.NmiFlagCounter = (byte)(FlagNmi ? 1 : 0);
 			}
 			cpu.IrqSource = (byte)(
-				(FlagIrqHvCounters ? (byte)SnesIrqSource.Ppu : 0) | 
+				(FlagIrqHvCounters ? (byte)SnesIrqSource.Ppu : 0) |
 				(FlagIrqCoprocessor ? (byte)SnesIrqSource.Coprocessor : 0)
 			);
 

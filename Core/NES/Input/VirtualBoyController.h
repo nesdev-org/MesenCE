@@ -11,7 +11,23 @@ private:
 	uint32_t _stateBuffer = 0;
 
 protected:
-	enum Buttons { Down1 = 0, Left1, Select, Start, Up0, Down0, Left0, Right0, Right1, Up1, L, R, B, A };
+	enum Buttons
+	{
+		Down1 = 0,
+		Left1,
+		Select,
+		Start,
+		Up0,
+		Down0,
+		Left0,
+		Right0,
+		Right1,
+		Up1,
+		L,
+		R,
+		B,
+		A
+	};
 
 	string GetKeyNames() override
 	{
@@ -21,7 +37,7 @@ protected:
 	void InternalSetStateFromInput() override
 	{
 		for(KeyMapping& keyMapping : _keyMappings) {
-			for(int i = 0; i < 14; i++) 			{
+			for(int i = 0; i < 14; i++) {
 				SetPressedState(i, keyMapping.CustomKeys[i]);
 			}
 
@@ -35,11 +51,11 @@ protected:
 					ClearBit(Buttons::Left0);
 					ClearBit(Buttons::Right0);
 				}
-				if (IsPressed(Buttons::Up1) && IsPressed(Buttons::Down1)) {
+				if(IsPressed(Buttons::Up1) && IsPressed(Buttons::Down1)) {
 					ClearBit(Buttons::Down1);
 					ClearBit(Buttons::Up1);
 				}
-				if (IsPressed(Buttons::Left1) && IsPressed(Buttons::Right1)) {
+				if(IsPressed(Buttons::Left1) && IsPressed(Buttons::Right1)) {
 					ClearBit(Buttons::Left1);
 					ClearBit(Buttons::Right1);
 				}
@@ -51,8 +67,7 @@ protected:
 	{
 		//"A Virtual Boy controller returns a 16-bit report in a similar order as SNES, with two additional buttons."
 
-		return
-			(uint8_t)IsPressed(Buttons::Down1) |
+		return (uint8_t)IsPressed(Buttons::Down1) |
 			((uint8_t)IsPressed(Buttons::Left1) << 1) |
 			((uint8_t)IsPressed(Buttons::Select) << 2) |
 			((uint8_t)IsPressed(Buttons::Start) << 3) |

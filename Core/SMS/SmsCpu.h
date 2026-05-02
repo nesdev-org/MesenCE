@@ -1,15 +1,15 @@
 #if (defined(DUMMYCPU) && !defined(__DUMMYSmsCpu__H)) || (!defined(DUMMYCPU) && !defined(__SmsCpu__H))
-#ifdef DUMMYCPU
-#define __DUMMYSmsCpu__H
-#else
-#define __SmsCpu__H
-#endif
+	#ifdef DUMMYCPU
+		#define __DUMMYSmsCpu__H
+	#else
+		#define __SmsCpu__H
+	#endif
 
-#include "pch.h"
-#include "SMS/SmsTypes.h"
-#include "Shared/MemoryOperationType.h"
-#include "Shared/MemoryType.h"
-#include "Utilities/ISerializable.h"
+	#include "pch.h"
+	#include "SMS/SmsTypes.h"
+	#include "Shared/MemoryOperationType.h"
+	#include "Shared/MemoryType.h"
+	#include "Utilities/ISerializable.h"
 
 class Emulator;
 class SmsConsole;
@@ -118,7 +118,7 @@ private:
 	void XOR(uint8_t value);
 
 	void UpdateLogicalOpFlags(uint8_t value);
-	
+
 	void CP(uint8_t value);
 
 	void NOP();
@@ -152,7 +152,7 @@ private:
 
 	template<uint8_t bit>
 	void BIT(uint8_t src);
-	
+
 	template<uint8_t bit>
 	void BIT_Indirect(Register16& src);
 
@@ -181,7 +181,7 @@ private:
 	void RET(bool condition);
 	void RETI();
 	void RST(uint8_t value);
-	
+
 	void POP(Register16& reg);
 	void PUSH(Register16& reg);
 	void POP_AF();
@@ -192,7 +192,7 @@ private:
 	void IM(uint8_t mode);
 	void EI();
 	void DI();
-	
+
 	template<uint8_t prefix>
 	void PREFIX_CB();
 
@@ -244,7 +244,7 @@ private:
 	void UpdateInOutRepeatFlags();
 
 	void IncrementR();
-	
+
 	void InitPostBiosState();
 
 public:
@@ -262,7 +262,7 @@ public:
 
 	void Serialize(Serializer& s) override;
 
-#ifdef DUMMYCPU
+	#ifdef DUMMYCPU
 private:
 	uint32_t _memOpCounter = 0;
 	MemoryOperationInfo _memOperations[10] = {};
@@ -272,6 +272,6 @@ public:
 	uint32_t GetOperationCount();
 	void LogMemoryOperation(uint32_t addr, uint8_t value, MemoryOperationType type, MemoryType memType);
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
-#endif
+	#endif
 };
 #endif

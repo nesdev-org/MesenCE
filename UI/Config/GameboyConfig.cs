@@ -15,12 +15,12 @@ namespace Mesen.Config
 
 		[Reactive] public ControllerConfig Controller { get; set; } = new();
 
-		[Reactive] public GameboyModel Model { get; set; } = GameboyModel.AutoFavorGbc;
+		[Reactive] public GameboyModel Model { get; set; } = GameboyModel.AutoFavorBest;
 		[Reactive] public bool UseSgb2 { get; set; } = true;
 
 		[Reactive] public bool BlendFrames { get; set; } = true;
 		[Reactive] public bool GbcAdjustColors { get; set; } = true;
-		
+
 		[Reactive] public bool DisableBackground { get; set; } = false;
 		[Reactive] public bool DisableSprites { get; set; } = false;
 		[Reactive] public bool HideSgbBorders { get; set; } = false;
@@ -82,7 +82,7 @@ namespace Mesen.Config
 
 		[MarshalAs(UnmanagedType.I1)] public bool BlendFrames;
 		[MarshalAs(UnmanagedType.I1)] public bool GbcAdjustColors;
-		
+
 		[MarshalAs(UnmanagedType.I1)] public bool DisableBackground;
 		[MarshalAs(UnmanagedType.I1)] public bool DisableSprites;
 		[MarshalAs(UnmanagedType.I1)] public bool HideSgbBorders;
@@ -92,10 +92,10 @@ namespace Mesen.Config
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 		public UInt32[] BgColors;
-		
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 		public UInt32[] Obj0Colors;
-		
+
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 		public UInt32[] Obj1Colors;
 
@@ -107,6 +107,7 @@ namespace Mesen.Config
 
 	public enum GameboyModel
 	{
+		AutoFavorBest,
 		AutoFavorGbc,
 		AutoFavorSgb,
 		AutoFavorGb,

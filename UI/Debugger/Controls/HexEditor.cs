@@ -2,14 +2,16 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Mesen.Config;
+using Mesen.Debugger.Utilities;
 using Mesen.Utilities;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Mesen.Config;
-using System.Text.RegularExpressions;
-using Mesen.Debugger.Utilities;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Mesen.Debugger.Controls
 {
@@ -27,7 +29,7 @@ namespace Mesen.Debugger.Controls
 
 		public static readonly StyledProperty<bool> ShowStringViewProperty = AvaloniaProperty.Register<HexEditor, bool>(nameof(ShowStringView), false);
 		public static readonly StyledProperty<bool> HighDensityModeProperty = AvaloniaProperty.Register<HexEditor, bool>(nameof(HighDensityMode), false);
-		
+
 		public static readonly StyledProperty<bool> LastNibbleProperty = AvaloniaProperty.Register<HexEditor, bool>(nameof(LastNibble), false);
 
 		public static readonly StyledProperty<SolidColorBrush> SelectedRowColumnColorProperty = AvaloniaProperty.Register<HexEditor, SolidColorBrush>(nameof(SelectedRowColumnColor), new SolidColorBrush(0xFFF0F0F0));
@@ -35,7 +37,7 @@ namespace Mesen.Debugger.Controls
 		public static readonly StyledProperty<SolidColorBrush> HeaderBackgroundProperty = AvaloniaProperty.Register<HexEditor, SolidColorBrush>(nameof(HeaderBackground), new SolidColorBrush(Color.FromRgb(235, 235, 235)));
 		public static readonly StyledProperty<SolidColorBrush> HeaderForegroundProperty = AvaloniaProperty.Register<HexEditor, SolidColorBrush>(nameof(HeaderForeground), new SolidColorBrush(Colors.Gray));
 		public static readonly StyledProperty<SolidColorBrush> HeaderHighlightProperty = AvaloniaProperty.Register<HexEditor, SolidColorBrush>(nameof(HeaderHighlight), new SolidColorBrush(Colors.White));
-		
+
 		public static readonly StyledProperty<int> NewByteValueProperty = AvaloniaProperty.Register<HexEditor, int>(nameof(NewByteValue), -1);
 
 		public IHexEditorDataProvider DataProvider
@@ -59,7 +61,8 @@ namespace Mesen.Debugger.Controls
 		public int SelectionStart
 		{
 			get { return GetValue(SelectionStartProperty); }
-			set {
+			set
+			{
 				CommitByteChanges();
 				SetValue(SelectionStartProperty, value);
 			}
@@ -118,13 +121,13 @@ namespace Mesen.Debugger.Controls
 			get { return GetValue(HeaderHighlightProperty); }
 			set { SetValue(HeaderHighlightProperty, value); }
 		}
-		
+
 		public int NewByteValue
 		{
 			get { return GetValue(NewByteValueProperty); }
 			set { SetValue(NewByteValueProperty, value); }
 		}
-		
+
 		private bool LastNibble
 		{
 			get { return GetValue(LastNibbleProperty); }
@@ -135,6 +138,8 @@ namespace Mesen.Debugger.Controls
 
 		private Typeface Font { get; set; }
 		private Size LetterSize { get; set; }
+		private SKTypeface _skTypeface;
+
 		private double RowHeight => HighDensityMode ? LetterSize.Height * 0.8 : LetterSize.Height;
 
 		private int HeaderCharLength => DataProvider.Length > 0 ? (DataProvider.Length - 1).ToString(HexFormat).Length : 0;
@@ -307,7 +312,7 @@ namespace Mesen.Debugger.Controls
 						ChangeSelectionLength(-(anchor % BytesPerRow));
 						break;
 					}
-					
+
 					case Key.End: {
 						int anchor = _cursorPosition == SelectionStart ? _cursorPosition : SelectionStart + SelectionLength;
 						ChangeSelectionLength(BytesPerRow - (anchor % BytesPerRow));
@@ -320,7 +325,7 @@ namespace Mesen.Debugger.Controls
 					case Key.Right: MoveCursor(1, ctrl); break;
 					case Key.Up: MoveCursor(-BytesPerRow, keepNibble: true); break;
 					case Key.Down: MoveCursor(BytesPerRow, keepNibble: true); break;
-					
+
 					case Key.PageUp: MoveCursor(-BytesPerRow * VisibleRows, keepNibble: true); break;
 					case Key.PageDown: MoveCursor(BytesPerRow * VisibleRows, keepNibble: true); break;
 					case Key.Home:
@@ -549,8 +554,8 @@ namespace Mesen.Debugger.Controls
 		{
 			base.OnPointerWheelChanged(e);
 			_scrollAccumulator += e.GetDeltaY() * 3;
-			this.TopRow = Math.Min((DataProvider.Length / BytesPerRow) - 1, Math.Max(0, this.TopRow - (int) _scrollAccumulator));
-			_scrollAccumulator -= (int) _scrollAccumulator;
+			this.TopRow = Math.Min((DataProvider.Length / BytesPerRow) - 1, Math.Max(0, this.TopRow - (int)_scrollAccumulator));
+			_scrollAccumulator -= (int)_scrollAccumulator;
 		}
 
 		protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -602,7 +607,7 @@ namespace Mesen.Debugger.Controls
 		{
 			MoveSelectionWithMouse(GetByteOffset(gridPos));
 		}
-		
+
 		private void MoveSelectionWithMouse(int currentPos)
 		{
 			if(currentPos < _lastClickedPosition) {
@@ -788,11 +793,13 @@ namespace Mesen.Debugger.Controls
 			}
 		}
 
+		[MemberNotNull(nameof(HexEditor._skTypeface))]
 		private void InitFontAndLetterSize()
 		{
 			this.Font = new Typeface(FontFamily);
 			var text = new FormattedText("A", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Font, FontSize, null);
 			this.LetterSize = new Size(text.Width, text.Height);
+			_skTypeface = SKTypeface.FromFamilyName(FontFamily.Name);
 		}
 
 		private void DrawRowHeaders(DrawingContext context)
@@ -818,7 +825,7 @@ namespace Mesen.Debugger.Controls
 			context.DrawRectangle(ColorHelper.GetBrush(HeaderHighlight), null, new Rect(leftMargin + selectedColumn * LetterSize.Width * 3 - LetterSize.Width / 2, 0, LetterSize.Width * 3, ColumnHeaderHeight));
 
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0, len = BytesPerRow; i < len ; i++) {
+			for(int i = 0, len = BytesPerRow; i < len; i++) {
 				sb.Append(i.ToString(HexFormat) + " ");
 			}
 

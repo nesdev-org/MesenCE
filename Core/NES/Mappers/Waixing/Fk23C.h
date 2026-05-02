@@ -20,10 +20,10 @@ private:
 	bool _allowSingleScreenMirroring = false;
 	bool _fk23RegistersEnabled = false;
 	bool _wramConfigEnabled = false;
-	
+
 	bool _wramEnabled = false;
 	bool _wramWriteProtected = false;
-	
+
 	bool _invertPrgA14 = false;
 	bool _invertChrA12 = false;
 
@@ -38,14 +38,14 @@ private:
 
 	uint8_t _cnromChrReg = 0;
 	uint8_t _mmc3Registers[12] = {};
-	
+
 	uint8_t _irqDelay = 0;
 	A12Watcher _a12Watcher;
 
 protected:
 	uint16_t GetPrgPageSize() override { return 0x2000; }
 	uint16_t GetChrPageSize() override { return 0x0400; }
-	
+
 	uint32_t GetChrRamSize() override { return 0x40000; } //Some games have up to 256kb of CHR RAM (only used for iNES 1.0 files w/ no DB entry)
 	uint16_t GetChrRamPageSize() override { return 0x400; }
 
@@ -65,7 +65,7 @@ protected:
 
 		//$5001 (mostly)
 		//Subtype 1, 1024 KiB PRG-ROM, 1024 KiB CHR-ROM: boot in second 512 KiB of PRG-ROM.
-		_prgBaseBits = (_prgSize == 1024*1024 && _prgSize == _chrRomSize) ? 0x20 : 0;
+		_prgBaseBits = (_prgSize == 1024 * 1024 && _prgSize == _chrRomSize) ? 0x20 : 0;
 
 		//$5002
 		_chrBaseBits = 0;
@@ -87,7 +87,7 @@ protected:
 
 		_cnromChrReg = 0;
 
-		constexpr uint8_t initValues[12] = { 0,2,4,5,6,7,0,1,0xFE, 0xFF, 0xFF, 0xFF };
+		constexpr uint8_t initValues[12] = { 0, 2, 4, 5, 6, 7, 0, 1, 0xFE, 0xFF, 0xFF, 0xFF };
 		for(int i = 0; i < 12; i++) {
 			_mmc3Registers[i] = initValues[i];
 		}
@@ -307,7 +307,7 @@ protected:
 
 			switch(addr & 0xE001) {
 				case 0x8000:
-					if(_prgSize == 16384*1024 && (value == 0x46 || value == 0x47)) {
+					if(_prgSize == 16384 * 1024 && (value == 0x46 || value == 0x47)) {
 						//Subtype 2, 16384 KiB PRG-ROM, no CHR-ROM: Like Subtype 0, but MMC3 registers $46 and $47 swapped.
 						value ^= 1;
 					}
@@ -343,7 +343,7 @@ protected:
 					_allowSingleScreenMirroring = (value & 0x08) != 0;
 					_wramConfigEnabled = (value & 0x20) != 0;
 					_fk23RegistersEnabled = (value & 0x40) != 0;
-					
+
 					_wramWriteProtected = (value & 0x40) != 0;
 					_wramEnabled = (value & 0x80) != 0;
 

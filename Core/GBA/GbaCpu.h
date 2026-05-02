@@ -1,16 +1,16 @@
 #if (defined(DUMMYCPU) && !defined(__DUMMYGBACPU__H)) || (!defined(DUMMYCPU) && !defined(__GBACPU__H))
-#ifdef DUMMYCPU
-#define __DUMMYGBACPU__H
-#else
-#define __GBACPU__H
-#endif
+	#ifdef DUMMYCPU
+		#define __DUMMYGBACPU__H
+	#else
+		#define __GBACPU__H
+	#endif
 
-#include "pch.h"
-#include "GBA/GbaTypes.h"
-#include "GBA/GbaMemoryManager.h"
-#include "Shared/Emulator.h"
-#include "Debugger/DebugTypes.h"
-#include "Utilities/ISerializable.h"
+	#include "pch.h"
+	#include "GBA/GbaTypes.h"
+	#include "GBA/GbaMemoryManager.h"
+	#include "Shared/Emulator.h"
+	#include "Debugger/DebugTypes.h"
+	#include "Utilities/ISerializable.h"
 
 class GbaMemoryManager;
 class GbaRomPrefetch;
@@ -28,7 +28,7 @@ private:
 	GbaRomPrefetch* _prefetch = nullptr;
 	Emulator* _emu = nullptr;
 
-	typedef void(GbaCpu::* Func)();
+	typedef void (GbaCpu::*Func)();
 	static Func _armTable[0x1000];
 	static Func _thumbTable[0x100];
 	static ArmOpCategory _armCategory[0x1000];
@@ -201,7 +201,7 @@ public:
 		if constexpr(debuggerEnabled) {
 			_emu->ProcessHaltedCpu<CpuType::Gba>();
 		}
-		
+
 		bool isHaltOver = _memoryManager->IsHaltOver();
 
 		if(_memoryManager->IsSystemStopped()) {
@@ -222,7 +222,7 @@ public:
 	template<bool inlineHalt, bool debuggerEnabled>
 	__forceinline void Exec()
 	{
-#ifndef DUMMYCPU
+	#ifndef DUMMYCPU
 		//Check if DMA needs to be executed before running the next	instruction.
 		//If a DMA is pending, it needs to start before the CPU tries to run the
 		//next instruction instruction. This can impact the timing at which the IRQ is checked
@@ -249,23 +249,23 @@ public:
 
 		uint64_t startClock = _memoryManager->GetMasterClock();
 		bool irqDisable = _state.CPSR.IrqDisable;
-#endif
+	#endif
 
 		_opCode = _state.Pipeline.Execute.OpCode;
 		if(_state.CPSR.Thumb) {
 			(this->*_thumbTable[(_opCode >> 8) & 0xFF])();
 		} else {
-#ifndef DUMMYCPU
+	#ifndef DUMMYCPU
 			if(CheckConditions(_opCode >> 28)) {
-#else 
+	#else
 			{
-#endif
+	#endif
 				uint16_t opType = ((_opCode & 0x0FF00000) >> 16) | ((_opCode & 0xF0) >> 4);
 				(this->*_armTable[opType])();
 			}
 		}
 
-#ifndef DUMMYCPU
+	#ifndef DUMMYCPU
 		if(_state.Pipeline.ReloadRequested) {
 			ReloadPipeline();
 		}
@@ -282,23 +282,24 @@ public:
 		if(!irqDisable && hasPendingIrq) {
 			CheckForIrqs();
 		}
-#endif
+	#endif
 	}
 
 	bool IsHalted() { return _state.Stopped; }
-	void SetStopFlag(bool freeze = false) {
+	void SetStopFlag(bool freeze = false)
+	{
 		_state.Stopped = true;
 		_state.Frozen = freeze;
 	}
 
 	void ClearSequentialFlag() { _state.Pipeline.Mode &= ~GbaAccessMode::Sequential; }
 	void SetSequentialFlag() { _state.Pipeline.Mode |= GbaAccessMode::Sequential; }
-	
+
 	void PowerOn();
 
 	void Serialize(Serializer& s) override;
 
-#ifdef DUMMYCPU
+	#ifdef DUMMYCPU
 private:
 	uint32_t _memOpCounter = 0;
 	MemoryOperationInfo _memOperations[32] = {};
@@ -310,6 +311,6 @@ public:
 	void LogMemoryOperation(uint32_t addr, uint32_t value, GbaAccessModeVal mode, MemoryOperationType type);
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
 	GbaAccessModeVal GetOperationMode(uint32_t index);
-#endif
+	#endif
 };
 #endif

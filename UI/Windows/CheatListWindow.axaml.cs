@@ -1,17 +1,17 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Data.Converters;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using DataBoxControl;
+using Mesen.Config;
+using Mesen.Interop;
+using Mesen.ViewModels;
 using System;
 using System.ComponentModel;
-using Avalonia.Data;
-using Mesen.Interop;
-using Mesen.Config;
-using Avalonia.Input;
-using Mesen.ViewModels;
-using Avalonia.Data.Converters;
-using DataBoxControl;
 using System.Linq;
 
 namespace Mesen.Windows

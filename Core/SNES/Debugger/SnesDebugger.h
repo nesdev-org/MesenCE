@@ -104,11 +104,11 @@ public:
 	StepBackConfig GetStepBackConfig() override;
 
 	void DrawPartialFrame() override;
-	
+
 	DebuggerFeatures GetSupportedFeatures() override;
 	void SetProgramCounter(uint32_t addr, bool updateDebuggerOnly = false) override;
 	uint32_t GetProgramCounter(bool getInstPc) override;
-	
+
 	uint8_t GetCpuFlags(uint32_t addr) override;
 
 	ITraceLogger* GetTraceLogger() override;
@@ -117,6 +117,7 @@ public:
 	IAssembler* GetAssembler() override;
 	BaseEventManager* GetEventManager() override;
 	PpuTools* GetPpuTools() override;
+	ISerializable* GetSerializableCpu() override;
 
 	BaseState& GetState() override;
 	void GetPpuState(BaseState& state) override;

@@ -61,7 +61,7 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 					filename = line.substr(start + 1, end - start - 1);
 				}
 			}
-			
+
 			filename = StringUtilities::Trim(filename);
 			if(!filename.empty()) {
 				VirtualFile dataFile = cueFile.GetFolderPath() + filename;
@@ -101,9 +101,9 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 				MessageManager::Log("[CUE] Unexpected PREGAP entry");
 				return false;
 			}
-			
+
 			vector<string> entry = StringUtilities::Split(line, ' ');
-			
+
 			CueGapEntry gap = {};
 
 			vector<string> lengthParts = StringUtilities::Split(entry[1], ':');
@@ -252,7 +252,7 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 		}
 		MessageManager::Log("  Time: " + trk.StartPosition.ToString() + " - " + trk.EndPosition.ToString());
 		MessageManager::Log("  Sectors: " + std::to_string(trk.FirstSector) + " - " + std::to_string(trk.LastSector));
-		MessageManager::Log("  File offset: " + std::to_string(trk.FileOffset) + " - " + std::to_string(trk.FileOffset+trk.Size-1));
+		MessageManager::Log("  File offset: " + std::to_string(trk.FileOffset) + " - " + std::to_string(trk.FileOffset + trk.Size - 1));
 		i++;
 	}
 	MessageManager::Log("---- END TRACKS ----");
@@ -274,7 +274,7 @@ void CdReader::LoadSubcodeFile(VirtualFile& cueFile, DiscInfo& disc)
 
 			for(int j = 0; j < 12; j++) {
 				for(int k = 7; k >= 0; k--) {
-					uint8_t encoded = (
+					uint8_t encoded =
 						(((subCode[i * 96 + j + 0] >> k) & 0x01) << 7) |
 						(((subCode[i * 96 + j + 12] >> k) & 0x01) << 6) |
 						(((subCode[i * 96 + j + 24] >> k) & 0x01) << 5) |
@@ -282,8 +282,7 @@ void CdReader::LoadSubcodeFile(VirtualFile& cueFile, DiscInfo& disc)
 						(((subCode[i * 96 + j + 48] >> k) & 0x01) << 3) |
 						(((subCode[i * 96 + j + 60] >> k) & 0x01) << 2) |
 						(((subCode[i * 96 + j + 72] >> k) & 0x01) << 1) |
-						(((subCode[i * 96 + j + 84] >> k) & 0x01) << 0)
-					);
+						(((subCode[i * 96 + j + 84] >> k) & 0x01) << 0);
 
 					disc.SubCode.push_back(encoded);
 				}

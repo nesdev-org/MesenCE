@@ -38,7 +38,7 @@ protected:
 		} else {
 			SelectPrgPage(0, _regs[0] & 0x03);
 		}
-		
+
 		SelectPrgPage(1, _regs[1] & 0x7F);
 		SetMirroringType(_regs[0] & 0x10 ? MirroringType::Vertical : MirroringType::Horizontal);
 	}
@@ -52,6 +52,6 @@ protected:
 			_regs[1] = value;
 			_mode = reg;
 		}
-		UpdateState();		
+		UpdateState();
 	}
 };

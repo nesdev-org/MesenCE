@@ -26,7 +26,7 @@ namespace Mesen.Debugger
 		public byte[] ByteCode = Array.Empty<byte>();
 
 		private string _byteCodeString = "";
-		public string ByteCodeStr 
+		public string ByteCodeStr
 		{
 			get
 			{

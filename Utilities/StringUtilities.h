@@ -97,7 +97,7 @@ public:
 	static bool Contains(string& str, const char* content)
 	{
 		size_t length = strlen(content);
-		return std::search(str.begin(), str.end(), content, content+length) != str.end();
+		return std::search(str.begin(), str.end(), content, content + length) != str.end();
 	}
 
 	static string GetString(char* src, uint32_t maxLen)
@@ -112,6 +112,17 @@ public:
 				return string(src, src + i);
 			}
 		}
-		return string(src, src+maxLen);
+		return string(src, src + maxLen);
+	}
+
+	static string SizeToString(int32_t size)
+	{
+		if((size & 0x3FF) == 0) {
+			// Size is a multiple of 1 KiB, so print it in that form.
+			return std::to_string(size / 1024) + " KB";
+		} else {
+			// Size is not a multiple of 1 KiB, so just print the bytes.
+			return std::to_string(size) + " bytes";
+		}
 	}
 };

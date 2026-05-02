@@ -14,7 +14,7 @@ bool GameDatabase::_enabled = true;
 bool GameDatabase::_initialized = false;
 SimpleLock GameDatabase::_loadLock;
 
-template<typename T> 
+template<typename T>
 T GameDatabase::ToInt(string value)
 {
 	if(value.empty()) {
@@ -23,9 +23,21 @@ T GameDatabase::ToInt(string value)
 	return std::stoi(value);
 }
 
+template<typename T>
+T GameDatabase::ToSize(string value)
+{
+	if(value.empty()) {
+		return 0;
+	} else if(value[0] == 'b') {
+		return std::stoi(value.substr(1));
+	} else {
+		return std::stoi(value) * 1024;
+	}
+}
+
 void GameDatabase::LoadGameDb(vector<string> data)
 {
-	for(string &row : data) {
+	for(string& row : data) {
 		vector<string> values = StringUtilities::Split(row, ',');
 		if(values.size() >= 16) {
 			GameInfo gameInfo;
@@ -35,11 +47,11 @@ void GameDatabase::LoadGameDb(vector<string> data)
 			gameInfo.Pcb = values[3];
 			gameInfo.Chip = values[4];
 			gameInfo.MapperID = (uint16_t)ToInt<uint32_t>(values[5]);
-			gameInfo.PrgRomSize = ToInt<uint32_t>(values[6]) * 1024;
-			gameInfo.ChrRomSize = ToInt<uint32_t>(values[7]) * 1024;
-			gameInfo.ChrRamSize = ToInt<uint32_t>(values[8]) * 1024;
-			gameInfo.WorkRamSize = ToInt<uint32_t>(values[9]) * 1024;
-			gameInfo.SaveRamSize = ToInt<uint32_t>(values[10]) * 1024;
+			gameInfo.PrgRomSize = ToSize<uint32_t>(values[6]);
+			gameInfo.ChrRomSize = ToSize<uint32_t>(values[7]);
+			gameInfo.ChrRamSize = ToSize<uint32_t>(values[8]);
+			gameInfo.WorkRamSize = ToSize<uint32_t>(values[9]);
+			gameInfo.SaveRamSize = ToSize<uint32_t>(values[10]);
 			gameInfo.HasBattery = ToInt<uint32_t>(values[11]) == 0 ? false : true;
 			gameInfo.Mirroring = values[12];
 			gameInfo.InputType = (GameInputType)ToInt<uint32_t>(values[13]);
@@ -60,7 +72,7 @@ void GameDatabase::LoadGameDb(vector<string> data)
 	MessageManager::Log("[DB] Initialized - " + std::to_string(_gameDatabase.size()) + " games in DB");
 }
 
-void GameDatabase::LoadGameDb(std::istream &db)
+void GameDatabase::LoadGameDb(std::istream& db)
 {
 	vector<string> dbData;
 	while(db.good()) {
@@ -115,11 +127,11 @@ GameSystem GameDatabase::GetGameSystem(string system)
 	} else if(system.compare("Playchoice") == 0) {
 		return GameSystem::Playchoice;
 	}
-	
+
 	return GameSystem::NesNtsc;
 }
 
-uint8_t GameDatabase::GetSubMapper(GameInfo &info)
+uint8_t GameDatabase::GetSubMapper(GameInfo& info)
 {
 	if(!info.SubmapperID.empty()) {
 		return ToInt<uint8_t>(info.SubmapperID);
@@ -127,7 +139,7 @@ uint8_t GameDatabase::GetSubMapper(GameInfo &info)
 	return 0;
 }
 
-bool GameDatabase::GetDbRomSize(uint32_t romCrc, uint32_t &prgSize, uint32_t &chrSize)
+bool GameDatabase::GetDbRomSize(uint32_t romCrc, uint32_t& prgSize, uint32_t& chrSize)
 {
 	InitDatabase();
 	auto result = _gameDatabase.find(romCrc);
@@ -139,7 +151,7 @@ bool GameDatabase::GetDbRomSize(uint32_t romCrc, uint32_t &prgSize, uint32_t &ch
 	return false;
 }
 
-bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
+bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader& nesHeader)
 {
 	GameInfo info = {};
 	InitDatabase();
@@ -148,7 +160,7 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 		info = result->second;
 
 		nesHeader.Byte9 = 0;
-		if(info.PrgRomSize > 4096*1024) {
+		if(info.PrgRomSize > 4096 * 1024) {
 			uint16_t prgSize = info.PrgRomSize / 0x4000;
 			nesHeader.PrgCount = prgSize & 0xFF;
 			nesHeader.Byte9 |= (prgSize & 0xF00) >> 8;
@@ -156,14 +168,14 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 			nesHeader.PrgCount = info.PrgRomSize / 0x4000;
 		}
 
-		if(info.ChrRomSize > 2048*1024) {
+		if(info.ChrRomSize > 2048 * 1024) {
 			uint16_t chrSize = info.ChrRomSize / 0x2000;
 			nesHeader.ChrCount = chrSize & 0xFF;
 			nesHeader.Byte9 |= (chrSize & 0xF00) >> 4;
 		} else {
 			nesHeader.ChrCount = info.ChrRomSize / 0x2000;
 		}
-		
+
 		nesHeader.Byte6 = (info.MapperID & 0x0F) << 4;
 		if(info.HasBattery) {
 			nesHeader.Byte6 |= 0x02;
@@ -179,7 +191,7 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 		} else if(system == GameSystem::VsSystem) {
 			nesHeader.Byte7 |= 0x01;
 		}
-		
+
 		//Don't set this, otherwise the header will be used over the game DB data
 		//nesHeader.Byte7 |= 0x08; //NES 2.0 marker
 
@@ -197,7 +209,7 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 		if(info.ChrRamSize > 0) {
 			nesHeader.Byte11 |= ((int)log2(info.ChrRamSize) - 6);
 		}
-		
+
 		nesHeader.Byte12 = system == GameSystem::NesPal ? 0x01 : 0;
 		nesHeader.Byte13 = 0; //VS PPU variant
 
@@ -207,8 +219,8 @@ bool GameDatabase::GetiNesHeader(uint32_t romCrc, NesHeader &nesHeader)
 	return false;
 }
 
-void GameDatabase::SetGameInfo(uint32_t romCrc, RomData &romData, bool updateRomData, bool forHeaderlessRom)
-{	
+void GameDatabase::SetGameInfo(uint32_t romCrc, RomData& romData, bool updateRomData, bool forHeaderlessRom)
+{
 	GameInfo info = {};
 
 	InitDatabase();
@@ -264,16 +276,16 @@ void GameDatabase::SetGameInfo(uint32_t romCrc, RomData &romData, bool updateRom
 			}
 			MessageManager::Log(msg);
 		}
-		MessageManager::Log("[DB] PRG ROM: " + std::to_string(info.PrgRomSize / 1024) + " KB");
-		MessageManager::Log("[DB] CHR ROM: " + std::to_string(info.ChrRomSize / 1024) + " KB");
+		MessageManager::Log("[DB] PRG ROM: " + StringUtilities::SizeToString(info.PrgRomSize));
+		MessageManager::Log("[DB] CHR ROM: " + StringUtilities::SizeToString(info.ChrRomSize));
 		if(info.ChrRamSize > 0) {
-			MessageManager::Log("[DB] CHR RAM: " + std::to_string(info.ChrRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] CHR RAM: " + StringUtilities::SizeToString(info.ChrRamSize));
 		}
 		if(info.WorkRamSize > 0) {
-			MessageManager::Log("[DB] Work RAM: " + std::to_string(info.WorkRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] Work RAM: " + StringUtilities::SizeToString(info.WorkRamSize));
 		}
 		if(info.SaveRamSize > 0) {
-			MessageManager::Log("[DB] Save RAM: " + std::to_string(info.SaveRamSize / 1024) + " KB");
+			MessageManager::Log("[DB] Save RAM: " + StringUtilities::SizeToString(info.SaveRamSize));
 		}
 		MessageManager::Log("[DB] Battery: " + string(info.HasBattery ? "Yes" : "No"));
 
@@ -293,7 +305,7 @@ void GameDatabase::SetGameInfo(uint32_t romCrc, RomData &romData, bool updateRom
 	romData.Info.DatabaseInfo = info;
 }
 
-void GameDatabase::UpdateRomData(GameInfo &info, RomData &romData)
+void GameDatabase::UpdateRomData(GameInfo& info, RomData& romData)
 {
 	romData.Info.MapperID = info.MapperID;
 	romData.Info.System = GetGameSystem(info.System);

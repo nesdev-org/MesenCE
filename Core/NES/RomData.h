@@ -74,7 +74,7 @@ struct NesRomInfo
 
 	uint16_t MapperID = 0;
 	uint8_t SubMapperID = 0;
-	
+
 	GameSystem System = GameSystem::Unknown;
 	VsSystemType VsType = VsSystemType::Default;
 	GameInputType InputType = GameInputType::Unspecified;

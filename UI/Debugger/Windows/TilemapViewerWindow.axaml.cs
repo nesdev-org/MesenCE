@@ -1,15 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using System;
-using Mesen.Debugger.Controls;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using System.ComponentModel;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Mesen.Debugger.Utilities;
+using Avalonia.Markup.Xaml;
 using Mesen.Config;
+using Mesen.Debugger.Controls;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.ViewModels;
+using Mesen.Interop;
+using System;
+using System.ComponentModel;
 
 namespace Mesen.Debugger.Windows
 {

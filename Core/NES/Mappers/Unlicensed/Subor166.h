@@ -23,7 +23,7 @@ protected:
 		BaseMapper::Serialize(s);
 		SVArray(_regs, 4);
 	}
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0xE000) {
@@ -40,7 +40,7 @@ protected:
 		if(_regs[1] & 0x08) {
 			//32 KiB NROM
 			uint8_t bank = (outerBank | innerBank) & 0xFE;
-			SelectPrgPage(0, altMode  ? bank + 1 : bank);
+			SelectPrgPage(0, altMode ? bank + 1 : bank);
 			SelectPrgPage(1, altMode ? bank : bank + 1);
 		} else if(_regs[1] & 0x04) {
 			//512 KiB inverted UNROM(mapper 180)

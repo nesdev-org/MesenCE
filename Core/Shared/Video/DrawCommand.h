@@ -42,7 +42,7 @@ protected:
 				if(_overwritePixels) {
 					_argbBuffer[offset] = 0;
 				}
-				
+
 				if(_argbBuffer[offset] == 0) {
 					//When drawing on an empty background, premultiply channels & preserve alpha value
 					//This is needed for hardware blending between the HUD and the game screen
@@ -64,8 +64,7 @@ protected:
 			x < left ||
 			y < top ||
 			x - left >= (int32_t)_frameInfo.Width ||
-			y - top >= (int32_t)_frameInfo.Height
-		);
+			y - top >= (int32_t)_frameInfo.Height);
 	}
 
 	void DrawPixel(uint32_t x, uint32_t y, int color)
@@ -83,7 +82,7 @@ protected:
 				int32_t offset = ((int32_t)y - top) * _frameInfo.Width + (int32_t)x - left;
 				InternalDrawPixel(offset, color, alpha);
 			} else {
-				int xPixelCount = _useIntegerScaling ? (int)std::floor(_xScale): (int)((x + 1)*_xScale) - (int)(x*_xScale);
+				int xPixelCount = _useIntegerScaling ? (int)std::floor(_xScale) : (int)((x + 1) * _xScale) - (int)(x * _xScale);
 				x = (int)(x * (_useIntegerScaling ? (int)std::floor(_xScale) : _xScale));
 				y = (int)(y * _yScale);
 
@@ -117,7 +116,7 @@ protected:
 
 public:
 	DrawCommand(int startFrame, int frameCount, bool useIntegerScaling = false)
-	{ 
+	{
 		_frameCount = frameCount > 0 ? frameCount : -1;
 		_startFrame = startFrame;
 		_useIntegerScaling = useIntegerScaling;
@@ -127,7 +126,7 @@ public:
 	{
 	}
 
-	void Draw(unordered_map<uint32_t, uint32_t>* drawnPixels, uint32_t* argbBuffer, FrameInfo frameInfo, OverscanDimensions &overscan, uint32_t frameNumber, HudScaleFactors &scaleFactors)
+	void Draw(unordered_map<uint32_t, uint32_t>* drawnPixels, uint32_t* argbBuffer, FrameInfo frameInfo, OverscanDimensions& overscan, uint32_t frameNumber, HudScaleFactors& scaleFactors)
 	{
 		if(_startFrame < 0) {
 			//When no start frame was specified, start on the next drawn frame

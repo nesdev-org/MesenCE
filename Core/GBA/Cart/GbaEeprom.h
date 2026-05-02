@@ -96,7 +96,7 @@ public:
 				break;
 
 			case GbaEepromMode::ReadCommand:
-				if(_addressSize && _len == _addressSize){
+				if(_addressSize && _len == _addressSize) {
 					_mode = GbaEepromMode::ReadDataReady;
 					_counter = 0;
 				} else {

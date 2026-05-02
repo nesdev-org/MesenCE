@@ -39,7 +39,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public string? TraceFile { get; set; } = null;
 		[Reactive] public bool AllowOpenTraceFile { get; private set; } = false;
 		[Reactive] public bool IsStartLoggingEnabled { get; set; }
-		
+
 		[Reactive] public bool ShowByteCode { get; private set; }
 
 		[Reactive] public int SelectionStart { get; private set; }
@@ -55,7 +55,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public List<ContextMenuAction> ViewMenuItems { get; private set; } = new();
 
 		public QuickSearchViewModel QuickSearch { get; } = new();
-		
+
 		private DisassemblyViewer? _viewer = null;
 
 		public TraceLoggerViewModel()
@@ -113,7 +113,7 @@ namespace Mesen.Debugger.ViewModels
 		{
 			CodeLineData[] lines = GetCodeLines(0, DebugApi.TraceLogBufferSize);
 			string needle = e.SearchString.ToLowerInvariant();
-			
+
 			int startRow = SelectedRow;
 			if(e.Direction == SearchDirection.Backward) {
 				startRow--;
@@ -469,7 +469,7 @@ namespace Mesen.Debugger.ViewModels
 			_traceLogger = traceLogger;
 			CpuType = cpuType;
 			Options = options;
-			
+
 			ShowEnableButton = showEnableButton;
 			ShowStatusFormat = cpuType != CpuType.Cx4 && cpuType != CpuType.NecDsp;
 			ShowIndentCode = cpuType != CpuType.Gsu;
@@ -673,7 +673,7 @@ namespace Mesen.Debugger.ViewModels
 				CpuType.Nes => new string[] { "A", "X", "Y", "P", "SP" },
 				CpuType.Pce => new string[] { "A", "X", "Y", "P", "SP" },
 				CpuType.Sms => new string[] { "A", "B", "C", "D", "E", "F", "H", "L", "IX", "IY", "A'", "B'", "C'", "D'", "E'", "F'", "H'", "L'", "I", "R", "PS", "SP" },
-				CpuType.Gba or CpuType.St018  => new string[] { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "CPSR" },
+				CpuType.Gba or CpuType.St018 => new string[] { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "CPSR" },
 				CpuType.Ws => new string[] { "AX", "BX", "CX", "DX", "CS", "IP", "SS", "SP", "BP", "DS", "ES", "SI", "DI", "F" },
 				_ => throw new Exception("unsupported cpu type")
 			};

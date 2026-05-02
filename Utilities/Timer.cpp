@@ -6,7 +6,7 @@
 
 using namespace std::chrono;
 
-Timer::Timer() 
+Timer::Timer()
 {
 	Reset();
 }

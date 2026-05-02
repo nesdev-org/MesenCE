@@ -21,16 +21,13 @@
 	<StackPanel Orientation="Horizontal" Background="#15808080">
 		<CheckBox IsChecked="{Binding Config.AutoRefresh}" Content="{l:Translate lblScanline}" />
 		<c:MesenNumericUpDown
-			Value="{Binding Config.RefreshScanline}"
-			Minimum="{Binding MinScanline}"
-			Maximum="{Binding MaxScanline}"
+			Value="{Binding ConsoleConfig.RefreshScanline}"
 			Margin="3 0"
 		/>
 		<TextBlock VerticalAlignment="Center" Text="{l:Translate lblCycle}" />
 		<c:MesenNumericUpDown
-			Value="{Binding Config.RefreshCycle}"
+			Value="{Binding ConsoleConfig.RefreshCycle}"
 			Minimum="0"
-			Maximum="{Binding MaxCycle}"
 			Margin="3 0"
 		/>
 		<c:IconButton

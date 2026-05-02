@@ -5,10 +5,10 @@
 class MMC3_123 : public MMC3
 {
 private:
-	static constexpr uint8_t _security[8] = { 0,3,1,5,6,7,2,4 };
+	static constexpr uint8_t _security[8] = { 0, 3, 1, 5, 6, 7, 2, 4 };
 	uint8_t _exReg[2] = {};
 
-	void UpdatePrgMapping() override 
+	void UpdatePrgMapping() override
 	{
 		if(_exReg[0] & 0x40) {
 			uint8_t bank = (_exReg[0] & 0x05) | ((_exReg[0] & 0x08) >> 2) | ((_exReg[0] & 0x20) >> 2);

@@ -54,7 +54,7 @@ void GameServer::UpdateConnections()
 	}
 }
 
-bool GameServer::SetInput(BaseControlDevice *device)
+bool GameServer::SetInput(BaseControlDevice* device)
 {
 	uint8_t port = device->GetPort();
 	IControllerHub* hub = dynamic_cast<IControllerHub*>(device);
@@ -86,7 +86,7 @@ bool GameServer::SetInput(BaseControlDevice *device)
 
 void GameServer::RecordInput(vector<shared_ptr<BaseControlDevice>> devices)
 {
-	for(shared_ptr<BaseControlDevice> &device : devices) {
+	for(shared_ptr<BaseControlDevice>& device : devices) {
 		for(unique_ptr<GameServerConnection>& connection : _openConnections) {
 			if(!connection->ConnectionError()) {
 				//Send movie stream
@@ -96,7 +96,7 @@ void GameServer::RecordInput(vector<shared_ptr<BaseControlDevice>> devices)
 	}
 }
 
-void GameServer::ProcessNotification(ConsoleNotificationType type, void * parameter)
+void GameServer::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
 	for(unique_ptr<GameServerConnection>& connection : _openConnections) {
 		connection->ProcessNotification(type, parameter);
@@ -115,7 +115,7 @@ void GameServer::Exec()
 	_listener->Listen(10);
 	_stop = false;
 	_initialized = true;
-	MessageManager::DisplayMessage("NetPlay" , "ServerStarted", std::to_string(_port));
+	MessageManager::DisplayMessage("NetPlay", "ServerStarted", std::to_string(_port));
 
 	while(!_stop) {
 		AcceptConnections();

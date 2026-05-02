@@ -12,7 +12,7 @@
 #include "Debugger/DebugBreakHelper.h"
 #include "Debugger/BaseEventManager.h"
 
-NesEventManager::NesEventManager(Debugger *debugger, NesConsole* console)
+NesEventManager::NesEventManager(Debugger* debugger, NesConsole* console)
 {
 	_debugger = debugger;
 	_console = console;
@@ -114,7 +114,7 @@ DebugEventInfo NesEventManager::GetEvent(uint16_t y, uint16_t x)
 
 	int cycle = x / 2; //convert to cycle value
 	int scanline = ((int)y / 2) - 1; //convert to scanline value
-	
+
 	//Search without including larger background color first
 	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--) {
 		DebugEventInfo& evt = _sentEvents[i];
@@ -238,13 +238,13 @@ FrameInfo NesEventManager::GetDisplayBufferSize()
 	return size;
 }
 
-void NesEventManager::DrawScreen(uint32_t *buffer)
+void NesEventManager::DrawScreen(uint32_t* buffer)
 {
-	uint16_t *src = _ppuBuffer;
-	for(uint32_t y = 0, len = NesConstants::ScreenHeight*2; y < len; y++) {
+	uint16_t* src = _ppuBuffer;
+	for(uint32_t y = 0, len = NesConstants::ScreenHeight * 2; y < len; y++) {
 		int rowOffset = (y + 2) * NesConstants::CyclesPerLine * 2;
 
-		for(uint32_t x = 0; x < NesConstants::ScreenWidth *2; x++) {
+		for(uint32_t x = 0; x < NesConstants::ScreenWidth * 2; x++) {
 			int srcOffset = ((y >> 1) << 8) | (x >> 1);
 			buffer[rowOffset + x + 1 * 2] = _palette[src[srcOffset]];
 		}
@@ -255,7 +255,7 @@ void NesEventManager::DrawScreen(uint32_t *buffer)
 	}
 }
 
-void NesEventManager::DrawPixel(uint32_t *buffer, int32_t x, uint32_t y, uint32_t color)
+void NesEventManager::DrawPixel(uint32_t* buffer, int32_t x, uint32_t y, uint32_t color)
 {
 	if(x < 0) {
 		x += NesConstants::CyclesPerLine;
@@ -289,7 +289,7 @@ void NesEventManager::ProcessNtscBorderColorEvents(vector<DebugEventInfo>& event
 	}
 }
 
-void NesEventManager::DrawNtscBorders(uint32_t *buffer)
+void NesEventManager::DrawNtscBorders(uint32_t* buffer)
 {
 	//Generate array of bg color for all pixels on the screen
 	uint32_t currentPos = 0;
@@ -298,10 +298,18 @@ void NesEventManager::DrawNtscBorders(uint32_t *buffer)
 	bgColor.resize(NesConstants::CyclesPerLine * 243);
 
 	ProcessNtscBorderColorEvents(_snapshotCurrentFrame, bgColor, currentPos, currentColor);
-	
+
 	if(!_forAutoRefresh && _snapshotScanline < 242) {
 		uint32_t snapshotPos = (_snapshotScanline * NesConstants::CyclesPerLine) + _snapshotCycle;
-		std::fill(bgColor.begin() + currentPos, bgColor.begin() + snapshotPos, currentColor);
+		if(currentPos < snapshotPos) {
+			//After step back, some events might exist past the snapshot's scanline+cycle, because
+			//step back restores a save state right before pausing (to restore the state of the
+			//previous instruction). This can cause currentPos to be higher than snapshotPos if a BgColorChange
+			//event is triggered on the last instruction just before restoring the save state.
+			//This then causes std::fill to cause crashes (memory corruption, etc.) if executed
+			//(so skip this operation when this happens)
+			std::fill(bgColor.begin() + currentPos, bgColor.begin() + snapshotPos, currentColor);
+		}
 		currentPos = snapshotPos;
 		ProcessNtscBorderColorEvents(_snapshotPrevFrame, bgColor, currentPos, currentColor);
 	}
@@ -320,7 +328,7 @@ void NesEventManager::DrawNtscBorders(uint32_t *buffer)
 
 		//Right border
 		for(int32_t x = 0; x < 11; x++) {
-			DrawPixel(buffer, 257+x, y, _palette[bgColor[basePos + 257 + x]]);
+			DrawPixel(buffer, 257 + x, y, _palette[bgColor[basePos + 257 + x]]);
 		}
 	}
 

@@ -92,6 +92,7 @@ public:
 	BreakpointManager* GetBreakpointManager() override;
 	ITraceLogger* GetTraceLogger() override;
 	PpuTools* GetPpuTools() override;
+	ISerializable* GetSerializableCpu() override;
 
 	BaseState& GetState() override;
 	void GetPpuState(BaseState& state) override;

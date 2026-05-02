@@ -158,7 +158,10 @@
 					<v:VideoConfigOverrideView DataContext="{Binding Config.ConfigOverrides}" />
 
 					<c:OptionSection Header="{l:Translate lblMiscSettings}">
-						<CheckBox IsChecked="{Binding Config.BlendHighResolutionModes}" Content="{l:Translate chkBlendHighResolutionModes}" />
+						<WrapPanel>
+							<TextBlock Text="{l:Translate lblHighResBlendMode}" VerticalAlignment="Center" />
+							<c:EnumComboBox SelectedItem="{Binding Config.HighResBlendMode}" />
+						</WrapPanel>
 						<c:CheckBoxWarning IsChecked="{Binding Config.ForceFixedResolution}" Text="{l:Translate chkForceFixedResolution}" />
 						<c:CheckBoxWarning IsChecked="{Binding Config.DisableFrameSkipping}" Text="{l:Translate chkDisableFrameSkipping}" />
 						<c:CheckBoxWarning IsChecked="{Binding Config.HideBgLayer1}" Text="{l:Translate chkHideBgLayer1}" />

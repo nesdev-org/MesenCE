@@ -14,7 +14,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public byte RegSP { get; set; }
 		[Reactive] public UInt16 RegPC { get; set; }
 		[Reactive] public byte RegPS { get; set; }
-		
+
 		[Reactive] public bool FlagN { get; set; }
 		[Reactive] public bool FlagV { get; set; }
 		[Reactive] public bool FlagD { get; set; }
@@ -23,7 +23,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagC { get; set; }
 
 		[Reactive] public bool FlagNmi { get; set; }
-		
+
 		[Reactive] public bool FlagIrqExternal { get; set; }
 		[Reactive] public bool FlagIrqFrameCount { get; set; }
 		[Reactive] public bool FlagIrqDmc { get; set; }
@@ -40,7 +40,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool SpriteOverflow { get; set; }
 		[Reactive] public bool VerticalBlank { get; set; }
 		[Reactive] public bool WriteToggle { get; set; }
-		
+
 		//Mask
 		[Reactive] public bool BgEnabled { get; set; }
 		[Reactive] public bool SpritesEnabled { get; set; }

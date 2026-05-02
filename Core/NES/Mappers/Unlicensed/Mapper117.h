@@ -53,12 +53,21 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr) {
-			case 0x8000: case 0x8001: case 0x8002: case 0x8003:
+			case 0x8000:
+			case 0x8001:
+			case 0x8002:
+			case 0x8003:
 				SelectPrgPage(addr & 0x03, value);
 				break;
 
-			case 0xA000: case 0xA001: case 0xA002: case 0xA003:
-			case 0xA004: case 0xA005: case 0xA006: case 0xA007:
+			case 0xA000:
+			case 0xA001:
+			case 0xA002:
+			case 0xA003:
+			case 0xA004:
+			case 0xA005:
+			case 0xA006:
+			case 0xA007:
 				SelectChrPage(addr & 0x07, value);
 				break;
 

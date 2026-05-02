@@ -96,7 +96,7 @@ void VideoRenderer::RenderThread()
 				auto lock = _hudLock.AcquireSafe();
 				_systemHud->Draw(_rendererHud.get(), size.Width, size.Height);
 			}
-			
+
 			_emuHudSurface.IsDirty = _rendererHud->Draw(_emuHudSurface.Buffer, size, {}, 0, {}, true);
 			_scriptHudSurface.IsDirty = DrawScriptHud(frame);
 
@@ -187,13 +187,13 @@ void VideoRenderer::ClearFrame()
 	}
 }
 
-void VideoRenderer::RegisterRenderingDevice(IRenderingDevice *renderer)
+void VideoRenderer::RegisterRenderingDevice(IRenderingDevice* renderer)
 {
 	_renderer = renderer;
 	StartThread();
 }
 
-void VideoRenderer::UnregisterRenderingDevice(IRenderingDevice *renderer)
+void VideoRenderer::UnregisterRenderingDevice(IRenderingDevice* renderer)
 {
 	if(_renderer == renderer) {
 		StopThread();
@@ -217,7 +217,7 @@ void VideoRenderer::ProcessAviRecording(RenderedFrame& frame)
 
 			//Update the surface to match the frame's size
 			_aviRecorderSurface.UpdateSize(frame.Width, frame.Height);
-			
+
 			//Copy the game screen
 			memcpy(_aviRecorderSurface.Buffer, frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
 
@@ -260,7 +260,7 @@ void VideoRenderer::StartRecording(string filename, RecordAviOptions options)
 
 	if(recorder->Init(filename)) {
 		_recorder.reset(recorder);
-		
+
 		if(!options.RecordSystemHud) {
 			//Only display message if not recording the system HUD (otherwise the message is always visible on the recording, which isn't ideal)
 			MessageManager::DisplayMessage("VideoRecorder", "VideoRecorderStarted", filename);

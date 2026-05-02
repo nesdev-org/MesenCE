@@ -8,7 +8,7 @@ class SmsBiosMapper final : public ISerializable
 {
 private:
 	SmsMemoryManager* _memoryManager = nullptr;
-	uint8_t _prgBanks[3] = { 0,1,2 };
+	uint8_t _prgBanks[3] = { 0, 1, 2 };
 
 public:
 	SmsBiosMapper(SmsMemoryManager* memoryManager);

@@ -3,6 +3,7 @@
 #include "pch.h"
 
 #include "NES/INesMemoryHandler.h"
+#include "NES/NesTypes.h"
 #include "NES/OpenBusHandler.h"
 #include "NES/InternalRamHandler.h"
 #include "Shared/MemoryOperationType.h"
@@ -54,6 +55,7 @@ public:
 
 	uint8_t* GetInternalRam();
 
+	template<NesCpuBusType busType = NesCpuBusType::Both>
 	uint8_t Read(uint16_t addr, MemoryOperationType operationType = MemoryOperationType::Read);
 	void Write(uint16_t addr, uint8_t value, MemoryOperationType operationType);
 

@@ -19,6 +19,7 @@ private:
 	VsSystemType _vsSystemType = VsSystemType::Default;
 
 	uint32_t _protectionCounter = 0;
+	// clang-format off
 	const uint32_t _protectionData[3][32] = { 
 		{
 			0xFF, 0xBF, 0xB7, 0x97, 0x97, 0x17, 0x57, 0x4F,
@@ -39,6 +40,7 @@ private:
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		}
 	};
+	// clang-format on
 
 protected:
 	void RemapControllerButtons() override;
@@ -54,13 +56,13 @@ public:
 	void Serialize(Serializer& s) override;
 	void Reset(bool softReset) override;
 
-	void GetMemoryRanges(MemoryRanges &ranges) override;
+	void GetMemoryRanges(MemoryRanges& ranges) override;
 
 	uint8_t GetPrgChrSelectBit();
 
 	void UpdateControlDevices() override;
 
-	uint8_t ReadRam(uint16_t addr) override;	
+	uint8_t ReadRam(uint16_t addr) override;
 	void WriteRam(uint16_t addr, uint8_t value) override;
 
 	// Inherited via IInputProvider

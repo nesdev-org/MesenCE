@@ -55,7 +55,7 @@ RowDataType GbaTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void GbaTraceLogger::GetTraceRow(string &output, GbaCpuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void GbaTraceLogger::GetTraceRow(string& output, GbaCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	for(RowPart& rowPart : _rowParts) {
 		switch(rowPart.DataType) {
@@ -81,14 +81,14 @@ void GbaTraceLogger::GetTraceRow(string &output, GbaCpuState &cpuState, TraceLog
 					WriteIntValue(output, cpuState.CPSR.ToInt32(), rowPart);
 				} else {
 					FastString flags;
-					
+
 					bool showInactive = (rowPart.MinWidth > 0);
 
 					flags.Write(cpuState.CPSR.Negative ? "N" : (showInactive ? "n" : ""));
 					flags.Write(cpuState.CPSR.Zero ? "Z" : (showInactive ? "z" : ""));
 					flags.Write(cpuState.CPSR.Carry ? "C" : (showInactive ? "c" : ""));
 					flags.Write(cpuState.CPSR.Overflow ? "V" : (showInactive ? "v" : ""));
-					
+
 					flags.Write(cpuState.CPSR.Thumb ? "T" : (showInactive ? "t" : ""));
 					flags.Write(cpuState.CPSR.FiqDisable ? "F" : (showInactive ? "f" : ""));
 					flags.Write(cpuState.CPSR.IrqDisable ? "I" : (showInactive ? "i" : ""));

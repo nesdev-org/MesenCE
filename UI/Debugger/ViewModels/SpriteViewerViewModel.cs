@@ -26,7 +26,7 @@ namespace Mesen.Debugger.ViewModels
 	public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
 	{
 		public SpriteViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		public CpuType CpuType { get; set; }
 
@@ -205,14 +205,14 @@ namespace Mesen.Debugger.ViewModels
 						DebugPaletteInfo pal = _data.Palette.Value;
 						int paletteOffset = (int)(pal.SpritePaletteOffset / pal.ColorsPerPalette);
 						TileEditorWindow.OpenAtTile(
-							sprite.TileAddresses.Select(x => new AddressInfo() { Address = (int)x, Type = CpuType.GetVramMemoryType(sprite.UseExtendedVram) }).ToList(),
+							sprite.TileAddresses.Select(x => new TileAddressInfo() { Address = new AddressInfo() { Address = (int)x, Type = CpuType.GetVramMemoryType(sprite.UseExtendedVram) } }).ToList(),
 							sprite.RealWidth / size.Width,
 							sprite.Format,
 							sprite.Palette + paletteOffset,
 							wnd,
 							CpuType,
-							RefreshTiming.Config.RefreshScanline,
-							RefreshTiming.Config.RefreshCycle
+							RefreshTiming.ConsoleConfig.RefreshScanline,
+							RefreshTiming.ConsoleConfig.RefreshCycle
 						);
 					}
 				}
@@ -601,7 +601,7 @@ namespace Mesen.Debugger.ViewModels
 			} else {
 				ViewerBitmap.HighlightRects = null;
 			}
-				
+
 			ViewerBitmap.Invalidate();
 
 			int selectedIndex = SelectedSprite?.SpriteIndex ?? -1;
@@ -688,6 +688,7 @@ namespace Mesen.Debugger.ViewModels
 
 		public void OnGameLoaded()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
 			RefreshData();
 		}
 	}

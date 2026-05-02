@@ -40,8 +40,7 @@ private:
 	uint16_t GetChrOuterBank()
 	{
 		uint16_t reg = _exRegs[0];
-		return 
-			(~reg << 0 & 0x0080 & _exRegs[2]) |
+		return (~reg << 0 & 0x0080 & _exRegs[2]) |
 			(reg << 4 & 0x0080 & reg) |
 			(reg << 3 & 0x0100) |
 			(reg << 5 & 0x0200);
@@ -83,6 +82,6 @@ private:
 			}
 		} else {
 			MMC3::WriteRegister(addr, value);
-		}		
+		}
 	}
 };

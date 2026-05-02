@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Dock.Model.Controls;
 using Dock.Model.Core;
@@ -17,14 +16,11 @@ using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
-using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels
@@ -60,7 +56,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public string CdlStats { get; private set; } = "";
 
 		[Reactive] public List<ContextMenuAction> ToolbarItems { get; private set; } = new();
-		
+
 		[Reactive] public List<ContextMenuAction> FileMenuItems { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> SearchMenuItems { get; private set; } = new();
@@ -762,7 +758,7 @@ namespace Mesen.Debugger.ViewModels
 						OnClick = () => ShortcutHandler.ReloadRom()
 					}
 				});
-			};
+			}
 
 			return debugMenu;
 		}

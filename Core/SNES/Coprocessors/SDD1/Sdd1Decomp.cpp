@@ -1,3 +1,4 @@
+// clang-format off
 //Altered to integrate with Mesen's code
 
 /************************************************************************

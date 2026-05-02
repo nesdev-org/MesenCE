@@ -1,12 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using Avalonia.Platform.Storage.FileIO;
 using Avalonia.Rendering;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mesen.Utilities
@@ -51,17 +47,19 @@ namespace Mesen.Utilities
 				List<FilePickerFileType> filter = new List<FilePickerFileType>();
 				foreach(string ext in extensions) {
 					if(ext == FileDialogHelper.RomExt) {
-						filter.Add(new FilePickerFileType("All supported files") { Patterns = new List<string>() { 
-							"*.sfc", "*.fig", "*.smc", "*.bs", "*.st", "*.spc",
-							"*.nes", "*.fds", "*.qd", "*.unif", "*.unf", "*.studybox", "*.nsf", "*.nsfe",
-							"*.gb", "*.gbc", "*.gbx", "*.gbs",
-							"*.pce", "*.sgx", "*.cue", "*.hes",
-							"*.sms", "*.gg", "*.sg", "*.col",
-							"*.gba",
-							"*.ws", "*.wsc",
-							"*.zip", "*.7z",
-							"*.ips", "*.bps"
-						} });
+						filter.Add(new FilePickerFileType("All supported files") {
+							Patterns = new List<string>() {
+								"*.sfc", "*.fig", "*.smc", "*.bs", "*.st", "*.spc",
+								"*.nes", "*.fds", "*.qd", "*.unif", "*.unf", "*.studybox", "*.nsf", "*.nsfe",
+								"*.gb", "*.gbc", "*.gbx", "*.gbs",
+								"*.pce", "*.sgx", "*.cue", "*.hes",
+								"*.sms", "*.gg", "*.sg", "*.col",
+								"*.gba",
+								"*.ws", "*.wsc",
+								"*.zip", "*.7z",
+								"*.ips", "*.bps"
+							}
+						});
 						filter.Add(new FilePickerFileType("SNES ROM files") { Patterns = new List<string>() { "*.sfc", "*.fig", "*.smc", "*.bs", "*.st", "*.spc" } });
 						filter.Add(new FilePickerFileType("NES ROM files") { Patterns = new List<string>() { "*.nes", "*.fds", "*.qd", "*.unif", "*.unf", "*.studybox", "*.nsf", "*.nsfe" } });
 						filter.Add(new FilePickerFileType("GB ROM files") { Patterns = new List<string>() { "*.gb", "*.gbc", "*.gbx", "*.gbs" } });
@@ -73,7 +71,7 @@ namespace Mesen.Utilities
 						filter.Add(new FilePickerFileType("WonderSwan ROM files") { Patterns = new List<string>() { "*.ws", "*.wsc" } });
 						filter.Add(new FilePickerFileType("Patch files (IPS/BPS)") { Patterns = new List<string>() { "*.ips", "*.bps" } });
 					} else if(ext == FileDialogHelper.FirmwareExt) {
-						filter.Add(new FilePickerFileType("All firmware files") { Patterns = new List<string>() { "*.sfc", "*.pce", "*.nes", "*.bin", "*.rom", "*.col", "*.sms", "*.gg", "*.gba" } });
+						filter.Add(new FilePickerFileType("All firmware files") { Patterns = new List<string>() { "*.sfc", "*.pce", "*.nes", "*.bin", "*.rom", "*.col", "*.sms", "*.gg", "*.gba", "*.ws", "*.wsc" } });
 					} else if(ext == FileDialogHelper.LabelFileExt) {
 						filter.Add(new FilePickerFileType("All label files") { Patterns = new List<string>() { "*.mlb", "*.sym", "*.dbg", "*.fns", "*.elf", "*.cdb" } });
 					} else {

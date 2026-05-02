@@ -21,7 +21,10 @@ void PceSf2RomMapper::Write(uint8_t bank, uint16_t addr, uint8_t value)
 void PceSf2RomMapper::UpdateMappings()
 {
 	uint32_t bankOffsets[8] = {
-		0x00, 0x10, 0x20, 0x30,
+		0x00,
+		0x10,
+		0x20,
+		0x30,
 		0x40u + (_selectedBank * 0x40),
 		0x50u + (_selectedBank * 0x40),
 		0x60u + (_selectedBank * 0x40),

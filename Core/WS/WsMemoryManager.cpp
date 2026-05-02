@@ -24,7 +24,7 @@ void WsMemoryManager::Init(Emulator* emu, WsConsole* console, WsCpu* cpu, WsPpu*
 	_controlManager = controlManager;
 	_eeprom = eeprom;
 	_serial = serial;
-	
+
 	_workRamSize = _emu->GetMemory(MemoryType::WsWorkRam).Size;
 
 	_prgRom = (uint8_t*)_emu->GetMemory(MemoryType::WsPrgRom).Memory;
@@ -254,8 +254,7 @@ uint8_t WsMemoryManager::InternalReadPort(uint16_t port, bool isWordAccess)
 				}
 				return (
 					(_state.PowerOffRequested ? 0x01 : 0) |
-					(_console->GetModel() == WsModel::SwanCrystal ? 0x80 : 0)
-				);
+					(_console->GetModel() == WsModel::SwanCrystal ? 0x80 : 0));
 
 			case 0xA0:
 				return (

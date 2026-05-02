@@ -74,10 +74,16 @@ void Spc7110Decomp::Decode()
 
 			if(pa != pb || pb != pc) {
 				uint32_t match = pa ^ pb ^ pc;
-				diff = 4;                        //no match; all pixels differ
-				if((match ^ pc) == 0) diff = 3;  //a == b; pixel c differs
-				if((match ^ pb) == 0) diff = 2;  //c == a; pixel b differs
-				if((match ^ pa) == 0) diff = 1;  //b == c; pixel a differs
+				diff = 4; //no match; all pixels differ
+				if((match ^ pc) == 0) {
+					diff = 3; //a == b; pixel c differs
+				}
+				if((match ^ pb) == 0) {
+					diff = 2; //c == a; pixel b differs
+				}
+				if((match ^ pa) == 0) {
+					diff = 1; //b == c; pixel a differs
+				}
 			}
 
 			_colormap = MoveToFront(_colormap, pa);
@@ -105,18 +111,18 @@ void Spc7110Decomp::Decode()
 			auto& ctx = _context[set][bit + history - 1];
 			auto& model = evolution[ctx.prediction];
 			uint8_t lps_offset = _range - model.probability;
-			bool symbol = _input >= (lps_offset << 8);  //test only the MSB
+			bool symbol = _input >= (lps_offset << 8); //test only the MSB
 
 			_output = _output << 1 | ((uint8_t)symbol ^ ctx.swap);
 
-			if(symbol == MPS) {          //[0 ... range-p]
-				_range = lps_offset;        //range = range-p
-			} else {                     //[range-p+1 ... range]
-				_range -= lps_offset;       //range = p-1, with p < 0.75
-				_input -= lps_offset << 8;  //therefore, always rescale
+			if(symbol == MPS) { //[0 ... range-p]
+				_range = lps_offset; //range = range-p
+			} else { //[range-p+1 ... range]
+				_range -= lps_offset; //range = p-1, with p < 0.75
+				_input -= lps_offset << 8; //therefore, always rescale
 			}
 
-			while(_range <= Max / 2) {    //scale back into [0.75 ... 1.5]
+			while(_range <= Max / 2) { //scale back into [0.75 ... 1.5]
 				ctx.prediction = model.next[symbol];
 
 				_range <<= 1;
@@ -162,16 +168,30 @@ uint8_t Spc7110Decomp::GetBpp()
 
 void Spc7110Decomp::Serialize(Serializer& s)
 {
-	SV(_bpp); SV(_offset); SV(_bits); SV(_range); SV(_input); SV(_output); SV(_pixels); SV(_colormap); SV(_result);
+	SV(_bpp);
+	SV(_offset);
+	SV(_bits);
+	SV(_range);
+	SV(_input);
+	SV(_output);
+	SV(_pixels);
+	SV(_colormap);
+	SV(_result);
 	for(int i = 0; i < 15; i++) {
-		SVI(_context[0][i].swap); SVI(_context[0][i].prediction);
-		SVI(_context[1][i].swap); SVI(_context[1][i].prediction);
-		SVI(_context[2][i].swap); SVI(_context[2][i].prediction);
-		SVI(_context[3][i].swap); SVI(_context[3][i].prediction);
-		SVI(_context[4][i].swap); SVI(_context[4][i].prediction);
+		SVI(_context[0][i].swap);
+		SVI(_context[0][i].prediction);
+		SVI(_context[1][i].swap);
+		SVI(_context[1][i].prediction);
+		SVI(_context[2][i].swap);
+		SVI(_context[2][i].prediction);
+		SVI(_context[3][i].swap);
+		SVI(_context[3][i].prediction);
+		SVI(_context[4][i].swap);
+		SVI(_context[4][i].prediction);
 	}
 }
 
+// clang-format off
 Spc7110Decomp::ModelState Spc7110Decomp::evolution[53] = {
 	{0x5a, { 1, 1}}, {0x25, { 2, 6}}, {0x11, { 3, 8}},
 	{0x08, { 4,10}}, {0x03, { 5,12}}, {0x01, { 5,15}},
@@ -197,3 +217,4 @@ Spc7110Decomp::ModelState Spc7110Decomp::evolution[53] = {
 	{0x56, {48,47}}, {0x4f, {49,47}}, {0x47, {50,48}},
 	{0x41, {51,49}}, {0x3c, {52,50}}, {0x37, {43,51}},
 };
+// clang-format on

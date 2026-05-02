@@ -47,8 +47,8 @@ void SystemHud::Draw(DebugHud* hud, uint32_t width, uint32_t height) const
 		}
 	}
 }
- 
-void SystemHud::DrawMessage(DebugHud* hud, MessageInfo &msg, uint32_t screenWidth, uint32_t screenHeight, int& lastHeight) const
+
+void SystemHud::DrawMessage(DebugHud* hud, MessageInfo& msg, uint32_t screenWidth, uint32_t screenHeight, int& lastHeight) const
 {
 	//Get opacity for fade in/out effect
 	uint8_t opacity = (uint8_t)(msg.GetOpacity() * 255);
@@ -167,7 +167,7 @@ void SystemHud::DrawBar(DebugHud* hud, int x, int y, int width, int height) cons
 {
 	hud->DrawRectangle(x, y, width, height, 0xFFFFFF, true, 1);
 	hud->DrawLine(x, y + 1, x + width, y + 1, 0x4FBECE, 1);
-	hud->DrawLine(x+1, y, x+1, y + height, 0x4FBECE, 1);
+	hud->DrawLine(x + 1, y, x + 1, y + height, 0x4FBECE, 1);
 
 	hud->DrawLine(x + width - 1, y, x + width - 1, y + height, 0xCC9E22, 1);
 	hud->DrawLine(x, y + height - 1, x + width, y + height - 1, 0xCC9E22, 1);
@@ -238,7 +238,7 @@ void SystemHud::DrawTurboRewindIcon(DebugHud* hud, bool forRewind, int xOffset) 
 	if(frameId >= 8) {
 		frameId = (~frameId & 0x07);
 	}
-	
+
 	static constexpr uint32_t rewindColors[8] = { 0xFF8080, 0xFF9080, 0xFFA080, 0xFFB080, 0xFFC080, 0xFFD080, 0xFFE080, 0xFFF080 };
 	static constexpr uint32_t turboColors[8] = { 0x80FF80, 0x90FF80, 0xA0FF80, 0xB0FF80, 0xC0FF80, 0xD0FF80, 0xE0FF80, 0xF0FF80 };
 
@@ -249,23 +249,23 @@ void SystemHud::DrawTurboRewindIcon(DebugHud* hud, bool forRewind, int xOffset) 
 	} else {
 		color = turboColors[frameId];
 	}
-	
+
 	int borderColor = 0x333333;
 	int sign = forRewind ? -1 : 1;
 
 	for(int j = 0; j < 2; j++) {
 		for(int i = 0; i < width; i++) {
-			int left = x + i*sign * 2;
+			int left = x + i * sign * 2;
 			int top = y + i * 2;
-			hud->DrawLine(left, top - 2, left, y + height - i*2 + 2, borderColor, 1);
-			hud->DrawLine(left + 1 * sign, top - 1, left + 1 * sign, y + height - i*2 + 1, borderColor, 1);
+			hud->DrawLine(left, top - 2, left, y + height - i * 2 + 2, borderColor, 1);
+			hud->DrawLine(left + 1 * sign, top - 1, left + 1 * sign, y + height - i * 2 + 1, borderColor, 1);
 
 			if(i > 0) {
-				hud->DrawLine(left, top - 1, left, y + height + 1 - i*2, color, 1);
+				hud->DrawLine(left, top - 1, left, y + height + 1 - i * 2, color, 1);
 			}
 
 			if(i < width - 1) {
-				hud->DrawLine(left + 1 * sign, top, left + 1 * sign, y + height - i*2, color, 1);
+				hud->DrawLine(left + 1 * sign, top, left + 1 * sign, y + height - i * 2, color, 1);
 			}
 		}
 

@@ -53,8 +53,14 @@ uint8_t PceVpc::Read(uint16_t addr)
 	if(_vdc2) {
 		//SuperGrafx enabled
 		switch(addr & 0x1F) {
-			case 0: case 1: case 2: case 3:
-			case 4: case 5: case 6: case 7:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
 				return _vdc1->ReadRegister(addr);
 
 			case 0x08: return _state.Priority1;
@@ -68,8 +74,14 @@ uint8_t PceVpc::Read(uint16_t addr)
 			case 0x0E: return 0;
 			case 0x0F: return 0;
 
-			case 0x10: case 0x11: case 0x12: case 0x13:
-			case 0x14: case 0x15: case 0x16: case 0x17:
+			case 0x10:
+			case 0x11:
+			case 0x12:
+			case 0x13:
+			case 0x14:
+			case 0x15:
+			case 0x16:
+			case 0x17:
 				return _vdc2->ReadRegister(addr & 0x03);
 
 			default:
@@ -93,8 +105,14 @@ void PceVpc::Write(uint16_t addr, uint8_t value)
 
 		//SuperGrafx enabled
 		switch(addr & 0x1F) {
-			case 0: case 1: case 2: case 3:
-			case 4: case 5: case 6: case 7:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
 				_vdc1->WriteRegister(addr, value);
 				break;
 
@@ -117,8 +135,14 @@ void PceVpc::Write(uint16_t addr, uint8_t value)
 
 			case 0x0E: _state.StToVdc2Mode = (value & 0x01) != 0; break;
 
-			case 0x10: case 0x11: case 0x12: case 0x13:
-			case 0x14: case 0x15: case 0x16: case 0x17:
+			case 0x10:
+			case 0x11:
+			case 0x12:
+			case 0x13:
+			case 0x14:
+			case 0x15:
+			case 0x16:
+			case 0x17:
 				_vdc2->WriteRegister(addr & 0x03, value);
 				break;
 
@@ -158,13 +182,12 @@ void PceVpc::ProcessStartFrame()
 	if(_emu->IsRunAheadFrame()) {
 		_skipRender = true;
 	} else {
-		_skipRender = (
+		_skipRender =
 			!_emu->GetSettings()->GetPcEngineConfig().DisableFrameSkipping &&
 			!_emu->GetRewindManager()->IsRewinding() &&
 			!_emu->GetVideoRenderer()->IsRecording() &&
 			(_emu->GetSettings()->GetEmulationSpeed() == 0 || _emu->GetSettings()->GetEmulationSpeed() > 150) &&
-			_frameSkipTimer.GetElapsedMS() < 10
-		);
+			_frameSkipTimer.GetElapsedMS() < 10;
 	}
 }
 
@@ -181,7 +204,7 @@ void PceVpc::ProcessScanlineStart(PceVdc* vdc, uint16_t scanline)
 		if(row == 0) {
 			_currentOutBuffer = _currentOutBuffer == _outBuffer[0] ? _outBuffer[1] : _outBuffer[0];
 		}
-		
+
 		//Store clock dividers for each row at the end of the buffer
 		_currentOutBuffer[PceConstants::MaxScreenWidth * PceConstants::ScreenHeight + row] = _vce->GetClockDivider();
 	}
@@ -215,8 +238,7 @@ void PceVpc::ProcessScanline()
 			case 1: color = rowBuffer[i]; break;
 			case 2: color = rowBufferVdc2[i]; break;
 
-			case 3:
-			{
+			case 3: {
 				bool isSpriteVdc1 = (rowBuffer[i] & PceVpc::SpritePixelFlag) != 0;
 				bool isSpriteVdc2 = (rowBufferVdc2[i] & PceVpc::SpritePixelFlag) != 0;
 				bool isTransparentVdc1 = (rowBuffer[i] & PceVpc::TransparentPixelFlag) != 0;
@@ -313,7 +335,7 @@ void PceVpc::DebugSendFrame()
 	if(scanline >= 14 && scanline < 256) {
 		DrawScanline();
 		ProcessScanlineEnd(_vdc1, scanline, _vdc1->GetRowBuffer());
-	
+
 		uint32_t lastPixel = _vdc1->GetHClock() / _vce->GetClockDivider();
 		int offset = std::max(0, (int)(lastPixel + (scanline - 14) * PceConstants::MaxScreenWidth));
 		int pixelsToClear = PceConstants::MaxScreenWidth * PceConstants::ScreenHeight - offset;

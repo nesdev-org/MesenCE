@@ -19,15 +19,15 @@ namespace Mesen.Debugger.ViewModels
 	public class RegisterViewerWindowViewModel : DisposableViewModel, ICpuTypeModel
 	{
 		[Reactive] public List<RegisterViewerTab> Tabs { get; set; } = new List<RegisterViewerTab>();
-		
+
 		public RegisterViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		[Reactive] public List<object> FileMenuActions { get; private set; } = new();
 		[Reactive] public List<object> ViewMenuActions { get; private set; } = new();
 
 		private BaseState? _state = null;
-		
+
 		public CpuType CpuType
 		{
 			get => _romInfo.ConsoleType.GetMainCpuType();
@@ -49,7 +49,6 @@ namespace Mesen.Debugger.ViewModels
 			}
 
 			UpdateRomInfo();
-			RefreshTiming.UpdateMinMaxValues(CpuType);
 			RefreshData();
 		}
 
@@ -157,6 +156,7 @@ namespace Mesen.Debugger.ViewModels
 
 		public void OnGameLoaded()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
 			UpdateRomInfo();
 			RefreshData();
 		}
@@ -211,9 +211,10 @@ namespace Mesen.Debugger.ViewModels
 		public event PropertyChangedEventHandler? PropertyChanged;
 
 		public string Value
-		{ 
+		{
 			get => _value;
-			set {
+			set
+			{
 				if(_value != value) {
 					_value = value;
 					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));

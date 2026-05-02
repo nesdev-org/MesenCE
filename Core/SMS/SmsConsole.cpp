@@ -58,14 +58,14 @@ LoadRomResult SmsConsole::LoadRom(VirtualFile& romFile)
 			_romFormat = RomFormat::Sms;
 			_model = SmsModel::Sms;
 		}
-		
+
 		_vdp.reset(new SmsVdp());
 		_memoryManager.reset(new SmsMemoryManager());
 		_cpu.reset(new SmsCpu());
 		_psg.reset(new SmsPsg(_emu, this));
 		_fmAudio.reset(new SmsFmAudio(_emu, this));
 		_controlManager.reset(new SmsControlManager(_emu, this, _vdp.get()));
-		
+
 		InitCart(romData);
 
 		vector<uint8_t> biosRom;
@@ -124,8 +124,8 @@ void SmsConsole::InitCart(vector<uint8_t>& romData)
 				_cart.reset(new SmsKoreanCart(_memoryManager.get()));
 				break;
 
-			//TODOSMS
-			//case 0x192949D5: //Janggun-ui Adeul
+				//TODOSMS
+				//case 0x192949D5: //Janggun-ui Adeul
 
 			default:
 				if(romData.size() <= 0xC000) {
@@ -258,7 +258,7 @@ uint32_t SmsConsole::GetMasterClockRate()
 
 double SmsConsole::GetFps()
 {
-	return (_model != SmsModel::GameGear && _region == ConsoleRegion::Pal) ? 49.701460 :  59.9227434;
+	return (_model != SmsModel::GameGear && _region == ConsoleRegion::Pal) ? 49.701460 : 59.9227434;
 }
 
 BaseVideoFilter* SmsConsole::GetVideoFilter(bool getDefaultFilter)
@@ -287,7 +287,7 @@ PpuFrameInfo SmsConsole::GetPpuFrame()
 	frame.Height = 240;
 	frame.ScanlineCount = _region == ConsoleRegion::Ntsc ? 262 : 313;
 	frame.CycleCount = 342;
-	frame.FrameBufferSize = 256*240*sizeof(uint16_t);
+	frame.FrameBufferSize = 256 * 240 * sizeof(uint16_t);
 	frame.FrameBuffer = (uint8_t*)_vdp->GetScreenBuffer(false);
 	return frame;
 }

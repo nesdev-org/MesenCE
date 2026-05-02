@@ -212,6 +212,7 @@
     <ClInclude Include="Audio\ymfm\ymfm_adpcm.h">
       <Filter>Audio\ymfm</Filter>
     </ClInclude>
+    <ClInclude Include="TimeUtilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xBRZ\xbrz.cpp">

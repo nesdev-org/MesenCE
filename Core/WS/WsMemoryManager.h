@@ -49,7 +49,7 @@ private:
 
 public:
 	WsMemoryManager() {}
-		
+
 	void Init(Emulator* emu, WsConsole* console, WsCpu* cpu, WsPpu* ppu, WsControlManager* controlManager, WsCart* cart, WsTimer* timer, WsDmaController* dmaController, WsEeprom* eeprom, WsApu* apu, WsSerial* serial);
 	WsMemoryManagerState& GetState() { return _state; }
 

@@ -8,7 +8,7 @@ private:
 	string _hashSalt;
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
 		SV(_hashSalt);
 	}

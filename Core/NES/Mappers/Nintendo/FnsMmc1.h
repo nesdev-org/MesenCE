@@ -40,14 +40,25 @@ public:
 	{
 		if(addr < 0x6000) {
 			switch(addr) {
-				case 0x40AE: _workRamEnable1 = value & 0x01; UpdateState();  break;
-				case 0x40B0: _kanjiRomBank = value & 0x01; break;
-				case 0x40C0: 
+				case 0x40AE:
+					_workRamEnable1 = value & 0x01;
+					UpdateState();
+					break;
+
+				case 0x40B0:
+					_kanjiRomBank = value & 0x01;
+					break;
+
+				case 0x40C0:
 					_workRamEnable2 = value & 0x01;
 					_chrRamBank = (value & 0x08) >> 3;
 					UpdateState();
 					break;
-				case 0x40AD: _mirroringSelect = value & 0x80 ? MirroringType::Horizontal : MirroringType::Vertical; UpdateState(); break;
+
+				case 0x40AD:
+					_mirroringSelect = value & 0x80 ? MirroringType::Horizontal : MirroringType::Vertical;
+					UpdateState();
+					break;
 			}
 		} else {
 			MMC1::WriteRegister(addr, value);

@@ -16,6 +16,6 @@ public:
 	bool Save();
 
 	void AddFile(string filepath, string zipFilename);
-	void AddFile(vector<uint8_t> &fileData, string zipFilename);
-	void AddFile(std::stringstream &filestream, string zipFilename);
+	void AddFile(vector<uint8_t>& fileData, string zipFilename);
+	void AddFile(std::stringstream& filestream, string zipFilename);
 };

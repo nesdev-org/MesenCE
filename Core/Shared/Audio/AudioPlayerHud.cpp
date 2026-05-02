@@ -34,7 +34,7 @@ void AudioPlayerHud::Draw(uint32_t frameCounter, double fps)
 	if(trackInfo.Position <= 1) {
 		_changeTrackPending = false;
 	}
-	
+
 	_hud->DrawRectangle(0, 0, 256, 240, 0, true, 1);
 
 	int y = 12;
@@ -102,7 +102,7 @@ void AudioPlayerHud::Draw(uint32_t frameCounter, double fps)
 	_hud->DrawLine(192, top, 192, bottom, fgColor, 1);
 	_hud->DrawLine(128, top, 128, bottom, fgColor, 1);
 	_hud->DrawLine(64, top, 64, bottom, fgColor, 1);
-	
+
 	_hud->DrawLine(224, top, 224, bottom, fgColor2, 1);
 	_hud->DrawLine(160, top, 160, bottom, fgColor2, 1);
 	_hud->DrawLine(96, top, 96, bottom, fgColor2, 1);
@@ -143,7 +143,7 @@ void AudioPlayerHud::Draw(uint32_t frameCounter, double fps)
 
 				int red = std::min(255, (int)(256 * (avgAmp / maxVal) * 2));
 				int green = std::max(0, std::min(255, (int)(256 * ((maxVal - avgAmp) / maxVal) * 2)));
-				_hud->DrawRectangle(i*32+j, 190, 1, (int)-avgAmp, red << 16 | green << 8, true, 1);
+				_hud->DrawRectangle(i * 32 + j, 190, 1, (int)-avgAmp, red << 16 | green << 8, true, 1);
 			}
 		}
 

@@ -13,7 +13,6 @@
 
 //TODO: Proper open bus behavior (and return 0s for missing save ram, too)
 //TODO: CPU shouldn't have access to PRG ROM while the CX4 is loading from PRG ROM
-//TODO: Timings are apparently not perfect (desync in MMX2 intro)
 
 Cx4::Cx4(SnesConsole* console)
 {
@@ -21,12 +20,12 @@ Cx4::Cx4(SnesConsole* console)
 	_console = console;
 	_memoryManager = console->GetMemoryManager();
 	_cpu = console->GetCpu();
-	
+
 	_emu->RegisterMemory(MemoryType::Cx4DataRam, _dataRam, Cx4::DataRamSize);
 	_console->InitializeRam(_dataRam, Cx4::DataRamSize);
-	
-	auto &prgRomHandlers = console->GetCartridge()->GetPrgRomHandlers();
-	auto &saveRamHandlers = console->GetCartridge()->GetSaveRamHandlers();
+
+	auto& prgRomHandlers = console->GetCartridge()->GetPrgRomHandlers();
+	auto& saveRamHandlers = console->GetCartridge()->GetSaveRamHandlers();
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 
 	//PRG ROM
@@ -94,7 +93,7 @@ void Cx4::Run()
 
 			uint16_t opCode = _prgRam[_state.Cache.Page][_state.PC];
 			_state.PC++;
-			
+
 			if(_state.PC == 0) {
 				//If execution reached the end of the page, start loading the next page
 				//This must be done BEFORE running the instruction (otherwise a jump/branch to address 0 will trigger this)
@@ -141,7 +140,7 @@ void Cx4::SwitchCachePage()
 	if(_state.Cache.Lock[1]) {
 		Stop();
 		return;
-	} 
+	}
 
 	_state.PB = _state.P;
 
@@ -156,32 +155,34 @@ bool Cx4::ProcessCache(uint64_t targetCycle)
 	uint32_t address = (_state.Cache.Base + (_state.PB << 9)) & 0xFFFFFF;
 
 	if(_state.Cache.Pos == 0) {
-		if(_state.Cache.Address[_state.Cache.Page] == address) {
-			//Current cache page matches the needed address, keep using it
-			_state.Cache.Enabled = false;
-			return true;
-		}
+		if(!_state.Cache.Preload) {
+			if(_state.Cache.Address[_state.Cache.Page] == address) {
+				//Current cache page matches the needed address, keep using it
+				_state.Cache.Enabled = false;
+				return true;
+			}
 
-		//Check if the other page matches
-		_state.Cache.Page ^= 1;
-
-		if(_state.Cache.Address[_state.Cache.Page] == address) {
-			//The other cache page matches, use it
-			_state.Cache.Enabled = false;
-			return true;
-		}
-
-		if(_state.Cache.Lock[_state.Cache.Page]) {
-			//If it's locked, use the other page
+			//Check if the other page matches
 			_state.Cache.Page ^= 1;
+
+			if(_state.Cache.Address[_state.Cache.Page] == address) {
+				//The other cache page matches, use it
+				_state.Cache.Enabled = false;
+				return true;
+			}
+
+			if(_state.Cache.Lock[_state.Cache.Page]) {
+				//If it's locked, use the other page
+				_state.Cache.Page ^= 1;
+			}
+
+			if(_state.Cache.Lock[_state.Cache.Page]) {
+				//The both pages are locked, and the cache is invalid, give up.
+				_state.Cache.Enabled = false;
+				return false;
+			}
 		}
 
-		if(_state.Cache.Lock[_state.Cache.Page]) {
-			//The both pages are locked, and the cache is invalid, give up.
-			_state.Cache.Enabled = false;
-			return false;
-		}
-	
 		_state.Cache.Enabled = true;
 	}
 
@@ -196,7 +197,7 @@ bool Cx4::ProcessCache(uint64_t targetCycle)
 		_prgRam[_state.Cache.Page][_state.Cache.Pos] = (msb << 8) | lsb;
 		_state.Cache.Pos++;
 
-		if(_state.CycleCount > targetCycle) {
+		if(_state.CycleCount >= targetCycle) {
 			break;
 		}
 	}
@@ -205,6 +206,7 @@ bool Cx4::ProcessCache(uint64_t targetCycle)
 		_state.Cache.Address[_state.Cache.Page] = address;
 		_state.Cache.Pos = 0;
 		_state.Cache.Enabled = false;
+		_state.Cache.Preload = false;
 		return true;
 	}
 
@@ -218,8 +220,8 @@ void Cx4::ProcessDma(uint64_t targetCycle)
 		uint32_t src = (_state.Dma.Source + _state.Dma.Pos) & 0xFFFFFF;
 		uint32_t dest = (_state.Dma.Dest + _state.Dma.Pos) & 0xFFFFFF;
 
-		IMemoryHandler *srcHandler = _mappings.GetHandler(src);
-		IMemoryHandler *destHandler = _mappings.GetHandler(dest);
+		IMemoryHandler* srcHandler = _mappings.GetHandler(src);
+		IMemoryHandler* destHandler = _mappings.GetHandler(dest);
 		if(!srcHandler || !destHandler || srcHandler->GetMemoryType() == destHandler->GetMemoryType() || destHandler->GetMemoryType() == MemoryType::SnesPrgRom) {
 			//Invalid DMA, the chip is locked until it gets restarted by a write to $7F53
 			_state.Locked = true;
@@ -235,7 +237,7 @@ void Cx4::ProcessDma(uint64_t targetCycle)
 		WriteCx4(dest, value);
 		_state.Dma.Pos++;
 
-		if(_state.CycleCount > targetCycle) {
+		if(_state.CycleCount >= targetCycle) {
 			break;
 		}
 	}
@@ -249,10 +251,12 @@ void Cx4::ProcessDma(uint64_t targetCycle)
 uint8_t Cx4::GetAccessDelay(uint32_t addr)
 {
 	IMemoryHandler* handler = _mappings.GetHandler(addr);
-	if(handler->GetMemoryType() == MemoryType::SnesPrgRom) {
-		return 1 + _state.RomAccessDelay;
-	} else if(handler->GetMemoryType() == MemoryType::SnesSaveRam) {
-		return 1 + _state.RamAccessDelay;
+	if(handler) {
+		if(handler->GetMemoryType() == MemoryType::SnesPrgRom) {
+			return 1 + _state.RomAccessDelay;
+		} else if(handler->GetMemoryType() == MemoryType::SnesSaveRam) {
+			return 1 + _state.RamAccessDelay;
+		}
 	}
 
 	return 1;
@@ -288,7 +292,7 @@ uint8_t Cx4::Read(uint32_t addr)
 		return _state.Vectors[addr & 0x1F];
 	} else if((addr >= 0x7F80 && addr <= 0x7FAF) || (addr >= 0x7FC0 && addr <= 0x7FEF)) {
 		addr &= 0x3F;
-		uint32_t &reg = _state.Regs[addr / 3];
+		uint32_t& reg = _state.Regs[addr / 3];
 		switch(addr % 3) {
 			case 0: return reg;
 			case 1: return reg >> 8;
@@ -330,13 +334,13 @@ void Cx4::Write(uint32_t addr, uint8_t value)
 	if(addr <= 0x7BFF) {
 		_dataRam[addr & 0xFFF] = value;
 		return;
-	} 
-	
+	}
+
 	if(addr >= 0x7F60 && addr <= 0x7F7F) {
 		_state.Vectors[addr & 0x1F] = value;
 	} else if((addr >= 0x7F80 && addr <= 0x7FAF) || (addr >= 0x7FC0 && addr <= 0x7FEF)) {
 		addr &= 0x3F;
-		uint32_t &reg = _state.Regs[addr / 3];
+		uint32_t& reg = _state.Regs[addr / 3];
 		switch(addr % 3) {
 			case 0: reg = (reg & 0xFFFF00) | value; break;
 			case 1: reg = (reg & 0xFF00FF) | (value << 8); break;
@@ -364,6 +368,8 @@ void Cx4::Write(uint32_t addr, uint8_t value)
 			case 0x7F48:
 				_state.Cache.Page = value & 0x01;
 				if(_state.Stopped) {
+					_state.PB = _state.Cache.ProgramBank;
+					_state.Cache.Preload = true;
 					_state.Cache.Enabled = true;
 				}
 				break;
@@ -397,7 +403,7 @@ void Cx4::Write(uint32_t addr, uint8_t value)
 			case 0x7F51:
 				_state.IrqDisabled = value & 0x01;
 				if(_state.IrqDisabled) {
-					_state.IrqFlag = true;
+					_state.IrqFlag = false;
 					_cpu->ClearIrqSource(SnesIrqSource::Coprocessor);
 				}
 				break;
@@ -411,9 +417,9 @@ void Cx4::Write(uint32_t addr, uint8_t value)
 
 			case 0x7F5D: _state.Suspend.Enabled = false; break;
 
-			case 0x7F5E: 
+			case 0x7F5E:
 				//Clear IRQ flag in CX4, but keeps IRQ signal high
-				_state.IrqFlag = false; 
+				_state.IrqFlag = false;
 				break;
 		}
 	}
@@ -429,17 +435,57 @@ bool Cx4::IsBusy()
 	return _state.Cache.Enabled || _state.Dma.Enabled || _state.Bus.DelayCycles > 0;
 }
 
-void Cx4::Serialize(Serializer &s)
+void Cx4::Serialize(Serializer& s)
 {
-	SV(_state.CycleCount); SV(_state.PB); SV(_state.PC); SV(_state.A); SV(_state.P); SV(_state.SP); SV(_state.Mult); SV(_state.RomBuffer);
-	SV(_state.RamBuffer[0]); SV(_state.RamBuffer[1]); SV(_state.RamBuffer[2]); SV(_state.MemoryDataReg); SV(_state.MemoryAddressReg);
-	SV(_state.DataPointerReg); SV(_state.Negative); SV(_state.Zero); SV(_state.Carry); SV(_state.Overflow); SV(_state.IrqFlag); SV(_state.Stopped);
-	SV(_state.Locked); SV(_state.IrqDisabled); SV(_state.SingleRom); SV(_state.RamAccessDelay); SV(_state.RomAccessDelay); SV(_state.Bus.Address);
-	SV(_state.Bus.DelayCycles); SV(_state.Bus.Enabled); SV(_state.Bus.Reading); SV(_state.Bus.Writing); SV(_state.Dma.Dest); SV(_state.Dma.Enabled);
-	SV(_state.Dma.Length); SV(_state.Dma.Source); SV(_state.Dma.Pos); SV(_state.Suspend.Duration); SV(_state.Suspend.Enabled); SV(_state.Cache.Enabled);
-	SV(_state.Cache.Lock[0]); SV(_state.Cache.Lock[1]); SV(_state.Cache.Address[0]); SV(_state.Cache.Address[1]); SV(_state.Cache.Base);
-	SV(_state.Cache.Page); SV(_state.Cache.ProgramBank); SV(_state.Cache.ProgramCounter); SV(_state.Cache.Pos);
-	
+	SV(_state.CycleCount);
+	SV(_state.PB);
+	SV(_state.PC);
+	SV(_state.A);
+	SV(_state.P);
+	SV(_state.SP);
+	SV(_state.Mult);
+	SV(_state.RomBuffer);
+	SV(_state.RamBuffer[0]);
+	SV(_state.RamBuffer[1]);
+	SV(_state.RamBuffer[2]);
+	SV(_state.MemoryDataReg);
+	SV(_state.MemoryAddressReg);
+	SV(_state.DataPointerReg);
+	SV(_state.Negative);
+	SV(_state.Zero);
+	SV(_state.Carry);
+	SV(_state.Overflow);
+	SV(_state.IrqFlag);
+	SV(_state.Stopped);
+	SV(_state.Locked);
+	SV(_state.IrqDisabled);
+	SV(_state.SingleRom);
+	SV(_state.RamAccessDelay);
+	SV(_state.RomAccessDelay);
+	SV(_state.Bus.Address);
+	SV(_state.Bus.DelayCycles);
+	SV(_state.Bus.Enabled);
+	SV(_state.Bus.Reading);
+	SV(_state.Bus.Writing);
+	SV(_state.Dma.Dest);
+	SV(_state.Dma.Enabled);
+	SV(_state.Dma.Length);
+	SV(_state.Dma.Source);
+	SV(_state.Dma.Pos);
+	SV(_state.Suspend.Duration);
+	SV(_state.Suspend.Enabled);
+	SV(_state.Cache.Enabled);
+	SV(_state.Cache.Preload);
+	SV(_state.Cache.Lock[0]);
+	SV(_state.Cache.Lock[1]);
+	SV(_state.Cache.Address[0]);
+	SV(_state.Cache.Address[1]);
+	SV(_state.Cache.Base);
+	SV(_state.Cache.Page);
+	SV(_state.Cache.ProgramBank);
+	SV(_state.Cache.ProgramCounter);
+	SV(_state.Cache.Pos);
+
 	SVArray(_state.Stack, 8);
 	SVArray(_state.Regs, 16);
 	SVArray(_state.Vectors, 0x20);
