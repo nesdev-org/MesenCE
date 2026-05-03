@@ -465,8 +465,8 @@ uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool en
 
 	uint8_t val;
 	if(!enableInternalRegReads) {
-		if(addr >= 0x4000 && addr <= 0x401F) {
-			//Nothing will respond on $4000-$401F on the external bus - return open bus value
+		if(addr >= 0x4015 && addr <= 0x401A) {
+			//The readable 2A03 registers ($4015-$4017 and, in test mode, $4018-$401A) can't be seen by DMA in this case.
 			val = _memoryManager->GetOpenBus();
 		} else {
 			val = _memoryManager->Read(addr, MemoryOperationType::DmaRead);
@@ -507,11 +507,23 @@ uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool en
 					uint8_t obMask = ((NesControlManager*)_console->GetControlManager())->GetOpenBusMask(internalAddr - 0x4016);
 					uint8_t externalValue = _memoryManager->Read(addr, MemoryOperationType::DmaRead);
 
-					//Merge values, keep the external value for all open bus pins on the 4016/4017 port
-					//AND all other bits together (bus conflict)
+					// Joypads stop driving the bus later than cartridge ROM, so joypad bits win on open bus.
+					_memoryManager->SetOpenBus<NesCpuBusType::External>((externalValue & obMask) | (val & ~obMask));
+
+					//The value seen by the CPU is the bus conflict between the driven joypad bits and the DMA read value.
+					//The DMA read may come from an address that is open bus and thus does not drive bits, which should not
+					//cause a bus conflict. However, because we read the joypad first before doing the DMA, the joypad read
+					//updated open bus, and so any open bus bits in the DMA read will match the joypad read value. So, even
+					//if we simulate a bus conflict on these bits, because they are the same, it's the same as taking the
+					//joypad's value.
+					//For this bus conflict, we keep the external value for all open bus pins on the 4016/4017 port, and we
+					//AND all other bits together
 					val = (externalValue & obMask) | ((val & ~obMask) & (externalValue & ~obMask));
 				}
 				break;
+
+				//TODO if test mode is enabled, handle test mode registers here (and consider making the test mode check earlier in this
+				//function check for whether test mode is actually enabled).
 
 			default:
 				val = _memoryManager->Read(addr, MemoryOperationType::DmaRead);
