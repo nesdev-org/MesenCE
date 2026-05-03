@@ -92,27 +92,30 @@ void DeltaModulationChannel::SetDmcReadBuffer(uint8_t value)
 		}
 	}
 
-	if(_sampleLength == 1 && !_loopFlag) {
-		//When DMA ends around the time the bit counter resets, a CPU glitch sometimes causes another DMA to be requested immediately.
-		if(_bitsRemaining == 8 && _timer.GetTimer() == _timer.GetPeriod() && _console->GetNesConfig().EnableDmcSampleDuplicationGlitch) {
-			//When the DMA ends on the same cycle as the bit counter resets
-			//This glitch exists on all H CPUs and some G CPUs (those from around 1990 and later)
-			//In this case, a full DMA is performed on the same address, and the same sample byte
-			//is played twice in a row by the DMC
-			_shiftRegister = _readBuffer;
-			_silenceFlag = false;
-			_bufferEmpty = true;
+	//When DMA ends around the time the bit counter resets, a CPU glitch sometimes causes another DMA to be requested immediately.
+	if(_bitsRemaining == 8 && _timer.GetTimer() == _timer.GetPeriod() && _console->GetNesConfig().EnableDmcSampleDuplicationGlitch) {
+		//When the DMA ends on the same cycle as the bit counter resets.
+		//On earlier CPUs, there is normally a 1 APU cycle gap between the end of one DMC DMA
+		//and the start of another. All H CPUs and some G CPUs (those from around 1990 and later)
+		//remove this gap requirement.
+		_shiftRegister = _readBuffer;
+		_silenceFlag = false;
+		_bufferEmpty = true;
+
+		//If the sample was 1 byte, a full DMA is performed on the same address
+		//and the same sample byte is played twice in a row by the DMC.
+		if(_sampleLength == 1) {
 			InitSample();
-			StartDmcTransfer();
-		} else if(_bitsRemaining == 1 && _timer.GetTimer() < 2) {
-			//When the DMA ends on the APU cycle before the bit counter resets
-			//If it this happens right before the bit counter resets,
-			//a DMA is triggered and aborted 1 cycle later (causing one halted CPU cycle)
-			_shiftRegister = _readBuffer;
-			_bufferEmpty = false;
-			InitSample();
-			_disableDelay = 3;
 		}
+		StartDmcTransfer();
+	} else if(_sampleLength == 1 && !_loopFlag && _bitsRemaining == 1 && _timer.GetTimer() < 2) {
+		//When the DMA ends on the APU cycle before the bit counter resets.
+		//If this happens right before the bit counter resets,
+		//a DMA is triggered and aborted 1 cycle later (causing one halted CPU cycle)
+		_shiftRegister = _readBuffer;
+		_bufferEmpty = false;
+		InitSample();
+		_disableDelay = 3;
 	}
 }
 
