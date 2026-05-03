@@ -86,20 +86,7 @@ void GbMemoryManager::ExecTimerDmaSerial()
 	}
 
 	if(_state.SerialBitCount && ((_state.SerialControl & 0x81) == 0x81) && (_cpu->GetState().CycleCount & ((_state.SerialControl & 0x2) ? 0xF : 0x1FF)) == 0) {
-		_state.MostRecentSerialBit = (_state.SerialData & 0x80) == 0x80;
-		if(_gameboy->GetLinkedConsole() != nullptr) {
-			_state.SerialData = (_state.SerialData << 1) | (_gameboy->GetLinkedConsole()->GetMemoryManager()->ExchangeSerialBits(_state.MostRecentSerialBit) ? 0x01 : 0x00);
-		} else {
-			_state.SerialData = (_state.SerialData << 1) | 0x01;
-		}
-		if(--_state.SerialBitCount == 0) {
-			//"It will be notified that the transfer is complete in two ways:
-			//SC's Bit 7 will be cleared"
-			_state.SerialControl &= 0x7F;
-
-			//"and the Serial Interrupt handler will be called"
-			RequestIrq(GbIrqSource::Serial);
-		}
+		RunSerialTransfer();
 	}
 }
 
@@ -601,6 +588,24 @@ bool GbMemoryManager::IsBootRomDisabled()
 uint64_t GbMemoryManager::GetApuCycleCount()
 {
 	return _state.ApuCycleCount;
+}
+
+void GbMemoryManager::RunSerialTransfer()
+{
+	_state.MostRecentSerialBit = (_state.SerialData & 0x80) == 0x80;
+	if(_gameboy->GetLinkedConsole() != nullptr) {
+		_state.SerialData = (_state.SerialData << 1) | (_gameboy->GetLinkedConsole()->GetMemoryManager()->ExchangeSerialBits(_state.MostRecentSerialBit) ? 0x01 : 0x00);
+	} else {
+		_state.SerialData = (_state.SerialData << 1) | 0x01;
+	}
+	if(--_state.SerialBitCount == 0) {
+		//"It will be notified that the transfer is complete in two ways:
+		//SC's Bit 7 will be cleared"
+		_state.SerialControl &= 0x7F;
+
+		//"and the Serial Interrupt handler will be called"
+		RequestIrq(GbIrqSource::Serial);
+	}
 }
 
 bool GbMemoryManager::ExchangeSerialBits(bool serialBit)
