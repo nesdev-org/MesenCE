@@ -199,6 +199,7 @@ void NesApu::Exec()
 {
 	_currentCycle++;
 	if(_currentCycle == NesSoundMixer::CycleLength - 1) {
+		_dmc->ProcessClock();
 		EndFrame();
 	} else if(NeedToRun(_currentCycle)) {
 		Run();
@@ -207,7 +208,6 @@ void NesApu::Exec()
 
 void NesApu::EndFrame()
 {
-	_dmc->ProcessClock();
 	Run();
 	_square1->EndFrame();
 	_square2->EndFrame();
