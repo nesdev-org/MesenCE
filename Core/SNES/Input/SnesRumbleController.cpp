@@ -21,6 +21,24 @@ void SnesRumbleController::Serialize(Serializer& s)
 {
 	SnesController::Serialize(s);
 	SV(_rumbleData);
+	SV(_rumbleActive);
+	SV(_lastRumbleFrame);
+}
+
+void SnesRumbleController::RefreshStateBuffer()
+{
+	_rumbleData = 0;
+
+	//The LRG rumble controller stops rumbling shortly after the last rumble command.
+	//Not accurate, assumes the game regularly latches the controller.
+	if(_rumbleActive) {
+		if(_emu->GetFrameCount() - _lastRumbleFrame > 2) {
+			KeyManager::SetForceFeedback(0, 0);
+			_rumbleActive = false;
+		}
+	}
+
+	SnesController::RefreshStateBuffer();
 }
 
 uint8_t SnesRumbleController::ReadRam(uint16_t addr)
@@ -44,7 +62,8 @@ uint8_t SnesRumbleController::ReadRam(uint16_t addr)
 
 			KeyManager::SetForceFeedback(rightRumble, leftRumble);
 
-			_rumbleData = 0;
+			_rumbleActive = true;
+			_lastRumbleFrame = _emu->GetFrameCount();
 		}
 	}
 

@@ -12,9 +12,12 @@ class SnesRumbleController : public SnesController
 private:
 	SnesConsole* _console = nullptr;
 	uint16_t _rumbleData = 0;
+	bool _rumbleActive = false;
+	uint32_t _lastRumbleFrame = 0;
 
 protected:
 	void Serialize(Serializer& s) override;
+	void RefreshStateBuffer() override;
 
 public:
 	SnesRumbleController(Emulator* emu, SnesConsole* console, uint8_t port, KeyMappingSet keyMappings);
