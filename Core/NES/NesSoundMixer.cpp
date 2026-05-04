@@ -177,10 +177,13 @@ double NesSoundMixer::GetChannelOutput(AudioChannel channel, bool forRightChanne
 int16_t NesSoundMixer::GetOutputVolume(bool forRightChannel)
 {
 	double squareOutput = GetChannelOutput(AudioChannel::Square1, forRightChannel) + GetChannelOutput(AudioChannel::Square2, forRightChannel);
-	double tndOutput = GetChannelOutput(AudioChannel::DMC, forRightChannel) + 2.7516713261 * GetChannelOutput(AudioChannel::Triangle, forRightChannel) + 1.8493587125 * GetChannelOutput(AudioChannel::Noise, forRightChannel);
+	double tndOutput = 2.7516713261 * GetChannelOutput(AudioChannel::Triangle, forRightChannel) + 1.8493587125 * GetChannelOutput(AudioChannel::Noise, forRightChannel) + GetChannelOutput(AudioChannel::DMC, forRightChannel);
 
-	uint16_t squareVolume = (uint16_t)((95.88 * 5000.0) / (8128.0 / squareOutput + 100.0));
-	uint16_t tndVolume = (uint16_t)((159.79 * 5000.0) / (22638.0 / tndOutput + 100.0));
+	//Non-linear square channel mixer flag
+	double squareVolume = _console->GetNesConfig().NonlinearSquareMixer ? 
+		95.88 / (8128.0 / squareOutput + 100.0) * 5000.0
+		: squareOutput / 240.0 * squareSumFactor[_squareVolume[(int)AudioChannel::Square1] + _squareVolume[(int)AudioChannel::Square2]] * 0.258483 * 5000.0;
+	double tndVolume = 159.79 / (1.0 / (tndOutput / 22638.0) + 100.0) * 5000.0;
 
 	return (int16_t)(squareVolume + tndVolume +
 		GetChannelOutput(AudioChannel::FDS, forRightChannel) * 20 +
@@ -196,6 +199,11 @@ void NesSoundMixer::AddDelta(AudioChannel channel, uint32_t time, int16_t delta)
 		_timestamps.push_back(time);
 		_channelOutput[(int)channel][time] += delta;
 	}
+}
+
+void NesSoundMixer::RawVolume(AudioChannel channel, uint8_t rawVolume)
+{
+	_squareVolume[(int)channel] = rawVolume;
 }
 
 void NesSoundMixer::EndFrame(uint32_t time)

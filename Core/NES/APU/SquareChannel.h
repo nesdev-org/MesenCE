@@ -18,6 +18,13 @@ protected:
 		{ 0, 0, 0, 0, 1, 1, 1, 1 },
 		{ 1, 1, 1, 1, 1, 1, 0, 0 }
 	};
+	
+	static constexpr int8_t _dutySequencesUnbiased[4][8] = {
+		{-1,-1,-1,-1,-1,-1,-1, 7 },
+		{-2,-2,-2,-2,-2,-2, 6, 6 },
+		{-4,-4,-4,-4, 4, 4, 4, 4 },
+		{ 2, 2, 2, 2, 2, 2,-6,-6 },
+	};
 
 	NesConsole* _console = nullptr;
 	ApuEnvelope _envelope;
@@ -84,8 +91,10 @@ protected:
 	{
 		if(IsMuted()) {
 			_timer.AddOutput(0);
+			_timer.SendVolume(0);
 		} else {
-			_timer.AddOutput(_dutySequences[_duty][_dutyPos] * _envelope.GetVolume());
+			_timer.AddOutput(_console->GetNesConfig().NonlinearSquareMixer ? _dutySequences[_duty][_dutyPos] * _envelope.GetVolume() : _dutySequencesUnbiased[_duty][_dutyPos] * _envelope.GetVolume());
+			_timer.SendVolume(_envelope.GetVolume());
 		}
 	}
 
