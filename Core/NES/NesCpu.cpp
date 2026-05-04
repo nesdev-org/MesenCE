@@ -413,6 +413,13 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 				_dmcDmaRunning = false;
 				_abortDmcDma = false;
 				_console->GetApu()->SetDmcReadBuffer(readValue);
+				//On later CPUs, a DMC DMA may start immediately after another DMC DMA. We need to
+				//call ProcessPendingDma again to handle the behavior of the halt cycle. This
+				//allows the second DMA to clock the joypads again on NES-behavior consoles.
+				//Fixes dmc_dma_start_test_v2 case C with sample duplication turned on.
+				if(_needHalt) {
+					ProcessPendingDmaNoinline(readAddress, opType);
+				}
 			} else if(_spriteDmaTransfer) {
 				//DMC DMA is not running, or not ready, run sprite DMA
 				processCycle();
