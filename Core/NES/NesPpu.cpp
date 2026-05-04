@@ -1426,6 +1426,12 @@ template<class T> void NesPpu<T>::ProcessScanlineFirstCycle()
 		SendFrame();
 		_frameCount++;
 	}
+
+	//Refresh the decay timer for the current OAM1 row if in vblank/fblank.
+	//This happens every dot on hardware, but doing it once per scanline should be more than enough while reducing performance cost.
+	if(_enableOamDecay && (_scanline >= 240 || !IsRenderingEnabled())) {
+		_oamDecayCycles[_spriteRamAddr >> 3] = _console->GetCpu()->GetCycleCount();
+	}
 }
 
 template<class T> void NesPpu<T>::UpdateState()
