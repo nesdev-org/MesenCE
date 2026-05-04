@@ -34,7 +34,7 @@ protected:
 
 		if(_prgReg & 0x80) {
 			if(_prgReg & 0x20) {
-				SelectPrgPage4x(0, ((_prgReg & 0x0F) >> 1) << 2);				
+				SelectPrgPage4x(0, ((_prgReg & 0x0F) >> 1) << 2);
 			} else {
 				SelectPrgPage2x(0, (_prgReg & 0x0F) << 1);
 				SelectPrgPage2x(1, (_prgReg & 0x0F) << 1);
@@ -64,7 +64,7 @@ protected:
 			MMC3::WriteRegister(addr, value);
 		}
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		MMC3::Serialize(s);

@@ -6,7 +6,7 @@ template<size_t Mask>
 class InternalRamHandler : public INesMemoryHandler
 {
 private:
-	uint8_t *_internalRam = nullptr;
+	uint8_t* _internalRam = nullptr;
 
 public:
 	void SetInternalRam(uint8_t* internalRam)
@@ -14,7 +14,7 @@ public:
 		_internalRam = internalRam;
 	}
 
-	void GetMemoryRanges(MemoryRanges &ranges) override
+	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		ranges.SetAllowOverride();
 		ranges.AddHandler(MemoryOperation::Any, 0, 0x1FFF);

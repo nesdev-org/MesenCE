@@ -15,7 +15,7 @@ protected:
 	MemoryType _memType = {};
 	uint32_t _memSize = 0;
 	uint32_t _romCrc32 = 0;
-	
+
 	virtual void InternalLoadCdlFile(uint8_t* cdlData, uint32_t cdlSize) {}
 	virtual void InternalSaveCdlFile(ofstream& cdlFile) {}
 
@@ -36,7 +36,7 @@ public:
 	void SetCode(int32_t absoluteAddr)
 	{
 		for(int i = 0; i < accessWidth; i++) {
-			_cdlData[absoluteAddr+i] |= CdlFlags::Code | flags;
+			_cdlData[absoluteAddr + i] |= CdlFlags::Code | flags;
 		}
 	}
 
@@ -46,7 +46,7 @@ public:
 		_cdlData[absoluteAddr] |= CdlFlags::Code | flags; //only sets extra flags on first byte
 		if constexpr(accessWidth > 1) {
 			for(int i = 1; i < accessWidth; i++) {
-				_cdlData[absoluteAddr+i] |= CdlFlags::Code;
+				_cdlData[absoluteAddr + i] |= CdlFlags::Code;
 			}
 		}
 	}
@@ -55,7 +55,7 @@ public:
 	void SetData(int32_t absoluteAddr)
 	{
 		for(int i = 0; i < accessWidth; i++) {
-			_cdlData[absoluteAddr+i] |= CdlFlags::Data | flags;
+			_cdlData[absoluteAddr + i] |= CdlFlags::Data | flags;
 		}
 	}
 
@@ -66,10 +66,10 @@ public:
 	bool IsSubEntryPoint(uint32_t absoluteAddr);
 	bool IsData(uint32_t absoluteAddr);
 
-	void SetCdlData(uint8_t *cdlData, uint32_t length);
-	void GetCdlData(uint32_t offset, uint32_t length, uint8_t *cdlData);
+	void SetCdlData(uint8_t* cdlData, uint32_t length);
+	void GetCdlData(uint32_t offset, uint32_t length, uint8_t* cdlData);
 	uint8_t GetFlags(uint32_t addr);
-	
+
 	uint32_t GetFunctions(uint32_t functions[], uint32_t maxSize);
 
 	void MarkBytesAs(uint32_t start, uint32_t end, uint8_t flags);

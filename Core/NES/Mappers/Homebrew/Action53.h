@@ -67,8 +67,8 @@ protected:
 			SelectPrgPage(slotSelect ? 1 : 0, (outerPrgSelect & 0x1FE) | slotSelect);
 		} else {
 			prgSelect <<= 1;
-			uint16_t outerAnd[4]{ 0x1FE, 0x1FC, 0x1F8, 0x1F0 };
-			uint8_t innerAnd[4]{ 0x01, 0x03, 0x07, 0x0F };
+			uint16_t outerAnd[4] { 0x1FE, 0x1FC, 0x1F8, 0x1F0 };
+			uint8_t innerAnd[4] { 0x01, 0x03, 0x07, 0x0F };
 			SelectPrgPage(0, (outerPrgSelect & outerAnd[gameSize]) | (prgSelect & innerAnd[gameSize]));
 			SelectPrgPage(1, (outerPrgSelect & outerAnd[gameSize]) | ((prgSelect | 0x01) & innerAnd[gameSize]));
 		}

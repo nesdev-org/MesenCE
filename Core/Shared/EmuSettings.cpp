@@ -52,32 +52,56 @@ void EmuSettings::Serialize(Serializer& s)
 			SV(_nes.RamPowerOnState);
 			SV(_nes.RandomizeMapperPowerOnState);
 			SV(_nes.RandomizeCpuPpuAlignment);
-			SV(_nes.DisableOamAddrBug); SV(_nes.DisablePaletteRead); SV(_nes.DisablePpu2004Reads);
-			SV(_nes.DisableGameGenieBusConflicts); SV(_nes.DisablePpuReset); SV(_nes.EnableOamDecay);
-			SV(_nes.EnablePpu2000ScrollGlitch); SV(_nes.EnablePpu2006ScrollGlitch); SV(_nes.EnablePpuOamRowCorruption);
+			SV(_nes.DisableOamAddrBug);
+			SV(_nes.DisablePaletteRead);
+			SV(_nes.DisablePpu2004Reads);
+			SV(_nes.DisableGameGenieBusConflicts);
+			SV(_nes.DisablePpuReset);
+			SV(_nes.EnableOamDecay);
+			SV(_nes.EnablePpu2000ScrollGlitch);
+			SV(_nes.EnablePpu2006ScrollGlitch);
+			SV(_nes.EnablePpuOamRowCorruption);
 			SV(_nes.RestrictPpuAccessOnFirstFrame);
 			SV(_nes.EnableCpuTestMode);
 			SV(_nes.EnableDmcSampleDuplicationGlitch);
 			SV(_nes.EnablePpuSpriteEvalBug);
-			SV(_nes.PpuExtraScanlinesAfterNmi); SV(_nes.PpuExtraScanlinesBeforeNmi);
+			SV(_nes.PpuExtraScanlinesAfterNmi);
+			SV(_nes.PpuExtraScanlinesBeforeNmi);
 			SV(_nes.Region);
 			SV(_nes.LightDetectionRadius);
-			SV(_nes.Port1.Type); SV(_nes.Port1SubPorts[0].Type); SV(_nes.Port1SubPorts[1].Type); SV(_nes.Port1SubPorts[2].Type); SV(_nes.Port1SubPorts[3].Type);
+			SV(_nes.Port1.Type);
+			SV(_nes.Port1SubPorts[0].Type);
+			SV(_nes.Port1SubPorts[1].Type);
+			SV(_nes.Port1SubPorts[2].Type);
+			SV(_nes.Port1SubPorts[3].Type);
 			SV(_nes.Port2.Type);
-			SV(_nes.ExpPort.Type); SV(_nes.ExpPortSubPorts[0].Type); SV(_nes.ExpPortSubPorts[1].Type); SV(_nes.ExpPortSubPorts[2].Type); SV(_nes.ExpPortSubPorts[3].Type);
+			SV(_nes.ExpPort.Type);
+			SV(_nes.ExpPortSubPorts[0].Type);
+			SV(_nes.ExpPortSubPorts[1].Type);
+			SV(_nes.ExpPortSubPorts[2].Type);
+			SV(_nes.ExpPortSubPorts[3].Type);
 			break;
 
 		case ConsoleType::Snes:
 			SV(_snes.RamPowerOnState);
 			SV(_snes.EnableRandomPowerOnState);
 			SV(_snes.GsuClockSpeed);
-			SV(_snes.PpuExtraScanlinesAfterNmi); SV(_snes.PpuExtraScanlinesBeforeNmi);
+			SV(_snes.PpuExtraScanlinesAfterNmi);
+			SV(_snes.PpuExtraScanlinesBeforeNmi);
 			SV(_snes.Region);
-			SV(_snes.Port1.Type); SV(_snes.Port1SubPorts[0].Type); SV(_snes.Port1SubPorts[1].Type); SV(_snes.Port1SubPorts[2].Type); SV(_snes.Port1SubPorts[3].Type);
-			SV(_snes.Port2.Type); SV(_snes.Port2SubPorts[0].Type); SV(_snes.Port2SubPorts[1].Type); SV(_snes.Port2SubPorts[2].Type); SV(_snes.Port2SubPorts[3].Type);
+			SV(_snes.Port1.Type);
+			SV(_snes.Port1SubPorts[0].Type);
+			SV(_snes.Port1SubPorts[1].Type);
+			SV(_snes.Port1SubPorts[2].Type);
+			SV(_snes.Port1SubPorts[3].Type);
+			SV(_snes.Port2.Type);
+			SV(_snes.Port2SubPorts[0].Type);
+			SV(_snes.Port2SubPorts[1].Type);
+			SV(_snes.Port2SubPorts[2].Type);
+			SV(_snes.Port2SubPorts[3].Type);
 			SV(_snes.BsxCustomDate);
 			SV(_snes.SpcClockSpeedAdjustment);
-			
+
 			if(_emu->GetRomInfo().Format == RomFormat::Gb) {
 				SV(_gameboy.RamPowerOnState);
 				SV(_gameboy.Controller.Type);
@@ -147,7 +171,7 @@ string EmuSettings::GetVersionString()
 	return std::to_string(version >> 16) + "." + std::to_string((version >> 8) & 0xFF) + "." + std::to_string(version & 0xFF);
 }
 
-void EmuSettings::ProcessString(string & str, const char ** strPointer)
+void EmuSettings::ProcessString(string& str, const char** strPointer)
 {
 	//Make a copy of the string and keep it (the original pointer will not be valid after the call is over)
 	if(*strPointer) {
@@ -303,8 +327,7 @@ void EmuSettings::SetPreferences(PreferencesConfig& config)
 		_saveFolder,
 		_saveStateFolder,
 		_screenshotFolder,
-		""
-	);
+		"");
 }
 
 PreferencesConfig& EmuSettings::GetPreferences()
@@ -325,7 +348,7 @@ AudioPlayerConfig& EmuSettings::GetAudioPlayerConfig()
 void EmuSettings::SetDebugConfig(DebugConfig& config)
 {
 	_debug = config;
-	
+
 	DebuggerRequest req = _emu->GetDebugger(false);
 	Debugger* dbg = req.GetDebugger();
 	if(dbg) {
@@ -359,7 +382,7 @@ void EmuSettings::SetShortcutKey(EmulatorShortcut shortcut, KeyCombination keyCo
 	_emulatorKeys[keySetIndex][(uint32_t)shortcut] = keyCombination;
 
 	for(int i = 0; i < 3; i++) {
-		for(std::pair<const uint32_t, KeyCombination> &kvp : _emulatorKeys[i]) {
+		for(std::pair<const uint32_t, KeyCombination>& kvp : _emulatorKeys[i]) {
 			if(keyCombination.IsSubsetOf(kvp.second)) {
 				_shortcutSupersets[keySetIndex][(uint32_t)shortcut].push_back(kvp.second);
 			} else if(kvp.second.IsSubsetOf(keyCombination)) {
@@ -374,7 +397,7 @@ void EmuSettings::SetShortcutKeys(vector<ShortcutKeyInfo> shortcuts)
 	auto lock = _updateShortcutsLock.AcquireSafe();
 	ClearShortcutKeys();
 
-	for(ShortcutKeyInfo &shortcut : shortcuts) {
+	for(ShortcutKeyInfo& shortcut : shortcuts) {
 		if(_emulatorKeys[0][(uint32_t)shortcut.Shortcut].GetKeys().empty()) {
 			SetShortcutKey(shortcut.Shortcut, shortcut.Keys, 0);
 		} else {
@@ -414,7 +437,7 @@ OverscanDimensions EmuSettings::GetOverscan()
 			if(_emu->GetConsoleType() == ConsoleType::Snes && _emu->GetSettings()->GetGameboyConfig().HideSgbBorders) {
 				//Override overscan dimensions to hide SGB borders
 				OverscanDimensions overscan = {};
-				overscan.Top =  46;
+				overscan.Top = 46;
 				overscan.Bottom = 49;
 				overscan.Left = 48;
 				overscan.Right = 48;
@@ -436,7 +459,7 @@ OverscanDimensions EmuSettings::GetOverscan()
 			} else if(romFormat == RomFormat::GameGear) {
 				return _sms.GameGearOverscan;
 			} else {
-				return  _emu->GetRegion() == ConsoleRegion::Ntsc ? _sms.NtscOverscan : _sms.PalOverscan;
+				return _emu->GetRegion() == ConsoleRegion::Ntsc ? _sms.NtscOverscan : _sms.PalOverscan;
 			}
 
 		case ConsoleType::Gameboy:
@@ -467,7 +490,7 @@ double EmuSettings::GetAspectRatio(ConsoleRegion region, FrameInfo baseFrameSize
 
 	switch(_video.AspectRatio) {
 		case VideoAspectRatio::NoStretching: return screenAspectRatio;
-		
+
 		//For auto, ntsc and pal, these are PAR ratios, so multiply them with the base screen's aspect ratio to get the expected screen aspect ratio
 		case VideoAspectRatio::Auto:
 			if(_emu->GetConsoleType() == ConsoleType::Gameboy || _emu->GetConsoleType() == ConsoleType::Gba || _emu->GetConsoleType() == ConsoleType::Ws) {
@@ -567,7 +590,7 @@ void EmuSettings::InitializeRam(RamState state, void* data, uint32_t length)
 			while(i < length) {
 				uint64_t randomData = dist(_mt);
 				for(int j = 0; j < 8 && i < length; j++) {
-					((uint8_t*)data)[i] = (uint8_t)(randomData >> (8*j));
+					((uint8_t*)data)[i] = (uint8_t)(randomData >> (8 * j));
 					i++;
 				}
 			}
@@ -582,8 +605,8 @@ int EmuSettings::GetRandomValue(int maxValue)
 }
 
 bool EmuSettings::GetRandomBool()
-{ 
-	return GetRandomValue(1) == 1; 
+{
+	return GetRandomValue(1) == 1;
 }
 
 bool EmuSettings::IsInputEnabled()

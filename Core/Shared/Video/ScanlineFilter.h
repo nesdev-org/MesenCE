@@ -27,7 +27,7 @@ public:
 
 		for(uint32_t i = 0, len = height / scale; i < len; i++) {
 			buffer += width * linesToSkip;
-			
+
 			for(uint32_t j = 0; j < width; j++) {
 				*buffer = ApplyScanlineEffect(*buffer, intensity);
 				buffer++;

@@ -22,14 +22,14 @@ SuperGameboy::SuperGameboy(SnesConsole* console, Gameboy* gameboy)
 	_memoryManager = console->GetMemoryManager();
 	_cart = _console->GetCartridge();
 	_spc = _console->GetSpc();
-	
+
 	_gameboy = gameboy;
 	_controlManager = (GbControlManager*)gameboy->GetControlManager();
 	_ppu = gameboy->GetPpu();
 
 	_control = 0x01; //Divider = 5, gameboy = not running
 	UpdateClockRatio();
-	
+
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 	for(int i = 0; i <= 0x3F; i++) {
 		cpuMappings->RegisterHandler(i, i, 0x6000, 0x7FFF, this);
@@ -72,7 +72,7 @@ void SuperGameboy::Reset()
 uint8_t SuperGameboy::Read(uint32_t addr)
 {
 	addr &= 0xF80F;
-	
+
 	if(addr >= 0x7000 && addr <= 0x700F) {
 		if(addr == 0x7000) {
 			_packetReady = false;
@@ -113,7 +113,7 @@ void SuperGameboy::Write(uint32_t addr, uint8_t value)
 
 	switch(addr & 0xFFFF) {
 		case 0x6001:
-			_lcdRowSelect = value & 0x03; 
+			_lcdRowSelect = value & 0x03;
 			_readPosition = 0;
 			break;
 
@@ -234,7 +234,7 @@ void SuperGameboy::LogPacket()
 		case 0x16: name = "ATTR_SET"; break; //Set Data to ATF
 		case 0x17: name = "MASK_EN"; break; //Game Boy Window Mask
 		case 0x18: name = "OBJ_TRN"; break; //Super NES OBJ Mode
-		
+
 		case 0x1E: name = "Header Data"; break;
 		case 0x1F: name = "Header Data"; break;
 
@@ -281,7 +281,7 @@ void SuperGameboy::MixAudio(int16_t* out, uint32_t sampleCount, uint32_t sampleR
 	int16_t* gbSamples = nullptr;
 	uint32_t gbSampleCount = 0;
 	_gameboy->GetSoundSamples(gbSamples, gbSampleCount);
-	
+
 	if(!_spc->IsMuted()) {
 		_resampler.SetSampleRates(GbApu::SampleRate * _effectiveClockRate / _gameboy->GetMasterClockRate(), sampleRate);
 		_resampler.Resample<true>(gbSamples, gbSampleCount, out, sampleCount, true);
@@ -368,8 +368,24 @@ AddressInfo SuperGameboy::GetAbsoluteAddress(uint32_t address)
 
 void SuperGameboy::Serialize(Serializer& s)
 {
-	SV(_control); SV(_resetClock); SV(_input[0]); SV(_input[1]); SV(_input[2]); SV(_input[3]); SV(_inputIndex); SV(_listeningForPacket); SV(_packetReady);
-	SV(_inputWriteClock); SV(_inputValue); SV(_packetByte); SV(_packetBuffer); SV(_packetBit); SV(_lcdRowSelect); SV(_readPosition); SV(_waitForHigh); SV(_clockRatio);
+	SV(_control);
+	SV(_resetClock);
+	SV(_input[0]);
+	SV(_input[1]);
+	SV(_input[2]);
+	SV(_input[3]);
+	SV(_inputIndex);
+	SV(_listeningForPacket);
+	SV(_packetReady);
+	SV(_inputWriteClock);
+	SV(_inputValue);
+	SV(_packetByte);
+	SV(_packetBuffer);
+	SV(_packetBit);
+	SV(_lcdRowSelect);
+	SV(_readPosition);
+	SV(_waitForHigh);
+	SV(_clockRatio);
 	SV(_row);
 	SV(_bank);
 

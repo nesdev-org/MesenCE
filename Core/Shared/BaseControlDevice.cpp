@@ -26,8 +26,8 @@ uint8_t BaseControlDevice::GetPort()
 }
 
 ControllerType BaseControlDevice::GetControllerType()
-{ 
-	return _type; 
+{
+	return _type;
 }
 
 void BaseControlDevice::SetStateFromInput()
@@ -323,7 +323,7 @@ void BaseControlDevice::SwapButtons(shared_ptr<BaseControlDevice> state1, uint8_
 	}
 }
 
-void BaseControlDevice::Serialize(Serializer &s)
+void BaseControlDevice::Serialize(Serializer& s)
 {
 	auto lock = _stateLock.AcquireSafe();
 	SV(_strobe);

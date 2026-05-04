@@ -22,7 +22,7 @@ protected:
 		SelectPrgPage(0, 0);
 		SelectChrPage(0, 0);
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);

@@ -153,7 +153,8 @@ struct HdPackBasePositionCheckCondition : public HdPackCondition
 	string GetConditionName() override
 	{
 		switch(GetConditionType()) {
-			default: case HdPackConditionType::PositionCheckX: return "positionCheckX";
+			default:
+			case HdPackConditionType::PositionCheckX: return "positionCheckX";
 			case HdPackConditionType::PositionCheckY: return "positionCheckY";
 			case HdPackConditionType::OriginPositionCheckX: return "originPositionCheckX";
 			case HdPackConditionType::OriginPositionCheckY: return "originPositionCheckY";
@@ -171,12 +172,13 @@ struct HdPackBasePositionCheckCondition : public HdPackCondition
 	{
 		uint32_t val;
 		switch(Type) {
-			default: case HdPackConditionType::PositionCheckX: val = (uint32_t)x; break;
+			default:
+			case HdPackConditionType::PositionCheckX: val = (uint32_t)x; break;
 			case HdPackConditionType::PositionCheckY: val = (uint32_t)y; break;
 			case HdPackConditionType::OriginPositionCheckX: val = tile->HorizontalMirroring ? (uint32_t)(x - (7 - tile->OffsetX)) : (uint32_t)(x - tile->OffsetX); break;
 			case HdPackConditionType::OriginPositionCheckY: val = tile->VerticalMirroring ? (uint32_t)(y - (7 - tile->OffsetY)) : (uint32_t)(y - tile->OffsetY); break;
 		}
-		
+
 		switch(Operator) {
 			case HdPackConditionOperator::Equal: return val == Operand;
 			case HdPackConditionOperator::NotEqual: return val != Operand;
@@ -328,13 +330,13 @@ struct HdPackTileAtPositionCondition : public HdPackBaseTileCondition
 
 struct HdPackSpriteAtPositionCondition : public HdPackBaseTileCondition
 {
-	HdPackSpriteAtPositionCondition() { _useCache = true; }	
+	HdPackSpriteAtPositionCondition() { _useCache = true; }
 	HdPackConditionType GetConditionType() override { return HdPackConditionType::SpriteAtPos; }
 	string GetConditionName() override { return "spriteAtPosition"; }
 
 	bool InternalCheckCondition(int x, int y, HdPpuTileInfo* tile) override
 	{
-		for(int i = 0, len = _screenInfo->ScreenTiles[PixelOffset].SpriteCount; i < len;  i++) {
+		for(int i = 0, len = _screenInfo->ScreenTiles[PixelOffset].SpriteCount; i < len; i++) {
 			HdPpuTileInfo& target = _screenInfo->ScreenTiles[PixelOffset].Sprite[i];
 			if(TileIndex >= 0) {
 				if((target.PaletteColors == PaletteColors || IgnorePalette) && (target.TileIndex == TileIndex || _hdPack->GetFallbackTile(target.TileIndex) == TileIndex)) {
@@ -392,7 +394,7 @@ struct HdPackSpriteNearbyCondition : public HdPackBaseTileCondition
 			return false;
 		}
 
-		for(int i = 0, len = _screenInfo->ScreenTiles[pixelIndex].SpriteCount; i < len;  i++) {
+		for(int i = 0, len = _screenInfo->ScreenTiles[pixelIndex].SpriteCount; i < len; i++) {
 			HdPpuTileInfo& target = _screenInfo->ScreenTiles[pixelIndex].Sprite[i];
 			if(TileIndex >= 0) {
 				if((target.PaletteColors == PaletteColors || IgnorePalette) && (target.TileIndex == TileIndex || _hdPack->GetFallbackTile(target.TileIndex) == TileIndex)) {

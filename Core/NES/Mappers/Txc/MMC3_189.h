@@ -9,7 +9,7 @@ private:
 	uint8_t _prgReg = 0;
 
 	uint16_t RegisterStartAddress() override { return 0x4120; }
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		if(addr <= 0x7FFF) {
@@ -28,9 +28,9 @@ private:
 		//" 'A' and 'B' bits of the $4120 reg seem to be effectively OR'd."
 		uint8_t prgPage = (((_prgReg) | (_prgReg >> 4)) & 0x07) * 4;
 		SelectPrgPage(0, prgPage);
-		SelectPrgPage(1, prgPage+1);
-		SelectPrgPage(2, prgPage+2);
-		SelectPrgPage(3, prgPage+3);
+		SelectPrgPage(1, prgPage + 1);
+		SelectPrgPage(2, prgPage + 2);
+		SelectPrgPage(3, prgPage + 3);
 	}
 
 	void Serialize(Serializer& s) override

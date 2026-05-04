@@ -32,7 +32,7 @@ namespace Mesen.Windows
 
 			string initFilename = EmuApi.GetRomInfo().GetRomName() + (isGif ? ".gif" : ".avi");
 			string? filename = await FileDialogHelper.SaveFile(ConfigManager.AviFolder, initFilename, VisualRoot, isGif ? FileDialogHelper.GifExt : FileDialogHelper.AviExt);
-			
+
 			if(filename != null) {
 				model.SavePath = filename;
 			}

@@ -1,14 +1,14 @@
 #if (defined(DUMMYCPU) && !defined(__DUMMYGBCPU__H)) || (!defined(DUMMYCPU) && !defined(__GBCPU__H))
-#ifdef DUMMYCPU
-#define __DUMMYGBCPU__H
-#else
-#define __GBCPU__H
-#endif
+	#ifdef DUMMYCPU
+		#define __DUMMYGBCPU__H
+	#else
+		#define __GBCPU__H
+	#endif
 
-#include "pch.h"
-#include "Gameboy/GbTypes.h"
-#include "Debugger/DebugTypes.h"
-#include "Utilities/ISerializable.h"
+	#include "pch.h"
+	#include "Gameboy/GbTypes.h"
+	#include "Debugger/DebugTypes.h"
+	#include "Utilities/ISerializable.h"
 
 class GbMemoryManager;
 class Gameboy;
@@ -82,7 +82,7 @@ private:
 	void AND(uint8_t value);
 	void OR(uint8_t value);
 	void XOR(uint8_t value);
-	
+
 	void CP(uint8_t value);
 
 	void NOP();
@@ -146,7 +146,7 @@ private:
 	void RET(bool condition);
 	void RETI();
 	void RST(uint8_t value);
-	
+
 	void POP(Register16& reg);
 	void PUSH(Register16& reg);
 	void POP_AF();
@@ -157,7 +157,7 @@ private:
 	void EI();
 	void DI();
 	void PREFIX();
-	
+
 	__forceinline void ProcessNextCycleStart();
 	__noinline bool HandleStoppedState();
 
@@ -176,7 +176,7 @@ public:
 
 	void Serialize(Serializer& s) override;
 
-#ifdef DUMMYCPU
+	#ifdef DUMMYCPU
 private:
 	uint32_t _memOpCounter = 0;
 	MemoryOperationInfo _memOperations[10] = {};
@@ -186,6 +186,6 @@ public:
 	uint32_t GetOperationCount();
 	void LogMemoryOperation(uint32_t addr, uint8_t value, MemoryOperationType type);
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
-#endif
+	#endif
 };
 #endif

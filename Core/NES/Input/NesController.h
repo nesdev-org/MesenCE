@@ -17,7 +17,8 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_stateBuffer); SV(_microphoneEnabled);
+		SV(_stateBuffer);
+		SV(_microphoneEnabled);
 	}
 
 	uint8_t GetControllerStateBuffer()
@@ -77,19 +78,29 @@ protected:
 	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, Start, Select, B, A, Microphone };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		Start,
+		Select,
+		B,
+		A,
+		Microphone
+	};
 
 	NesController(Emulator* emu, ControllerType type, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, type, port, keyMappings)
 	{
 		_turboSpeed = keyMappings.TurboSpeed;
 		_microphoneEnabled = port == 1 && type == ControllerType::FamicomControllerP2;
 	}
-	
+
 	uint8_t ToByte()
 	{
 		//"Button status for each controller is returned as an 8-bit report in the following order: A, B, Select, Start, Up, Down, Left, Right."
-		return
-			(uint8_t)IsPressed(Buttons::A) |
+		return (uint8_t)IsPressed(Buttons::A) |
 			((uint8_t)IsPressed(Buttons::B) << 1) |
 			((uint8_t)IsPressed(Buttons::Select) << 2) |
 			((uint8_t)IsPressed(Buttons::Start) << 3) |
@@ -105,7 +116,7 @@ public:
 
 		if(IsCurrentPort(addr)) {
 			StrobeProcessRead();
-			
+
 			output = _stateBuffer & 0x01;
 			_stateBuffer >>= 1;
 

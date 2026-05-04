@@ -40,8 +40,16 @@
 	<DockPanel Margin="3">
 		<DockPanel DockPanel.Dock="Bottom">
 			<Button DockPanel.Dock="Right" HorizontalContentAlignment="Center" IsCancel="True" Click="Cancel_OnClick" Content="{l:Translate btnCancel}" />
-			<c:ButtonWithIcon DockPanel.Dock="Right" Icon="Assets/SaveFloppy.png" HorizontalContentAlignment="Center" IsDefault="True" Click="Ok_OnClick" Text="{l:Translate btnSaveAs}" />
-			<TextBlock VerticalAlignment="Center" Text="{Binding ErrorMessage}" Foreground="{DynamicResource SystemErrorTextColor}" />
+			<c:ButtonWithIcon
+				DockPanel.Dock="Right"
+				Icon="Assets/SaveFloppy.png"
+				HorizontalContentAlignment="Center"
+				IsDefault="True"
+				Click="Ok_OnClick"
+				IsEnabled="{Binding !ErrorMessage.Length}"
+				Text="{l:Translate btnSaveAs}"
+			/>
+			<TextBlock TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding ErrorMessage}" Foreground="{DynamicResource SystemErrorTextColor}" />
 		</DockPanel>
 
 		<TextBox
@@ -86,13 +94,13 @@
 			<TextBlock Text="{l:Translate lblPrgRom}" Grid.Row="0" Grid.Column="3" />
 			<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="4">
 				<c:MesenNumericTextBox Value="{Binding Header.PrgRom}"  />
-				<TextBlock Text=" KB" />
+				<c:EnumComboBox SelectedItem="{Binding Header.PrgRomUnit}" IsEnabled="{Binding IsNes20}" />
 			</StackPanel>
 
 			<TextBlock Text="{l:Translate lblChrRom}" Grid.Row="1" Grid.Column="3" />
 			<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="4">
 				<c:MesenNumericTextBox Value="{Binding Header.ChrRom}"  />
-				<TextBlock Text=" KB" />
+				<c:EnumComboBox SelectedItem="{Binding Header.ChrRomUnit}" IsEnabled="{Binding IsNes20}" />
 			</StackPanel>
 
 			<TextBlock Text="{l:Translate lblWorkRam}" Grid.Row="2" Grid.Column="3" />

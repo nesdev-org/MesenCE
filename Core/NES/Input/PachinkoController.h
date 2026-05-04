@@ -9,12 +9,17 @@ private:
 	uint16_t _pachinkoState = 0;
 
 protected:
-	enum PachinkoButtons { Press = 8, Release = 9 };
-	
+	enum PachinkoButtons
+	{
+		Press = 8,
+		Release = 9
+	};
+
 	void Serialize(Serializer& s) override
 	{
 		NesController::Serialize(s);
-		SV(_pachinkoState); SV(_analogData);
+		SV(_pachinkoState);
+		SV(_analogData);
 	}
 
 	void InternalSetStateFromInput() override

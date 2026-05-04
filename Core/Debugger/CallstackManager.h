@@ -35,7 +35,7 @@ public:
 		return false;
 	}
 
-	void GetCallstack(StackFrameInfo* callstackArray, uint32_t &callstackSize);
+	void GetCallstack(StackFrameInfo* callstackArray, uint32_t& callstackSize);
 	int32_t GetReturnAddress();
 	int64_t GetReturnStackPointer();
 	Profiler* GetProfiler();

@@ -1,23 +1,23 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using System;
-using Mesen.Debugger.ViewModels;
-using Mesen.Interop;
-using Avalonia.Interactivity;
-using System.ComponentModel;
-using Avalonia.Threading;
-using Mesen.Config;
-using System.Runtime.InteropServices;
-using Mesen.Debugger.Utilities;
-using Mesen.Utilities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Avalonia.VisualTree;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
+using Mesen.Config;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.ViewModels;
 using Mesen.Debugger.Views;
-using System.Linq;
+using Mesen.Interop;
+using Mesen.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Mesen.Debugger.Windows
 {
@@ -49,7 +49,7 @@ namespace Mesen.Debugger.Windows
 			if(Design.IsDesignMode) {
 				return;
 			}
-			
+
 			AddHandler(DragDrop.DropEvent, OnDrop);
 
 			_model.Config.LoadWindowSettings(this);

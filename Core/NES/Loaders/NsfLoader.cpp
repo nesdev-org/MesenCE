@@ -4,27 +4,27 @@
 #include "NES/MapperFactory.h"
 #include "Shared/RomInfo.h"
 
-void NsfLoader::Read(uint8_t *& data, uint8_t & dest)
+void NsfLoader::Read(uint8_t*& data, uint8_t& dest)
 {
 	dest = data[0];
 	data++;
 }
 
-void NsfLoader::Read(uint8_t *& data, uint16_t & dest)
+void NsfLoader::Read(uint8_t*& data, uint16_t& dest)
 {
 	dest = data[0] | (data[1] << 8);
 	data += 2;
 }
 
-void NsfLoader::Read(uint8_t *& data, char * dest, size_t len)
+void NsfLoader::Read(uint8_t*& data, char* dest, size_t len)
 {
 	memcpy(dest, data, len);
 	data += len;
 }
 
-void NsfLoader::InitializeFromHeader(RomData &romData)
+void NsfLoader::InitializeFromHeader(RomData& romData)
 {
-	NsfHeader &header = romData.Info.NsfInfo;
+	NsfHeader& header = romData.Info.NsfInfo;
 
 	romData.Info.Format = RomFormat::Nsf;
 	romData.Info.MapperID = MapperFactory::NsfMapperID;
@@ -107,7 +107,7 @@ void NsfLoader::InitializeFromHeader(RomData &romData)
 	Log("[NSF] ROM size: " + std::to_string(romData.PrgRom.size() / 1024) + " KB");
 }
 
-void NsfLoader::InitHeader(NsfHeader & header)
+void NsfLoader::InitHeader(NsfHeader& header)
 {
 	for(int i = 0; i < 256; i++) {
 		//Used by NSFE
@@ -118,7 +118,7 @@ void NsfLoader::InitHeader(NsfHeader & header)
 
 void NsfLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile)
 {
-	NsfHeader &header = romData.Info.NsfInfo;
+	NsfHeader& header = romData.Info.NsfInfo;
 
 	InitHeader(header);
 

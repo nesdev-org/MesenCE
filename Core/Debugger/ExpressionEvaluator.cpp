@@ -13,12 +13,12 @@
 #include "Utilities/HexUtilities.h"
 
 const vector<string> ExpressionEvaluator::_binaryOperators = { { "*", "/", "%", "+", "-", "<<", ">>", "<", "<=", ">", ">=", "==", "!=", "&", "^", "|", "&&", "||" } };
-const vector<int> ExpressionEvaluator::_binaryPrecedence = { { 10,  10,  10,   9,   9,    8,    8,   7,   7,    7,    7,    6,    6,   5,   4,   3,    2,    1 } };
+const vector<int> ExpressionEvaluator::_binaryPrecedence = { { 10, 10, 10, 9, 9, 8, 8, 7, 7, 7, 7, 6, 6, 5, 4, 3, 2, 1 } };
 const vector<string> ExpressionEvaluator::_unaryOperators = { { "+", "-", "~", "!", ":", "#" } };
-const vector<int> ExpressionEvaluator::_unaryPrecedence = { { 11,  11,  11,  11, 11, 11 } };
+const vector<int> ExpressionEvaluator::_unaryPrecedence = { { 11, 11, 11, 11, 11, 11 } };
 const std::unordered_set<string> ExpressionEvaluator::_operators = { { "*", "/", "%", "+", "-", "<<", ">>", "<", "<=", ">", ">=", "==", "!=", "&", "^", "|", "&&", "||", "~", "!", "(", ")", "{", "}", "[", "]", ":", "#" } };
 
-bool ExpressionEvaluator::IsOperator(string token, int &precedence, bool unaryOperator)
+bool ExpressionEvaluator::IsOperator(string token, int& precedence, bool unaryOperator)
 {
 	if(unaryOperator) {
 		for(size_t i = 0, len = _unaryOperators.size(); i < len; i++) {
@@ -77,7 +77,7 @@ unordered_map<string, int64_t>* ExpressionEvaluator::GetAvailableTokens()
 	return nullptr;
 }
 
-bool ExpressionEvaluator::CheckSpecialTokens(string expression, size_t &pos, string &output, ExpressionData &data)
+bool ExpressionEvaluator::CheckSpecialTokens(string expression, size_t& pos, string& output, ExpressionData& data)
 {
 	string token;
 	size_t initialPos = pos;
@@ -131,7 +131,7 @@ bool ExpressionEvaluator::CheckSpecialTokens(string expression, size_t &pos, str
 	}
 }
 
-int64_t ExpressionEvaluator::ProcessSharedTokens(string token) 
+int64_t ExpressionEvaluator::ProcessSharedTokens(string token)
 {
 	if(token == "value") {
 		return EvalValues::Value;
@@ -153,7 +153,7 @@ int64_t ExpressionEvaluator::ProcessSharedTokens(string token)
 	return -1;
 }
 
-string ExpressionEvaluator::GetNextToken(string expression, size_t &pos, ExpressionData &data, bool &success, bool previousTokenIsOp)
+string ExpressionEvaluator::GetNextToken(string expression, size_t& pos, ExpressionData& data, bool& success, bool previousTokenIsOp)
 {
 	string output;
 	success = true;
@@ -239,8 +239,8 @@ string ExpressionEvaluator::GetNextToken(string expression, size_t &pos, Express
 
 	return output;
 }
-	
-bool ExpressionEvaluator::ProcessSpecialOperator(EvalOperators evalOp, std::stack<EvalOperators> &opStack, std::stack<int> &precedenceStack, vector<int64_t> &outputQueue)
+
+bool ExpressionEvaluator::ProcessSpecialOperator(EvalOperators evalOp, std::stack<EvalOperators>& opStack, std::stack<int>& precedenceStack, vector<int64_t>& outputQueue)
 {
 	if(opStack.empty()) {
 		return false;
@@ -263,9 +263,9 @@ bool ExpressionEvaluator::ProcessSpecialOperator(EvalOperators evalOp, std::stac
 	return true;
 }
 
-bool ExpressionEvaluator::ToRpn(string expression, ExpressionData &data)
+bool ExpressionEvaluator::ToRpn(string expression, ExpressionData& data)
 {
-	std::stack<EvalOperators> opStack = std::stack<EvalOperators>();	
+	std::stack<EvalOperators> opStack = std::stack<EvalOperators>();
 	std::stack<int> precedenceStack;
 
 	size_t position = 0;
@@ -290,11 +290,11 @@ bool ExpressionEvaluator::ToRpn(string expression, ExpressionData &data)
 		bool requireOperator = operatorExpected;
 		bool requireOperatorOrEndToken = operatorOrEndTokenExpected;
 		bool unaryOperator = previousTokenIsOp;
-		
+
 		operatorExpected = false;
 		operatorOrEndTokenExpected = false;
 		previousTokenIsOp = false;
-		
+
 		int precedence = 0;
 		if(IsOperator(token, precedence, unaryOperator)) {
 			EvalOperators op = GetOperator(token, unaryOperator);
@@ -342,7 +342,7 @@ bool ExpressionEvaluator::ToRpn(string expression, ExpressionData &data)
 			precedenceStack.push(0);
 		} else if(token[0] == '}') {
 			braceCount--;
-			if(!ProcessSpecialOperator(EvalOperators::Braces, opStack, precedenceStack, data.RpnQueue)){
+			if(!ProcessSpecialOperator(EvalOperators::Braces, opStack, precedenceStack, data.RpnQueue)) {
 				return false;
 			}
 			operatorOrEndTokenExpected = true;
@@ -369,7 +369,7 @@ bool ExpressionEvaluator::ToRpn(string expression, ExpressionData &data)
 	return true;
 }
 
-int64_t ExpressionEvaluator::Evaluate(ExpressionData &data, EvalResultType &resultType, MemoryOperationInfo &operationInfo, AddressInfo& addressInfo)
+int64_t ExpressionEvaluator::Evaluate(ExpressionData& data, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo)
 {
 	if(data.RpnQueue.empty()) {
 		resultType = EvalResultType::Invalid;
@@ -407,7 +407,7 @@ int64_t ExpressionEvaluator::Evaluate(ExpressionData &data, EvalResultType &resu
 					case EvalValues::IsWrite: token = operationInfo.Type == MemoryOperationType::Write || operationInfo.Type == MemoryOperationType::DmaWrite || operationInfo.Type == MemoryOperationType::DummyWrite; break;
 					case EvalValues::IsRead: token = operationInfo.Type != MemoryOperationType::Write && operationInfo.Type != MemoryOperationType::DmaWrite && operationInfo.Type != MemoryOperationType::DummyWrite; break;
 					case EvalValues::IsDma: token = operationInfo.Type == MemoryOperationType::DmaRead || operationInfo.Type == MemoryOperationType::DmaWrite; break;
-					case EvalValues::IsDummy: token = operationInfo.Type == MemoryOperationType::DummyRead|| operationInfo.Type == MemoryOperationType::DummyWrite; break;
+					case EvalValues::IsDummy: token = operationInfo.Type == MemoryOperationType::DummyRead || operationInfo.Type == MemoryOperationType::DummyWrite; break;
 					case EvalValues::OpProgramCounter: token = _cpuDebugger->GetProgramCounter(true); break;
 
 					default:
@@ -448,12 +448,14 @@ int64_t ExpressionEvaluator::Evaluate(ExpressionData &data, EvalResultType &resu
 			resultType = EvalResultType::Numeric;
 			switch(token) {
 				case EvalOperators::Multiplication: token = left * right; break;
-				case EvalOperators::Division: 
+				case EvalOperators::Division:
 					if(right == 0) {
 						resultType = EvalResultType::DivideBy0;
 						return 0;
 					}
-					token = left / right; break;
+					token = left / right;
+					break;
+
 				case EvalOperators::Modulo:
 					if(right == 0) {
 						resultType = EvalResultType::DivideBy0;
@@ -465,17 +467,50 @@ int64_t ExpressionEvaluator::Evaluate(ExpressionData &data, EvalResultType &resu
 				case EvalOperators::Substration: token = left - right; break;
 				case EvalOperators::ShiftLeft: token = left << right; break;
 				case EvalOperators::ShiftRight: token = left >> right; break;
-				case EvalOperators::SmallerThan: token = left < right; resultType = EvalResultType::Boolean; break;
-				case EvalOperators::SmallerOrEqual: token = left <= right; resultType = EvalResultType::Boolean; break;
-				case EvalOperators::GreaterThan: token = left > right; resultType = EvalResultType::Boolean; break;
-				case EvalOperators::GreaterOrEqual: token = left >= right; resultType = EvalResultType::Boolean; break;
-				case EvalOperators::Equal: token = left == right; resultType = EvalResultType::Boolean; break;
-				case EvalOperators::NotEqual: token = left != right; resultType = EvalResultType::Boolean; break;
+
+				case EvalOperators::SmallerThan:
+					token = left < right;
+					resultType = EvalResultType::Boolean;
+					break;
+
+				case EvalOperators::SmallerOrEqual:
+					token = left <= right;
+					resultType = EvalResultType::Boolean;
+					break;
+
+				case EvalOperators::GreaterThan:
+					token = left > right;
+					resultType = EvalResultType::Boolean;
+					break;
+
+				case EvalOperators::GreaterOrEqual:
+					token = left >= right;
+					resultType = EvalResultType::Boolean;
+					break;
+
+				case EvalOperators::Equal:
+					token = left == right;
+					resultType = EvalResultType::Boolean;
+					break;
+
+				case EvalOperators::NotEqual:
+					token = left != right;
+					resultType = EvalResultType::Boolean;
+					break;
+
 				case EvalOperators::BinaryAnd: token = left & right; break;
 				case EvalOperators::BinaryXor: token = left ^ right; break;
 				case EvalOperators::BinaryOr: token = left | right; break;
-				case EvalOperators::LogicalAnd: token = (bool)(left && right); resultType = EvalResultType::Boolean; break;
-				case EvalOperators::LogicalOr: token = (bool)(left || right); resultType = EvalResultType::Boolean; break;
+
+				case EvalOperators::LogicalAnd:
+					token = (bool)(left && right);
+					resultType = EvalResultType::Boolean;
+					break;
+
+				case EvalOperators::LogicalOr:
+					token = (bool)(left || right);
+					resultType = EvalResultType::Boolean;
+					break;
 
 				//Unary operators
 				case EvalOperators::Plus: token = right; break;
@@ -514,7 +549,7 @@ bool ExpressionEvaluator::ReturnBool(int64_t value, EvalResultType& resultType)
 	return value != 0;
 }
 
-ExpressionData ExpressionEvaluator::GetRpnList(string expression, bool &success)
+ExpressionData ExpressionEvaluator::GetRpnList(string expression, bool& success)
 {
 	ExpressionData* cachedData = PrivateGetRpnList(expression, success);
 	if(cachedData) {
@@ -528,9 +563,9 @@ void ExpressionEvaluator::GetTokenList(char* tokenList)
 {
 	//Returns all CPU-specific tokens, sorted by the their EvalValues order
 	unordered_map<string, int64_t>* availableTokens = GetAvailableTokens();
-	
+
 	vector<std::pair<string, int64_t>> entries;
-	
+
 	int pos = 0;
 	if(availableTokens) {
 		for(auto entry : *availableTokens) {
@@ -556,7 +591,7 @@ void ExpressionEvaluator::GetTokenList(char* tokenList)
 
 ExpressionData* ExpressionEvaluator::PrivateGetRpnList(string expression, bool& success)
 {
-	ExpressionData *cachedData = nullptr;
+	ExpressionData* cachedData = nullptr;
 	{
 		LockHandler lock = _cacheLock.AcquireSafe();
 
@@ -583,20 +618,20 @@ ExpressionData* ExpressionEvaluator::PrivateGetRpnList(string expression, bool& 
 	return cachedData;
 }
 
-int64_t ExpressionEvaluator::PrivateEvaluate(string expression, EvalResultType &resultType, MemoryOperationInfo &operationInfo, AddressInfo& addressInfo, bool& success)
+int64_t ExpressionEvaluator::PrivateEvaluate(string expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo, bool& success)
 {
 	success = true;
-	ExpressionData *cachedData = PrivateGetRpnList(expression, success);
+	ExpressionData* cachedData = PrivateGetRpnList(expression, success);
 
 	if(!success) {
 		resultType = EvalResultType::Invalid;
 		return 0;
 	}
 
-	return Evaluate(*cachedData, resultType, operationInfo, addressInfo);	
+	return Evaluate(*cachedData, resultType, operationInfo, addressInfo);
 }
 
-int64_t ExpressionEvaluator::Evaluate(string expression, EvalResultType &resultType, MemoryOperationInfo &operationInfo, AddressInfo& addressInfo)
+int64_t ExpressionEvaluator::Evaluate(string expression, EvalResultType& resultType, MemoryOperationInfo& operationInfo, AddressInfo& addressInfo)
 {
 	try {
 		bool success;
@@ -625,9 +660,9 @@ bool ExpressionEvaluator::Validate(string expression)
 }
 
 #if _DEBUG
-#include <assert.h>
-#include "SNES/SnesCpuTypes.h"
-#include "SNES/SnesPpuTypes.h"
+	#include <assert.h>
+	#include "SNES/SnesCpuTypes.h"
+	#include "SNES/SnesPpuTypes.h"
 void ExpressionEvaluator::RunTests()
 {
 	//Some basic unit tests to run in debug mode
@@ -640,7 +675,7 @@ void ExpressionEvaluator::RunTests()
 		assert(type == expectedType);
 		assert(result == expectedResult);
 	};
-	
+
 	test("1 - -1", EvalResultType::Numeric, 2);
 	test("1 - (-1)", EvalResultType::Numeric, 2);
 	test("1 - -(-1)", EvalResultType::Numeric, 0);
@@ -681,11 +716,11 @@ void ExpressionEvaluator::RunTests()
 
 	test("{$4500}", EvalResultType::Numeric, word4500);
 	test("[$4500]", EvalResultType::Numeric, byte4500);
-	
+
 	test("[$45]3", EvalResultType::Invalid, 0);
 	test("($45)3", EvalResultType::Invalid, 0);
 	test("($45]", EvalResultType::Invalid, 0);
-	
+
 	test("%11", EvalResultType::Numeric, 3);
 	test("%011", EvalResultType::Numeric, 3);
 	test("%1011", EvalResultType::Numeric, 11);

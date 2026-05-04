@@ -13,6 +13,7 @@ LinuxKeyManager::LinuxKeyManager(Emulator* emu)
 
 	_keyDefinitions = KeyDefinition::GetSharedKeyDefinitions();
 
+	// clang-format off
 	vector<string> buttonNames = { 
 		"A", "B", "C", "X", "Y", "Z", "L1", "R1", "L2", "R2", "Select", "Start", "L3", "R3", 
 		"X+", "X-", "Y+", "Y-", "Z+", "Z-", 
@@ -26,6 +27,7 @@ LinuxKeyManager::LinuxKeyManager(Emulator* emu)
 		"Base5", "Base6", "Dead",
 		"Y", "X", "Y2", "X2", "Z", "Z2"
 	};
+	// clang-format on
 
 	for(int i = 0; i < 20; i++) {
 		for(int j = 0; j < (int)buttonNames.size(); j++) {
@@ -33,7 +35,7 @@ LinuxKeyManager::LinuxKeyManager(Emulator* emu)
 		}
 	}
 
-	for(KeyDefinition &keyDef : _keyDefinitions) {
+	for(KeyDefinition& keyDef : _keyDefinitions) {
 		_keyNames[keyDef.keyCode] = keyDef.name;
 		_keyCodes[keyDef.name] = keyDef.keyCode;
 	}
@@ -42,7 +44,7 @@ LinuxKeyManager::LinuxKeyManager(Emulator* emu)
 
 	_disableAllKeys = false;
 	_stopUpdateDeviceThread = false;
-	StartUpdateDeviceThread();	
+	StartUpdateDeviceThread();
 }
 
 LinuxKeyManager::~LinuxKeyManager()
@@ -136,7 +138,7 @@ void LinuxKeyManager::UpdateDevices()
 
 void LinuxKeyManager::CheckForGamepads(bool logInformation)
 {
-	vector<int> connectedIDs; 
+	vector<int> connectedIDs;
 	for(int i = _controllers.size() - 1; i >= 0; i--) {
 		if(!_controllers[i]->IsDisconnected()) {
 			connectedIDs.push_back(_controllers[i]->GetDeviceID());
@@ -169,7 +171,7 @@ void LinuxKeyManager::StartUpdateDeviceThread()
 	_updateDeviceThread = std::thread([=]() {
 		while(!_stopUpdateDeviceThread) {
 			//Check for newly plugged in controllers every 5 secs
-			vector<shared_ptr<LinuxGameController>> controllersToAdd; 
+			vector<shared_ptr<LinuxGameController>> controllersToAdd;
 			vector<int> indexesToRemove;
 			for(int i = _controllers.size() - 1; i >= 0; i--) {
 				if(_controllers[i]->IsDisconnected()) {
@@ -182,18 +184,18 @@ void LinuxKeyManager::StartUpdateDeviceThread()
 			if(!indexesToRemove.empty() || !controllersToAdd.empty()) {
 				_emu->Pause();
 				for(int index : indexesToRemove) {
-					_controllers.erase(_controllers.begin()+index);
+					_controllers.erase(_controllers.begin() + index);
 				}
 				for(std::shared_ptr<LinuxGameController> controller : controllersToAdd) {
 					_controllers.push_back(controller);
-				} 
+				}
 				_emu->Resume();
 			}
 
 			_stopSignal.Wait(5000);
 		}
 	});
-}	
+}
 
 bool LinuxKeyManager::SetKeyState(uint16_t scanCode, bool state)
 {

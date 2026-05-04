@@ -1,27 +1,27 @@
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Avalonia.Interactivity;
-using System;
-using Mesen.Config.Shortcuts;
-using System.Collections.Generic;
-using System.Linq;
-using Avalonia.Input;
-using System.ComponentModel;
-using Mesen.Interop;
-using Avalonia.Threading;
 using Avalonia;
-using Mesen.Config;
-using Mesen.Utilities;
-using Mesen.Localization;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using Mesen.Config;
+using Mesen.Config.Shortcuts;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Mesen.Windows
 {
 	public class GetKeyWindow : MesenWindow
 	{
-		private DispatcherTimer _timer; 
-		
+		private DispatcherTimer _timer;
+
 		private List<UInt16> _prevScanCodes = new List<UInt16>();
 		private TextBlock lblCurrentKey;
 		private bool _allowKeyboardOnly;
@@ -31,7 +31,7 @@ namespace Mesen.Windows
 
 		public string HintLabel { get; }
 		public bool SingleKeyMode { get; set; } = false;
-		
+
 		public DbgShortKeys DbgShortcutKey { get; set; } = new DbgShortKeys();
 		public KeyCombination ShortcutKey { get; set; } = new KeyCombination();
 
@@ -49,7 +49,7 @@ namespace Mesen.Windows
 			InitializeComponent();
 
 			lblCurrentKey = this.GetControl<TextBlock>("lblCurrentKey");
-			
+
 			_timer = new DispatcherTimer(TimeSpan.FromMilliseconds(25), DispatcherPriority.Normal, (s, e) => UpdateKeyDisplay());
 			_timer.Start();
 

@@ -74,7 +74,7 @@ void PcmReader::SetLoopFlag(bool loop)
 	_loop = loop;
 }
 
-void PcmReader::ReadSample(int16_t &left, int16_t &right)
+void PcmReader::ReadSample(int16_t& left, int16_t& right)
 {
 	uint8_t val[4];
 	_file.get(((char*)val)[0]);
@@ -92,7 +92,7 @@ void PcmReader::LoadSamples(uint32_t samplesToLoad)
 
 	int16_t left = 0;
 	int16_t right = 0;
-	for(uint32_t i = _fileOffset; i < _fileSize && samplesRead < samplesToLoad; i+=4) {
+	for(uint32_t i = _fileOffset; i < _fileSize && samplesRead < samplesToLoad; i += 4) {
 		ReadSample(left, right);
 
 		_pcmBuffer.push_back(left);
@@ -116,7 +116,7 @@ void PcmReader::LoadSamples(uint32_t samplesToLoad)
 	}
 }
 
-void PcmReader::ApplySamples(int16_t *buffer, size_t sampleCount, uint8_t volume)
+void PcmReader::ApplySamples(int16_t* buffer, size_t sampleCount, uint8_t volume)
 {
 	if(_done) {
 		return;

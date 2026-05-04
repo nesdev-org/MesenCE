@@ -90,7 +90,7 @@ private:
 	static constexpr uint16_t DirectColorFlag = 0x8000;
 	static constexpr uint16_t SpriteBlendFlag = 0x4000;
 	static constexpr uint16_t SpriteMosaicFlag = 0x2000;
-	
+
 	static constexpr uint8_t Window0 = 0;
 	static constexpr uint8_t Window1 = 1;
 	static constexpr uint8_t ObjWindow = 2;
@@ -125,7 +125,7 @@ private:
 
 	GbaPixelData _oamOutputBuffers[2][GbaConstants::ScreenWidth] = {};
 	GbaPixelData _layerOutput[4][GbaConstants::ScreenWidth] = {};
-	
+
 	uint8_t _oamWindow[GbaConstants::ScreenWidth] = {};
 	uint8_t _activeWindow[256] = {};
 
@@ -144,7 +144,7 @@ private:
 	int16_t _lastRenderCycle = -1;
 	GbaLayerRendererData _layerData[4] = {};
 	GbaSpriteRendererData _objData[2] = {};
-	
+
 	int16_t _evalOamIndex = -1;
 	int16_t _loadOamTileCounter = 0;
 	int16_t _oamLastCycle = -1;
@@ -160,8 +160,8 @@ private:
 	bool _newObjLayerEnabled = false;
 
 	uint8_t _memoryAccess[308 * 4] = {};
-	
-	typedef void(GbaPpu::*Func)();
+
+	typedef void (GbaPpu::*Func)();
 	Func _colorMathFunc[128] = {};
 
 	uint16_t _skippedOutput[240];
@@ -173,7 +173,7 @@ private:
 				return;
 			}
 		}
-		
+
 		if(_layerOutput[i][x].Priority < main.Priority) {
 			sub = main;
 			main = _layerOutput[i][x];
@@ -194,7 +194,7 @@ private:
 	void SetWindowActiveLayers(int window, uint8_t cfg);
 
 	void SendFrame();
-	
+
 	template<int i, bool mosaic, bool bpp8> __forceinline void PushBgPixels(int renderX);
 	template<int i, bool mosaic, bool bpp8, bool mirror> __forceinline void PushBgPixels(int renderX);
 
@@ -203,11 +203,11 @@ private:
 
 	template<int layer> void RenderTransformTilemap();
 	template<int mode> void RenderBitmapMode();
-	
+
 	__forceinline void SetPixelData(GbaPixelData& pixel, uint16_t color, uint8_t priority, uint8_t layer);
 
 	void ProcessSprites();
-	
+
 	__noinline void InitSpriteEvaluation();
 	void AddVisibleSprite(uint32_t sprData);
 	void LoadSpriteAttr2();
@@ -238,7 +238,7 @@ public:
 	{
 		_state.Cycle++;
 
-		if(_state.Cycle == 308*4) {
+		if(_state.Cycle == 308 * 4) {
 			ProcessEndOfScanline();
 		} else if(_state.Cycle >= 1006) {
 			if(_state.Cycle == 1006) {
@@ -259,7 +259,7 @@ public:
 	void ProcessObjEnableChange();
 
 	void RenderScanline(bool forceRender = false);
-	
+
 	void DebugSendFrame();
 
 	void WriteRegister(uint32_t addr, uint8_t value);

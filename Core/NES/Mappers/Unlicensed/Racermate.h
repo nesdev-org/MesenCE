@@ -43,16 +43,15 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0xC000) {
-			case 0x8000: 
+			case 0x8000:
 				SelectPrgPage(0, (value >> 6) & 0x03);
 				SelectChrPage(1, value & 0x0F);
 				break;
 
-			case 0xC000: 
+			case 0xC000:
 				_irqCounter = 1024;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
 		}
-
 	}
 };

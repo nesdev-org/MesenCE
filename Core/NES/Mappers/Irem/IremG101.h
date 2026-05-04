@@ -21,7 +21,7 @@ protected:
 
 		if(_romInfo.SubMapperID == 1) {
 			//032: 1 Major League
-			//CIRAM A10 is tied high (fixed one-screen mirroring) and PRG banking style is fixed as 8+8+16F 
+			//CIRAM A10 is tied high (fixed one-screen mirroring) and PRG banking style is fixed as 8+8+16F
 			SetMirroringType(MirroringType::ScreenAOnly);
 		}
 	}

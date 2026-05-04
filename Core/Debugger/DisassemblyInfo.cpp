@@ -41,7 +41,7 @@ void DisassemblyInfo::Initialize(uint32_t cpuAddress, uint8_t cpuFlags, CpuType 
 	_opSize = GetOpSize(_byteCode[0], _flags, _cpuType, cpuAddress, memType, memoryDumper);
 
 	for(int i = 1; i < _opSize && i < 8; i++) {
-		_byteCode[i] = memoryDumper->GetMemoryValue(memType, cpuAddress+i);
+		_byteCode[i] = memoryDumper->GetMemoryValue(memType, cpuAddress + i);
 	}
 
 	_initialized = true;
@@ -62,7 +62,7 @@ void DisassemblyInfo::Reset()
 	_initialized = false;
 }
 
-void DisassemblyInfo::GetDisassembly(string &out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
+void DisassemblyInfo::GetDisassembly(string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
 	switch(_cpuType) {
 		case CpuType::Sa1:
@@ -85,10 +85,9 @@ void DisassemblyInfo::GetDisassembly(string &out, uint32_t memoryAddr, LabelMana
 		default:
 			throw std::runtime_error("GetDisassembly - Unsupported CPU type");
 	}
-
 }
 
-EffectiveAddressInfo DisassemblyInfo::GetEffectiveAddress(Debugger *debugger, void *cpuState, CpuType cpuType)
+EffectiveAddressInfo DisassemblyInfo::GetEffectiveAddress(Debugger* debugger, void* cpuState, CpuType cpuType)
 {
 	switch(_cpuType) {
 		case CpuType::Sa1:
@@ -99,7 +98,7 @@ EffectiveAddressInfo DisassemblyInfo::GetEffectiveAddress(Debugger *debugger, vo
 		case CpuType::Gsu: return GsuDisUtils::GetEffectiveAddress(*this, (SnesConsole*)debugger->GetConsole(), *(GsuState*)cpuState);
 		case CpuType::Cx4: return Cx4DisUtils::GetEffectiveAddress(*this, *(Cx4State*)cpuState, debugger->GetMemoryDumper());
 		case CpuType::St018: return St018DisUtils::GetEffectiveAddress(*this, (SnesConsole*)debugger->GetConsole(), *(ArmV3CpuState*)cpuState);
-		
+
 		case CpuType::NecDsp:
 			return {};
 
@@ -165,7 +164,7 @@ void DisassemblyInfo::GetByteCode(uint8_t copyBuffer[8])
 	memcpy(copyBuffer, _byteCode, _opSize);
 }
 
-void DisassemblyInfo::GetByteCode(string &out)
+void DisassemblyInfo::GetByteCode(string& out)
 {
 	FastString str;
 	for(int i = 0; i < _opSize; i++) {
@@ -183,7 +182,7 @@ uint8_t DisassemblyInfo::GetOpSize(uint32_t opCode, uint8_t flags, CpuType type,
 		case CpuType::Snes: return SnesDisUtils::GetOpSize(opCode, flags);
 		case CpuType::Spc: return SpcDisUtils::GetOpSize(opCode);
 		case CpuType::NecDsp: return NecDspDisUtils::GetOpSize();
-		case CpuType::Sa1:return SnesDisUtils::GetOpSize(opCode, flags);
+		case CpuType::Sa1: return SnesDisUtils::GetOpSize(opCode, flags);
 		case CpuType::Gsu: return GsuDisUtils::GetOpSize(opCode);
 		case CpuType::Cx4: return Cx4DisUtils::GetOpSize();
 		case CpuType::St018: return GbaDisUtils::GetOpSize(opCode, flags);
@@ -236,7 +235,7 @@ bool DisassemblyInfo::IsReturnInstruction()
 		case CpuType::Gba: return GbaDisUtils::IsReturnInstruction(GetFullOpCode<CpuType::Gba>(), _flags);
 		case CpuType::Ws: return WsDisUtils::IsReturnInstruction(GetFullOpCode<CpuType::Ws>());
 	}
-	
+
 	throw std::runtime_error("IsReturnInstruction - Unsupported CPU type");
 }
 
@@ -312,7 +311,7 @@ void DisassemblyInfo::UpdateCpuFlags(uint8_t& cpuFlags)
 	}
 }
 
-uint32_t DisassemblyInfo::GetMemoryValue(EffectiveAddressInfo effectiveAddress, MemoryDumper *memoryDumper, MemoryType memType)
+uint32_t DisassemblyInfo::GetMemoryValue(EffectiveAddressInfo effectiveAddress, MemoryDumper* memoryDumper, MemoryType memType)
 {
 	MemoryType effectiveMemType = effectiveAddress.Type == MemoryType::None ? memType : effectiveAddress.Type;
 	switch(effectiveAddress.ValueSize) {

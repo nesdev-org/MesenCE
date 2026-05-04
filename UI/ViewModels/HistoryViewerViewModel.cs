@@ -27,15 +27,15 @@ namespace Mesen.ViewModels
 
 		[Reactive] public string TotalTimeText { get; set; } = "00:00";
 		[Reactive] public string CurrentTimeText { get; set; } = "00:00";
-		
+
 		[Reactive] public uint MaxPosition { get; set; }
 		[Reactive] public uint CurrentPosition { get; set; }
-		
+
 		[Reactive] public Size RendererSize { get; set; }
 
 		[Reactive] public List<ContextMenuAction> FileMenuItems { get; private set; } = new();
 		[Reactive] public List<ContextMenuAction> OptionsMenuItems { get; private set; } = new();
-		
+
 		public SoftwareRendererViewModel SoftwareRenderer { get; } = new();
 		[Reactive] public bool IsSoftwareRendererVisible { get; set; } = false;
 
@@ -72,7 +72,7 @@ namespace Mesen.ViewModels
 			HistoryApi.HistoryViewerSetOptions(new HistoryViewerOptions() {
 				IsPaused = IsPaused,
 				Volume = (uint)Config.Volume,
-				Width = (uint)RendererSize.Width ,
+				Width = (uint)RendererSize.Width,
 				Height = (uint)RendererSize.Height
 			});
 		}
@@ -105,7 +105,7 @@ namespace Mesen.ViewModels
 			OptionsMenuItems = new List<ContextMenuAction>() {
 				new ContextMenuAction() {
 					ActionType = ActionType.VideoScale,
-					SubActions = new List<object>() { 
+					SubActions = new List<object>() {
 						GetScaleMenuItem(wnd, 1),
 						GetScaleMenuItem(wnd, 2),
 						GetScaleMenuItem(wnd, 3),

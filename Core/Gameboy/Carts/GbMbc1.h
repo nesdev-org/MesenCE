@@ -34,11 +34,11 @@ public:
 		Map(0x0000, 0x3FFF, GbMemoryType::PrgRom, (_mode ? (_ramBank << shift) : 0) * prgBankSize, true);
 
 		uint8_t prgBank = (_prgBank & mask) | (_ramBank << shift);
-		Map(0x4000, 0x7FFF, GbMemoryType::PrgRom, prgBank*prgBankSize, true);
+		Map(0x4000, 0x7FFF, GbMemoryType::PrgRom, prgBank * prgBankSize, true);
 
 		if(_ramEnabled) {
 			uint8_t ramBank = _mode ? _ramBank : 0;
-			Map(0xA000, 0xBFFF, GbMemoryType::CartRam, ramBank*ramBankSize, false);
+			Map(0xA000, 0xBFFF, GbMemoryType::CartRam, ramBank * ramBankSize, false);
 			_memoryManager->MapRegisters(0xA000, 0xBFFF, RegisterAccess::None);
 		} else {
 			Unmap(0xA000, 0xBFFF);
@@ -65,6 +65,9 @@ public:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_ramEnabled); SV(_prgBank); SV(_ramBank); SV(_mode);
+		SV(_ramEnabled);
+		SV(_prgBank);
+		SV(_ramBank);
+		SV(_mode);
 	}
 };

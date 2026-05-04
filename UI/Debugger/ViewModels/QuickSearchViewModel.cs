@@ -77,7 +77,7 @@ public class QuickSearchViewModel : ViewModelBase
 		if(_searchInProgress) {
 			return;
 		}
-		
+
 		_searchInProgress = true;
 
 		Task.Run(() => {

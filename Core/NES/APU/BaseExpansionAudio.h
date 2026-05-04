@@ -6,7 +6,7 @@ class NesConsole;
 
 class BaseExpansionAudio : public ISerializable
 {
-protected: 
+protected:
 	NesConsole* _console = nullptr;
 
 	virtual void ClockAudio() = 0;

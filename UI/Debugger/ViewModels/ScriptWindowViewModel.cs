@@ -1,8 +1,10 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using Mesen.Config;
 using Mesen.Debugger.Utilities;
 using Mesen.Debugger.Windows;
 using Mesen.Interop;
+using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
@@ -12,13 +14,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reactive.Linq;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Localization;
-using Avalonia.Threading;
 
 namespace Mesen.Debugger.ViewModels
 {
@@ -173,7 +173,7 @@ namespace Mesen.Debugger.ViewModels
 				ActionType = ActionType.BuiltInScripts,
 				AlwaysShowLabel = true,
 				SubActions = GetBuiltInScriptActions()
-			});			
+			});
 			return actions;
 		}
 
@@ -230,7 +230,7 @@ namespace Mesen.Debugger.ViewModels
 
 		private List<ContextMenuAction> GetScriptMenuActions()
 		{
-			 return new() {
+			return new() {
 				new ContextMenuAction() {
 					ActionType = ActionType.RunScript,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.ScriptWindow_RunScript),

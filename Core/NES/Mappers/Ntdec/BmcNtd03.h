@@ -21,7 +21,7 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		uint8_t prg = ((addr >> 10) & 0x1E);
-		uint8_t chr= ((addr & 0x0300) >> 5) | (addr & 0x07);
+		uint8_t chr = ((addr & 0x0300) >> 5) | (addr & 0x07);
 		if(addr & 0x80) {
 			SelectPrgPage(0, prg | ((addr >> 6) & 1));
 			SelectPrgPage(1, prg | ((addr >> 6) & 1));

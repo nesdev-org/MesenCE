@@ -2,13 +2,13 @@
 #include "Equalizer.h"
 #include "orfanidis_eq.h"
 
-void Equalizer::ApplyEqualizer(uint32_t sampleCount, int16_t *samples)
+void Equalizer::ApplyEqualizer(uint32_t sampleCount, int16_t* samples)
 {
 	double outL, outR;
 	for(uint32_t i = 0; i < sampleCount; i++) {
 		double inL = samples[i * 2];
 		double inR = samples[i * 2 + 1];
-			
+
 		_equalizerLeft->sbs_process(&inL, &outL);
 		_equalizerRight->sbs_process(&inR, &outR);
 

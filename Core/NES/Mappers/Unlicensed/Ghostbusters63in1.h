@@ -14,7 +14,7 @@ protected:
 	void InitMapper() override
 	{
 	}
-	
+
 	void Reset(bool softReset) override
 	{
 		_regs[0] = _regs[1] = 0;
@@ -25,7 +25,7 @@ protected:
 	{
 		BaseMapper::Serialize(s);
 		SVArray(_regs, 2);
-		
+
 		if(!s.IsSaving()) {
 			UpdateState();
 		}

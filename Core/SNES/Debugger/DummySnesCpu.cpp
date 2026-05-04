@@ -7,7 +7,6 @@
 #undef SnesCpu
 #undef DUMMYCPU
 
-
 DummySnesCpu::DummySnesCpu(SnesConsole* console, CpuType type)
 {
 	_console = console;

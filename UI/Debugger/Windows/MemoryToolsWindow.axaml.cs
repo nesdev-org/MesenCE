@@ -1,23 +1,23 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using System;
+using Mesen.Config;
 using Mesen.Debugger.Controls;
+using Mesen.Debugger.Disassembly;
+using Mesen.Debugger.Labels;
+using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
-using System.ComponentModel;
-using Avalonia.Interactivity;
-using Mesen.Debugger.Utilities;
-using System.IO;
-using Mesen.Utilities;
-using Mesen.Config;
-using Mesen.Debugger.Labels;
-using System.Linq;
-using System.Collections.Generic;
 using Mesen.Localization;
-using Avalonia.Input;
-using Mesen.Debugger.Disassembly;
+using Mesen.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
 
 namespace Mesen.Debugger.Windows
 {
@@ -110,7 +110,7 @@ namespace Mesen.Debugger.Windows
 			if(byteOffset >= 0) {
 				if(byteOffset != _prevByteOffset) {
 					CpuType cpuType = _model.Config.MemoryType.ToCpuType();
-					
+
 					AddressInfo addr = new AddressInfo() { Address = byteOffset, Type = _model.Config.MemoryType };
 					AddressInfo relAddr;
 					AddressInfo absAddr;
@@ -597,9 +597,9 @@ namespace Mesen.Debugger.Windows
 					Breakpoint? bp = BreakpointManager.GetMatchingBreakpoint(startAddress, endAddress, memType);
 					CpuType cpuType = memType.ToCpuType();
 					if(bp == null) {
-						bp = new Breakpoint() { 
-							MemoryType = memType, 
-							CpuType = cpuType, 
+						bp = new Breakpoint() {
+							MemoryType = memType,
+							CpuType = cpuType,
 							StartAddress = startAddress,
 							EndAddress = endAddress,
 							BreakOnWrite = true,

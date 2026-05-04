@@ -63,11 +63,11 @@ RowDataType SmsTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void SmsTraceLogger::GetTraceRow(string &output, SmsCpuState &cpuState, TraceLogPpuState &vdpState, DisassemblyInfo &disassemblyInfo)
+void SmsTraceLogger::GetTraceRow(string& output, SmsCpuState& cpuState, TraceLogPpuState& vdpState, DisassemblyInfo& disassemblyInfo)
 {
 	constexpr char activeStatusLetters[8] = { 'S', 'Z', '5', 'H', '3', 'P', 'N', 'C' };
 	constexpr char inactiveStatusLetters[8] = { 's', 'z', '-', 'h', '-', 'p', 'n', 'c' };
-	
+
 	for(RowPart& rowPart : _rowParts) {
 		switch(rowPart.DataType) {
 			case RowDataType::A: WriteIntValue(output, cpuState.A, rowPart); break;

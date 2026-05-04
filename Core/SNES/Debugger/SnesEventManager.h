@@ -47,16 +47,16 @@ private:
 
 	SnesEventViewerConfig _config;
 
-	SnesCpu * _cpu;
-	SnesPpu *_ppu;
+	SnesCpu* _cpu;
+	SnesPpu* _ppu;
 	SnesMemoryManager* _memoryManager;
-	SnesDmaController *_dmaController;
-	Debugger *_debugger;
+	SnesDmaController* _dmaController;
+	Debugger* _debugger;
 
 	bool _overscanMode = false;
 	bool _useHighResOutput = false;
 	uint32_t _scanlineCount = 262;
-	uint16_t *_ppuBuffer = nullptr;
+	uint16_t* _ppuBuffer = nullptr;
 
 protected:
 	void ConvertScanlineCycleToRowColumn(int32_t& x, int32_t& y) override;
@@ -64,12 +64,12 @@ protected:
 	bool ShowPreviousFrameEvents() override;
 
 public:
-	SnesEventManager(Debugger *debugger, SnesCpu *cpu, SnesPpu *ppu, SnesMemoryManager *memoryManager, SnesDmaController *dmaController);
+	SnesEventManager(Debugger* debugger, SnesCpu* cpu, SnesPpu* ppu, SnesMemoryManager* memoryManager, SnesDmaController* dmaController);
 	~SnesEventManager();
 
-	void AddEvent(DebugEventType type, MemoryOperationInfo &operation, int32_t breakpointId = -1) override;
+	void AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId = -1) override;
 	void AddEvent(DebugEventType type) override;
-	
+
 	EventViewerCategoryCfg GetEventConfig(DebugEventInfo& evt) override;
 
 	uint32_t TakeEventSnapshot(bool forAutoRefresh) override;

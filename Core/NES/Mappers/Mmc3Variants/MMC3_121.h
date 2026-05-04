@@ -48,7 +48,7 @@ protected:
 		if(_prgSize == _chrRomSize) {
 			//Hack for Super 3-in-1
 			BaseMapper::SelectChrPage(slot, page | ((_exRegs[3] & 0x80) << 1), memoryType);
-		} else {			
+		} else {
 			if((slot < 4 && _chrMode == 0) || (slot >= 4 && _chrMode == 1)) {
 				page |= 0x100;
 			}
@@ -59,20 +59,49 @@ protected:
 	void UpdateExRegs()
 	{
 		switch(_exRegs[5] & 0x3F) {
-			case 0x20: _exRegs[7] = 1; _exRegs[0] = _exRegs[6]; break;
-			case 0x29: _exRegs[7] = 1; _exRegs[0] = _exRegs[6]; break;
-			case 0x26: _exRegs[7] = 0; _exRegs[0] = _exRegs[6]; break;
-			case 0x2B: _exRegs[7] = 1; _exRegs[0] = _exRegs[6]; break;
+			case 0x20:
+				_exRegs[7] = 1;
+				_exRegs[0] = _exRegs[6];
+				break;
+
+			case 0x29:
+				_exRegs[7] = 1;
+				_exRegs[0] = _exRegs[6];
+				break;
+
+			case 0x26:
+				_exRegs[7] = 0;
+				_exRegs[0] = _exRegs[6];
+				break;
+
+			case 0x2B:
+				_exRegs[7] = 1;
+				_exRegs[0] = _exRegs[6];
+				break;
+
 			case 0x2C:
 				_exRegs[7] = 1;
 				if(_exRegs[6]) {
 					_exRegs[0] = _exRegs[6];
 				}
 				break;
+
 			case 0x3C:
-			case 0x3F: _exRegs[7] = 1; _exRegs[0] = _exRegs[6]; break;
-			case 0x28: _exRegs[7] = 0; _exRegs[1] = _exRegs[6]; break;
-			case 0x2A: _exRegs[7] = 0; _exRegs[2] = _exRegs[6]; break;
+			case 0x3F:
+				_exRegs[7] = 1;
+				_exRegs[0] = _exRegs[6];
+				break;
+
+			case 0x28:
+				_exRegs[7] = 0;
+				_exRegs[1] = _exRegs[6];
+				break;
+
+			case 0x2A:
+				_exRegs[7] = 0;
+				_exRegs[2] = _exRegs[6];
+				break;
+
 			case 0x2F: break;
 			default: _exRegs[5] = 0; break;
 		}
@@ -84,7 +113,7 @@ protected:
 			//$5000-$5FFF
 			const uint8_t lookup[] = { 0x83, 0x83, 0x42, 0x00 };
 			_exRegs[4] = lookup[value & 0x03];
-			if((addr & 0x5180) == 0x5180) {	
+			if((addr & 0x5180) == 0x5180) {
 				//Hack for Super 3-in-1
 				_exRegs[3] = value;
 				UpdateState();

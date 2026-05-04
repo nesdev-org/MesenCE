@@ -35,7 +35,7 @@ namespace Mesen.Debugger
 
 		public bool IsAbsoluteAddress { get { return !MemoryType.IsRelativeMemory(); } }
 		public bool SupportsExec { get { return MemoryType.SupportsExecBreakpoints(); } }
-		
+
 		public bool IsSingleAddress { get { return StartAddress == EndAddress; } }
 		public bool IsAddressRange { get { return StartAddress != EndAddress; } }
 
@@ -159,8 +159,8 @@ namespace Mesen.Debugger
 			DebuggerConfig config = ConfigManager.Config.Debug.Debugger;
 			if(Forbid) {
 				return Color.FromUInt32(config.ForbidBreakpointColor);
-			} 
-			return Color.FromUInt32(BreakOnExec ? config.CodeExecBreakpointColor: (BreakOnWrite ? config.CodeWriteBreakpointColor : config.CodeReadBreakpointColor));
+			}
+			return Color.FromUInt32(BreakOnExec ? config.CodeExecBreakpointColor : (BreakOnWrite ? config.CodeWriteBreakpointColor : config.CodeReadBreakpointColor));
 		}
 
 		public Breakpoint Clone()

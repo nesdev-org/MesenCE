@@ -1,12 +1,12 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Debugger.ViewModels;
+using DataBoxControl;
 using Mesen.Debugger.Labels;
+using Mesen.Debugger.ViewModels;
 using Mesen.Debugger.Windows;
 using System;
-using Avalonia.Input;
-using DataBoxControl;
 using static Mesen.Debugger.ViewModels.FunctionListViewModel;
 
 namespace Mesen.Debugger.Views

@@ -108,7 +108,7 @@ template<WsVideoMode mode>
 void WsPpu::DrawScanline()
 {
 	uint8_t rowIndex = _state.Scanline & 0x01;
-	std::fill(_rowData[rowIndex], _rowData[rowIndex] + WsConstants::ScreenWidth, PixelData{});
+	std::fill(_rowData[rowIndex], _rowData[rowIndex] + WsConstants::ScreenWidth, PixelData {});
 
 	DrawSprites<mode>();
 	DrawBackground<mode, 0>();
@@ -263,8 +263,7 @@ uint16_t WsPpu::GetPixelColor(uint16_t tileAddr, uint8_t column)
 			uint8_t tileData2 = _vram[tileAddr + 1];
 			return (
 				((tileData << column) & 0x80) >> 7 |
-				((tileData2 << column) & 0x80) >> 6
-			);
+				((tileData2 << column) & 0x80) >> 6);
 		}
 
 		case WsVideoMode::Color2bpp: {
@@ -272,8 +271,7 @@ uint16_t WsPpu::GetPixelColor(uint16_t tileAddr, uint8_t column)
 			uint8_t tileData2 = _vram[tileAddr + 1];
 			return (
 				((tileData << column) & 0x80) >> 7 |
-				((tileData2 << column) & 0x80) >> 6
-			);
+				((tileData2 << column) & 0x80) >> 6);
 		}
 
 		case WsVideoMode::Color4bpp: {
@@ -285,8 +283,7 @@ uint16_t WsPpu::GetPixelColor(uint16_t tileAddr, uint8_t column)
 				((tileData << column) & 0x80) >> 7 |
 				((tileData2 << column) & 0x80) >> 6 |
 				((tileData3 << column) & 0x80) >> 5 |
-				((tileData4 << column) & 0x80) >> 4
-			);
+				((tileData4 << column) & 0x80) >> 4);
 		}
 
 		case WsVideoMode::Color4bppPacked:
@@ -306,7 +303,7 @@ void WsPpu::ProcessSpriteCopy()
 
 	int i = _state.Cycle << 1;
 	_spriteRam[i] = _vram[baseAddr + (((_state.FirstSpriteIndex * 4) + i) & 0x1FF)];
-	_spriteRam[i+1] = _vram[baseAddr + (((_state.FirstSpriteIndex * 4) + i + 1) & 0x1FF)];
+	_spriteRam[i + 1] = _vram[baseAddr + (((_state.FirstSpriteIndex * 4) + i + 1) & 0x1FF)];
 }
 
 void WsPpu::DrawIcons()
@@ -351,13 +348,15 @@ void WsPpu::DrawIcons()
 		} else {
 			if(_console->GetModel() == WsModel::Monochrome) {
 				switch(_console->GetApu()->GetMasterVolume()) {
-					default: case 0: DrawIcon(true, volumeWsOff, 52); break;
+					default:
+					case 0: DrawIcon(true, volumeWsOff, 52); break;
 					case 1: DrawIcon(true, volumeWsLow, 52); break;
 					case 2: DrawIcon(true, volumeWsHigh, 52); break;
 				}
 			} else {
 				switch(_console->GetApu()->GetMasterVolume()) {
-					default: case 0: DrawIcon(true, volumeWscOff, 52); break;
+					default:
+					case 0: DrawIcon(true, volumeWscOff, 52); break;
 					case 1: DrawIcon(true, volumeWscLow, 52); break;
 					case 2: DrawIcon(true, volumeWscMed, 52); break;
 					case 3: DrawIcon(true, volumeWscHigh, 52); break;
@@ -365,7 +364,7 @@ void WsPpu::DrawIcons()
 			}
 		}
 	}
-		
+
 	DrawIcon(_state.Icons.Vertical, verticalIcon, 78);
 	DrawIcon(_state.Icons.Horizontal, horizontalIcon, 91);
 	DrawIcon(_state.Icons.Aux3, aux3, 104);
@@ -444,13 +443,15 @@ uint8_t WsPpu::GetLcdStatus()
 
 	if(_console->GetModel() == WsModel::Monochrome) {
 		switch(masterVolume) {
-			default: case 0: volumeLevel = 0; break;
+			default:
+			case 0: volumeLevel = 0; break;
 			case 1: volumeLevel = 2; break;
 			case 2: volumeLevel = 3; break;
 		}
 	} else {
 		switch(masterVolume) {
-			default: case 0: volumeLevel = 0; break;
+			default:
+			case 0: volumeLevel = 0; break;
 			case 1: volumeLevel = 2; break;
 			case 2: volumeLevel = 1; break;
 			case 3: volumeLevel = 3; break;
@@ -472,8 +473,7 @@ uint8_t WsPpu::GetLcdStatus()
 		(_state.SleepEnabled ? 0x01 : 0) |
 		(headphone ? 0x02 : 0) |
 		(volumeLevel << 2) |
-		(speaker ? 0x10 : 0)
-	);
+		(speaker ? 0x10 : 0));
 }
 
 void WsPpu::SendFrame()
@@ -508,162 +508,158 @@ void WsPpu::SendFrame()
 uint8_t WsPpu::ReadPort(uint16_t port)
 {
 	switch(port) {
-	case 0x00: return _state.Control;
-	case 0x01: return _state.BgColor & (_memoryManager->IsColorEnabled() ? 0xFF : 0x07);
-	case 0x02: return _state.Scanline;
-	case 0x03: return _state.IrqScanline;
-	case 0x04: return (_state.SpriteTableAddress >> 9) & (_memoryManager->IsColorEnabled() ? 0x3F : 0x1F);
-	case 0x05: return _state.FirstSpriteIndex;
-	case 0x06: return _state.SpriteCount;
-	case 0x07: return _state.ScreenAddress & (_memoryManager->IsColorEnabled() ? 0xFF : 0x77);
-	case 0x08: return _state.BgWindow.Left;
-	case 0x09: return _state.BgWindow.Top;
-	case 0x0A: return _state.BgWindow.Right;
-	case 0x0B: return _state.BgWindow.Bottom;
+		case 0x00: return _state.Control;
+		case 0x01: return _state.BgColor & (_memoryManager->IsColorEnabled() ? 0xFF : 0x07);
+		case 0x02: return _state.Scanline;
+		case 0x03: return _state.IrqScanline;
+		case 0x04: return (_state.SpriteTableAddress >> 9) & (_memoryManager->IsColorEnabled() ? 0x3F : 0x1F);
+		case 0x05: return _state.FirstSpriteIndex;
+		case 0x06: return _state.SpriteCount;
+		case 0x07: return _state.ScreenAddress & (_memoryManager->IsColorEnabled() ? 0xFF : 0x77);
+		case 0x08: return _state.BgWindow.Left;
+		case 0x09: return _state.BgWindow.Top;
+		case 0x0A: return _state.BgWindow.Right;
+		case 0x0B: return _state.BgWindow.Bottom;
 
-	case 0x0C: return _state.SpriteWindow.Left;
-	case 0x0D: return _state.SpriteWindow.Top;
-	case 0x0E: return _state.SpriteWindow.Right;
-	case 0x0F: return _state.SpriteWindow.Bottom;
+		case 0x0C: return _state.SpriteWindow.Left;
+		case 0x0D: return _state.SpriteWindow.Top;
+		case 0x0E: return _state.SpriteWindow.Right;
+		case 0x0F: return _state.SpriteWindow.Bottom;
 
-	case 0x10: return _state.BgLayers[0].ScrollX;
-	case 0x11: return _state.BgLayers[0].ScrollY;
-	case 0x12: return _state.BgLayers[1].ScrollX;
-	case 0x13: return _state.BgLayers[1].ScrollY;
-	case 0x14: return  _state.LcdControl;
-	case 0x15: return _state.Icons.Value;
-	case 0x16: return _state.LastScanline;
-	case 0x17: return _state.BackPorchScanline;
-	case 0x1A: return GetLcdStatus();
-	case 0x1B: return 0;
+		case 0x10: return _state.BgLayers[0].ScrollX;
+		case 0x11: return _state.BgLayers[0].ScrollY;
+		case 0x12: return _state.BgLayers[1].ScrollX;
+		case 0x13: return _state.BgLayers[1].ScrollY;
+		case 0x14: return _state.LcdControl;
+		case 0x15: return _state.Icons.Value;
+		case 0x16: return _state.LastScanline;
+		case 0x17: return _state.BackPorchScanline;
+		case 0x1A: return GetLcdStatus();
+		case 0x1B: return 0;
 
-	case 0x1C:
-	case 0x1D:
-	case 0x1E:
-	case 0x1F:
-		return (
-			_state.BwShades[(port - 0x1C) * 2] |
-			(_state.BwShades[(port - 0x1C) * 2 + 1] << 4)
-		);
-
-	default:
-		if(port >= 0x20 && port <= 0x3F) {
+		case 0x1C:
+		case 0x1D:
+		case 0x1E:
+		case 0x1F:
 			return (
-				_state.BwPalettes[(port - 0x20) * 2] |
-				(_state.BwPalettes[(port - 0x20) * 2 + 1] << 4)
-			);
-		}
-		else {
-			LogDebug("[Debug] PPU Read - missing handler: $" + HexUtilities::ToHex(port));
-			return _memoryManager->GetUnmappedPort();
-		}
+				_state.BwShades[(port - 0x1C) * 2] |
+				(_state.BwShades[(port - 0x1C) * 2 + 1] << 4));
+
+		default:
+			if(port >= 0x20 && port <= 0x3F) {
+				return (
+					_state.BwPalettes[(port - 0x20) * 2] |
+					(_state.BwPalettes[(port - 0x20) * 2 + 1] << 4));
+			} else {
+				LogDebug("[Debug] PPU Read - missing handler: $" + HexUtilities::ToHex(port));
+				return _memoryManager->GetUnmappedPort();
+			}
 	}
 }
 
 void WsPpu::WritePort(uint16_t port, uint8_t value)
 {
 	switch(port) {
-	case 0x00:
-		_state.Control = value & 0x3F;
-		_state.BgLayers[0].Enabled = value & 0x01;
-		_state.BgLayers[1].Enabled = value & 0x02;
-		_state.SpritesEnabled = value & 0x04;
-		_state.SpriteWindow.Enabled = value & 0x08;
-		_state.DrawOutsideBgWindow = value & 0x10;
-		_state.BgWindow.Enabled = value & 0x20;
-		break;
+		case 0x00:
+			_state.Control = value & 0x3F;
+			_state.BgLayers[0].Enabled = value & 0x01;
+			_state.BgLayers[1].Enabled = value & 0x02;
+			_state.SpritesEnabled = value & 0x04;
+			_state.SpriteWindow.Enabled = value & 0x08;
+			_state.DrawOutsideBgWindow = value & 0x10;
+			_state.BgWindow.Enabled = value & 0x20;
+			break;
 
-	case 0x01: _state.BgColor = value & (_console->GetModel() == WsModel::Monochrome ? 0x07 : 0xFF); break;
-	case 0x03: _state.IrqScanline = value; break;
-	case 0x04: _state.SpriteTableAddress = (value & (_console->GetModel() == WsModel::Monochrome ? 0x1F : 0x3F)) << 9; break;
+		case 0x01: _state.BgColor = value & (_console->GetModel() == WsModel::Monochrome ? 0x07 : 0xFF); break;
+		case 0x03: _state.IrqScanline = value; break;
+		case 0x04: _state.SpriteTableAddress = (value & (_console->GetModel() == WsModel::Monochrome ? 0x1F : 0x3F)) << 9; break;
 
-	case 0x05: _state.FirstSpriteIndex = value & 0x7F; break;
-	case 0x06: _state.SpriteCount = value; break;
+		case 0x05: _state.FirstSpriteIndex = value & 0x7F; break;
+		case 0x06: _state.SpriteCount = value; break;
 
-	case 0x07:
-		_state.ScreenAddress = value & (_console->GetModel() == WsModel::Monochrome ? 0x77 : 0xFF);
-		_state.BgLayers[0].MapAddress = (_state.ScreenAddress & 0x0F) << 11;
-		_state.BgLayers[1].MapAddress = (_state.ScreenAddress & 0xF0) << 7;
-		break;
+		case 0x07:
+			_state.ScreenAddress = value & (_console->GetModel() == WsModel::Monochrome ? 0x77 : 0xFF);
+			_state.BgLayers[0].MapAddress = (_state.ScreenAddress & 0x0F) << 11;
+			_state.BgLayers[1].MapAddress = (_state.ScreenAddress & 0xF0) << 7;
+			break;
 
-	case 0x08: _state.BgWindow.Left = value; break;
-	case 0x09: _state.BgWindow.Top = value; break;
-	case 0x0A: _state.BgWindow.Right = value; break;
-	case 0x0B: _state.BgWindow.Bottom = value; break;
+		case 0x08: _state.BgWindow.Left = value; break;
+		case 0x09: _state.BgWindow.Top = value; break;
+		case 0x0A: _state.BgWindow.Right = value; break;
+		case 0x0B: _state.BgWindow.Bottom = value; break;
 
-	case 0x0C: _state.SpriteWindow.Left = value; break;
-	case 0x0D: _state.SpriteWindow.Top = value; break;
-	case 0x0E: _state.SpriteWindow.Right = value; break;
-	case 0x0F: _state.SpriteWindow.Bottom = value; break;
+		case 0x0C: _state.SpriteWindow.Left = value; break;
+		case 0x0D: _state.SpriteWindow.Top = value; break;
+		case 0x0E: _state.SpriteWindow.Right = value; break;
+		case 0x0F: _state.SpriteWindow.Bottom = value; break;
 
-	case 0x10: _state.BgLayers[0].ScrollX = value; break;
-	case 0x11: _state.BgLayers[0].ScrollY = value; break;
-	case 0x12: _state.BgLayers[1].ScrollX = value; break;
-	case 0x13: _state.BgLayers[1].ScrollY = value; break;
+		case 0x10: _state.BgLayers[0].ScrollX = value; break;
+		case 0x11: _state.BgLayers[0].ScrollY = value; break;
+		case 0x12: _state.BgLayers[1].ScrollX = value; break;
+		case 0x13: _state.BgLayers[1].ScrollY = value; break;
 
-	case 0x14:
-		_state.LcdEnabled = value & 0x01;
-		switch(_console->GetModel()) {
-			case WsModel::SwanCrystal:
-				_state.LcdControl = value & 0x01;
-				break;
+		case 0x14:
+			_state.LcdEnabled = value & 0x01;
+			switch(_console->GetModel()) {
+				case WsModel::SwanCrystal:
+					_state.LcdControl = value & 0x01;
+					break;
 
-			case WsModel::Color:
-				_state.HighContrast = value & 0x02;
-				_state.LcdControl = value & 0xF3;
-				break;
+				case WsModel::Color:
+					_state.HighContrast = value & 0x02;
+					_state.LcdControl = value & 0xF3;
+					break;
 
-			default:
-				_state.LcdControl = value & 0xF1;
-				break;
-		}
-		break;
-
-	case 0x15:
-		_state.Icons.Sleep = value & 0x01;
-		_state.Icons.Vertical = value & 0x02;
-		_state.Icons.Horizontal = value & 0x04;
-		_state.Icons.Aux1 = value & 0x08;
-		_state.Icons.Aux2 = value & 0x10;
-		_state.Icons.Aux3 = value & 0x20;
-		_state.Icons.Value = value & 0x3F;
-		break;
-
-	case 0x16: _state.LastScanline = value; break;
-
-	case 0x17:
-		if(_console->GetModel() != WsModel::SwanCrystal) {
-			_state.BackPorchScanline = value;
-		}
-		break;
-
-	case 0x1A:
-		_state.SleepEnabled = value & 0x01;
-		break;
-
-	case 0x1C:
-	case 0x1D:
-	case 0x1E:
-	case 0x1F:
-		_state.BwShades[(port - 0x1C) * 2] = value & 0x0F;
-		_state.BwShades[(port - 0x1C) * 2 + 1] = (value >> 4) & 0x0F;
-		break;
-
-	default:
-		if(port >= 0x20 && port <= 0x3F) {
-			int index = port - 0x20;
-
-			//Color 0 only exists on palettes 0-3 and 8-11
-			//For other palettes, this is always read as 0 (writes have no effect)
-			if((index & 0x09) != 0x08) {
-				_state.BwPalettes[index * 2] = value & 0x07;
+				default:
+					_state.LcdControl = value & 0xF1;
+					break;
 			}
-			_state.BwPalettes[index * 2 + 1] = (value >> 4) & 0x07;
-		} else {
-			LogDebug("[Debug] PPU Write - missing handler: $" + HexUtilities::ToHex(port) + "  = " + HexUtilities::ToHex(value));
-		}
-		break;
+			break;
 
+		case 0x15:
+			_state.Icons.Sleep = value & 0x01;
+			_state.Icons.Vertical = value & 0x02;
+			_state.Icons.Horizontal = value & 0x04;
+			_state.Icons.Aux1 = value & 0x08;
+			_state.Icons.Aux2 = value & 0x10;
+			_state.Icons.Aux3 = value & 0x20;
+			_state.Icons.Value = value & 0x3F;
+			break;
+
+		case 0x16: _state.LastScanline = value; break;
+
+		case 0x17:
+			if(_console->GetModel() != WsModel::SwanCrystal) {
+				_state.BackPorchScanline = value;
+			}
+			break;
+
+		case 0x1A:
+			_state.SleepEnabled = value & 0x01;
+			break;
+
+		case 0x1C:
+		case 0x1D:
+		case 0x1E:
+		case 0x1F:
+			_state.BwShades[(port - 0x1C) * 2] = value & 0x0F;
+			_state.BwShades[(port - 0x1C) * 2 + 1] = (value >> 4) & 0x0F;
+			break;
+
+		default:
+			if(port >= 0x20 && port <= 0x3F) {
+				int index = port - 0x20;
+
+				//Color 0 only exists on palettes 0-3 and 8-11
+				//For other palettes, this is always read as 0 (writes have no effect)
+				if((index & 0x09) != 0x08) {
+					_state.BwPalettes[index * 2] = value & 0x07;
+				}
+				_state.BwPalettes[index * 2 + 1] = (value >> 4) & 0x07;
+			} else {
+				LogDebug("[Debug] PPU Write - missing handler: $" + HexUtilities::ToHex(port) + "  = " + HexUtilities::ToHex(value));
+			}
+			break;
 	}
 }
 
@@ -683,7 +679,7 @@ void WsPpu::Serialize(Serializer& s)
 	SV(_state.Cycle);
 	SV(_state.Scanline);
 	SV(_state.LastScanline);
-	
+
 	for(int i = 0; i < 2; i++) {
 		SVI(_state.BgLayers[i].Enabled);
 		SVI(_state.BgLayers[i].EnabledLatch);
@@ -733,7 +729,7 @@ void WsPpu::Serialize(Serializer& s)
 	SV(_state.SpritesEnabledLatch);
 	SV(_state.Mode);
 	SV(_state.NextMode);
-	
+
 	SV(_state.BgColor);
 	SV(_state.IrqScanline);
 

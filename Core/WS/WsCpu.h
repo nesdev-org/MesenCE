@@ -1,15 +1,15 @@
 #if (defined(DUMMYCPU) && !defined(__DUMMYWsCpu__H)) || (!defined(DUMMYCPU) && !defined(__WsCpu__H))
-#ifdef DUMMYCPU
-#define __DUMMYWsCpu__H
-#else
-#define __WsCpu__H
-#endif
+	#ifdef DUMMYCPU
+		#define __DUMMYWsCpu__H
+	#else
+		#define __WsCpu__H
+	#endif
 
-#include "pch.h"
-#include "WS/WsCpuPrefetch.h"
-#include "WS/WsTypes.h"
-#include "Shared/MemoryOperationType.h"
-#include "Utilities/ISerializable.h"
+	#include "pch.h"
+	#include "WS/WsCpuPrefetch.h"
+	#include "WS/WsTypes.h"
+	#include "Shared/MemoryOperationType.h"
+	#include "Utilities/ISerializable.h"
 
 class Emulator;
 class WsConsole;
@@ -75,16 +75,13 @@ private:
 	uint64_t _suppressIrqClock = 0;
 	uint64_t _suppressTrapClock = 0;
 
-#ifndef DUMMYCPU
+	#ifndef DUMMYCPU
 	WsCpuPrefetch _prefetch;
-#endif
+	#endif
 
 	uint16_t* _modRegLut8[4] = { &_state.AX, &_state.CX, &_state.DX, &_state.BX };
 	uint16_t* _modSegLut16[4] = { &_state.ES, &_state.CS, &_state.SS, &_state.DS };
-	uint16_t* _modRegLut16[8] = {
-		&_state.AX, &_state.CX, &_state.DX, &_state.BX,
-		&_state.SP, &_state.BP, &_state.SI, &_state.DI
-	};
+	uint16_t* _modRegLut16[8] = { &_state.AX, &_state.CX, &_state.DX, &_state.BX, &_state.SP, &_state.BP, &_state.SI, &_state.DI };
 
 	//Used to re-fill prefetch buffer with last opcode when REP prefix is used
 	uint8_t _opCode = 0;
@@ -207,7 +204,7 @@ private:
 
 	void Enter();
 	void Leave();
-	
+
 	void NOP();
 	void FP01();
 
@@ -227,7 +224,7 @@ private:
 	void LDS();
 	void LES();
 	void LEA();
-	
+
 	void XLAT();
 
 	void AdjustAscii(bool forSub);
@@ -283,7 +280,7 @@ public:
 
 	void Serialize(Serializer& s) override;
 
-#ifdef DUMMYCPU
+	#ifdef DUMMYCPU
 private:
 	uint32_t _memOpCounter = 0;
 	MemoryOperationInfo _memOperations[32] = {};
@@ -295,7 +292,7 @@ public:
 	void LogMemoryOperation(uint32_t addr, uint16_t value, MemoryOperationType type, MemoryType memType, bool isWordAccess);
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
 	bool IsWordAccess(uint32_t index);
-#endif
+	#endif
 };
 
 template<> uint8_t WsCpu::GetModRegister<uint8_t>(uint8_t reg);

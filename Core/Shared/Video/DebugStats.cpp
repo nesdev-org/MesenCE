@@ -7,7 +7,7 @@
 #include "Shared/RewindManager.h"
 #include "Shared/EmuSettings.h"
 
-void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
+void DebugStats::DisplayStats(Emulator* emu, double lastFrameTime)
 {
 	AudioStatistics stats = emu->GetSoundMixer()->GetStatistics();
 	AudioConfig audioCfg = emu->GetSettings()->GetAudioConfig();
@@ -84,7 +84,7 @@ void DebugStats::DisplayStats(Emulator *emu, double lastFrameTime)
 		} else if(std::abs(duration - expectedFrameDelay) > 1) {
 			lineColor = 0xFFA500;
 		}
-		hud->DrawLine(130 + i*2, 60 + 50 - duration*2, 130 + i*2 + 2, 60 + 50 - nextDuration*2, lineColor, 1, startFrame);
+		hud->DrawLine(130 + i * 2, 60 + 50 - duration * 2, 130 + i * 2 + 2, 60 + 50 - nextDuration * 2, lineColor, 1, startFrame);
 	}
 
 	hud->DrawRectangle(8, 60, 115, 34, 0x40000000, true, 1, startFrame);

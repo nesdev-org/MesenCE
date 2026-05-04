@@ -1,3 +1,4 @@
+// clang-format off
 #ifndef _EMU2413_H_
 #define _EMU2413_H_
 

@@ -22,7 +22,7 @@ private:
 protected:
 	bool HasCoordinates() override { return true; }
 
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
 		SV(_stateBuffer);
@@ -46,7 +46,11 @@ protected:
 	}
 
 public:
-	enum Buttons { Left = 0, Right };
+	enum Buttons
+	{
+		Left = 0,
+		Right
+	};
 
 	SnesMouse(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::SnesMouse, port, keyMappings)
 	{
@@ -86,8 +90,12 @@ public:
 
 		//These flags will maintain and report their last moved direction.
 		//It's a hardware quirk that the real mouse does. (unknown if any games rely on this)
-		if(dx != 0) { _leftFlag = dx < 0 ? 0x80 : 0; }
-		if(dy != 0) { _upFlag = dy < 0 ? 0x80 : 0; }
+		if(dx != 0) {
+			_leftFlag = dx < 0 ? 0x80 : 0;
+		}
+		if(dy != 0) {
+			_upFlag = dy < 0 ? 0x80 : 0;
+		}
 
 		dx = std::min(std::abs(dx), 127);
 		dy = std::min(std::abs(dy), 127);

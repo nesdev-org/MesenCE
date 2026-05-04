@@ -22,7 +22,7 @@ HdPackLoader::HdPackLoader()
 {
 }
 
-bool HdPackLoader::InitializeLoader(VirtualFile &romFile, HdPackData *data)
+bool HdPackLoader::InitializeLoader(VirtualFile& romFile, HdPackData* data)
 {
 	_data = data;
 
@@ -40,7 +40,7 @@ bool HdPackLoader::InitializeLoader(VirtualFile &romFile, HdPackData *data)
 	return false;
 }
 
-bool HdPackLoader::LoadHdNesPack(string definitionFile, HdPackData &outData)
+bool HdPackLoader::LoadHdNesPack(string definitionFile, HdPackData& outData)
 {
 	HdPackLoader loader;
 	if(ifstream(definitionFile)) {
@@ -52,7 +52,7 @@ bool HdPackLoader::LoadHdNesPack(string definitionFile, HdPackData &outData)
 	return false;
 }
 
-bool HdPackLoader::LoadHdNesPack(VirtualFile &romFile, HdPackData &outData)
+bool HdPackLoader::LoadHdNesPack(VirtualFile& romFile, HdPackData& outData)
 {
 	HdPackLoader loader;
 	if(loader.InitializeLoader(romFile, &outData)) {
@@ -75,7 +75,7 @@ bool HdPackLoader::CheckFile(string filename)
 	return false;
 }
 
-bool HdPackLoader::LoadFile(string filename, vector<uint8_t> &fileData)
+bool HdPackLoader::LoadFile(string filename, vector<uint8_t>& fileData)
 {
 	fileData.clear();
 
@@ -92,7 +92,7 @@ bool HdPackLoader::LoadFile(string filename, vector<uint8_t> &fileData)
 
 			fileData.resize(fileSize);
 			file.read((char*)fileData.data(), fileSize);
-			
+
 			return true;
 		}
 	}
@@ -212,7 +212,7 @@ bool HdPackLoader::LoadPack()
 		}
 
 		return true;
-	} catch(std::exception &ex) {
+	} catch(std::exception& ex) {
 		logError(string("Error: ") + ex.what() + " on line: " + lineContent);
 		return false;
 	}
@@ -233,7 +233,8 @@ bool HdPackLoader::ProcessImgTag(string src)
 }
 
 template<typename T>
-void HdPackLoader::AddGlobalCondition(string name) {
+void HdPackLoader::AddGlobalCondition(string name)
+{
 	T* cond = new T();
 	cond->Name = name;
 	_data->Conditions.push_back(unique_ptr<HdPackCondition>(cond));
@@ -251,7 +252,7 @@ void HdPackLoader::InitializeGlobalConditions()
 	AddGlobalCondition<HdPackHorizontalMirroringCondition>("hmirror");
 	AddGlobalCondition<HdPackVerticalMirroringCondition>("vmirror");
 	AddGlobalCondition<HdPackBgPriorityCondition>("bgpriority");
-	
+
 	if(_data->Version >= 107) {
 		AddGlobalCondition<HdPackSpritePaletteCondition<0>>("sppalette0");
 		AddGlobalCondition<HdPackSpritePaletteCondition<1>>("sppalette1");
@@ -281,7 +282,7 @@ void HdPackLoader::ReadTileData(HdTileKey& key, string& tileData, string& palDat
 	key.PaletteColors = HexUtilities::FromHex(palData);
 }
 
-void HdPackLoader::ProcessOverscanTag(vector<string> &tokens)
+void HdPackLoader::ProcessOverscanTag(vector<string>& tokens)
 {
 	OverscanDimensions overscan;
 	overscan.Top = std::stoi(tokens[0]);
@@ -292,7 +293,7 @@ void HdPackLoader::ProcessOverscanTag(vector<string> &tokens)
 	_data->Overscan = overscan;
 }
 
-void HdPackLoader::ProcessPatchTag(vector<string> &tokens)
+void HdPackLoader::ProcessPatchTag(vector<string>& tokens)
 {
 	checkConstraint(tokens.size() >= 2, "Patch tag requires more parameters");
 	checkConstraintEx(tokens.size() < 3, "Patch tag contains too many parameters");
@@ -311,9 +312,9 @@ void HdPackLoader::ProcessPatchTag(vector<string> &tokens)
 	}
 }
 
-void HdPackLoader::ProcessTileTag(vector<string> &tokens, vector<HdPackCondition*> conditions)
+void HdPackLoader::ProcessTileTag(vector<string>& tokens, vector<HdPackCondition*> conditions)
 {
-	HdPackTileInfo *tileInfo = new HdPackTileInfo();
+	HdPackTileInfo* tileInfo = new HdPackTileInfo();
 	size_t index = 0;
 	if(_data->Version < 100) {
 		tileInfo->TileIndex = std::stoi(tokens[index++]);
@@ -333,7 +334,7 @@ void HdPackLoader::ProcessTileTag(vector<string> &tokens, vector<HdPackCondition
 	tileInfo->ForceDisableCache = false;
 	for(HdPackCondition* condition : conditions) {
 		HdPackConditionType type = condition->GetConditionType();
-		switch(type){
+		switch(type) {
 			case HdPackConditionType::SpriteNearby:
 			case HdPackConditionType::PositionCheckX:
 			case HdPackConditionType::PositionCheckY:
@@ -392,7 +393,7 @@ void HdPackLoader::ProcessTileTag(vector<string> &tokens, vector<HdPackCondition
 	_data->Tiles.push_back(unique_ptr<HdPackTileInfo>(tileInfo));
 }
 
-void HdPackLoader::ProcessOptionTag(vector<string> &tokens)
+void HdPackLoader::ProcessOptionTag(vector<string>& tokens)
 {
 	for(string token : tokens) {
 		if(token == "disableSpriteLimit") {
@@ -413,14 +414,14 @@ void HdPackLoader::ProcessOptionTag(vector<string> &tokens)
 	}
 }
 
-void HdPackLoader::ProcessConditionTag(vector<string> &tokens, bool createInvertedCondition)
+void HdPackLoader::ProcessConditionTag(vector<string>& tokens, bool createInvertedCondition)
 {
 	checkConstraint(tokens.size() >= 4, "Condition tag should contain at least 4 parameters");
 	checkConstraint(tokens[0].size() > 0, "Condition name may not be empty");
 	checkConstraint(tokens[0].find_last_of('!') == string::npos, "Condition name may not contain '!' characters");
 
 	unique_ptr<HdPackCondition> condition;
-	
+
 	if(tokens[1] == "tileAtPosition") {
 		condition.reset(new HdPackTileAtPositionCondition());
 	} else if(tokens[1] == "tileNearby") {
@@ -511,7 +512,7 @@ void HdPackLoader::ProcessConditionTag(vector<string> &tokens, bool createInvert
 
 			HdPackConditionOperator op = ParseConditionOperator(tokens[index++]);
 			checkConstraint(op != HdPackConditionOperator::Invalid, "Invalid operator.");
-			
+
 			uint32_t operandB = HexUtilities::FromHex(tokens[index++]);
 			uint32_t mask = 0xFF;
 			if(tokens.size() > 5 && _data->Version >= 103) {
@@ -581,8 +582,8 @@ void HdPackLoader::ProcessConditionTag(vector<string> &tokens, bool createInvert
 			break;
 		}
 	}
-	
-	HdPackCondition *cond = condition.get();
+
+	HdPackCondition* cond = condition.get();
 	condition.release();
 	_data->Conditions.emplace_back(unique_ptr<HdPackCondition>(cond));
 	_conditionsByName[cond->Name] = cond;
@@ -606,7 +607,7 @@ HdPackConditionOperator HdPackLoader::ParseConditionOperator(string& opString)
 	return HdPackConditionOperator::Invalid;
 }
 
-void HdPackLoader::ProcessBackgroundTag(vector<string> &tokens, vector<HdPackCondition*> conditions)
+void HdPackLoader::ProcessBackgroundTag(vector<string>& tokens, vector<HdPackCondition*> conditions)
 {
 	checkConstraint(tokens.size() >= 2, "Background tag should contain at least 2 parameters");
 	checkConstraintEx(tokens.size() < 9, "Background tag contains too many parameters");
@@ -631,7 +632,7 @@ void HdPackLoader::ProcessBackgroundTag(vector<string> &tokens, vector<HdPackCon
 	HdBackgroundInfo backgroundInfo;
 	if(bgFileData) {
 		backgroundInfo.Data = bgFileData;
-		if (_data->Version >= 105) {
+		if(_data->Version >= 105) {
 			backgroundInfo.Brightness = (int)(std::stof(tokens[1]) * 255);
 		} else {
 			backgroundInfo.Brightness = (uint8_t)(std::stof(tokens[1]) * 255);
@@ -684,7 +685,7 @@ void HdPackLoader::ProcessBackgroundTag(vector<string> &tokens, vector<HdPackCon
 
 			if(tokens.size() > 7) {
 				checkConstraintEx(_data->Version >= 107, "Background blend mode feature requires version 107+ of HD Packs");
-				auto blendMode  = magic_enum::enum_cast<HdPackBlendMode>(tokens[7]);
+				auto blendMode = magic_enum::enum_cast<HdPackBlendMode>(tokens[7]);
 				if(blendMode.has_value()) {
 					backgroundInfo.BlendMode = blendMode.value();
 				} else {
@@ -750,7 +751,7 @@ int HdPackLoader::ProcessSoundTrack(string albumString, string trackString, stri
 	return album * 256 + track;
 }
 
-void HdPackLoader::ProcessBgmTag(vector<string> &tokens)
+void HdPackLoader::ProcessBgmTag(vector<string>& tokens)
 {
 	checkConstraint(tokens.size() >= 3, "BGM tag should contain at least 3 parameters");
 	checkConstraintEx(tokens.size() < 5, "BGM tag contains too many parameters");
@@ -763,7 +764,7 @@ void HdPackLoader::ProcessBgmTag(vector<string> &tokens)
 		}
 
 		if(_loadFromZip) {
-			track.Filename = 	VirtualFile(_hdPackFolder, tokens[2]);
+			track.Filename = VirtualFile(_hdPackFolder, tokens[2]);
 		} else {
 			track.Filename = FolderUtilities::CombinePath(_hdPackFolder, tokens[2]);
 		}
@@ -771,7 +772,7 @@ void HdPackLoader::ProcessBgmTag(vector<string> &tokens)
 	}
 }
 
-void HdPackLoader::ProcessSfxTag(vector<string> &tokens)
+void HdPackLoader::ProcessSfxTag(vector<string>& tokens)
 {
 	checkConstraint(tokens.size() >= 3, "SFX tag should contain at least 3 parameters");
 	checkConstraintEx(tokens.size() < 4, "SFX tag contains too many parameters");
@@ -833,8 +834,8 @@ void HdPackLoader::LoadCustomPalette()
 	if(LoadFile("palette.dat", fileData)) {
 		vector<uint32_t> paletteData;
 
-		for(size_t i = 0; i < fileData.size(); i+= 3){
-			paletteData.push_back(0xFF000000 | (fileData[i] << 16) | (fileData[i+1] << 8) | fileData[i+2]);
+		for(size_t i = 0; i < fileData.size(); i += 3) {
+			paletteData.push_back(0xFF000000 | (fileData[i] << 16) | (fileData[i + 1] << 8) | fileData[i + 2]);
 		}
 
 		if(paletteData.size() == 0x40) {
@@ -845,7 +846,7 @@ void HdPackLoader::LoadCustomPalette()
 
 void HdPackLoader::InitializeHdPack()
 {
-	for(unique_ptr<HdPackTileInfo> &tileInfo : _data->Tiles) {
+	for(unique_ptr<HdPackTileInfo>& tileInfo : _data->Tiles) {
 		auto tiles = _data->TileByKey.find(tileInfo->GetKey(false));
 		if(tiles == _data->TileByKey.end()) {
 			_data->TileByKey[tileInfo->GetKey(false)] = vector<HdPackTileInfo*>();

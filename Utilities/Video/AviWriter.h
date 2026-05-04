@@ -40,17 +40,17 @@ private:
 	uint8_t* _frameBuffer = nullptr;
 
 	vector<uint8_t> _aviIndex;
-	
+
 	SimpleLock _audioLock;
 
 private:
 	void host_writew(uint8_t* buffer, uint16_t value);
 	void host_writed(uint8_t* buffer, uint32_t value);
-	void WriteAviChunk(const char * tag, uint32_t size, void * data, uint32_t flags);
+	void WriteAviChunk(const char* tag, uint32_t size, void* data, uint32_t flags);
 
 public:
 	void AddFrame(uint8_t* frameData);
-	void AddSound(int16_t * data, uint32_t sampleCount);
+	void AddSound(int16_t* data, uint32_t sampleCount);
 
 	bool StartWrite(string filename, VideoCodec codec, uint32_t width, uint32_t height, uint32_t bpp, uint32_t fps, uint32_t audioSampleRate, uint32_t compressionLevel);
 	void EndWrite();

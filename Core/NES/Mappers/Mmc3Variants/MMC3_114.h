@@ -5,7 +5,7 @@
 class MMC3_114 : public MMC3
 {
 private:
-	static constexpr uint8_t _security[8] = { 0,3,1,5,6,7,2,4 };
+	static constexpr uint8_t _security[8] = { 0, 3, 1, 5, 6, 7, 2, 4 };
 	uint8_t _exRegs[2] = {};
 
 protected:

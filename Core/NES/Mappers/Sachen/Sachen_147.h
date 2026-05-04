@@ -38,7 +38,7 @@ protected:
 		SelectPrgPage(0, ((out & 0x20) >> 4) | (out & 0x01));
 		SelectChrPage(0, (out & 0x1E) >> 1);
 	}
-	
+
 	uint8_t ReadRegister(uint16_t addr) override
 	{
 		uint8_t openBus = _console->GetMemoryManager()->GetOpenBus();

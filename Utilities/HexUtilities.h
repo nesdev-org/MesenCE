@@ -16,7 +16,7 @@ public:
 	static string ToHex24(int32_t value);
 	static string ToHex32(uint32_t value);
 	static string ToHex(uint64_t value);
-	static string ToHex(vector<uint8_t> &data, char delimiter = 0);
+	static string ToHex(vector<uint8_t>& data, char delimiter = 0);
 
 	static int FromHex(string hex);
 };

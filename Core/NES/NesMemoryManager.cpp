@@ -36,7 +36,7 @@ NesMemoryManager::NesMemoryManager(NesConsole* console, BaseMapper* mapper)
 		_ramWriteHandlers[i] = &_openBusHandler;
 	}
 
-	RegisterIODevice(_internalRamHandler.get());	
+	RegisterIODevice(_internalRamHandler.get());
 }
 
 NesMemoryManager::~NesMemoryManager()
@@ -56,7 +56,7 @@ void NesMemoryManager::Reset(bool softReset)
 	_mapper->Reset(softReset);
 }
 
-void NesMemoryManager::InitializeMemoryHandlers(INesMemoryHandler** memoryHandlers, INesMemoryHandler* handler, vector<uint16_t> *addresses, bool allowOverride)
+void NesMemoryManager::InitializeMemoryHandlers(INesMemoryHandler** memoryHandlers, INesMemoryHandler* handler, vector<uint16_t>* addresses, bool allowOverride)
 {
 	for(uint16_t address : *addresses) {
 		if(!allowOverride && memoryHandlers[address] != &_openBusHandler && memoryHandlers[address] != handler) {
@@ -66,7 +66,7 @@ void NesMemoryManager::InitializeMemoryHandlers(INesMemoryHandler** memoryHandle
 	}
 }
 
-void NesMemoryManager::RegisterIODevice(INesMemoryHandler*handler)
+void NesMemoryManager::RegisterIODevice(INesMemoryHandler* handler)
 {
 	MemoryRanges ranges;
 	handler->GetMemoryRanges(ranges);
@@ -89,7 +89,7 @@ void NesMemoryManager::RegisterReadHandler(INesMemoryHandler* handler, uint32_t 
 	}
 }
 
-void NesMemoryManager::UnregisterIODevice(INesMemoryHandler*handler)
+void NesMemoryManager::UnregisterIODevice(INesMemoryHandler* handler)
 {
 	MemoryRanges ranges;
 	handler->GetMemoryRanges(ranges);
@@ -122,6 +122,7 @@ uint16_t NesMemoryManager::DebugReadWord(uint16_t addr)
 	return DebugRead(addr) | (DebugRead(addr + 1) << 8);
 }
 
+template<NesCpuBusType busType>
 uint8_t NesMemoryManager::Read(uint16_t addr, MemoryOperationType operationType)
 {
 	uint8_t value = _ramReadHandlers[addr]->ReadRam(addr);
@@ -130,7 +131,7 @@ uint8_t NesMemoryManager::Read(uint16_t addr, MemoryOperationType operationType)
 	}
 	_emu->ProcessMemoryRead<CpuType::Nes>(addr, value, operationType);
 
-	_openBusHandler.SetOpenBus(value, addr == 0x4015);
+	_openBusHandler.SetOpenBus<busType>(value, addr == 0x4015);
 
 	return value;
 }
@@ -139,7 +140,7 @@ void NesMemoryManager::Write(uint16_t addr, uint8_t value, MemoryOperationType o
 {
 	if(_emu->ProcessMemoryWrite<CpuType::Nes>(addr, value, operationType)) {
 		_ramWriteHandlers[addr]->WriteRam(addr, value);
-		_openBusHandler.SetOpenBus(value, false);
+		_openBusHandler.SetOpenBus(value);
 	}
 }
 
@@ -162,7 +163,7 @@ void NesMemoryManager::DebugWrite(uint16_t addr, uint8_t value, bool disableSide
 	}
 }
 
-void NesMemoryManager::Serialize(Serializer &s)
+void NesMemoryManager::Serialize(Serializer& s)
 {
 	SVArray(_internalRam, _internalRamSize);
 	SV(_openBusHandler);
@@ -177,3 +178,7 @@ uint8_t NesMemoryManager::GetInternalOpenBus(uint8_t mask)
 {
 	return _openBusHandler.GetInternalOpenBus() & mask;
 }
+
+template uint8_t NesMemoryManager::Read<NesCpuBusType::Both>(uint16_t, MemoryOperationType);
+template uint8_t NesMemoryManager::Read<NesCpuBusType::Internal>(uint16_t, MemoryOperationType);
+template uint8_t NesMemoryManager::Read<NesCpuBusType::External>(uint16_t, MemoryOperationType);

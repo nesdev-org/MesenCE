@@ -6,7 +6,7 @@ class ModChannel : public BaseFdsChannel
 {
 private:
 	const int32_t ModReset = 0xFF;
-	const int32_t _modLut[8] = { 0,1,2,4,ModReset,-4,-2,-1 };
+	const int32_t _modLut[8] = { 0, 1, 2, 4, ModReset, -4, -2, -1 };
 
 	int8_t _counter = 0;
 	bool _modulationDisabled = false;
@@ -20,9 +20,13 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseFdsChannel::Serialize(s);
-		
+
 		SVArray(_modTable, 64);
-		SV(_counter); SV(_modulationDisabled); SV(_modTablePosition); SV(_overflowCounter); SV(_output);
+		SV(_counter);
+		SV(_modulationDisabled);
+		SV(_modTablePosition);
+		SV(_overflowCounter);
+		SV(_output);
 	}
 
 public:

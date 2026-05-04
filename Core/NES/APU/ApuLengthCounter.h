@@ -35,13 +35,13 @@ public:
 			_console->GetApu()->SetNeedToRun();
 		}
 	}
-	
+
 	ApuLengthCounter(AudioChannel channel, NesConsole* console)
 	{
 		_channel = channel;
 		_console = console;
 	}
-	
+
 	void Reset(bool softReset)
 	{
 		if(softReset) {
@@ -64,9 +64,14 @@ public:
 		}
 	}
 
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
-		SV(_enabled); SV(_halt); SV(_newHaltValue); SV(_counter); SV(_previousValue); SV(_reloadValue);
+		SV(_enabled);
+		SV(_halt);
+		SV(_newHaltValue);
+		SV(_counter);
+		SV(_previousValue);
+		SV(_reloadValue);
 	}
 
 	bool GetStatus()
@@ -78,7 +83,7 @@ public:
 	{
 		return _halt;
 	}
-	
+
 	void ReloadCounter()
 	{
 		if(_reloadValue) {

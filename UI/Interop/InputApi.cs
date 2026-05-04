@@ -9,17 +9,17 @@ namespace Mesen.Interop
 	public class InputApi
 	{
 		private const string DllPath = EmuApi.DllName;
-		
-		[DllImport(DllPath)] public static extern void SetKeyState(UInt16 scanCode, [MarshalAs(UnmanagedType.I1)]bool pressed);
+
+		[DllImport(DllPath)] public static extern void SetKeyState(UInt16 scanCode, [MarshalAs(UnmanagedType.I1)] bool pressed);
 		[DllImport(DllPath)] public static extern void ResetKeyState();
 
 		[DllImport(DllPath)] public static extern void SetMouseMovement(Int16 x, Int16 y);
 		[DllImport(DllPath)] public static extern void SetMousePosition(double x, double y);
-		[DllImport(DllPath)] public static extern void DisableAllKeys([MarshalAs(UnmanagedType.I1)]bool disabled);
+		[DllImport(DllPath)] public static extern void DisableAllKeys([MarshalAs(UnmanagedType.I1)] bool disabled);
 		[DllImport(DllPath)] public static extern void UpdateInputDevices();
 
-		[DllImport(DllPath)] public static extern UInt16 GetKeyCode([MarshalAs(UnmanagedType.LPUTF8Str)]string keyName);
-		
+		[DllImport(DllPath)] public static extern UInt16 GetKeyCode([MarshalAs(UnmanagedType.LPUTF8Str)] string keyName);
+
 		[DllImport(DllPath)] public static extern void ResetLagCounter();
 
 		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool HasControlDevice(ControllerType type);

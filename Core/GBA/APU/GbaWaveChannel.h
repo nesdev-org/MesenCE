@@ -22,7 +22,7 @@ public:
 	bool Enabled();
 	void Disable();
 	void ResetLengthCounter();
-	
+
 	uint8_t GetRawOutput();
 	double GetOutput();
 

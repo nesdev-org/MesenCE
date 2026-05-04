@@ -49,7 +49,7 @@ protected:
 		_vrc2Prg[0] = 0;
 		_vrc2Prg[1] = 1;
 		_vrc2Mirroring = 0;
-		
+
 		_mmc3Regs[0] = 0;
 		_mmc3Regs[1] = 2;
 		_mmc3Regs[2] = 4;
@@ -95,7 +95,7 @@ protected:
 		SV(_irqEnabled);
 		SV(_irqReload);
 		SV(_irqReloadValue),
-		SV(_mmc1Buffer);
+			SV(_mmc1Buffer);
 		SV(_mmc1Shift);
 	}
 
@@ -231,9 +231,20 @@ protected:
 			UpdateChr();
 		} else {
 			switch(addr & 0xF000) {
-				case 0x8000: _vrc2Prg[0] = value; UpdatePrg(); break;
-				case 0xA000: _vrc2Prg[1] = value; UpdatePrg(); break;
-				case 0x9000: _vrc2Mirroring = value; UpdateMirroring(); break;
+				case 0x8000:
+					_vrc2Prg[0] = value;
+					UpdatePrg();
+					break;
+
+				case 0xA000:
+					_vrc2Prg[1] = value;
+					UpdatePrg();
+					break;
+
+				case 0x9000:
+					_vrc2Mirroring = value;
+					UpdateMirroring();
+					break;
 			}
 		}
 	}
@@ -258,12 +269,12 @@ protected:
 
 			case 0xC000: _irqReloadValue = value; break;
 			case 0xC001: _irqReload = true; break;
-			
+
 			case 0xE000:
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				_irqEnabled = false;
 				break;
-			
+
 			case 0xE001: _irqEnabled = true; break;
 		}
 	}

@@ -33,13 +33,13 @@ namespace Mesen.Controls
 			get { return GetValue(ValueProperty); }
 			set { SetValue(ValueProperty, value); }
 		}
-		
+
 		public string Text
 		{
 			get { return GetValue(TextProperty); }
 			set { SetValue(TextProperty, value); }
 		}
-		
+
 		public bool HideValue
 		{
 			get { return GetValue(HideValueProperty); }

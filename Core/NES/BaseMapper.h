@@ -29,7 +29,7 @@ private:
 	uint16_t InternalGetChrRamPageSize();
 	bool ValidateAddressRange(uint16_t startAddr, uint16_t endAddr);
 
-	uint8_t *_nametableRam = nullptr;
+	uint8_t* _nametableRam = nullptr;
 	uint8_t _nametableCount = 2;
 	uint32_t _ntRamSize = 0;
 
@@ -37,7 +37,7 @@ private:
 
 	bool _hasBusConflicts = false;
 	bool _hasDefaultWorkRam = false;
-	
+
 	bool _hasCustomReadVram = false;
 	bool _hasCpuClockHook = false;
 	bool _hasVramAddressHook = false;
@@ -84,7 +84,7 @@ protected:
 	uint32_t _mapperRamSize = 0;
 
 	virtual void InitMapper() = 0;
-	virtual void InitMapper(RomData &romData);
+	virtual void InitMapper(RomData& romData);
 	virtual uint16_t GetPrgPageSize() = 0;
 	virtual uint16_t GetChrPageSize() = 0;
 
@@ -96,7 +96,7 @@ protected:
 	virtual uint32_t GetSaveRamSize() { return 0x2000; }
 	virtual uint32_t GetSaveRamPageSize() { return 0x2000; }
 	virtual bool ForceChrBattery() { return false; }
-	
+
 	virtual bool ForceSaveRamSize() { return false; }
 	virtual bool ForceWorkRamSize() { return false; }
 
@@ -105,7 +105,7 @@ protected:
 	//Work ram is NOT saved - aka Expansion ram, etc.
 	virtual uint32_t GetWorkRamSize() { return 0x2000; }
 	virtual uint32_t GetWorkRamPageSize() { return 0x2000; }
-	
+
 	virtual uint32_t GetMapperRamSize() { return 0; }
 
 	virtual uint16_t RegisterStartAddress() { return 0x8000; }
@@ -118,7 +118,7 @@ protected:
 
 	virtual uint32_t GetDipSwitchCount() { return 0; }
 	virtual uint32_t GetNametableCount() { return 0; }
-	
+
 	virtual bool HasBusConflicts() { return false; }
 
 	uint8_t InternalReadRam(uint16_t addr);
@@ -131,7 +131,7 @@ protected:
 	virtual void SelectPrgPage(uint16_t slot, uint16_t page, PrgMemoryType memoryType = PrgMemoryType::PrgRom);
 	void SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, int16_t pageNumber, PrgMemoryType type, int8_t accessType = -1);
 	void SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, PrgMemoryType type, uint32_t sourceOffset, int8_t accessType);
-	void SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint8_t *source, uint32_t sourceOffset, uint32_t sourceSize, int8_t accessType = -1);
+	void SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint8_t* source, uint32_t sourceOffset, uint32_t sourceSize, int8_t accessType = -1);
 	void RemoveCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr);
 
 	virtual void SelectChrPage8x(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
@@ -192,8 +192,8 @@ protected:
 
 public:
 	static constexpr uint32_t NametableSize = 0x400;
-	
-	void Initialize(NesConsole* console, RomData &romData);
+
+	void Initialize(NesConsole* console, RomData& romData);
 	void InitSpecificMapper(RomData& romData);
 
 	BaseMapper();
@@ -203,20 +203,20 @@ public:
 
 	GameSystem GetGameSystem();
 	PpuModel GetPpuModel();
-	
+
 	Epsm* GetEpsm() { return _epsm.get(); }
-	
+
 	bool HasDefaultWorkRam();
 
 	void SetRegion(ConsoleRegion region);
 
 	__forceinline bool HasCpuClockHook() { return _hasCpuClockHook; }
 	virtual void ProcessCpuClock();
-	
+
 	__forceinline bool HasVramAddressHook() { return _hasVramAddressHook; }
 	virtual void NotifyVramAddressChange(uint16_t addr);
 
-	virtual void GetMemoryRanges(MemoryRanges &ranges) override;
+	virtual void GetMemoryRanges(MemoryRanges& ranges) override;
 	virtual uint32_t GetInternalRamSize() { return 0x800; }
 
 	virtual void SaveBattery();
@@ -251,7 +251,7 @@ public:
 
 	uint8_t DebugReadVram(uint16_t addr, bool disableSideEffects = true);
 
-	void CopyChrTile(uint32_t address, uint8_t *dest);
+	void CopyChrTile(uint32_t address, uint8_t* dest);
 
 	//Debugger Helper Functions
 	bool HasChrRam();
@@ -259,7 +259,7 @@ public:
 	uint32_t GetChrRomSize() { return _chrRomSize; }
 
 	CartridgeState GetState();
-	
+
 	AddressInfo GetAbsoluteAddress(uint16_t relativeAddr);
 	void GetPpuAbsoluteAddress(uint16_t relativeAddr, AddressInfo& info);
 	AddressInfo GetPpuAbsoluteAddress(uint32_t relativeAddr);
@@ -269,7 +269,7 @@ public:
 	bool IsWriteRegister(uint16_t addr);
 	bool IsReadRegister(uint16_t addr);
 
-	void GetRomFileData(vector<uint8_t> &out, bool asIpsFile, uint8_t* header);
+	void GetRomFileData(vector<uint8_t>& out, bool asIpsFile, uint8_t* header);
 
 	vector<uint8_t> GetPrgChrCopy();
 	void RestorePrgChrBackup(vector<uint8_t>& backupData);

@@ -48,7 +48,7 @@ bool GifRecorder::AddFrame(void* frameBuffer, uint32_t width, uint32_t height, d
 	}
 
 	_frameCounter++;
-	
+
 	if(fps < 55 || (_frameCounter % 6) != 0) {
 		//At 60 FPS, skip 1 of every 6 frames (max FPS for GIFs is 50fps)
 		GifWriteFrame(_gif.get(), (uint8_t*)frameBuffer, width, height, 2, 8, false);

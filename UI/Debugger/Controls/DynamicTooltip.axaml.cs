@@ -193,7 +193,7 @@ namespace Mesen.Debugger.Controls
 				AddEntry(name, value == NullableBoolean.True);
 			}
 		}
-		
+
 		public void AddEntry(string name, object value, bool useMonoFont = false)
 		{
 			_updatedKeys.Add(name);

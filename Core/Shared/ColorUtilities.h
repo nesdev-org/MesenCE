@@ -28,8 +28,7 @@ public:
 		return (
 			((value & 0x30) << 9) | ((value & 0x30) << 7) | ((value & 0x20) << 5) |
 			((value & 0x0C) << 6) | ((value & 0x0C) << 4) | ((value & 0x08) << 2) |
-			((value & 0x03) << 3) | ((value & 0x03) << 1) | ((value & 0x02) >> 1)
-		);
+			((value & 0x03) << 3) | ((value & 0x03) << 1) | ((value & 0x02) >> 1));
 	}
 
 	static uint16_t Rgb444To555(uint16_t value)
@@ -37,8 +36,7 @@ public:
 		return (
 			((value & 0xF00) << 3) | ((value & 0x800) >> 1) |
 			((value & 0x0F0) << 2) | ((value & 0x080) >> 2) |
-			((value & 0x00F) << 1) | ((value & 0x008) >> 3)
-		);
+			((value & 0x00F) << 1) | ((value & 0x008) >> 3));
 	}
 
 	static uint32_t Rgb222ToArgb(uint8_t rgb222)

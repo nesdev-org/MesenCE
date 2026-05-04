@@ -48,10 +48,25 @@ protected:
 	}
 
 	void RefreshStateBuffer() override
-	{}
+	{
+	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, Up2, Down2, Left2, Right2, Sound, Start, B, A };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		Up2,
+		Down2,
+		Left2,
+		Right2,
+		Sound,
+		Start,
+		B,
+		A
+	};
 
 	WsController(Emulator* emu, WsConsole* console, uint8_t port, KeyMappingSet horizontalMappings, KeyMappingSet verticalMappings) : BaseControlDevice(emu, ControllerType::WsController, port, horizontalMappings)
 	{

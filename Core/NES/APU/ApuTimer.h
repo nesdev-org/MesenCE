@@ -23,7 +23,7 @@ public:
 		_channel = channel;
 		_mixer = mixer;
 		Reset(false);
-	}	
+	}
 
 	void Reset(bool softReset)
 	{
@@ -39,7 +39,9 @@ public:
 			_previousCycle = 0;
 		}
 
-		SV(_timer); SV(_period); SV(_lastOutput);
+		SV(_timer);
+		SV(_period);
+		SV(_lastOutput);
 	}
 
 	__forceinline void AddOutput(int8_t output)
@@ -58,7 +60,7 @@ public:
 	__forceinline bool Run(uint32_t targetCycle)
 	{
 		int32_t cyclesToRun = targetCycle - _previousCycle;
-		
+
 		if(cyclesToRun > _timer) {
 			_previousCycle += _timer + 1;
 			_timer = _period;

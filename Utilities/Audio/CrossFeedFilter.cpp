@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "CrossFeedFilter.h"
 
-void CrossFeedFilter::ApplyFilter(int16_t *stereoBuffer, size_t sampleCount, int ratio)
+void CrossFeedFilter::ApplyFilter(int16_t* stereoBuffer, size_t sampleCount, int ratio)
 {
 	for(size_t i = 0; i < sampleCount; i++) {
 		int16_t leftSample = stereoBuffer[0];

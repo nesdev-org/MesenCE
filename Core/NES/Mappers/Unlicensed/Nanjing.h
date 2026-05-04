@@ -35,11 +35,11 @@ protected:
 		SV(_autoSwitchCHR);
 	}
 
-	void InitMapper() override 
+	void InitMapper() override
 	{
 		memset(_registers, 0, sizeof(_registers));
 		_autoSwitchCHR = false;
-		
+
 		//"Initial value of this register is 1, initial value of "trigger" is 0."
 		_toggle = true;
 		_registers[4] = 0;

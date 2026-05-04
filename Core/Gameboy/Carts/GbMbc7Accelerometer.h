@@ -59,7 +59,7 @@ public:
 			KeyManager::GetKeyCode("Joy1 X"),
 			KeyManager::GetKeyCode("Pad1 X"),
 		};
-		
+
 		_yAxisCodes = {
 			KeyManager::GetKeyCode("Pad1 LT Y"),
 			KeyManager::GetKeyCode("Joy1 Y"),

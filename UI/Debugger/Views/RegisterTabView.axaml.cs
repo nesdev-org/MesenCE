@@ -1,19 +1,19 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Debugger.ViewModels;
-using Mesen.Debugger.Labels;
-using Mesen.Debugger.Windows;
-using System;
-using static Mesen.Debugger.ViewModels.LabelListViewModel;
-using Avalonia.Input;
-using DataBoxControl;
-using Mesen.Debugger.Utilities;
-using System.Collections.Generic;
 using AvaloniaEdit.Editing;
-using Mesen.Interop;
+using DataBoxControl;
 using Mesen.Config;
+using Mesen.Debugger.Labels;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.ViewModels;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
 using Mesen.Utilities;
+using System;
+using System.Collections.Generic;
+using static Mesen.Debugger.ViewModels.LabelListViewModel;
 
 namespace Mesen.Debugger.Views
 {

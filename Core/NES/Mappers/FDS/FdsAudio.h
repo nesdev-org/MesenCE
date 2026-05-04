@@ -30,7 +30,7 @@ private:
 	uint16_t _waveOverflowCounter = 0;
 	int32_t _wavePitch = 0;
 	uint8_t _wavePosition = 0;
-	
+
 	uint8_t _lastOutput = 0;
 
 protected:
@@ -44,6 +44,6 @@ public:
 
 	uint8_t ReadRegister(uint16_t addr);
 	void WriteRegister(uint16_t addr, uint8_t value);
-	
+
 	void GetMapperStateEntries(vector<MapperStateEntry>& entries);
 };

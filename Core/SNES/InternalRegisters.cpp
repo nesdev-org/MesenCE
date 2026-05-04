@@ -79,7 +79,7 @@ void InternalRegisters::ProcessAutoJoypad()
 	for(uint64_t clock = _autoReadNextClock; clock <= _console->GetMasterClock(); clock += 128) {
 		_autoReadNextClock = clock + 128;
 		int step = (clock - _autoReadClockStart) / 128;
-		
+
 		switch(step) {
 			case 0:
 				//Strobe starts 128 cycles before the auto-read flag is set
@@ -138,7 +138,7 @@ void InternalRegisters::ProcessAutoJoypad()
 		}
 	}
 
-	if(!_state.EnableAutoJoypadRead && (masterClock - _autoReadClockStart) >= 128*3) {
+	if(!_state.EnableAutoJoypadRead && (masterClock - _autoReadClockStart) >= 128 * 3) {
 		//Disable auto-read for the rest of the frame at this point if the enable flag is turned off
 		_autoReadDisabled = true;
 		_autoReadActive = false;
@@ -198,15 +198,14 @@ uint8_t InternalRegisters::Peek(uint16_t addr)
 				(_ppu->GetScanline() >= _ppu->GetNmiScanline() ? 0x80 : 0) |
 				((hClock >= 1 * 4 && hClock <= 274 * 4) ? 0 : 0x40) |
 				(_autoReadActive ? 0x01 : 0) | //Auto joypad read in progress
-				(_memoryManager->GetOpenBus() & 0x3E)
-			);
+				(_memoryManager->GetOpenBus() & 0x3E));
 		}
 
 		case 0x4214:
 		case 0x4215:
 		case 0x4216:
 		case 0x4217:
-			//Not completely accurate because the ALU results are only 
+			//Not completely accurate because the ALU results are only
 			//updated when the CPU actually reads the registers
 			return _aluMulDiv.Peek(addr);
 
@@ -228,7 +227,7 @@ uint8_t InternalRegisters::Read(uint16_t addr)
 	switch(addr) {
 		case 0x4210: {
 			constexpr uint8_t cpuRevision = 0x02;
-			
+
 			uint8_t value = (_nmiFlag ? 0x80 : 0) | cpuRevision;
 
 			//Reading $4210 on any cycle clears the NMI flag,
@@ -262,20 +261,19 @@ uint8_t InternalRegisters::Read(uint16_t addr)
 			//TODO TIMING (set/clear timing)
 			return (
 				(scanline >= nmiScanline ? 0x80 : 0) |
-				((hClock >= 1*4 && hClock <= 274*4) ? 0 : 0x40) |
+				((hClock >= 1 * 4 && hClock <= 274 * 4) ? 0 : 0x40) |
 				(_autoReadActive ? 0x01 : 0) | //Auto joypad read in progress
-				(_memoryManager->GetOpenBus() & 0x3E)
-			);
+				(_memoryManager->GetOpenBus() & 0x3E));
 		}
 
 		case 0x4213:
 			//RDIO - Programmable I/O port (in-port)
 			return _state.IoPortOutput;
-						 
+
 		case 0x4214:
 		case 0x4215:
 		case 0x4216:
-		case 0x4217: 
+		case 0x4217:
 			return _aluMulDiv.Read(addr);
 
 		case 0x4218: return ReadControllerData(0, false);
@@ -286,7 +284,7 @@ uint8_t InternalRegisters::Read(uint16_t addr)
 		case 0x421D: return ReadControllerData(2, true);
 		case 0x421E: return ReadControllerData(3, false);
 		case 0x421F: return ReadControllerData(3, true);
-		
+
 		default:
 			LogDebug("[Debug] Unimplemented register read: " + HexUtilities::ToHex(addr));
 			return _memoryManager->GetOpenBus();
@@ -313,12 +311,12 @@ void InternalRegisters::Write(uint16_t addr, uint8_t value)
 			_state.EnableHorizontalIrq = (value & 0x10) != 0;
 			_state.EnableAutoJoypadRead = autoRead;
 			_irqEnabled = _state.EnableHorizontalIrq || _state.EnableVerticalIrq;
-			
+
 			bool enableNmi = (value & 0x80) != 0;
 			if(_nmiFlag && enableNmi && !_state.EnableNmi) {
 				//When enabling NMIs in the middle of vblank, trigger an NMI right away
 				_cpu->SetNmiFlag(2);
-			}			
+			}
 			_state.EnableNmi = enableNmi;
 
 			if(!_irqEnabled) {
@@ -330,7 +328,7 @@ void InternalRegisters::Write(uint16_t addr, uint8_t value)
 
 		case 0x4201:
 			//TODO WRIO - Programmable I/O port (out-port)
-			
+
 			//The IO port's value affects the multitap - make sure to catch-up on the auto-read logic first to
 			//ensure the reads get the correct data, otherwise it might return the data for the wrong controllers
 			ProcessAutoJoypad();
@@ -349,18 +347,18 @@ void InternalRegisters::Write(uint16_t addr, uint8_t value)
 			_aluMulDiv.Write(addr, value);
 			break;
 
-		case 0x4207: 
-			_state.HorizontalTimer = (_state.HorizontalTimer & 0x100) | value; 
+		case 0x4207:
+			_state.HorizontalTimer = (_state.HorizontalTimer & 0x100) | value;
 			UpdateIrqLevel();
 			break;
 
-		case 0x4208: 
-			_state.HorizontalTimer = (_state.HorizontalTimer & 0xFF) | ((value & 0x01) << 8); 
+		case 0x4208:
+			_state.HorizontalTimer = (_state.HorizontalTimer & 0xFF) | ((value & 0x01) << 8);
 			UpdateIrqLevel();
 			break;
 
-		case 0x4209: 
-			_state.VerticalTimer = (_state.VerticalTimer & 0x100) | value; 
+		case 0x4209:
+			_state.VerticalTimer = (_state.VerticalTimer & 0x100) | value;
 
 			//Calling this here fixes flashing issue in "Shin Nihon Pro Wrestling Kounin - '95 Tokyo Dome Battle 7"
 			//The write to change from scanline 16 to 17 occurs between both ProcessIrqCounter calls, which causes the IRQ
@@ -368,7 +366,7 @@ void InternalRegisters::Write(uint16_t addr, uint8_t value)
 			UpdateIrqLevel();
 			break;
 
-		case 0x420A: 
+		case 0x420A:
 			_state.VerticalTimer = (_state.VerticalTimer & 0xFF) | ((value & 0x01) << 8);
 			UpdateIrqLevel();
 			break;
@@ -393,9 +391,22 @@ AluState InternalRegisters::GetAluState()
 
 void InternalRegisters::Serialize(Serializer& s)
 {
-	SV(_state.EnableFastRom); SV(_nmiFlag); SV(_state.EnableNmi); SV(_state.EnableHorizontalIrq); SV(_state.EnableVerticalIrq); SV(_state.HorizontalTimer);
-	SV(_state.VerticalTimer); SV(_state.IoPortOutput); SV(_state.ControllerData[0]); SV(_state.ControllerData[1]); SV(_state.ControllerData[2]); SV(_state.ControllerData[3]);
-	SV(_irqLevel); SV(_needIrq); SV(_state.EnableAutoJoypadRead); SV(_irqFlag);
+	SV(_state.EnableFastRom);
+	SV(_nmiFlag);
+	SV(_state.EnableNmi);
+	SV(_state.EnableHorizontalIrq);
+	SV(_state.EnableVerticalIrq);
+	SV(_state.HorizontalTimer);
+	SV(_state.VerticalTimer);
+	SV(_state.IoPortOutput);
+	SV(_state.ControllerData[0]);
+	SV(_state.ControllerData[1]);
+	SV(_state.ControllerData[2]);
+	SV(_state.ControllerData[3]);
+	SV(_irqLevel);
+	SV(_needIrq);
+	SV(_state.EnableAutoJoypadRead);
+	SV(_irqFlag);
 
 	SV(_aluMulDiv);
 

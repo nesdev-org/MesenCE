@@ -29,7 +29,7 @@ void OggMixer::Reset(uint32_t sampleRate)
 void OggMixer::SetPlaybackOptions(uint8_t options)
 {
 	_options = options;
-	
+
 	bool loop = (options & (int)OggPlaybackOptions::Loop) != 0;
 	if(_bgm) {
 		_bgm->SetLoopFlag(loop);
@@ -77,7 +77,7 @@ void OggMixer::SetSampleRate(int sampleRate)
 	if(_bgm) {
 		_bgm->SetSampleRate(sampleRate);
 	}
-	for(shared_ptr<OggReader> &sfx : _sfx) {
+	for(shared_ptr<OggReader>& sfx : _sfx) {
 		sfx->SetSampleRate(sampleRate);
 	}
 }

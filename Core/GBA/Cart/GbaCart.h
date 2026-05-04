@@ -16,7 +16,7 @@ class GbaCart final : public ISerializable
 {
 private:
 	Emulator* _emu = nullptr;
-	GbaMemoryManager* _memoryManager = nullptr;;
+	GbaMemoryManager* _memoryManager = nullptr;
 
 	shared_ptr<GbaTiltSensor> _tiltSensor;
 	unique_ptr<GbaEeprom> _eeprom;
@@ -29,7 +29,7 @@ private:
 
 	uint8_t* _prgRom = nullptr;
 	uint32_t _prgRomSize = 0;
-	
+
 	uint8_t* _saveRam = nullptr;
 	uint32_t _saveRamSize = 0;
 
@@ -74,7 +74,7 @@ public:
 
 	uint8_t ReadRam(uint32_t addr, uint32_t readAddr);
 	void WriteRam(GbaAccessModeVal mode, uint32_t addr, uint8_t value, uint32_t writeAddr, uint32_t fullValue);
-	
+
 	void DebugWriteRam(uint32_t addr, uint8_t value);
 	AddressInfo GetRamAbsoluteAddress(uint32_t addr);
 	int64_t GetRamRelativeAddress(AddressInfo& absAddress);

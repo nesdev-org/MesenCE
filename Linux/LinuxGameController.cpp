@@ -16,8 +16,8 @@
 std::shared_ptr<LinuxGameController> LinuxGameController::GetController(Emulator* emu, int deviceID, bool logInformation)
 {
 	std::string deviceName = "/dev/input/event" + std::to_string(deviceID);
-	struct stat buffer;   
-	if(stat(deviceName.c_str(), &buffer) == 0) { 	
+	struct stat buffer;
+	if(stat(deviceName.c_str(), &buffer) == 0) {
 		int fd = open(deviceName.c_str(), O_RDWR | O_NONBLOCK);
 		if(fd < 0) {
 			if(logInformation) {
@@ -25,7 +25,7 @@ std::shared_ptr<LinuxGameController> LinuxGameController::GetController(Emulator
 			}
 			return nullptr;
 		}
-		
+
 		libevdev* device = nullptr;
 		int rc = libevdev_new_from_fd(fd, &device);
 		if(rc < 0) {
@@ -44,9 +44,9 @@ std::shared_ptr<LinuxGameController> LinuxGameController::GetController(Emulator
 			if(logInformation) {
 				MessageManager::Log(std::string("[Input] Device ignored (Not a gamepad) - Name: ") + libevdev_get_name(device) + " Vendor: " + std::to_string(libevdev_get_id_vendor(device)) + " Product: " + std::to_string(libevdev_get_id_product(device)));
 			}
-			close(fd);			
+			close(fd);
 		}
-	}	
+	}
 	return nullptr;
 }
 
@@ -88,21 +88,21 @@ LinuxGameController::LinuxGameController(Emulator* emu, int deviceID, int fileDe
 			timeout.tv_sec = 0;
 			timeout.tv_usec = 100000;
 
-			rc = select((int)_fd+1, &readSet, nullptr, nullptr, &timeout);
+			rc = select((int)_fd + 1, &readSet, nullptr, nullptr, &timeout);
 			if(rc) {
 				do {
 					struct input_event ev;
 					rc = libevdev_next_event(_device, LIBEVDEV_READ_FLAG_NORMAL, &ev);
 					if(rc == LIBEVDEV_READ_STATUS_SYNC) {
-						while (rc == LIBEVDEV_READ_STATUS_SYNC) {
+						while(rc == LIBEVDEV_READ_STATUS_SYNC) {
 							rc = libevdev_next_event(_device, LIBEVDEV_READ_FLAG_SYNC, &ev);
 						}
 					} else if(rc == LIBEVDEV_READ_STATUS_SUCCESS) {
 						//print_event(&ev);
 					}
 				} while(rc == LIBEVDEV_READ_STATUS_SYNC || rc == LIBEVDEV_READ_STATUS_SUCCESS);
-			} 
-			
+			}
+
 			if(rc != LIBEVDEV_READ_STATUS_SYNC && rc != LIBEVDEV_READ_STATUS_SUCCESS && rc != -EAGAIN && rc != EWOULDBLOCK) {
 				//Device was disconnected
 				MessageManager::Log("[Input Device] Disconnected");
@@ -113,7 +113,7 @@ LinuxGameController::LinuxGameController(Emulator* emu, int deviceID, int fileDe
 				std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(100));
 				Calibrate();
 				calibrate = false;
-			}			
+			}
 		} while(!_stopFlag);
 
 		_disconnected = true;
@@ -122,7 +122,7 @@ LinuxGameController::LinuxGameController(Emulator* emu, int deviceID, int fileDe
 
 LinuxGameController::~LinuxGameController()
 {
-	_stopFlag = true;	
+	_stopFlag = true;
 	_eventThread.join();
 
 	libevdev_free(_device);
@@ -143,7 +143,7 @@ bool LinuxGameController::CheckAxis(unsigned int code, bool forPositive)
 	double deadZoneRatio = _emu->GetSettings()->GetControllerDeadzoneRatio();
 	int deadZoneNegative = (_axisDefaultValue[code] - libevdev_get_abs_minimum(_device, code)) * 0.400 * deadZoneRatio;
 	int deadZonePositive = (libevdev_get_abs_maximum(_device, code) - _axisDefaultValue[code]) * 0.400 * deadZoneRatio;
-	
+
 	if(forPositive) {
 		return libevdev_get_event_value(_device, EV_ABS, code) - _axisDefaultValue[code] > deadZonePositive;
 	} else {
@@ -273,7 +273,7 @@ void LinuxGameController::SetForceFeedback(uint16_t magnitudeRight, uint16_t mag
 	play.type = EV_FF;
 	play.code = _rumbleEffect->id;
 	play.value = 1;
-	
+
 	rc = write(_fd, (const void*)&play, sizeof(play));
 	if(rc < 0) {
 		//MessageManager::Log("Could not play force feedback effect.");

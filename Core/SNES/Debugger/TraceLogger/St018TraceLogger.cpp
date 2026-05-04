@@ -55,7 +55,7 @@ RowDataType St018TraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void St018TraceLogger::GetTraceRow(string &output, ArmV3CpuState& cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void St018TraceLogger::GetTraceRow(string& output, ArmV3CpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	for(RowPart& rowPart : _rowParts) {
 		switch(rowPart.DataType) {
@@ -81,14 +81,14 @@ void St018TraceLogger::GetTraceRow(string &output, ArmV3CpuState& cpuState, Trac
 					WriteIntValue(output, cpuState.CPSR.ToInt32(), rowPart);
 				} else {
 					FastString flags;
-					
+
 					bool showInactive = (rowPart.MinWidth > 0);
 
 					flags.Write(cpuState.CPSR.Negative ? "N" : (showInactive ? "n" : ""));
 					flags.Write(cpuState.CPSR.Zero ? "Z" : (showInactive ? "z" : ""));
 					flags.Write(cpuState.CPSR.Carry ? "C" : (showInactive ? "c" : ""));
 					flags.Write(cpuState.CPSR.Overflow ? "V" : (showInactive ? "v" : ""));
-					
+
 					flags.Write(cpuState.CPSR.FiqDisable ? "F" : (showInactive ? "f" : ""));
 					flags.Write(cpuState.CPSR.IrqDisable ? "I" : (showInactive ? "i" : ""));
 

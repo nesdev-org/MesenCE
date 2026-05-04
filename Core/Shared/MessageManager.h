@@ -10,7 +10,7 @@
 	#define LogDebug(msg) MessageManager::Log(msg);
 	#define LogDebugIf(cond, msg) if(cond) { MessageManager::Log(msg); }
 #else
-	#define LogDebug(msg) 
+	#define LogDebug(msg)
 	#define LogDebugIf(cond, msg)
 #endif
 
@@ -25,7 +25,7 @@ private:
 	static SimpleLock _logLock;
 	static SimpleLock _messageLock;
 	static std::list<string> _log;
-	
+
 public:
 	static void SetOptions(bool osdEnabled, bool outputToStdout);
 

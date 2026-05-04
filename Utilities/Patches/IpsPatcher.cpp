@@ -15,7 +15,7 @@ public:
 	uint16_t RepeatCount = 0;
 	uint8_t Value = 0;
 
-	bool ReadRecord(std::istream &ipsFile)
+	bool ReadRecord(std::istream& ipsFile)
 	{
 		uint8_t buffer[3];
 
@@ -42,7 +42,7 @@ public:
 		}
 	}
 
-	void WriteRecord(vector<uint8_t> &output)
+	void WriteRecord(vector<uint8_t>& output)
 	{
 		output.push_back((Address >> 16) & 0xFF);
 		output.push_back((Address >> 8) & 0xFF);
@@ -61,7 +61,7 @@ public:
 	}
 };
 
-bool IpsPatcher::PatchBuffer(string ipsFilepath, vector<uint8_t> &input, vector<uint8_t> &output)
+bool IpsPatcher::PatchBuffer(string ipsFilepath, vector<uint8_t>& input, vector<uint8_t>& output)
 {
 	ifstream ipsFile(ipsFilepath, std::ios::in | std::ios::binary);
 	if(ipsFile) {
@@ -70,14 +70,14 @@ bool IpsPatcher::PatchBuffer(string ipsFilepath, vector<uint8_t> &input, vector<
 	return false;
 }
 
-bool IpsPatcher::PatchBuffer(vector<uint8_t> &ipsData, vector<uint8_t> &input, vector<uint8_t> &output)
+bool IpsPatcher::PatchBuffer(vector<uint8_t>& ipsData, vector<uint8_t>& input, vector<uint8_t>& output)
 {
 	std::stringstream ss;
 	ss.write((char*)ipsData.data(), ipsData.size());
 	return PatchBuffer(ss, input, output);
 }
 
-bool IpsPatcher::PatchBuffer(std::istream &ipsFile, vector<uint8_t> &input, vector<uint8_t> &output)
+bool IpsPatcher::PatchBuffer(std::istream& ipsFile, vector<uint8_t>& input, vector<uint8_t>& output)
 {
 	char header[5];
 	ipsFile.read((char*)&header, 5);
@@ -112,9 +112,9 @@ bool IpsPatcher::PatchBuffer(std::istream &ipsFile, vector<uint8_t> &input, vect
 
 	for(IpsRecord record : records) {
 		if(record.Length == 0) {
-			std::fill(&output[record.Address], &output[record.Address]+record.RepeatCount, record.Value);
+			std::fill(&output[record.Address], &output[record.Address] + record.RepeatCount, record.Value);
 		} else {
-			std::copy(record.Replacement.begin(), record.Replacement.end(), output.begin()+record.Address);
+			std::copy(record.Replacement.begin(), record.Replacement.end(), output.begin() + record.Address);
 		}
 	}
 

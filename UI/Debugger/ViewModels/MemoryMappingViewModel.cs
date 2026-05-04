@@ -291,7 +291,7 @@ namespace Mesen.Debugger.ViewModels
 			GbMemoryType memoryType = GbMemoryType.None;
 			GbRegisterAccess accessType = GbRegisterAccess.None;
 			int currentSize = 0;
-			
+
 			const int prgBankSize = 0x4000;
 			const int cartBankSize = 0x2000;
 			int wramBankSize = gbState.Ppu.CgbEnabled ? 0x1000 : 0x2000;
@@ -529,7 +529,7 @@ namespace Mesen.Debugger.ViewModels
 
 			AddressInfo prevAddr = new();
 			bool isUnmapped = false;
-			for(int i = 0; i < 16*16; i++) {
+			for(int i = 0; i < 16 * 16; i++) {
 				AddressInfo absAddr = DebugApi.GetAbsoluteAddress(new AddressInfo() { Address = i * minSize, Type = MemoryType.WsMemory });
 				if(!mainColors.ContainsKey(absAddr.Type)) {
 					//Prevent crash when power cycling caused by core returning { 0, MemoryType.SnesMemory } (default value)

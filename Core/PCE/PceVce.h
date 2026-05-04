@@ -21,7 +21,7 @@ public:
 	uint16_t GetScanlineCount() { return _state.ScanlineCount; }
 	uint8_t GetClockDivider() { return _state.ClockDivider; }
 	bool IsGrayscale() { return _state.Grayscale; }
-	
+
 	uint16_t GetPalette(uint16_t addr) { return _paletteRam[addr]; }
 	PceVceState& GetState() { return _state; }
 

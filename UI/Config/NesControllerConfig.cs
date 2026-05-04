@@ -88,8 +88,8 @@ namespace Mesen.Config
 			}
 
 			List<CustomKeyMapping> keys = type switch {
-				ControllerType.PowerPadSideA or 
-				ControllerType.PowerPadSideB or 
+				ControllerType.PowerPadSideA or
+				ControllerType.PowerPadSideB or
 				ControllerType.FamilyTrainerMatSideA or
 				ControllerType.FamilyTrainerMatSideB => Enum.GetValues<NesPowerPadButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
 
@@ -415,7 +415,7 @@ namespace Mesen.Config
 				case ControllerType.SuborKeyboard: SuborKeyboardButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.VbController: VirtualBoyButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.KonamiHyperShot: KonamiHyperShotButtons = GetDefaultCustomKeys(type, preset); break;
-				
+
 				case ControllerType.NesZapper: ZapperButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.FamicomZapper: ZapperButtons = GetDefaultCustomKeys(type, preset); break;
 
@@ -426,13 +426,13 @@ namespace Mesen.Config
 					//Set default controller keys, too
 					base.SetDefaultKeys(type, preset);
 					break;
-				
+
 				case ControllerType.NesArkanoidController: ArkanoidButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.FamicomArkanoidController: ArkanoidButtons = GetDefaultCustomKeys(type, preset); break;
-				
+
 				case ControllerType.SuborMouse: MouseButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.SnesMouse: MouseButtons = GetDefaultCustomKeys(type, preset); break;
-				
+
 				case ControllerType.OekaKidsTablet: OekakidsButtons = GetDefaultCustomKeys(type, preset); break;
 
 				case ControllerType.PowerPadSideA:

@@ -27,7 +27,7 @@ private:
 					case MirroringType::ScreenBOnly: reg = 1; break;
 				}
 
-				SetPpuMemoryMapping(0x2000+i*0x400, 0x2000+i*0x400+0x3FF, ChrMemoryType::Default, _ntRegs[reg] * 0x400, _chrRamSize > 0 ? MemoryAccessType::ReadWrite : MemoryAccessType::Read);
+				SetPpuMemoryMapping(0x2000 + i * 0x400, 0x2000 + i * 0x400 + 0x3FF, ChrMemoryType::Default, _ntRegs[reg] * 0x400, _chrRamSize > 0 ? MemoryAccessType::ReadWrite : MemoryAccessType::Read);
 			}
 		} else {
 			//Reset to default mirroring
@@ -44,7 +44,7 @@ protected:
 	{
 		_useChrForNametables = false;
 		_ntRegs[0] = _ntRegs[1] = 0;
-		
+
 		_licensingTimer = 0;
 		_usingExternalRom = false;
 		_prgRamEnabled = false;
@@ -59,7 +59,7 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
-		
+
 		SV(_ntRegs[0]);
 		SV(_ntRegs[1]);
 		SV(_useChrForNametables);
@@ -72,8 +72,8 @@ protected:
 	{
 		MemoryAccessType access = _prgRamEnabled ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess;
 		SetCpuMemoryMapping(0x6000, 0x7FFF, 0, HasBattery() ? PrgMemoryType::SaveRam : PrgMemoryType::WorkRam, access);
-		
-		if(_usingExternalRom) { 
+
+		if(_usingExternalRom) {
 			if(_licensingTimer == 0) {
 				RemoveCpuMemoryMapping(0x8000, 0xBFFF);
 			} else {
@@ -110,7 +110,7 @@ protected:
 			case 0x9000: SelectChrPage(1, value); break;
 			case 0xA000: SelectChrPage(2, value); break;
 			case 0xB000: SelectChrPage(3, value); break;
-			case 0xC000: 
+			case 0xC000:
 				_ntRegs[0] = value | 0x80;
 				UpdateNametables();
 				break;
@@ -128,7 +128,7 @@ protected:
 				_useChrForNametables = (value & 0x10) == 0x10;
 				UpdateNametables();
 				break;
-			case 0xF000: 
+			case 0xF000:
 				bool externalPrg = (value & 0x08) == 0;
 				if(externalPrg && GetPrgPageCount() > 8) {
 					_usingExternalRom = true;

@@ -38,7 +38,7 @@ HdPackBuilder::HdPackBuilder(Emulator* emu, PpuModel ppuModel, bool isChrRam, Hd
 			tile->Init();
 		}
 
-		for(unique_ptr<HdPackTileInfo> &tile : _hdData.Tiles) {
+		for(unique_ptr<HdPackTileInfo>& tile : _hdData.Tiles) {
 			//Mark the tiles in the first PNGs as higher usage (preserves order when adding new tiles to an existing set)
 			AddTile(tile.get(), 0xFFFFFFFF - tile->BitmapIndex);
 		}
@@ -58,7 +58,7 @@ HdPackBuilder::~HdPackBuilder()
 	SaveHdPack();
 }
 
-void HdPackBuilder::AddTile(HdPackTileInfo *tile, uint32_t usageCount)
+void HdPackBuilder::AddTile(HdPackTileInfo* tile, uint32_t usageCount)
 {
 	bool isTileBlank = _options.GroupBlankTiles ? tile->Blank : false;
 
@@ -69,7 +69,7 @@ void HdPackBuilder::AddTile(HdPackTileInfo *tile, uint32_t usageCount)
 		_tilesByChrBankByPalette[chrBankId] = std::map<uint32_t, vector<HdPackTileInfo*>>();
 	}
 
-	std::map<uint32_t, vector<HdPackTileInfo*>> &paletteMap = _tilesByChrBankByPalette[chrBankId];
+	std::map<uint32_t, vector<HdPackTileInfo*>>& paletteMap = _tilesByChrBankByPalette[chrBankId];
 	if(paletteMap.find(palette) == paletteMap.end()) {
 		paletteMap[palette] = vector<HdPackTileInfo*>(256, nullptr);
 	}
@@ -100,7 +100,7 @@ void HdPackBuilder::AddTile(HdPackTileInfo *tile, uint32_t usageCount)
 	_tileUsageCount[tile->GetKey(false)] = usageCount;
 }
 
-void HdPackBuilder::ProcessTile(uint32_t x, uint32_t y, uint16_t tileAddr, HdPpuTileInfo &tile, BaseMapper *mapper, bool isSprite, uint32_t chrBankHash, bool transparencyRequired)
+void HdPackBuilder::ProcessTile(uint32_t x, uint32_t y, uint16_t tileAddr, HdPpuTileInfo& tile, BaseMapper* mapper, bool isSprite, uint32_t chrBankHash, bool transparencyRequired)
 {
 	if(_options.IgnoreOverscan) {
 		OverscanDimensions overscan = _emu->GetSettings()->GetOverscan();
@@ -138,7 +138,7 @@ void HdPackBuilder::ProcessTile(uint32_t x, uint32_t y, uint16_t tileAddr, HdPpu
 				existingTile->second->TransparencyRequired = true;
 			}
 		}
-		
+
 		if(result->second < 0x7FFFFFFF) {
 			//Increase usage count
 			result->second++;
@@ -146,15 +146,15 @@ void HdPackBuilder::ProcessTile(uint32_t x, uint32_t y, uint16_t tileAddr, HdPpu
 	}
 }
 
-void HdPackBuilder::GenerateHdTile(HdPackTileInfo *tile)
+void HdPackBuilder::GenerateHdTile(HdPackTileInfo* tile)
 {
 	uint32_t hdScale = _hdData.Scale;
 
 	vector<uint32_t> originalTile = tile->ToRgb(_palette);
-	vector<uint32_t> hdTile(8 * 8 * hdScale*hdScale, 0);
+	vector<uint32_t> hdTile(8 * 8 * hdScale * hdScale, 0);
 
 	switch(_options.FilterType) {
-		case ScaleFilterType::HQX: 
+		case ScaleFilterType::HQX:
 			hqx(hdScale, originalTile.data(), hdTile.data(), 8, 8);
 			break;
 
@@ -162,7 +162,7 @@ void HdPackBuilder::GenerateHdTile(HdPackTileInfo *tile)
 			hdTile.clear();
 			for(uint8_t i = 0; i < 8 * hdScale; i++) {
 				for(uint8_t j = 0; j < 8 * hdScale; j++) {
-					hdTile.push_back(originalTile[i/hdScale*8+j/hdScale]);
+					hdTile.push_back(originalTile[i / hdScale * 8 + j / hdScale]);
 				}
 			}
 			break;
@@ -191,7 +191,7 @@ void HdPackBuilder::GenerateHdTile(HdPackTileInfo *tile)
 	tile->HdTileData = hdTile;
 }
 
-void HdPackBuilder::DrawTile(HdPackTileInfo *tile, int tileNumber, uint32_t *pngBuffer, int pageNumber, bool containsSpritesOnly)
+void HdPackBuilder::DrawTile(HdPackTileInfo* tile, int tileNumber, uint32_t* pngBuffer, int pageNumber, bool containsSpritesOnly)
 {
 	if(tile->HdTileData.empty()) {
 		GenerateHdTile(tile);
@@ -268,7 +268,8 @@ void HdPackBuilder::SaveHdPack()
 				pngName = "Chr_" + HexUtilities::ToHex(chrBankId) + "_" + std::to_string(pngNumber) + ".png";
 			}
 
-			tileRows << std::endl << "#" << pngName << std::endl;
+			tileRows << std::endl;
+			tileRows << "#" << pngName << std::endl;
 			tileRows << pngRows.str();
 			pngRows = stringstream();
 
@@ -284,21 +285,21 @@ void HdPackBuilder::SaveHdPack()
 		}
 	};
 
-	for(std::pair<const uint32_t, std::map<uint32_t, vector<HdPackTileInfo*>>> &kvp : _tilesByChrBankByPalette) {
+	for(std::pair<const uint32_t, std::map<uint32_t, vector<HdPackTileInfo*>>>& kvp : _tilesByChrBankByPalette) {
 		if(_options.SortByUsageFrequency) {
 			for(int i = 0; i < 256; i++) {
 				vector<std::pair<uint32_t, HdPackTileInfo*>> tiles;
-				for(std::pair<const uint32_t, vector<HdPackTileInfo*>> &paletteMap : kvp.second) {
+				for(std::pair<const uint32_t, vector<HdPackTileInfo*>>& paletteMap : kvp.second) {
 					if(paletteMap.second[i]) {
 						tiles.push_back({ _tileUsageCount[paletteMap.second[i]->GetKey(false)], paletteMap.second[i] });
 					}
 				}
-				std::sort(tiles.begin(), tiles.end(), [=](std::pair<uint32_t, HdPackTileInfo*> &a, std::pair<uint32_t, HdPackTileInfo*> &b) {
+				std::sort(tiles.begin(), tiles.end(), [=](std::pair<uint32_t, HdPackTileInfo*>& a, std::pair<uint32_t, HdPackTileInfo*>& b) {
 					return a.first > b.first;
 				});
 
 				size_t j = 0;
-				for(std::pair<const uint32_t, vector<HdPackTileInfo*>> &paletteMap : kvp.second) {
+				for(std::pair<const uint32_t, vector<HdPackTileInfo*>>& paletteMap : kvp.second) {
 					if(j < tiles.size()) {
 						paletteMap.second[i] = tiles[j].second;
 						j++;
@@ -313,7 +314,7 @@ void HdPackBuilder::SaveHdPack()
 			pngNumber = 0;
 		}
 
-		for(std::pair<const uint32_t, vector<HdPackTileInfo*>> &tileKvp : kvp.second) {
+		for(std::pair<const uint32_t, vector<HdPackTileInfo*>>& tileKvp : kvp.second) {
 			bool pageEmpty = true;
 			bool spritesOnly = true;
 			for(HdPackTileInfo* tileInfo : tileKvp.second) {
@@ -346,7 +347,7 @@ void HdPackBuilder::SaveHdPack()
 	}
 	savePng(-1);
 
-	for(unique_ptr<HdPackCondition> &condition : _hdData.Conditions) {
+	for(unique_ptr<HdPackCondition>& condition : _hdData.Conditions) {
 		if(!condition->IsExcludedFromFile()) {
 			ss << condition->ToString() << std::endl;
 		}
@@ -358,7 +359,7 @@ void HdPackBuilder::SaveHdPack()
 		}
 	}
 
-	for(auto &bgmInfo : _hdData.BgmFilesById) {
+	for(auto& bgmInfo : _hdData.BgmFilesById) {
 		ss << "<bgm>" << std::to_string(bgmInfo.first >> 8) << "," << std::to_string(bgmInfo.first & 0xFF) << "," << VirtualFile(bgmInfo.second.Filename).GetFileName();
 		if(bgmInfo.second.LoopPosition > 0) {
 			ss << "," << std::to_string(bgmInfo.second.LoopPosition);
@@ -366,11 +367,11 @@ void HdPackBuilder::SaveHdPack()
 		ss << std::endl;
 	}
 
-	for(auto &sfxInfo : _hdData.SfxFilesById) {
+	for(auto& sfxInfo : _hdData.SfxFilesById) {
 		ss << "<sfx>" << std::to_string(sfxInfo.first >> 8) << "," << std::to_string(sfxInfo.first & 0xFF) << "," << VirtualFile(sfxInfo.second).GetFileName() << std::endl;
 	}
 
-	for(auto &patchInfo : _hdData.PatchesByHash) {
+	for(auto& patchInfo : _hdData.PatchesByHash) {
 		ss << "<patch>" << VirtualFile(patchInfo.second).GetFileName() << "," << patchInfo.first << std::endl;
 	}
 

@@ -5,7 +5,7 @@
 #include "Debugger/DebugBreakHelper.h"
 #include "Shared/SettingTypes.h"
 
-PpuTools::PpuTools(Debugger* debugger, Emulator *emu)
+PpuTools::PpuTools(Debugger* debugger, Emulator* emu)
 {
 	_emu = emu;
 	_debugger = debugger;
@@ -31,18 +31,18 @@ void PpuTools::GetTileView(GetTileViewOptions options, uint8_t* source, uint32_t
 		case TileFormat::Mode7: InternalGetTileView<TileFormat::Mode7>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::Mode7DirectColor: InternalGetTileView<TileFormat::Mode7DirectColor>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::Mode7ExtBg: InternalGetTileView<TileFormat::Mode7ExtBg>(options, source, srcSize, colors, outBuffer); break;
-		
+
 		case TileFormat::NesBpp2: InternalGetTileView<TileFormat::NesBpp2>(options, source, srcSize, colors, outBuffer); break;
-		
+
 		case TileFormat::PceSpriteBpp4: InternalGetTileView<TileFormat::PceSpriteBpp4>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::PceBackgroundBpp2Cg0: InternalGetTileView<TileFormat::PceBackgroundBpp2Cg0>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::PceBackgroundBpp2Cg1: InternalGetTileView<TileFormat::PceBackgroundBpp2Cg1>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::PceSpriteBpp2Sp01: InternalGetTileView<TileFormat::PceSpriteBpp2Sp01>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::PceSpriteBpp2Sp23: InternalGetTileView<TileFormat::PceSpriteBpp2Sp23>(options, source, srcSize, colors, outBuffer); break;
-		
+
 		case TileFormat::SmsBpp4: InternalGetTileView<TileFormat::SmsBpp4>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::SmsSgBpp1: InternalGetTileView<TileFormat::SmsSgBpp1>(options, source, srcSize, colors, outBuffer); break;
-		
+
 		case TileFormat::GbaBpp4: InternalGetTileView<TileFormat::GbaBpp4>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::GbaBpp8: InternalGetTileView<TileFormat::GbaBpp8>(options, source, srcSize, colors, outBuffer); break;
 		case TileFormat::WsBpp4Packed: InternalGetTileView<TileFormat::WsBpp4Packed>(options, source, srcSize, colors, outBuffer); break;
@@ -76,20 +76,20 @@ uint32_t PpuTools::GetSpriteBackgroundColor(SpriteBackground bgColor, const uint
 }
 
 template<TileFormat format>
-void PpuTools::InternalGetTileView(GetTileViewOptions options, uint8_t *source, uint32_t srcSize, const uint32_t *colors, uint32_t *outBuffer)
+void PpuTools::InternalGetTileView(GetTileViewOptions options, uint8_t* source, uint32_t srcSize, const uint32_t* colors, uint32_t* outBuffer)
 {
 	uint8_t* ram = source;
 	uint8_t bpp;
 
 	int rowOffset = 2;
-	
+
 	int tileWidth = 8;
 	int tileHeight = 8;
 	switch(options.Format) {
 		case TileFormat::Bpp2: bpp = 2; break;
 		case TileFormat::Bpp4: bpp = 4; break;
 		case TileFormat::DirectColor: bpp = 8; break;
-		
+
 		case TileFormat::Mode7:
 		case TileFormat::Mode7DirectColor:
 		case TileFormat::Mode7ExtBg:
@@ -97,37 +97,91 @@ void PpuTools::InternalGetTileView(GetTileViewOptions options, uint8_t *source, 
 			rowOffset = 16;
 			break;
 
-		case TileFormat::NesBpp2: bpp = 2; rowOffset = 1; break;
-		
-		case TileFormat::PceSpriteBpp4: bpp = 4; rowOffset = 2; tileWidth = 16; tileHeight = 16; options.Width /= 2; options.Height /= 2; break;
-		case TileFormat::PceSpriteBpp2Sp01: bpp = 4; rowOffset = 2; tileWidth = 16; tileHeight = 16; options.Width /= 2; options.Height /= 2; break;
-		case TileFormat::PceSpriteBpp2Sp23: bpp = 4; rowOffset = 2; tileWidth = 16; tileHeight = 16; options.Width /= 2; options.Height /= 2; break;
-		
+		case TileFormat::NesBpp2:
+			bpp = 2;
+			rowOffset = 1;
+			break;
+
+		case TileFormat::PceSpriteBpp4:
+			bpp = 4;
+			rowOffset = 2;
+			tileWidth = 16;
+			tileHeight = 16;
+			options.Width /= 2;
+			options.Height /= 2;
+			break;
+
+		case TileFormat::PceSpriteBpp2Sp01:
+			bpp = 4;
+			rowOffset = 2;
+			tileWidth = 16;
+			tileHeight = 16;
+			options.Width /= 2;
+			options.Height /= 2;
+			break;
+
+		case TileFormat::PceSpriteBpp2Sp23:
+			bpp = 4;
+			rowOffset = 2;
+			tileWidth = 16;
+			tileHeight = 16;
+			options.Width /= 2;
+			options.Height /= 2;
+			break;
+
 		//2BPP, but use BPP=4 because tiles are arranged in the regular 4BPP layout
 		case TileFormat::PceBackgroundBpp2Cg0: bpp = 4; break;
 		case TileFormat::PceBackgroundBpp2Cg1: bpp = 4; break;
-		
-		case TileFormat::SmsBpp4: bpp = 4; rowOffset = 4; break;
-		case TileFormat::SmsSgBpp1: bpp = 1; rowOffset = 1; break;
 
-		case TileFormat::GbaBpp4: bpp = 4; rowOffset = 4; break;
-		case TileFormat::GbaBpp8: bpp = 8; rowOffset = 8; break;
-		
-		case TileFormat::WsBpp4Packed: bpp = 4; rowOffset = 4; break;
+		case TileFormat::SmsBpp4:
+			bpp = 4;
+			rowOffset = 4;
+			break;
+
+		case TileFormat::SmsSgBpp1:
+			bpp = 1;
+			rowOffset = 1;
+			break;
+
+		case TileFormat::GbaBpp4:
+			bpp = 4;
+			rowOffset = 4;
+			break;
+
+		case TileFormat::GbaBpp8:
+			bpp = 8;
+			rowOffset = 8;
+			break;
+
+		case TileFormat::WsBpp4Packed:
+			bpp = 4;
+			rowOffset = 4;
+			break;
 
 		default: bpp = 8; break;
 	}
 
-	int bytesPerTile = tileHeight*tileWidth * bpp / 8;
+	int bytesPerTile = tileHeight * tileWidth * bpp / 8;
 	int tileCount = options.Width * options.Height;
 
 	uint8_t colorMask = 0xFF;
 	if(options.UseGrayscalePalette) {
 		options.Palette = 0;
 		switch(bpp) {
-			case 1: colors = _grayscaleColorsBpp1; colorMask = 0x01; break;
-			case 2: colors = _grayscaleColorsBpp2; colorMask = 0x03; break;
-			default: colors = _grayscaleColorsBpp4; colorMask = 0x0F; break;
+			case 1:
+				colors = _grayscaleColorsBpp1;
+				colorMask = 0x01;
+				break;
+
+			case 2:
+				colors = _grayscaleColorsBpp2;
+				colorMask = 0x03;
+				break;
+
+			default:
+				colors = _grayscaleColorsBpp4;
+				colorMask = 0x0F;
+				break;
 		}
 	}
 
@@ -142,7 +196,7 @@ void PpuTools::InternalGetTileView(GetTileViewOptions options, uint8_t *source, 
 
 	for(int row = 0; row < rowCount; row++) {
 		uint32_t baseOffset = (options.Layout == TileLayout::Vertical) ? (row * bytesPerTile) : (row * bytesPerTile * options.Width);
-		
+
 		if(baseOffset >= srcSize) {
 			break;
 		}
@@ -152,11 +206,11 @@ void PpuTools::InternalGetTileView(GetTileViewOptions options, uint8_t *source, 
 
 			int baseOutputOffset;
 			if(options.Layout == TileLayout::SingleLine8x16) {
-				int displayColumn = column / 2 + ((row & 0x01) ? options.Width/2 : 0);
+				int displayColumn = column / 2 + ((row & 0x01) ? options.Width / 2 : 0);
 				int displayRow = (row & ~0x01) + ((column & 0x01) ? 1 : 0);
 				baseOutputOffset = displayRow * options.Width * tileWidth * tileHeight + displayColumn * tileWidth;
 			} else if(options.Layout == TileLayout::SingleLine16x16) {
-				int displayColumn = (column / 2) + (column & 0x01) + ((row & 0x01) ? options.Width/2 : 0) + ((column & 0x02) ? -1 : 0);
+				int displayColumn = (column / 2) + (column & 0x01) + ((row & 0x01) ? options.Width / 2 : 0) + ((column & 0x02) ? -1 : 0);
 				int displayRow = (row & ~0x01) + ((column & 0x02) ? 1 : 0);
 				baseOutputOffset = displayRow * options.Width * tileWidth * tileHeight + displayColumn * tileWidth;
 			} else {
@@ -192,8 +246,7 @@ bool PpuTools::IsTileHidden(MemoryType memType, uint32_t addr, GetTileViewOption
 	int16_t cdlFlags = _debugger->GetCdlManager()->GetCdlFlags(memType, addr);
 	return (
 		(cdlFlags == 0 && options.Filter == TileFilter::HideUnused) ||
-		(cdlFlags > 0 && options.Filter == TileFilter::HideUsed)
-	);
+		(cdlFlags > 0 && options.Filter == TileFilter::HideUsed));
 }
 
 void PpuTools::SetViewerUpdateTiming(uint32_t viewerId, uint16_t scanline, uint16_t cycle)
@@ -315,8 +368,7 @@ void PpuTools::GetSetTilePixel(AddressInfo tileAddress, TileFormat format, int32
 
 		case TileFormat::PceSpriteBpp4:
 		case TileFormat::PceSpriteBpp2Sp01:
-		case TileFormat::PceSpriteBpp2Sp23:
-		{
+		case TileFormat::PceSpriteBpp2Sp23: {
 			shift = 15 - x;
 			if(shift >= 8) {
 				shift -= 8;
@@ -370,7 +422,7 @@ void PpuTools::GetSetTilePixel(AddressInfo tileAddress, TileFormat format, int32
 			int32_t addr = (rowStart + (pixelOffset >> 1));
 			int offset = pixelOffset & 0x01 ? 4 : 0;
 			for(int i = 0; i < 4; i++) {
-				setBit(addr, i+offset, i);
+				setBit(addr, i + offset, i);
 			}
 			break;
 		}
@@ -389,7 +441,7 @@ void PpuTools::GetSetTilePixel(AddressInfo tileAddress, TileFormat format, int32
 			int32_t addr = (rowStart + (pixelOffset >> 1));
 			int offset = pixelOffset & 0x01 ? 0 : 4;
 			for(int i = 0; i < 4; i++) {
-				setBit(addr, i+offset, i);
+				setBit(addr, i + offset, i);
 			}
 			break;
 		}

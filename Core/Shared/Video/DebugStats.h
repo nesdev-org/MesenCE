@@ -12,5 +12,5 @@ private:
 	double _lastFrameMax = 0;
 
 public:
-	void DisplayStats(Emulator *emu, double lastFrameTime);
+	void DisplayStats(Emulator* emu, double lastFrameTime);
 };

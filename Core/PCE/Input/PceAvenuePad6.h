@@ -68,7 +68,21 @@ protected:
 	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, Select, Run, I, II, III, IV, V, VI };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		Select,
+		Run,
+		I,
+		II,
+		III,
+		IV,
+		V,
+		VI
+	};
 
 	PceAvenuePad6(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::PceAvenuePad6, port, keyMappings)
 	{

@@ -55,7 +55,17 @@ protected:
 	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, Start, Select, B, A };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		Start,
+		Select,
+		B,
+		A
+	};
 
 	GbController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::GameboyController, port, keyMappings)
 	{

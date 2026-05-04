@@ -24,7 +24,7 @@ protected:
 		SV(_lastOutput);
 		SV(_haltAudio);
 	}
-	
+
 	void ClockAudio() override
 	{
 		if(!_haltAudio) {
@@ -53,7 +53,9 @@ public:
 	void WriteRegister(uint16_t addr, uint8_t value)
 	{
 		switch(addr & 0xF003) {
-			case 0x9000: case 0x9001: case 0x9002:
+			case 0x9000:
+			case 0x9001:
+			case 0x9002:
 				_pulse1.WriteReg(addr, value);
 				break;
 
@@ -66,11 +68,15 @@ public:
 				break;
 			}
 
-			case 0xA000: case 0xA001: case 0xA002:
+			case 0xA000:
+			case 0xA001:
+			case 0xA002:
 				_pulse2.WriteReg(addr, value);
 				break;
 
-			case 0xB000: case 0xB001: case 0xB002:
+			case 0xB000:
+			case 0xB001:
+			case 0xB002:
 				_saw.WriteReg(addr, value);
 				break;
 		}

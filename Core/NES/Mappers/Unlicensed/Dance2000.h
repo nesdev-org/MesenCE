@@ -55,9 +55,9 @@ protected:
 	{
 		SelectChrPage(0, _lastNt);
 		SelectChrPage(1, 1);
-		if(_mode & 0x04)
+		if(_mode & 0x04) {
 			SelectPrgPage2x(0, (_prgReg & 0x07) << 1);
-		else {
+		} else {
 			SelectPrgPage(0, _prgReg & 0x0F);
 			SelectPrgPage(1, 0);
 		}

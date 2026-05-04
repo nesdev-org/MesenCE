@@ -11,7 +11,7 @@ namespace Mesen.Config
 		[Reactive] public bool ShowTileGrid { get; set; } = false;
 
 		[Reactive] public string SelectedPreset { get; set; } = "PPU";
-		
+
 		[Reactive] public MemoryType Source { get; set; }
 		[Reactive] public TileFormat Format { get; set; } = TileFormat.Bpp4;
 		[Reactive] public TileLayout Layout { get; set; } = TileLayout.Normal;

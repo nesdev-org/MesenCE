@@ -10,6 +10,7 @@ private:
 	uint8_t _column = 0;
 	bool _enabled = false;
 
+	// clang-format off
 	const uint32_t _keyMatrix[72] = {
 		F8, Return, LeftBracket, RightBracket,
 		Kana, RightShift, Yen, Stop,
@@ -43,6 +44,7 @@ private:
 		F1, F2, F3, F4, F5, F6, F7, F8,
 		Yen, Stop, AtSign, Grph, ClrHome, Kana
 	};
+	// clang-format on
 
 	string GetKeyNames() override
 	{
@@ -80,7 +82,9 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_row); SV(_column); SV(_enabled);
+		SV(_row);
+		SV(_column);
+		SV(_enabled);
 	}
 
 public:

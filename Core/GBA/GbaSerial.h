@@ -11,7 +11,7 @@ class GbaSerial final : public ISerializable
 private:
 	GbaSerialState _state = {};
 	GbaMemoryManager* _memoryManager = nullptr;
-	
+
 	void UpdateState()
 	{
 		if(_state.Active && _memoryManager->GetMasterClock() >= _state.EndMasterClock) {
@@ -49,10 +49,16 @@ public:
 	{
 		//TODOGBA - serial support
 		switch(addr) {
-			case 0x120: case 0x122: case 0x124: case 0x126: 
+			case 0x120:
+			case 0x122:
+			case 0x124:
+			case 0x126:
 				return BitUtilities::GetBits<0>(_state.Data[(addr & 0x06) >> 1]);
 
-			case 0x121: case 0x123: case 0x125: case 0x127:
+			case 0x121:
+			case 0x123:
+			case 0x125:
+			case 0x127:
 				return BitUtilities::GetBits<8>(_state.Data[(addr & 0x06) >> 1]);
 
 			case 0x128:
@@ -71,7 +77,7 @@ public:
 
 			case 0x12A: return BitUtilities::GetBits<0>(_state.SendData);
 			case 0x12B: return BitUtilities::GetBits<8>(_state.SendData);
-			
+
 			case 0x134: return BitUtilities::GetBits<0>(_state.Mode);
 			case 0x135: return BitUtilities::GetBits<8>(_state.Mode);
 			case 0x136: return 0;
@@ -102,11 +108,17 @@ public:
 	{
 		//TODOGBA - serial support
 		switch(addr) {
-			case 0x120: case 0x122: case 0x124: case 0x126:
+			case 0x120:
+			case 0x122:
+			case 0x124:
+			case 0x126:
 				BitUtilities::SetBits<0>(_state.Data[(addr & 0x06) >> 1], value);
 				break;
 
-			case 0x121: case 0x123: case 0x125: case 0x127:
+			case 0x121:
+			case 0x123:
+			case 0x125:
+			case 0x127:
 				BitUtilities::SetBits<8>(_state.Data[(addr & 0x06) >> 1], value);
 				break;
 

@@ -25,7 +25,6 @@ uint32_t SoundResampler::GetTargetRate()
 	return (uint32_t)_previousTargetRate;
 }
 
-
 double SoundResampler::GetTargetRateAdjustment()
 {
 	AudioConfig cfg = _emu->GetSettings()->GetAudioConfig();
@@ -50,7 +49,7 @@ double SoundResampler::GetTargetRateAdjustment()
 				_underTarget--;
 			}
 
-			//For every ~1 second spent under/over target latency, further adjust rate (GetTargetRate is called approx. 3x per frame) 
+			//For every ~1 second spent under/over target latency, further adjust rate (GetTargetRate is called approx. 3x per frame)
 			//This should slowly get us closer to the actual output rate of the sound card
 			double subAdjustment = 0.00003125 * _underTarget / 180;
 
@@ -78,7 +77,7 @@ double SoundResampler::GetTargetRateAdjustment()
 void SoundResampler::UpdateTargetSampleRate(uint32_t sourceRate, uint32_t sampleRate)
 {
 	double inputRate = sourceRate;
-	
+
 	if(_emu->GetSettings()->GetVideoConfig().IntegerFpsMode) {
 		//Adjust input sample rate when using integer fps values
 		double baseFps = _emu->GetConsoleUnsafe()->GetFps();
@@ -94,7 +93,7 @@ void SoundResampler::UpdateTargetSampleRate(uint32_t sourceRate, uint32_t sample
 	}
 }
 
-uint32_t SoundResampler::Resample(int16_t *inSamples, uint32_t sampleCount, uint32_t sourceRate, uint32_t sampleRate, int16_t *outSamples, uint32_t maxOutCount)
+uint32_t SoundResampler::Resample(int16_t* inSamples, uint32_t sampleCount, uint32_t sourceRate, uint32_t sampleRate, int16_t* outSamples, uint32_t maxOutCount)
 {
 	UpdateTargetSampleRate(sourceRate, sampleRate);
 	return _resampler.Resample<false>(inSamples, sampleCount, outSamples, maxOutCount);

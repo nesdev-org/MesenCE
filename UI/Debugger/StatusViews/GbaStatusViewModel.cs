@@ -35,7 +35,7 @@ namespace Mesen.Debugger.StatusViews
 		[Reactive] public bool FlagCarry { get; set; }
 		[Reactive] public bool FlagNegative { get; set; }
 		[Reactive] public bool FlagOverflow { get; set; }
-		
+
 		[Reactive] public bool FlagThumb { get; set; }
 		[Reactive] public bool FlagIrqDisable { get; set; }
 		[Reactive] public bool FlagFiqDisable { get; set; }
@@ -106,8 +106,8 @@ namespace Mesen.Debugger.StatusViews
 
 			StringBuilder sb = new StringBuilder();
 			byte[] stackValues = DebugApi.GetMemoryValues(MemoryType.GbaMemory, cpu.R[13], cpu.R[13] + 30 * 4 - 1);
-			for(int i = 0; i < stackValues.Length; i+=4) {
-				UInt32 value = (uint)stackValues[i] | (uint)(stackValues[i+1] << 8) | (uint)(stackValues[i+2] << 16) | (uint)(stackValues[i+3] << 24);
+			for(int i = 0; i < stackValues.Length; i += 4) {
+				UInt32 value = (uint)stackValues[i] | (uint)(stackValues[i + 1] << 8) | (uint)(stackValues[i + 2] << 16) | (uint)(stackValues[i + 3] << 24);
 				sb.Append($"${value:X8} ");
 			}
 			StackPreview = sb.ToString();

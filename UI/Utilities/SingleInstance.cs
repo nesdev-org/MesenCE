@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Mesen.Config;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
-using System.Threading;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Mesen.Config;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mesen.Utilities
 {

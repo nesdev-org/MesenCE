@@ -17,7 +17,7 @@ public:
 	HdVideoFilter(NesConsole* console, Emulator* emu, HdPackData* hdData);
 	virtual ~HdVideoFilter() = default;
 
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 	FrameInfo GetFrameInfo() override;
 	OverscanDimensions GetOverscan() override;
 };

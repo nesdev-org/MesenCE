@@ -1,30 +1,30 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.ViewModels;
+using Avalonia.VisualTree;
 using Mesen.Config;
+using Mesen.Controls;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using Mesen.Views;
 using System;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Mesen.Utilities;
-using Mesen.Interop;
-using Mesen.Views;
-using Avalonia.Layout;
-using Mesen.Debugger.Utilities;
-using System.Threading;
-using Mesen.Debugger.Windows;
-using Avalonia.Input.Platform;
-using System.Collections.Generic;
-using Mesen.Controls;
-using Mesen.Localization;
-using System.Diagnostics;
-using Avalonia.VisualTree;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mesen.Windows
 {
@@ -122,7 +122,7 @@ namespace Mesen.Windows
 			}
 
 			PlatformHotkeyConfiguration hotkeyConfig = Application.Current.PlatformSettings.HotkeyConfiguration;
-			List <KeyGesture> gestures = hotkeyConfig.OpenContextMenu;
+			List<KeyGesture> gestures = hotkeyConfig.OpenContextMenu;
 			for(int i = gestures.Count - 1; i >= 0; i--) {
 				if(gestures[i].Key == Key.F10 && gestures[i].KeyModifiers == KeyModifiers.Shift) {
 					//Disable Shift-F10 shortcut to open context menu - interferes with default shortcut for step back
@@ -247,7 +247,7 @@ namespace Mesen.Windows
 				);
 
 				ConfigManager.Config.RemoveObsoleteConfig();
-				
+
 				//InitializeDefaults must be after InitializeEmu, otherwise keybindings will be empty
 				ConfigManager.Config.InitializeDefaults();
 				ConfigManager.Config.UpgradeConfig();
@@ -301,10 +301,10 @@ namespace Mesen.Windows
 				case ConsoleNotificationType.GameLoaded:
 					CheatCodes.ApplyCheats();
 					RomInfo romInfo = EmuApi.GetRomInfo();
-					
+
 					Dispatcher.UIThread.Post(() => {
 						bool wasAudioFile = _model.AudioPlayer != null;
-						bool updateConfig = _model.RomInfo.Format != romInfo.Format;
+						bool updateConfig = _model.RomInfo.Format != romInfo.Format || _model.RomInfo.ConsoleType != romInfo.ConsoleType;
 						_model.RomInfo = romInfo;
 
 						if(updateConfig) {

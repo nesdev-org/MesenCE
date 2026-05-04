@@ -67,7 +67,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 		case 0x10: _cartEepromSize = 0x80; break;
 		case 0x20: _cartEepromSize = 0x800; break;
 		case 0x50: _cartEepromSize = 0x400; break;
-		
+
 		default: MessageManager::Log("Save RAM: unrecognized value"); break;
 	}
 
@@ -78,7 +78,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	MessageManager::Log("Save RAM size: " + std::to_string(_saveRamSize / 1024) + " KB");
 	MessageManager::Log("Cart EEPROM size: " + std::to_string(_cartEepromSize) + " bytes");
 	MessageManager::Log(string("Mapper: ") + (mapperType == 0 ? "Bandai 2001 / KARNAK" : (mapperType == 1 ? "Bandai 2003" : ("Unknown: " + std::to_string(mapperType)))));
-	
+
 	MessageManager::Log("------------------------------");
 
 	if(_saveRamSize > 0) {
@@ -86,7 +86,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 		memset(_saveRam, 0, _saveRamSize);
 		_emu->RegisterMemory(MemoryType::WsCartRam, _saveRam, _saveRamSize);
 	}
-	
+
 	if(_cartEepromSize > 0) {
 		_cartEepromData = new uint8_t[_cartEepromSize];
 		memset(_cartEepromData, 0, _cartEepromSize);
@@ -128,7 +128,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	_ppu.reset(new WsPpu(_emu, this, _memoryManager.get(), _timer.get(), _workRam));
 	_apu.reset(new WsApu(_emu, this, _memoryManager.get(), _dmaController.get()));
 	_cart.reset(new WsCart());
-	
+
 	_cart->Init(_memoryManager.get(), _cartEeprom.get());
 	_memoryManager->Init(_emu, this, _cpu.get(), _ppu.get(), _controlManager.get(), _cart.get(), _timer.get(), _dmaController.get(), _internalEeprom.get(), _apu.get(), _serial.get());
 	_timer->Init(_memoryManager.get());
@@ -149,7 +149,7 @@ void WsConsole::RunFrame()
 	while(frameCount == _ppu->GetFrameCount()) {
 		_cpu->Exec();
 	}
-	
+
 	_apu->PlayQueuedAudio();
 
 	//Make sure to process writes to EEPROM once a frame at least (so that the update is visible in the memory viewer)
@@ -247,14 +247,16 @@ void WsConsole::InitPostBootRomState()
 		ppu.Scanline = 26;
 		ppu.Cycle = 53;
 
+		// clang-format off
 		constexpr static uint8_t defaultBwPalette[] = {
-			0,0,0,7,0,0,0,5,0,0,0,4,0,0,0,3,
+			0,0,0,7,0,0,0,5,0,0,0,4,0,0,0,3, 
 			0,0,0,2,0,0,0,1,0,0,0,0,0,0,0,0,
 			0,3,5,7,0,0,0,0,0,0,0,0,0,0,0,0,
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		};
+		// clang-format on
 
-		constexpr static uint8_t defaultShades[] = { 0,2,4,6,8,10,12,15 };
+		constexpr static uint8_t defaultShades[] = { 0, 2, 4, 6, 8, 10, 12, 15 };
 
 		memcpy(ppu.BwPalettes, defaultBwPalette, sizeof(defaultBwPalette));
 		memcpy(ppu.BwShades, defaultShades, sizeof(defaultShades));
@@ -467,7 +469,7 @@ void WsConsole::Serialize(Serializer& s)
 	SV(_cpu);
 	SV(_ppu);
 	SV(_apu);
-	
+
 	//Process cart before memory manager to ensure mappings are updated properly
 	SV(_cart);
 	SV(_memoryManager);
@@ -479,7 +481,7 @@ void WsConsole::Serialize(Serializer& s)
 	SV(_internalEeprom);
 
 	SV(_verticalMode);
-	
+
 	SVArray(_workRam, _workRamSize);
 	if(_saveRam && _saveRamSize) {
 		SVArray(_saveRam, _saveRamSize);

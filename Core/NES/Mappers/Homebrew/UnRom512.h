@@ -43,7 +43,10 @@ protected:
 				switch(_romInfo.Header.Byte6 & 0x09) {
 					case 0: SetMirroringType(MirroringType::Horizontal); break;
 					case 1: SetMirroringType(MirroringType::Vertical); break;
-					case 8: SetMirroringType(MirroringType::ScreenAOnly); _enableMirroringBit = true; break;
+					case 8:
+						SetMirroringType(MirroringType::ScreenAOnly);
+						_enableMirroringBit = true;
+						break;
 					case 9: SetMirroringType(MirroringType::FourScreens); break;
 				}
 			}
@@ -73,7 +76,7 @@ protected:
 
 		SV(_flash);
 		SV(_prgBank);
-		
+
 		SerializeRomDiff(s, _orgPrgRom);
 	}
 

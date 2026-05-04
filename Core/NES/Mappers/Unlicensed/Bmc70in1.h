@@ -52,15 +52,16 @@ protected:
 	void UpdateState()
 	{
 		switch(_bankMode) {
-			case 0x00: case 0x10:
+			case 0x00:
+			case 0x10:
 				SelectPrgPage(0, _outerBank | _prgReg);
 				SelectPrgPage(1, _outerBank | 7);
 				break;
-			
+
 			case 0x20:
 				SelectPrgPage2x(0, (_outerBank | _prgReg) & 0xFE);
 				break;
-			
+
 			case 0x30:
 				SelectPrgPage(0, _outerBank | _prgReg);
 				SelectPrgPage(1, _outerBank | _prgReg);
@@ -83,7 +84,7 @@ protected:
 
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
-		if(addr & 0x4000) { 
+		if(addr & 0x4000) {
 			_bankMode = addr & 0x30;
 			_prgReg = addr & 0x07;
 		} else {

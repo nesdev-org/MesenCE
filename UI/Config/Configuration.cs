@@ -47,7 +47,7 @@ namespace Mesen.Config
 		[Reactive] public NetplayConfig Netplay { get; set; } = new();
 		[Reactive] public HistoryViewerConfig HistoryViewer { get; set; } = new();
 		[Reactive] public MainWindowConfig MainWindow { get; set; } = new();
-		
+
 		public DefaultKeyMappingType DefaultKeyMappings { get; set; } = DefaultKeyMappingType.Xbox | DefaultKeyMappingType.ArrowKeys;
 
 		public Configuration()
@@ -115,8 +115,8 @@ namespace Mesen.Config
 		{
 			if(ConfigUpgrade < (int)ConfigUpgradeHint.SmsInput) {
 				Sms.InitializeDefaults(DefaultKeyMappings);
-			} 
-			
+			}
+
 			if(ConfigUpgrade < (int)ConfigUpgradeHint.GbaInput) {
 				Gba.InitializeDefaults(DefaultKeyMappings);
 			}

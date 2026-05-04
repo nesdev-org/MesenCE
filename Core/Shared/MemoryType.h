@@ -91,7 +91,7 @@ enum class MemoryType
 	GbaVideoRam,
 	GbaSpriteRam,
 	GbaPaletteRam,
-	
+
 	WsPrgRom,
 	WsWorkRam,
 	WsCartRam,

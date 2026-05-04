@@ -30,7 +30,7 @@ RowDataType SpcTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void SpcTraceLogger::GetTraceRow(string &output, SpcState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void SpcTraceLogger::GetTraceRow(string& output, SpcState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	constexpr char activeStatusLetters[8] = { 'N', 'V', 'P', 'B', 'H', 'I', 'Z', 'C' };
 	constexpr char inactiveStatusLetters[8] = { 'n', 'v', 'p', 'b', 'h', 'i', 'z', 'c' };

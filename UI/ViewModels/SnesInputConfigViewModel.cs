@@ -10,7 +10,7 @@ namespace Mesen.ViewModels
 	public class SnesInputConfigViewModel : DisposableViewModel
 	{
 		[Reactive] public SnesConfig Config { get; set; }
-		
+
 		[ObservableAsProperty] public bool HasMultitap1 { get; }
 		[ObservableAsProperty] public bool HasMultitap2 { get; }
 
@@ -44,7 +44,7 @@ namespace Mesen.ViewModels
 		public SnesInputConfigViewModel(SnesConfig config)
 		{
 			Config = config;
-		
+
 			AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type)
 				.Select(x => x == ControllerType.Multitap)
 				.ToPropertyEx(this, x => x.HasMultitap1));

@@ -14,7 +14,7 @@ namespace Mesen.Debugger.Windows
 	public class LabelEditWindow : MesenWindow
 	{
 		private LabelEditViewModel _model;
-		
+
 		[Obsolete("For designer only")]
 		public LabelEditWindow() : this(new()) { }
 

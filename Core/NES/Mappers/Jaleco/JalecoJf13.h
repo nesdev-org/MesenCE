@@ -27,6 +27,5 @@ protected:
 				//Audio not supported
 				break;
 		}
-		
 	}
 };

@@ -91,14 +91,28 @@ protected:
 			UpdateChr();
 		} else {
 			switch(addr & 0xF003) {
-				case 0x8000: _prgRegs[0] = value; UpdatePrg(); break;
-				case 0xA000: _prgRegs[1] = value; UpdatePrg(); break;
-				case 0x9000: SetMirroringType(value & 0x01 ? MirroringType::Horizontal : MirroringType::Vertical); break;
-				case 0x9001: _swapPrg = (value & 0x03) != 0; UpdatePrg(); break;
+				case 0x8000:
+					_prgRegs[0] = value;
+					UpdatePrg();
+					break;
+
+				case 0xA000:
+					_prgRegs[1] = value;
+					UpdatePrg();
+					break;
+
+				case 0x9000:
+					SetMirroringType(value & 0x01 ? MirroringType::Horizontal : MirroringType::Vertical);
+					break;
+
+				case 0x9001:
+					_swapPrg = (value & 0x03) != 0;
+					UpdatePrg();
+					break;
 
 				case 0xF000: _irqReloadValue = (_irqReloadValue & 0xF0) | (value & 0x0F); break;
 				case 0xF002: _irqReloadValue = (_irqReloadValue & 0x0F) | (value << 4); break;
-				
+
 				case 0xF001:
 					//VRC-like IRQs?  This seems to make more sense than A12-based IRQs
 					//considering FCEUX/puNES both adjust the counter value based on when
@@ -112,7 +126,7 @@ protected:
 					_console->GetCpu()->ClearIrqSource(IRQSource::External);
 					break;
 
-				case 0xF003: 
+				case 0xF003:
 					_console->GetCpu()->ClearIrqSource(IRQSource::External);
 					break;
 			}

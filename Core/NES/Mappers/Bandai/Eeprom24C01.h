@@ -9,7 +9,7 @@
 class Eeprom24C01 : public BaseEeprom24C0X
 {
 private:
-	void WriteBit(uint8_t &dest, uint8_t value)
+	void WriteBit(uint8_t& dest, uint8_t value)
 	{
 		if(_counter < 8) {
 			uint8_t mask = ~(1 << _counter);

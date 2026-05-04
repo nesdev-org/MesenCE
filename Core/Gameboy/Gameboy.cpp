@@ -122,7 +122,7 @@ void Gameboy::Init(GbCart* cart, std::vector<uint8_t>& romData, uint32_t cartRam
 				break;
 		}
 	}
-	
+
 	_emu->RegisterMemory(MemoryType::GbBootRom, _bootRom, _bootRomSize);
 
 	InitializeRam(_cartRam, _cartRamSize);
@@ -137,7 +137,7 @@ void Gameboy::Init(GbCart* cart, std::vector<uint8_t>& romData, uint32_t cartRam
 	}
 }
 
-void Gameboy::PowerOn(SuperGameboy *sgb)
+void Gameboy::PowerOn(SuperGameboy* sgb)
 {
 	_superGameboy = sgb;
 
@@ -247,7 +247,7 @@ GbTimer* Gameboy::GetTimer()
 	return _timer.get();
 }
 
-void Gameboy::GetSoundSamples(int16_t* &samples, uint32_t& sampleCount)
+void Gameboy::GetSoundSamples(int16_t*& samples, uint32_t& sampleCount)
 {
 	_apu->GetSoundSamples(samples, sampleCount);
 }
@@ -400,7 +400,7 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 			//Pad to multiple of 16kb
 			gbsRomData.insert(gbsRomData.end(), 0x4000 - (gbsRomData.size() & 0x3FFF), 0);
 		}
-		
+
 		MessageManager::Log("-----------------------------");
 		MessageManager::Log("File: " + romFile.GetFileName());
 
@@ -632,7 +632,7 @@ uint64_t Gameboy::GetMasterClock()
 
 uint32_t Gameboy::GetMasterClockRate()
 {
-	return _memoryManager->IsHighSpeed() ? 4194304*2 : 4194304;
+	return _memoryManager->IsHighSpeed() ? 4194304 * 2 : 4194304;
 }
 
 BaseVideoFilter* Gameboy::GetVideoFilter(bool getDefaultFilter)

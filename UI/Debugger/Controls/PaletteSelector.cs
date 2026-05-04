@@ -152,7 +152,7 @@ namespace Mesen.Debugger.Controls
 			if(PaletteColors != null && ColumnCount > 0) {
 				return new Size(ColumnCount * BlockSize, (PaletteColors.Length / ColumnCount) * BlockSize);
 			} else {
-				return new Size(0,0);
+				return new Size(0, 0);
 			}
 		}
 
@@ -212,7 +212,7 @@ namespace Mesen.Debugger.Controls
 		public override void Render(DrawingContext context)
 		{
 			UInt32[] paletteColors = PaletteColors;
-			
+
 			if(paletteColors == null || ColumnCount == 0) {
 				return;
 			}
@@ -303,7 +303,7 @@ namespace Mesen.Debugger.Controls
 		protected override void OnPointerMoved(PointerEventArgs e)
 		{
 			base.OnPointerMoved(e);
-			
+
 			if(RawPalette == null) {
 				return;
 			}

@@ -5,7 +5,7 @@
 #include "Shared/MessageManager.h"
 #include "Shared/Interfaces/INotificationListener.h"
 
-class VsInputButtons: public BaseControlDevice, public INotificationListener
+class VsInputButtons : public BaseControlDevice, public INotificationListener
 {
 private:
 	static constexpr uint8_t InsertCoinFrameCount = 4;
@@ -24,7 +24,7 @@ private:
 				case 1: SetBit(VsInputButtons::VsButtons::InsertCoin2); break;
 				case 2: SetBit(VsInputButtons::VsButtons::InsertCoin3); break;
 				case 3: SetBit(VsInputButtons::VsButtons::InsertCoin4); break;
-			}			
+			}
 		}
 	}
 
@@ -34,7 +34,15 @@ private:
 	}
 
 public:
-	enum VsButtons { InsertCoin1 = 2, InsertCoin2, ServiceButton, InsertCoin3, InsertCoin4, ServiceButton2 };
+	enum VsButtons
+	{
+		InsertCoin1 = 2,
+		InsertCoin2,
+		ServiceButton,
+		InsertCoin3,
+		InsertCoin4,
+		ServiceButton2
+	};
 
 	VsInputButtons(Emulator* emu, bool isDualSystem) : BaseControlDevice(emu, ControllerType::None, BaseControlDevice::MapperInputPort)
 	{

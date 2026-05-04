@@ -16,7 +16,7 @@ private:
 	GbPpu* _ppu = nullptr;
 	GbCpu* _cpu = nullptr;
 	Gameboy* _gameboy = nullptr;
-	
+
 	void ProcessDmaBlock();
 	uint16_t GetOamReadAddress();
 

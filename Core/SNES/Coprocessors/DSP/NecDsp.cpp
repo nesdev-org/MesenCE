@@ -15,14 +15,14 @@
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/Serializer.h"
 
-NecDsp::NecDsp(CoprocessorType type, SnesConsole* console, vector<uint8_t> &programRom, vector<uint8_t> &dataRom)
+NecDsp::NecDsp(CoprocessorType type, SnesConsole* console, vector<uint8_t>& programRom, vector<uint8_t>& dataRom)
 {
 	_console = console;
 	_emu = console->GetEmulator();
 	_type = type;
 	_memoryManager = console->GetMemoryManager();
-	MemoryMappings *mm = _memoryManager->GetMemoryMappings();
-	
+	MemoryMappings* mm = _memoryManager->GetMemoryMappings();
+
 	if(type == CoprocessorType::ST010 || type == CoprocessorType::ST011) {
 		if(type == CoprocessorType::ST010) {
 			_frequency = 11000000;
@@ -60,7 +60,7 @@ NecDsp::NecDsp(CoprocessorType type, SnesConsole* console, vector<uint8_t> &prog
 	_emu->RegisterMemory(MemoryType::DspProgramRom, _progRom, _progSize);
 
 	_prgCache = new uint32_t[_progSize / 3];
-	_progMask = (_progSize / 3)- 1;
+	_progMask = (_progSize / 3) - 1;
 
 	_dataSize = (uint32_t)dataRom.size() / 2;
 	_dataRom = new uint16_t[_dataSize];
@@ -92,7 +92,7 @@ NecDsp::~NecDsp()
 	delete[] _ram;
 }
 
-NecDsp* NecDsp::InitCoprocessor(CoprocessorType type, SnesConsole *console, vector<uint8_t> &embeddedFirware)
+NecDsp* NecDsp::InitCoprocessor(CoprocessorType type, SnesConsole* console, vector<uint8_t>& embeddedFirware)
 {
 	Emulator* emu = console->GetEmulator();
 	bool firmwareLoaded = false;
@@ -283,7 +283,7 @@ uint8_t NecDsp::Peek(uint32_t addr)
 	return 0;
 }
 
-void NecDsp::PeekBlock(uint32_t addr, uint8_t *output)
+void NecDsp::PeekBlock(uint32_t addr, uint8_t* output)
 {
 	memset(output, 0, 0x1000);
 }
@@ -323,8 +323,16 @@ void NecDsp::RunApuOp(uint8_t aluOperation, uint16_t source)
 		case 0x05: result = acc + p; break;
 		case 0x06: result = acc - p - otherCarry; break;
 		case 0x07: result = acc + p + otherCarry; break;
-		case 0x08: result = acc - 1; p = 1; break;
-		case 0x09: result = acc + 1; p = 1; break;
+
+		case 0x08:
+			result = acc - 1;
+			p = 1;
+			break;
+
+		case 0x09:
+			result = acc + 1;
+			p = 1;
+			break;
 
 		case 0x0A: result = ~acc; break;
 		case 0x0B: result = (acc >> 1) | (acc & 0x8000); break;
@@ -341,14 +349,25 @@ void NecDsp::RunApuOp(uint8_t aluOperation, uint16_t source)
 	}
 
 	switch(aluOperation) {
-		case 0x00: case 0x01: case 0x02: case 0x03:
-		case 0x0A: case 0x0D: case 0x0E: case 0x0F:
+		case 0x00:
+		case 0x01:
+		case 0x02:
+		case 0x03:
+		case 0x0A:
+		case 0x0D:
+		case 0x0E:
+		case 0x0F:
 			flags.Carry = false;
 			flags.Overflow0 = false;
 			flags.Overflow1 = false;
 			break;
 
-		case 0x04: case 0x05: case 0x06: case 0x07: case 0x08: case 0x09: {
+		case 0x04:
+		case 0x05:
+		case 0x06:
+		case 0x07:
+		case 0x08:
+		case 0x09: {
 			uint16_t overflow = (acc ^ result) & (p ^ ((aluOperation & 0x01) ? result : acc));
 			flags.Overflow0 = (bool)((overflow & 0x8000) >> 15);
 			if(flags.Overflow0 && flags.Overflow1) {
@@ -427,7 +446,7 @@ void NecDsp::ExecAndReturn()
 {
 	ExecOp();
 	_state.SP = (_state.SP - 1) & _stackMask;
-	_state.PC = _stack[_state.SP];	
+	_state.PC = _stack[_state.SP];
 }
 
 void NecDsp::Jump()
@@ -610,15 +629,40 @@ NecDspState& NecDsp::GetState()
 	return _state;
 }
 
-void NecDsp::Serialize(Serializer &s)
+void NecDsp::Serialize(Serializer& s)
 {
-	SV(_state.A); SV(_state.B); SV(_state.DP); SV(_state.DR); SV(_state.K); SV(_state.L); SV(_state.M); SV(_state.N); SV(_state.PC);
-	SV(_state.RP); SV(_state.SerialIn); SV(_state.SerialOut); SV(_state.SP); SV(_state.SR); SV(_state.TR); SV(_state.TRB); 
-	SV(_state.FlagsA.Carry); SV(_state.FlagsA.Overflow0); SV(_state.FlagsA.Overflow1); SV(_state.FlagsA.Sign0); SV(_state.FlagsA.Sign1); SV(_state.FlagsA.Zero);
-	SV(_state.FlagsB.Carry); SV(_state.FlagsB.Overflow0); SV(_state.FlagsB.Overflow1); SV(_state.FlagsB.Sign0); SV(_state.FlagsB.Sign1); SV(_state.FlagsB.Zero);
+	SV(_state.A);
+	SV(_state.B);
+	SV(_state.DP);
+	SV(_state.DR);
+	SV(_state.K);
+	SV(_state.L);
+	SV(_state.M);
+	SV(_state.N);
+	SV(_state.PC);
+	SV(_state.RP);
+	SV(_state.SerialIn);
+	SV(_state.SerialOut);
+	SV(_state.SP);
+	SV(_state.SR);
+	SV(_state.TR);
+	SV(_state.TRB);
+	SV(_state.FlagsA.Carry);
+	SV(_state.FlagsA.Overflow0);
+	SV(_state.FlagsA.Overflow1);
+	SV(_state.FlagsA.Sign0);
+	SV(_state.FlagsA.Sign1);
+	SV(_state.FlagsA.Zero);
+	SV(_state.FlagsB.Carry);
+	SV(_state.FlagsB.Overflow0);
+	SV(_state.FlagsB.Overflow1);
+	SV(_state.FlagsB.Sign0);
+	SV(_state.FlagsB.Sign1);
+	SV(_state.FlagsB.Zero);
 	SV(_state.CycleCount);
 
-	SV(_opCode); SV(_inRqmLoop);
+	SV(_opCode);
+	SV(_inRqmLoop);
 	SVArray(_ram, _ramSize);
 	SVArray(_stack, _stackSize);
 }

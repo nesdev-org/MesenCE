@@ -12,9 +12,9 @@ namespace Mesen.ViewModels
 	{
 		[Reactive] public string SavePath { get; set; }
 		[Reactive] public VideoRecordConfig Config { get; set; }
-		
+
 		[ObservableAsProperty] public bool CompressionAvailable { get; set; }
-		
+
 		public VideoRecordConfigViewModel()
 		{
 			Config = ConfigManager.Config.VideoRecord.Clone();
@@ -35,5 +35,5 @@ namespace Mesen.ViewModels
 		{
 			ConfigManager.Config.VideoRecord = Config.Clone();
 		}
-   }
+	}
 }

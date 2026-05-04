@@ -36,7 +36,6 @@ private:
 	static constexpr int32_t OamDecayCycleCount = 3000;
 
 protected:
-	
 	void UpdateStatusFlag();
 
 	void SetControlRegister(uint8_t value);
@@ -110,7 +109,7 @@ public:
 	uint16_t* GetScreenBuffer(bool previousBuffer, bool processGrayscaleEmphasisBits = false) override;
 	void DebugCopyOutputBuffer(uint16_t* target);
 	void DebugUpdateFrameBuffer(bool toGrayscale);
-	
+
 	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		ranges.AddHandler(MemoryOperation::Read, 0x2000, 0x3FFF);

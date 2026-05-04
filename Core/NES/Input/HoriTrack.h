@@ -10,7 +10,7 @@ private:
 
 protected:
 	bool HasCoordinates() override { return true; }
-	
+
 	void Serialize(Serializer& s) override
 	{
 		NesController::Serialize(s);
@@ -24,7 +24,7 @@ protected:
 	}
 
 public:
-	HoriTrack(Emulator* emu,  KeyMappingSet keyMappings) : NesController(emu, ControllerType::HoriTrack, BaseControlDevice::ExpDevicePort, keyMappings)
+	HoriTrack(Emulator* emu, KeyMappingSet keyMappings) : NesController(emu, ControllerType::HoriTrack, BaseControlDevice::ExpDevicePort, keyMappings)
 	{
 	}
 
@@ -38,7 +38,7 @@ public:
 		}
 		return output;
 	}
-	
+
 	void RefreshStateBuffer() override
 	{
 		MouseMovement mov = GetMovement();
@@ -48,7 +48,7 @@ public:
 
 		mov.dx = ((mov.dx & 0x08) >> 3) | ((mov.dx & 0x04) >> 1) | ((mov.dx & 0x02) << 1) | ((mov.dx & 0x01) << 3);
 		mov.dy = ((mov.dy & 0x08) >> 3) | ((mov.dy & 0x04) >> 1) | ((mov.dy & 0x02) << 1) | ((mov.dy & 0x01) << 3);
-		
+
 		uint8_t byte1 = (~mov.dy & 0x0F) | ((~mov.dx & 0x0F) << 4);
 		uint8_t byte2 = 0x09;
 

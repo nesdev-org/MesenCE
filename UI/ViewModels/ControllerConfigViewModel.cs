@@ -33,7 +33,7 @@ namespace Mesen.ViewModels
 			Config = config;
 			OriginalConfig = originalConfig;
 			Type = type;
-			
+
 			KeyMapping1 = new KeyMappingViewModel(type, config.Mapping1, 0, port);
 			KeyMapping2 = new KeyMappingViewModel(type, config.Mapping2, 1, port);
 			KeyMapping3 = new KeyMappingViewModel(type, config.Mapping3, 2, port);

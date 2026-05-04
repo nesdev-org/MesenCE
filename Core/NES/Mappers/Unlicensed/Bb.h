@@ -39,7 +39,7 @@ protected:
 
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
-		if((addr & 0x9000) == 0x8000 || addr >= 0xF000){
+		if((addr & 0x9000) == 0x8000 || addr >= 0xF000) {
 			//A version of Bubble Bobble expects writes to $F000+ to switch the PRG banks
 			_prgReg = _chrReg = value;
 		} else {

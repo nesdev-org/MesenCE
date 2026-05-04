@@ -12,8 +12,7 @@ public:
 
 	ClientConnectionData() {}
 
-	ClientConnectionData(string host, uint16_t port, string password, bool spectator) :
-		Host(host), Port(port), Password(password), Spectator(spectator)
+	ClientConnectionData(string host, uint16_t port, string password, bool spectator) : Host(host), Port(port), Password(password), Spectator(spectator)
 	{
 	}
 

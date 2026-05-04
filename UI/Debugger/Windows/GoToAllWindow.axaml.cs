@@ -29,7 +29,7 @@ namespace Mesen.Debugger.Windows
 		public GoToAllWindow(GoToAllViewModel model)
 		{
 			_model = model;
-			DataContext =  model;
+			DataContext = model;
 
 			InitializeComponent();
 #if DEBUG
@@ -98,7 +98,7 @@ namespace Mesen.Debugger.Windows
 				case Key.PageUp: MoveSelection(-5); e.Handled = true; break;
 				case Key.Home: _model.SelectionModel.SelectedIndex = 0; e.Handled = true; break;
 				case Key.End: _model.SelectionModel.SelectedIndex = _model.SearchResults.Count - 1; e.Handled = true; break;
-			} 
+			}
 			base.OnKeyDown(e);
 		}
 
@@ -109,7 +109,7 @@ namespace Mesen.Debugger.Windows
 				Close();
 			}
 		}
-		
+
 		private void Select_OnClick(object sender, RoutedEventArgs e)
 		{
 			SelectAndClose();

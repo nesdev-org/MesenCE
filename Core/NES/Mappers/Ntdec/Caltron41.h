@@ -33,7 +33,7 @@ protected:
 		SV(_prgBank);
 		SV(_chrBank);
 	}
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		if(addr <= 0x67FF) {

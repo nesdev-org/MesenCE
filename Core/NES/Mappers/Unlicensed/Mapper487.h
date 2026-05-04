@@ -35,10 +35,9 @@ protected:
 	void UpdateState()
 	{
 		uint8_t prg = _regs[1] & 0x1E;
-		uint8_t chr = (
+		uint8_t chr =
 			((_regs[1] & 0x1E) << 2) |
-			(_regs[0] & 0x03)
-		);
+			(_regs[0] & 0x03);
 
 		if(_regs[1] & 0x40) {
 			//64kb banks, use inner bank for A15
@@ -58,7 +57,7 @@ protected:
 
 		SelectPrgPage(0, prg);
 		SelectChrPage(0, chr);
-		
+
 		SetMirroringType(_regs[1] & 0x80 ? MirroringType::Horizontal : MirroringType::Vertical);
 	}
 

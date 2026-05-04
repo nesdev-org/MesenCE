@@ -52,7 +52,7 @@ NesControlManager::~NesControlManager()
 shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(ControllerType type, uint8_t port)
 {
 	shared_ptr<BaseControlDevice> device;
-	
+
 	ControllerConfig controllers[4];
 	NesConfig& cfg = _emu->GetSettings()->GetNesConfig();
 	KeyMappingSet keys;
@@ -69,7 +69,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 
 	switch(type) {
 		case ControllerType::None: break;
-		
+
 		case ControllerType::NesController:
 		case ControllerType::FamicomController:
 		case ControllerType::FamicomControllerP2:
@@ -88,7 +88,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 
 		case ControllerType::NesArkanoidController: device.reset(new ArkanoidController(_emu, type, port, keys)); break;
 		case ControllerType::SnesController: device.reset(new SnesController(_emu, port, keys)); break;
-		
+
 		case ControllerType::PowerPadSideA:
 		case ControllerType::PowerPadSideB:
 			device.reset(new PowerPad(_emu, type, port, keys));
@@ -102,7 +102,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 		case ControllerType::FamicomZapper: device.reset(new Zapper(_console, type, BaseControlDevice::ExpDevicePort, keys)); break;
 		case ControllerType::FamicomArkanoidController: device.reset(new ArkanoidController(_emu, type, BaseControlDevice::ExpDevicePort, keys)); break;
 		case ControllerType::OekaKidsTablet: device.reset(new OekaKidsTablet(_emu, keys)); break;
-		
+
 		case ControllerType::FamilyTrainerMatSideA:
 		case ControllerType::FamilyTrainerMatSideB:
 			device.reset(new FamilyMatTrainer(_emu, type, keys));
@@ -120,7 +120,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 		case ControllerType::BandaiHyperShot: device.reset(new BandaiHyperShot(_console, keys)); break;
 		case ControllerType::AsciiTurboFile: device.reset(new AsciiTurboFile(_console)); break;
 		case ControllerType::BattleBox: device.reset(new BattleBox(_console)); break;
-		
+
 		case ControllerType::FourScore: {
 			std::copy(cfg.Port1SubPorts, cfg.Port1SubPorts + 4, controllers);
 			//Use the p1/p2 bindings for the first 2 ports (the UI does this, too)
@@ -175,7 +175,7 @@ void NesControlManager::UpdateControlDevices()
 		shared_ptr<BaseControlDevice> expDevice = CreateControllerDevice(cfg.ExpPort.Type, BaseControlDevice::ExpDevicePort);
 		if(expDevice) {
 			RegisterControlDevice(expDevice);
-			
+
 			if(std::dynamic_pointer_cast<FamilyBasicKeyboard>(expDevice)) {
 				//Automatically connect the data recorder if the family basic keyboard is connected
 				RegisterControlDevice(shared_ptr<FamilyBasicDataRecorder>(new FamilyBasicDataRecorder(_emu)));
@@ -195,13 +195,13 @@ bool NesControlManager::IsKeyboardConnected()
 
 uint8_t NesControlManager::GetOpenBusMask(uint8_t port)
 {
-	//"In the NES and Famicom, the top three (or five) bits are not driven, and so retain the bits of the previous byte on the bus. 
+	//"In the NES and Famicom, the top three (or five) bits are not driven, and so retain the bits of the previous byte on the bus.
 	//Usually this is the most significant byte of the address of the controller port - 0x40.
 	//Paperboy relies on this behavior and requires that reads from the controller ports return exactly $40 or $41 as appropriate."
 	switch(_console->GetNesConfig().ConsoleType) {
 		default:
 		case NesConsoleType::Nes001:
-				return 0xE0;
+			return 0xE0;
 
 		case NesConsoleType::Nes101:
 			return port == 0 ? 0xE4 : 0xE0;
@@ -240,7 +240,7 @@ uint8_t NesControlManager::ReadRam(uint16_t addr)
 	SetInputReadFlag();
 
 	uint8_t value = _console->GetMemoryManager()->GetOpenBus(GetOpenBusMask(addr - 0x4016));
-	for(shared_ptr<BaseControlDevice> &device : _controlDevices) {
+	for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
 		if(device->IsConnected()) {
 			value |= device->ReadRam(addr);
 		}

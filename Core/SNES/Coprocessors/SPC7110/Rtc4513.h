@@ -22,12 +22,12 @@ private:
 	uint8_t GetSeconds() { return _regs[0] + ((_regs[1] & 0x07) * 10); }
 	uint8_t GetMinutes() { return _regs[2] + ((_regs[3] & 0x07) * 10); }
 	uint8_t GetHours() { return _regs[4] + ((_regs[5] & 0x03) * 10); }
-	
+
 	uint8_t GetDay() { return _regs[6] + ((_regs[7] & 0x03) * 10); }
 	uint8_t GetMonth() { return _regs[8] + ((_regs[9] & 0x01) * 10); }
 	uint8_t GetYear() { return _regs[10] + (_regs[11] * 10); }
 	uint8_t GetDoW() { return _regs[12] & 0x07; }
-	
+
 	void UpdateTime();
 
 public:

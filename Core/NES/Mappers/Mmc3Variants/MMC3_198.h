@@ -47,7 +47,7 @@ protected:
 		}
 		MMC3::WriteRegister(addr, value);
 	}
-	
+
 	void SelectPrgPage(uint16_t slot, uint16_t page, PrgMemoryType memoryType) override
 	{
 		MMC3::SelectPrgPage(slot, _exRegs[slot], memoryType);

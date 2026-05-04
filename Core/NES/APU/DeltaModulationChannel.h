@@ -8,9 +8,9 @@ class NesConsole;
 
 class DeltaModulationChannel : public INesMemoryHandler, public ISerializable
 {
-private:	
-	static constexpr uint16_t _dmcPeriodLookupTableNtsc[16] = { 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106,  84,  72,  54 };
-	static constexpr uint16_t _dmcPeriodLookupTablePal[16] = { 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118,  98,  78,  66,  50 };
+private:
+	static constexpr uint16_t _dmcPeriodLookupTableNtsc[16] = { 428, 380, 340, 320, 286, 254, 226, 214, 190, 160, 142, 128, 106, 84, 72, 54 };
+	static constexpr uint16_t _dmcPeriodLookupTablePal[16] = { 398, 354, 316, 298, 276, 236, 210, 198, 176, 148, 132, 118, 98, 78, 66, 50 };
 
 	NesConsole* _console;
 	ApuTimer _timer;
@@ -48,7 +48,7 @@ public:
 	bool IrqPending(uint32_t cyclesToRun);
 	bool NeedToRun();
 	bool GetStatus();
-	void GetMemoryRanges(MemoryRanges &ranges) override;
+	void GetMemoryRanges(MemoryRanges& ranges) override;
 	void WriteRam(uint16_t addr, uint8_t value) override;
 	uint8_t ReadRam(uint16_t addr) override { return 0; }
 	void EndFrame();

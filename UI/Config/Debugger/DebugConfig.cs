@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Mesen.Debugger;
+using Mesen.Interop;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,8 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
-using Mesen.Debugger;
-using Mesen.Interop;
 
 namespace Mesen.Config
 {
@@ -35,7 +35,7 @@ namespace Mesen.Config
 		public DebuggerFontConfig Fonts { get; set; } = new();
 
 		public DebugConfig()
-		{		
+		{
 		}
 
 		public void ApplyConfig()
@@ -91,7 +91,7 @@ namespace Mesen.Config
 				PceBreakOnBrk = Debugger.Pce.BreakOnBrk,
 				PceBreakOnUnofficialOpCode = Debugger.Pce.BreakOnUnofficialOpCode,
 				PceBreakOnInvalidVramAddress = Debugger.Pce.BreakOnInvalidVramAddress,
-				
+
 				SmsBreakOnNopLoad = Debugger.Sms.BreakOnNopLoad,
 
 				GbaBreakOnInvalidOpCode = Debugger.Gba.BreakOnInvalidOpCode,
@@ -165,12 +165,12 @@ namespace Mesen.Config
 		[MarshalAs(UnmanagedType.I1)] public bool PceBreakOnInvalidVramAddress;
 
 		[MarshalAs(UnmanagedType.I1)] public bool SmsBreakOnNopLoad;
-		
+
 		[MarshalAs(UnmanagedType.I1)] public bool GbaBreakOnNopLoad;
 		[MarshalAs(UnmanagedType.I1)] public bool GbaBreakOnInvalidOpCode;
 		[MarshalAs(UnmanagedType.I1)] public bool GbaBreakOnUnalignedMemAccess;
 		public GbaDisassemblyMode GbaDisMode;
-		
+
 		[MarshalAs(UnmanagedType.I1)] public bool WsBreakOnUndefinedOpCode;
 
 		[MarshalAs(UnmanagedType.I1)] public bool ScriptAllowIoOsAccess;

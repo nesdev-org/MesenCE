@@ -40,14 +40,14 @@ OverscanDimensions SmsNtscFilter::GetOverscan()
 FrameInfo SmsNtscFilter::GetFrameInfo()
 {
 	OverscanDimensions overscan = GetOverscan();
-	
+
 	FrameInfo frameInfo;
 	if(_console->GetModel() == SmsModel::GameGear) {
 		frameInfo.Width = SNES_NTSC_OUT_WIDTH(_baseFrameInfo.Width) - overscan.Left - overscan.Right;
 	} else {
 		frameInfo.Width = SMS_NTSC_OUT_WIDTH(_baseFrameInfo.Width) - overscan.Left - overscan.Right;
 	}
-	frameInfo.Height = _baseFrameInfo.Height*2 - overscan.Top - overscan.Bottom;
+	frameInfo.Height = _baseFrameInfo.Height * 2 - overscan.Top - overscan.Bottom;
 	return frameInfo;
 }
 
@@ -71,14 +71,14 @@ void SmsNtscFilter::OnBeforeApplyFilter()
 	}
 }
 
-void SmsNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
+void SmsNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 {
 	FrameInfo frame = _frameInfo;
 	OverscanDimensions overscan = GetOverscan();
-	
+
 	uint32_t xOffset = overscan.Left;
 	uint32_t* out = GetOutputBuffer();
-	
+
 	uint32_t baseWidth;
 	if(_console->GetModel() == SmsModel::GameGear) {
 		baseWidth = SNES_NTSC_OUT_WIDTH(_baseFrameInfo.Width);
@@ -91,7 +91,8 @@ void SmsNtscFilter::ApplyFilter(uint16_t *ppuOutputBuffer)
 	uint32_t linesToSkip;
 	uint32_t scanlineCount = _console->GetVdp()->GetState().VisibleScanlineCount;
 	switch(scanlineCount) {
-		default: case 192: linesToSkip = 24 * 2; break;
+		default:
+		case 192: linesToSkip = 24 * 2; break;
 		case 224: linesToSkip = 8 * 2; break;
 		case 240: linesToSkip = 0; break;
 	}

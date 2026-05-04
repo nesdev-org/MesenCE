@@ -16,12 +16,12 @@ namespace Mesen.Config
 		//Input
 		[Reactive] public SnesControllerConfig Port1 { get; set; } = new SnesControllerConfig();
 		[Reactive] public SnesControllerConfig Port2 { get; set; } = new SnesControllerConfig();
-		
+
 		[Reactive] public SnesControllerConfig Port1A { get; set; } = new SnesControllerConfig();
 		[Reactive] public SnesControllerConfig Port1B { get; set; } = new SnesControllerConfig();
 		[Reactive] public SnesControllerConfig Port1C { get; set; } = new SnesControllerConfig();
 		[Reactive] public SnesControllerConfig Port1D { get; set; } = new SnesControllerConfig();
-		
+
 		[Reactive] public SnesControllerConfig Port2A { get; set; } = new SnesControllerConfig();
 		[Reactive] public SnesControllerConfig Port2B { get; set; } = new SnesControllerConfig();
 		[Reactive] public SnesControllerConfig Port2C { get; set; } = new SnesControllerConfig();
@@ -33,7 +33,7 @@ namespace Mesen.Config
 		[Reactive] public ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
 
 		//Video
-		[Reactive] public bool BlendHighResolutionModes { get; set; } = false;
+		[Reactive] public SnesHighResBlendMode HighResBlendMode { get; set; } = SnesHighResBlendMode.None;
 		[Reactive] public bool HideBgLayer1 { get; set; } = false;
 		[Reactive] public bool HideBgLayer2 { get; set; } = false;
 		[Reactive] public bool HideBgLayer3 { get; set; } = false;
@@ -59,12 +59,12 @@ namespace Mesen.Config
 		[Reactive] public bool EnableRandomPowerOnState { get; set; } = false;
 		[Reactive] public bool EnableStrictBoardMappings { get; set; } = false;
 		[Reactive] public RamState RamPowerOnState { get; set; } = RamState.Random;
-		[Reactive] [MinMax(-999, 999)] public Int32 SpcClockSpeedAdjustment { get; set; } = 40;
+		[Reactive][MinMax(-999, 999)] public Int32 SpcClockSpeedAdjustment { get; set; } = 40;
 
 		//Overclocking
-		[Reactive] [MinMax(0, 1000)] public UInt32 PpuExtraScanlinesBeforeNmi { get; set; } = 0;
-		[Reactive] [MinMax(0, 1000)] public UInt32 PpuExtraScanlinesAfterNmi { get; set; } = 0;
-		[Reactive] [MinMax(100, 1000)] public UInt32 GsuClockSpeed { get; set; } = 100;
+		[Reactive][MinMax(0, 1000)] public UInt32 PpuExtraScanlinesBeforeNmi { get; set; } = 0;
+		[Reactive][MinMax(0, 1000)] public UInt32 PpuExtraScanlinesAfterNmi { get; set; } = 0;
+		[Reactive][MinMax(100, 1000)] public UInt32 GsuClockSpeed { get; set; } = 100;
 
 		//BSX
 		[Reactive] public bool BsxUseCustomTime { get; set; } = false;
@@ -92,13 +92,13 @@ namespace Mesen.Config
 
 				AllowInvalidInput = this.AllowInvalidInput,
 
-				BlendHighResolutionModes = this.BlendHighResolutionModes,
+				HighResBlendMode = this.HighResBlendMode,
 				HideBgLayer1 = this.HideBgLayer1,
 				HideBgLayer2 = this.HideBgLayer2,
 				HideBgLayer3 = this.HideBgLayer3,
 				HideBgLayer4 = this.HideBgLayer4,
 				HideSprites = this.HideSprites,
-				
+
 				DisableFrameSkipping = DisableFrameSkipping,
 				ForceFixedResolution = ForceFixedResolution,
 
@@ -137,12 +137,12 @@ namespace Mesen.Config
 	{
 		public InteropControllerConfig Port1;
 		public InteropControllerConfig Port2;
-		
+
 		public InteropControllerConfig Port1A;
 		public InteropControllerConfig Port1B;
 		public InteropControllerConfig Port1C;
 		public InteropControllerConfig Port1D;
-		
+
 		public InteropControllerConfig Port2A;
 		public InteropControllerConfig Port2B;
 		public InteropControllerConfig Port2C;
@@ -151,7 +151,8 @@ namespace Mesen.Config
 		public ConsoleRegion Region;
 
 		[MarshalAs(UnmanagedType.I1)] public bool AllowInvalidInput;
-		[MarshalAs(UnmanagedType.I1)] public bool BlendHighResolutionModes;
+
+		public SnesHighResBlendMode HighResBlendMode;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer1;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer2;
 		[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer3;
@@ -190,5 +191,12 @@ namespace Mesen.Config
 		Cubic,
 		Sinc,
 		None
+	}
+
+	public enum SnesHighResBlendMode
+	{
+		None,
+		BlendAll,
+		BlendEvenOdd
 	}
 }

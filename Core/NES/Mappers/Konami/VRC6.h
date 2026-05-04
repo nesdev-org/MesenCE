@@ -15,7 +15,7 @@ private:
 	VRCVariant _model = {};
 	uint8_t _bankingMode = 0;
 	uint8_t _chrRegisters[8] = {};
-	
+
 	void UpdatePrgRamAccess()
 	{
 		SetCpuMemoryMapping(0x6000, 0x7FFF, 0, HasBattery() ? PrgMemoryType::SaveRam : PrgMemoryType::WorkRam, (_bankingMode & 0x80) ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess);
@@ -36,7 +36,7 @@ protected:
 		memset(_chrRegisters, 0, sizeof(_chrRegisters));
 		SelectPrgPage(3, -1);
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);
@@ -92,7 +92,8 @@ protected:
 				SelectChrPage(7, (_chrRegisters[3] & mask) | orMask);
 				break;
 
-			case 2: case 3:
+			case 2:
+			case 3:
 				SelectChrPage(0, _chrRegisters[0]);
 				SelectChrPage(1, _chrRegisters[1]);
 				SelectChrPage(2, _chrRegisters[2]);
@@ -103,7 +104,7 @@ protected:
 				SelectChrPage(7, (_chrRegisters[5] & mask) | orMask);
 				break;
 		}
-		
+
 		if(_bankingMode & 0x10) {
 			//CHR ROM nametables
 			switch(_bankingMode & 0x2F) {
@@ -233,14 +234,23 @@ protected:
 		}
 
 		switch(addr & 0xF003) {
-			case 0x8000: case 0x8001: case 0x8002: case 0x8003: 
-				SelectPrgPage2x(0, (value & 0x0F) << 1); 
+			case 0x8000:
+			case 0x8001:
+			case 0x8002:
+			case 0x8003:
+				SelectPrgPage2x(0, (value & 0x0F) << 1);
 				break;
 
-			case 0x9000: case 0x9001: case 0x9002:
+			case 0x9000:
+			case 0x9001:
+			case 0x9002:
 			case 0x9003:
-			case 0xA000: case 0xA001: case 0xA002:
-			case 0xB000: case 0xB001: case 0xB002:
+			case 0xA000:
+			case 0xA001:
+			case 0xA002:
+			case 0xB000:
+			case 0xB001:
+			case 0xB002:
 				_audio->WriteRegister(addr, value);
 				break;
 
@@ -248,17 +258,26 @@ protected:
 				_bankingMode = value;
 				UpdatePpuBanking();
 				break;
-				
-			case 0xC000: case 0xC001: case 0xC002: case 0xC003:
+
+			case 0xC000:
+			case 0xC001:
+			case 0xC002:
+			case 0xC003:
 				SelectPrgPage(2, value & 0x1F);
 				break;
 
-			case 0xD000: case 0xD001: case 0xD002: case 0xD003:
+			case 0xD000:
+			case 0xD001:
+			case 0xD002:
+			case 0xD003:
 				_chrRegisters[addr & 0x03] = value;
 				UpdatePpuBanking();
 				break;
 
-			case 0xE000: case 0xE001: case 0xE002: case 0xE003:
+			case 0xE000:
+			case 0xE001:
+			case 0xE002:
+			case 0xE003:
 				_chrRegisters[4 + (addr & 0x03)] = value;
 				UpdatePpuBanking();
 				break;

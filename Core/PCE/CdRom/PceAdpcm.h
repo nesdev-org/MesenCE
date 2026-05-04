@@ -31,6 +31,7 @@ private:
 	double _clocksPerSample = PceConstants::MasterClockRate / 32000.0;
 	double _nextSampleCounter = 0;
 
+	// clang-format off
 	constexpr static int _stepSize[392] =
 	{
 		0x0002, 0x0006, 0x000A, 0x000E, 0x0012, 0x0016, 0x001A, 0x001E,
@@ -83,6 +84,7 @@ private:
 		0x00B0, 0x0210, 0x0371, 0x04D1, 0x0633, 0x0793, 0x08F4, 0x0A54,
 		0x00C2, 0x0246, 0x03CA, 0x054E, 0x06D2, 0x0856, 0x09DA, 0x0B5E
 	};
+	// clang-format on
 
 	constexpr static int _stepFactor[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 

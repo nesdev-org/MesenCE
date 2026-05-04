@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using Avalonia.Media;
-using Mesen.Debugger.Controls;
+﻿using Avalonia.Media;
 using Mesen.Config;
 using Mesen.Debugger;
-using Mesen.Interop;
+using Mesen.Debugger.Controls;
 using Mesen.Debugger.Labels;
 using Mesen.Debugger.Utilities;
+using Mesen.Interop;
+using System;
+using System.Linq;
 
 namespace Mesen.Debugger
 {
@@ -157,7 +157,7 @@ namespace Mesen.Debugger
 					} else if(_cdlData[index].HasFlag(CdlFlags.Data) && _cfg.DataHighlight.Highlight) {
 						//Data
 						_byteInfo.BackColor = _cfg.DataHighlight.Color;
-					} 
+					}
 				}
 			}
 

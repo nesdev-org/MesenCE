@@ -134,7 +134,9 @@ void SmsPsg::Write(uint8_t value)
 	bool volReg = _state.SelectedReg & 0x01;
 
 	switch(channel) {
-		case 0: case 1: case 2:
+		case 0:
+		case 1:
+		case 2:
 			if(volReg) {
 				_state.Tone[channel].Volume = value & 0x0F;
 			} else {

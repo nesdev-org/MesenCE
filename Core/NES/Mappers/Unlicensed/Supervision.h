@@ -35,11 +35,16 @@ protected:
 	void UpdateState()
 	{
 		uint16_t r = _regs[0] << 3 & 0x78;
-		
+
 		SetCpuMemoryMapping(0x6000, 0x7FFF, (r << 1 | 0x0F) + (_epromFirst ? 0x04 : 0x00), PrgMemoryType::PrgRom);
 
-		SelectPrgPage2x(0, ((_regs[0] & 0x10) ? (r | (_regs[1] & 0x07)) + (_epromFirst ? 0x02 : 0x00) : _epromFirst ? 0x00 : 0x80) << 1);
-		SelectPrgPage2x(1, ((_regs[0] & 0x10) ? (r | (0xFF & 0x07)) + (_epromFirst ? 0x02 : 0x00) : _epromFirst ? 0x01 : 0x81) << 1);
+		if(_regs[0] & 0x10) {
+			SelectPrgPage2x(0, ((r | (_regs[1] & 0x07)) + (_epromFirst ? 0x02 : 0x00)) << 1);
+			SelectPrgPage2x(1, ((r | (0xFF & 0x07)) + (_epromFirst ? 0x02 : 0x00)) << 1);
+		} else {
+			SelectPrgPage2x(0, (_epromFirst ? 0x00 : 0x80) << 1);
+			SelectPrgPage2x(1, (_epromFirst ? 0x01 : 0x80) << 1);
+		}
 
 		SetMirroringType(_regs[0] & 0x20 ? MirroringType::Horizontal : MirroringType::Vertical);
 	}

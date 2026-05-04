@@ -27,7 +27,7 @@ public:
 		MessageManager::Log("[GBS] Timer Control: $" + HexUtilities::ToHex(header.TimerControl));
 		MessageManager::Log("[GBS] Timer Modulo: $" + HexUtilities::ToHex(header.TimerModulo));
 		MessageManager::Log("-----------------------------");
-		
+
 		_currentTrack = header.FirstTrack - 1;
 	}
 
@@ -54,9 +54,9 @@ public:
 		//Make RST xx calls jump to [LOAD+0/$8/$10/etc]
 		for(int i = 0; i <= 0x38; i += 8) {
 			//JP LoadAddress+i
-			prg[i+0] = 0xC3;
-			prg[i+1] = (loadAddress + i) & 0xFF;
-			prg[i+2] = ((loadAddress + i) >> 8) & 0xFF;
+			prg[i + 0] = 0xC3;
+			prg[i + 1] = (loadAddress + i) & 0xFF;
+			prg[i + 2] = ((loadAddress + i) >> 8) & 0xFF;
 		}
 
 		//Vertical Blank IRQ: CALL [PLAY]
@@ -199,6 +199,8 @@ public:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_prgBank); SV(_currentTrack); SV(_startClock);
+		SV(_prgBank);
+		SV(_currentTrack);
+		SV(_startClock);
 	}
 };

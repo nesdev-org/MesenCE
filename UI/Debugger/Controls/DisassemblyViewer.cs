@@ -364,7 +364,7 @@ namespace Mesen.Debugger.Controls
 					}
 				} else {
 					using(var clip = context.PushClip(new Rect(x, 0, Bounds.Width, Bounds.Height))) {
-						using(var translation = context.PushTransform(Matrix.CreateTranslation(-HorizontalScrollPosition*10, 0))) {
+						using(var translation = context.PushTransform(Matrix.CreateTranslation(-HorizontalScrollPosition * 10, 0))) {
 							if(lineStyle.TextBgColor.HasValue || lineStyle.OutlineColor.HasValue) {
 								text = FormatText(GetHighlightedText(line, lineParts, out double leftMargin));
 
@@ -545,10 +545,10 @@ namespace Mesen.Debugger.Controls
 
 					if(lineStyle.Symbol.HasFlag(LineSymbol.Forbid) || lineStyle.Symbol.HasFlag(LineSymbol.ForbidDotted)) {
 						p = new Pen(lineStyle.SymbolColor.Value.ToUInt32(), 1, dashStyle);
-						double xPos = LetterSize.Height / 2 - (Math.Cos(Math.PI / 4) * LetterSize.Height/2);
-						double yPos = LetterSize.Height / 2 - (Math.Sin(Math.PI / 4) * LetterSize.Height/2);
-						double xPos2 = LetterSize.Height / 2 + (Math.Cos(Math.PI / 4) * LetterSize.Height/2);
-						double yPos2 = LetterSize.Height / 2 + (Math.Sin(Math.PI / 4) * LetterSize.Height/2);
+						double xPos = LetterSize.Height / 2 - (Math.Cos(Math.PI / 4) * LetterSize.Height / 2);
+						double yPos = LetterSize.Height / 2 - (Math.Sin(Math.PI / 4) * LetterSize.Height / 2);
+						double xPos2 = LetterSize.Height / 2 + (Math.Cos(Math.PI / 4) * LetterSize.Height / 2);
+						double yPos2 = LetterSize.Height / 2 + (Math.Sin(Math.PI / 4) * LetterSize.Height / 2);
 						context.DrawLine(p, new Point(xPos, yPos), new Point(xPos2, yPos2));
 					}
 

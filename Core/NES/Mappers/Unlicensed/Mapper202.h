@@ -27,7 +27,7 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		_prgMode1 = (addr & 0x09) == 0x09;
-		
+
 		SelectChrPage(0, (addr >> 1) & 0x07);
 		if(_prgMode1) {
 			SelectPrgPage(0, (addr >> 1) & 0x07);
@@ -36,7 +36,7 @@ protected:
 			SelectPrgPage(0, (addr >> 1) & 0x07);
 			SelectPrgPage(1, (addr >> 1) & 0x07);
 		}
-		
+
 		SetMirroringType(addr & 0x01 ? MirroringType::Horizontal : MirroringType::Vertical);
 	}
 };

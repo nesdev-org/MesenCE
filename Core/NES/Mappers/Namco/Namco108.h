@@ -14,7 +14,9 @@ protected:
 
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
-		if (addr >= 0xa000) return;
+		if(addr >= 0xa000) {
+			return;
+		}
 		addr &= 0x8001;
 
 		if(addr == 0x8000) {

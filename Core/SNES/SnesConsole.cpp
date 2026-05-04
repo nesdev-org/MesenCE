@@ -75,7 +75,7 @@ void SnesConsole::ProcessEndOfFrame()
 	if(_cart->GetCoprocessor()) {
 		_cart->GetCoprocessor()->ProcessEndOfFrame();
 	}
-	
+
 	//Run the SPC at least once per frame to prevent issues (buffer overflow)
 	//when a very long DMA transfer is running across multiple frames.
 	//(RunFrame above can run more than one frame in this scenario, which could cause crashes)
@@ -114,7 +114,7 @@ LoadRomResult SnesConsole::LoadRom(VirtualFile& romFile)
 	unique_ptr<BaseCartridge> cart = BaseCartridge::CreateCartridge(this, romFile);
 	if(cart) {
 		_cart.swap(cart);
-		
+
 		UpdateRegion();
 
 		_internalRegisters.reset(new InternalRegisters());
@@ -138,7 +138,7 @@ LoadRomResult SnesConsole::LoadRom(VirtualFile& romFile)
 
 		_ppu->PowerOn();
 		_cpu->PowerOn();
-		
+
 		//After power on, run the PPU/etc ahead of the CPU (simulates delay CPU takes to get out of reset)
 		_memoryManager->IncMasterClockStartup();
 
@@ -273,7 +273,7 @@ BaseVideoFilter* SnesConsole::GetVideoFilter(bool getDefaultFilter)
 	}
 
 	VideoFilterType filterType = _emu->GetSettings()->GetVideoConfig().VideoFilter;
-	
+
 	switch(filterType) {
 		case VideoFilterType::NtscBlargg:
 		case VideoFilterType::NtscBisqwit:
@@ -308,7 +308,6 @@ AudioTrackInfo SnesConsole::GetAudioTrackInfo()
 		track.FadeLength = spc->FadeLength / 1000.0;
 		track.TrackNumber = _spcTrackNumber + 1;
 		track.TrackCount = (uint32_t)_spcPlaylist.size();
-
 	}
 	return track;
 }
@@ -362,14 +361,17 @@ void SnesConsole::Serialize(Serializer& s)
 SaveStateCompatInfo SnesConsole::ValidateSaveStateCompatibility(ConsoleType stateConsoleType)
 {
 	if(stateConsoleType == ConsoleType::Gameboy) {
-		return { true, "cart.gameboy.", "", {
-			//Keep all clock counters as-is when loading a GB/GBC state
-			//in a SGB core - this allows it to keep running in sync with
-			//the SNES core properly.
-			"apu.clockCounter", "apu.prevClockCount",
+		//Keep all clock counters as-is when loading a GB/GBC state
+		//in a SGB core - this allows it to keep running in sync with
+		//the SNES core properly.
+		vector<string> fieldsToRemove = {
+			"apu.clockCounter",
+			"apu.prevClockCount",
 			"cpu.cycleCount",
 			"memoryManager.apuCycleCount"
-		} };
+		};
+
+		return { true, "cart.gameboy.", "", fieldsToRemove };
 	}
 
 	return {};
@@ -449,7 +451,7 @@ AddressInfo SnesConsole::GetAbsoluteAddress(AddressInfo& relAddress)
 			} else {
 				return _memoryManager->GetMemoryMappings()->GetAbsoluteAddress(relAddress.Address);
 			}
-		
+
 		case MemoryType::SpcMemory: return _spc->GetAbsoluteAddress(relAddress.Address);
 		case MemoryType::Sa1Memory: return _cart->GetSa1() ? _cart->GetSa1()->GetMemoryMappings()->GetAbsoluteAddress(relAddress.Address) : unmapped;
 		case MemoryType::GsuMemory: return _cart->GetGsu() ? _cart->GetGsu()->GetMemoryMappings()->GetAbsoluteAddress(relAddress.Address) : unmapped;
@@ -482,8 +484,7 @@ AddressInfo SnesConsole::GetRelativeAddress(AddressInfo& absAddress, CpuType cpu
 		case MemoryType::SnesPrgRom:
 		case MemoryType::SnesWorkRam:
 		case MemoryType::SnesSaveRam:
-		case MemoryType::SufamiTurboFirmware:
-		{
+		case MemoryType::SufamiTurboFirmware: {
 			if(!mappings) {
 				return unmapped;
 			}

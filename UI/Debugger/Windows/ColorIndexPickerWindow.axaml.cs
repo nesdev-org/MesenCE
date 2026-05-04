@@ -2,13 +2,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Interop;
+using Avalonia.Threading;
 using Mesen.Config;
+using Mesen.Debugger.Controls;
+using Mesen.Interop;
+using Mesen.Utilities;
 using ReactiveUI.Fody.Helpers;
 using System;
-using Mesen.Debugger.Controls;
-using Mesen.Utilities;
-using Avalonia.Threading;
 
 namespace Mesen.Debugger.Windows
 {
@@ -50,7 +50,7 @@ namespace Mesen.Debugger.Windows
 					Palette = GenerateSmsPalette();
 					ColumnCount = 8;
 					break;
-				
+
 				case CpuType.Ws:
 					Palette = GenerateWsPalette();
 					ColumnCount = 8;

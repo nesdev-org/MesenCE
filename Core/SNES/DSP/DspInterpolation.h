@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "SNES/DSP/Dsp.h"
 
+// clang-format off
+
 class DspInterpolation
 {
 private:

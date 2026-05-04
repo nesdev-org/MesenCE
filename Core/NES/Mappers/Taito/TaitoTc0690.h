@@ -61,7 +61,10 @@ protected:
 				SelectChrPage(2, value * 2);
 				SelectChrPage(3, value * 2 + 1);
 				break;
-			case 0xA000: case 0xA001: case 0xA002: case 0xA003:
+			case 0xA000:
+			case 0xA001:
+			case 0xA002:
+			case 0xA003:
 				SelectChrPage(4 + (addr & 0x03), value);
 				break;
 

@@ -116,24 +116,26 @@ void GbApu::Run()
 
 void GbApu::UpdateOutput(GameboyConfig& cfg)
 {
-	int16_t leftOutput = (
+	int16_t baseLeftOutput =
 		(_square1->GetOutput() * (int32_t)(cfg.Square1Vol & _state.EnableLeftSq1) / 100) +
 		(_square2->GetOutput() * (int32_t)(cfg.Square2Vol & _state.EnableLeftSq2) / 100) +
 		(_wave->GetOutput() * (int32_t)(cfg.WaveVol & _state.EnableLeftWave) / 100) +
-		(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableLeftNoise) / 100)
-	) * (_state.LeftVolume + 1) * 40;
+		(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableLeftNoise) / 100);
+
+	int16_t leftOutput = baseLeftOutput * (_state.LeftVolume + 1) * 40;
 
 	if(_prevLeftOutput != leftOutput) {
 		blip_add_delta(_leftChannel, _clockCounter, leftOutput - _prevLeftOutput);
 		_prevLeftOutput = leftOutput;
 	}
 
-	int16_t rightOutput = (
+	int16_t baseRightOutput =
 		(_square1->GetOutput() * (int32_t)(cfg.Square1Vol & _state.EnableRightSq1) / 100) +
 		(_square2->GetOutput() * (int32_t)(cfg.Square2Vol & _state.EnableRightSq2) / 100) +
 		(_wave->GetOutput() * (int32_t)(cfg.WaveVol & _state.EnableRightWave) / 100) +
-		(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableRightNoise) / 100)
-	) * (_state.RightVolume + 1) * 40;
+		(_noise->GetOutput() * (int32_t)(cfg.NoiseVol & _state.EnableRightNoise) / 100);
+
+	int16_t rightOutput = baseRightOutput * (_state.RightVolume + 1) * 40;
 
 	if(_prevRightOutput != rightOutput) {
 		blip_add_delta(_rightChannel, _clockCounter, rightOutput - _prevRightOutput);
@@ -152,7 +154,7 @@ void GbApu::PlayQueuedAudio()
 	_clockCounter = 0;
 }
 
-void GbApu::GetSoundSamples(int16_t* &samples, uint32_t& sampleCount)
+void GbApu::GetSoundSamples(int16_t*& samples, uint32_t& sampleCount)
 {
 	Run();
 	blip_end_frame(_leftChannel, _clockCounter);
@@ -208,27 +210,40 @@ uint8_t GbApu::Read(uint16_t addr)
 uint8_t GbApu::InternalRead(uint16_t addr)
 {
 	switch(addr) {
-		case 0xFF10: case 0xFF11: case 0xFF12: case 0xFF13: case 0xFF14:
+		case 0xFF10:
+		case 0xFF11:
+		case 0xFF12:
+		case 0xFF13:
+		case 0xFF14:
 			return _square1->Read(addr - 0xFF10);
-			
-		case 0xFF16: case 0xFF17: case 0xFF18: case 0xFF19:
+
+		case 0xFF16:
+		case 0xFF17:
+		case 0xFF18:
+		case 0xFF19:
 			return _square2->Read(addr - 0xFF15);
 
-		case 0xFF1A: case 0xFF1B: case 0xFF1C: case 0xFF1D: case 0xFF1E:
+		case 0xFF1A:
+		case 0xFF1B:
+		case 0xFF1C:
+		case 0xFF1D:
+		case 0xFF1E:
 			return _wave->Read(addr - 0xFF1A);
 
-		case 0xFF20: case 0xFF21: case 0xFF22: case 0xFF23:
+		case 0xFF20:
+		case 0xFF21:
+		case 0xFF22:
+		case 0xFF23:
 			return _noise->Read(addr - 0xFF1F);
 
-		case 0xFF24: 
+		case 0xFF24:
 			return (
 				(_state.ExtAudioLeftEnabled ? 0x80 : 0) |
 				(_state.LeftVolume << 4) |
 				(_state.ExtAudioRightEnabled ? 0x08 : 0) |
-				_state.RightVolume
-			);
+				_state.RightVolume);
 
-		case 0xFF25: 
+		case 0xFF25:
 			return (
 				(_state.EnableLeftNoise ? 0x80 : 0) |
 				(_state.EnableLeftWave ? 0x40 : 0) |
@@ -237,8 +252,7 @@ uint8_t GbApu::InternalRead(uint16_t addr)
 				(_state.EnableRightNoise ? 0x08 : 0) |
 				(_state.EnableRightWave ? 0x04 : 0) |
 				(_state.EnableRightSq2 ? 0x02 : 0) |
-				(_state.EnableRightSq1 ? 0x01 : 0)
-			);
+				(_state.EnableRightSq1 ? 0x01 : 0));
 
 		case 0xFF26:
 			return (
@@ -247,11 +261,24 @@ uint8_t GbApu::InternalRead(uint16_t addr)
 				((_state.ApuEnabled && _noise->Enabled()) ? 0x08 : 0) |
 				((_state.ApuEnabled && _wave->Enabled()) ? 0x04 : 0) |
 				((_state.ApuEnabled && _square2->Enabled()) ? 0x02 : 0) |
-				((_state.ApuEnabled && _square1->Enabled()) ? 0x01 : 0)
-			);
+				((_state.ApuEnabled && _square1->Enabled()) ? 0x01 : 0));
 
-		case 0xFF30: case 0xFF31: case 0xFF32: case 0xFF33: case 0xFF34: case 0xFF35: case 0xFF36: case 0xFF37:
-		case 0xFF38: case 0xFF39: case 0xFF3A: case 0xFF3B: case 0xFF3C: case 0xFF3D: case 0xFF3E: case 0xFF3F:
+		case 0xFF30:
+		case 0xFF31:
+		case 0xFF32:
+		case 0xFF33:
+		case 0xFF34:
+		case 0xFF35:
+		case 0xFF36:
+		case 0xFF37:
+		case 0xFF38:
+		case 0xFF39:
+		case 0xFF3A:
+		case 0xFF3B:
+		case 0xFF3C:
+		case 0xFF3D:
+		case 0xFF3E:
+		case 0xFF3F:
 			return _wave->ReadRam(addr);
 	}
 
@@ -274,23 +301,37 @@ void GbApu::Write(uint16_t addr, uint8_t value)
 	}
 
 	switch(addr) {
-		case 0xFF10: case 0xFF11: case 0xFF12: case 0xFF13: case 0xFF14:
+		case 0xFF10:
+		case 0xFF11:
+		case 0xFF12:
+		case 0xFF13:
+		case 0xFF14:
 			_square1->Write(addr - 0xFF10, value);
 			break;
 
-		case 0xFF16: case 0xFF17: case 0xFF18: case 0xFF19:
+		case 0xFF16:
+		case 0xFF17:
+		case 0xFF18:
+		case 0xFF19:
 			_square2->Write(addr - 0xFF15, value); //Same as square1, but without a sweep unit
 			break;
 
-		case 0xFF1A: case 0xFF1B: case 0xFF1C: case 0xFF1D: case 0xFF1E:
+		case 0xFF1A:
+		case 0xFF1B:
+		case 0xFF1C:
+		case 0xFF1D:
+		case 0xFF1E:
 			_wave->Write(addr - 0xFF1A, value);
 			break;
 
-		case 0xFF20: case 0xFF21: case 0xFF22: case 0xFF23:
+		case 0xFF20:
+		case 0xFF21:
+		case 0xFF22:
+		case 0xFF23:
 			_noise->Write(addr - 0xFF1F, value);
 			break;
 
-		case 0xFF24: 
+		case 0xFF24:
 			_state.ExtAudioLeftEnabled = (value & 0x80) != 0;
 			_state.LeftVolume = (value & 0x70) >> 4;
 			_state.ExtAudioRightEnabled = (value & 0x08) != 0;
@@ -321,7 +362,7 @@ void GbApu::Write(uint16_t addr, uint8_t value)
 					Write(0xFF25, 0);
 				} else {
 					//"starting the APU while bit 4 of the DIV register is set causes the APU to skip the first DIV-APU event"
-					//Based on the results of the div_*_10 tests in SameSuite, when the first event is skipped, the 
+					//Based on the results of the div_*_10 tests in SameSuite, when the first event is skipped, the
 					//"length enable" glitch will be trigerred until the event after the skipped one occurs.
 					//This uses a counter to reproduce this behavior
 					_skipFirstEventCounter = _gameboy->GetTimer()->IsFrameSequencerBitSet() ? 2 : 0;
@@ -349,12 +390,26 @@ void GbApu::Write(uint16_t addr, uint8_t value)
 			}
 			break;
 		}
-		case 0xFF30: case 0xFF31: case 0xFF32: case 0xFF33: case 0xFF34: case 0xFF35: case 0xFF36: case 0xFF37:
-		case 0xFF38: case 0xFF39: case 0xFF3A: case 0xFF3B: case 0xFF3C: case 0xFF3D: case 0xFF3E: case 0xFF3F:
+		case 0xFF30:
+		case 0xFF31:
+		case 0xFF32:
+		case 0xFF33:
+		case 0xFF34:
+		case 0xFF35:
+		case 0xFF36:
+		case 0xFF37:
+		case 0xFF38:
+		case 0xFF39:
+		case 0xFF3A:
+		case 0xFF3B:
+		case 0xFF3C:
+		case 0xFF3D:
+		case 0xFF3E:
+		case 0xFF3F:
 			_wave->WriteRam(addr, value);
 			break;
 	}
-	
+
 	//Update APU output - some writes can immediately change the output
 	UpdateOutput(_settings->GetGameboyConfig());
 }
@@ -382,7 +437,7 @@ uint8_t GbApu::ReadCgbRegister(uint16_t addr)
 }
 
 template<typename T>
-void GbApu::ProcessLengthEnableFlag(uint8_t value, T &length, bool &lengthEnabled, bool &enabled)
+void GbApu::ProcessLengthEnableFlag(uint8_t value, T& length, bool& lengthEnabled, bool& enabled)
 {
 	bool newLengthEnabled = (value & 0x40) != 0;
 	if(newLengthEnabled && !lengthEnabled && ((_state.FrameSequenceStep & 0x01) == 1 || _skipFirstEventCounter)) {
@@ -413,11 +468,25 @@ void GbApu::Serialize(Serializer& s)
 		blip_clear(_rightChannel);
 	}
 
-	SV(_state.ApuEnabled); SV(_state.FrameSequenceStep);
-	SV(_state.EnableLeftSq1); SV(_state.EnableLeftSq2); SV(_state.EnableLeftWave); SV(_state.EnableLeftNoise);
-	SV(_state.EnableRightSq1); SV(_state.EnableRightSq2); SV(_state.EnableRightWave); SV(_state.EnableRightNoise);
-	SV(_state.LeftVolume); SV(_state.RightVolume); SV(_state.ExtAudioLeftEnabled); SV(_state.ExtAudioRightEnabled);
-	SV(_prevLeftOutput); SV(_prevRightOutput); SV(_clockCounter); SV(_prevClockCount); SV(_skipFirstEventCounter);
+	SV(_state.ApuEnabled);
+	SV(_state.FrameSequenceStep);
+	SV(_state.EnableLeftSq1);
+	SV(_state.EnableLeftSq2);
+	SV(_state.EnableLeftWave);
+	SV(_state.EnableLeftNoise);
+	SV(_state.EnableRightSq1);
+	SV(_state.EnableRightSq2);
+	SV(_state.EnableRightWave);
+	SV(_state.EnableRightNoise);
+	SV(_state.LeftVolume);
+	SV(_state.RightVolume);
+	SV(_state.ExtAudioLeftEnabled);
+	SV(_state.ExtAudioRightEnabled);
+	SV(_prevLeftOutput);
+	SV(_prevRightOutput);
+	SV(_clockCounter);
+	SV(_prevClockCount);
+	SV(_skipFirstEventCounter);
 	SV(_powerOnCycle);
 
 	SV(_square1);

@@ -22,22 +22,22 @@ bool CamstudioCodec::SetupCompress(int width, int height, uint32_t compressionLe
 	if(width % 4 != 0) {
 		_rowStride = ((int)((width * 24 + 31) / 32 * 4));
 	} else {
-		_rowStride = width*3;
+		_rowStride = width * 3;
 	}
 	_height = height;
 
-	_prevFrame = new uint8_t[_rowStride*_height]; //24-bit RGB
-	_currentFrame = new uint8_t[_rowStride*_height]; //24-bit RGB
-	_buffer = new uint8_t[_rowStride*_height]; //24-bit RGB
+	_prevFrame = new uint8_t[_rowStride * _height]; //24-bit RGB
+	_currentFrame = new uint8_t[_rowStride * _height]; //24-bit RGB
+	_buffer = new uint8_t[_rowStride * _height]; //24-bit RGB
 
-	_compressBufferLength = compressBound(_rowStride*_height) + 2;
+	_compressBufferLength = compressBound(_rowStride * _height) + 2;
 	_compressBuffer = new uint8_t[_compressBufferLength];
-	
+
 	memset(_prevFrame, 0, _rowStride * _height);
 	memset(_currentFrame, 0, _rowStride * _height);
 	memset(_buffer, 0, _rowStride * _height);
 	memset(_compressBuffer, 0, _compressBufferLength);
-	
+
 	deflateInit(&_compressor, compressionLevel);
 
 	return true;
@@ -54,7 +54,7 @@ void CamstudioCodec::LoadRow(uint8_t* inPointer, uint8_t* outPointer)
 	}
 }
 
-int CamstudioCodec::CompressFrame(bool isKeyFrame, uint8_t *frameData, uint8_t** compressedData)
+int CamstudioCodec::CompressFrame(bool isKeyFrame, uint8_t* frameData, uint8_t** compressedData)
 {
 	deflateReset(&_compressor);
 
@@ -79,11 +79,11 @@ int CamstudioCodec::CompressFrame(bool isKeyFrame, uint8_t *frameData, uint8_t**
 		_compressor.next_in = _buffer;
 	}
 
-	memcpy(_prevFrame, _currentFrame, _rowStride*_height);
-	
+	memcpy(_prevFrame, _currentFrame, _rowStride * _height);
+
 	_compressor.avail_in = _height * _rowStride;
 	deflate(&_compressor, MZ_FINISH);
-	
+
 	*compressedData = _compressBuffer;
 	return _compressor.total_out + 2;
 }

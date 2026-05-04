@@ -21,8 +21,8 @@ namespace Mesen.Debugger.ViewModels.DebuggerDock
 	{
 		private T? _model;
 
-		public T? Model 
-		{ 
+		public T? Model
+		{
 			get => _model;
 			set
 			{

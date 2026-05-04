@@ -34,7 +34,7 @@ public static class OpCodeHelper
 		if(!_data.TryGetValue(seg.Data.CpuType, out CpuDocumentationData? doc)) {
 			return null;
 		}
-		
+
 		OpCodeDesc? desc = null;
 		string opname = seg.Text.ToLower();
 		if(doc.OpDescGetter != null) {
@@ -55,7 +55,7 @@ public static class OpCodeHelper
 
 		StackPanel panel = new StackPanel() { MaxWidth = 250, HorizontalAlignment = HorizontalAlignment.Left };
 		panel.Children.Add(new TextBlock() { Text = desc.Name, FontSize = 14, Margin = new(0, 2), TextWrapping = TextWrapping.Wrap, FontWeight = FontWeight.Bold });
-		panel.Children.Add(new TextBlock() { Text = desc.Description, Margin = new(0, 3, 0, 5),  TextWrapping = TextWrapping.Wrap });
+		panel.Children.Add(new TextBlock() { Text = desc.Description, Margin = new(0, 3, 0, 5), TextWrapping = TextWrapping.Wrap });
 
 		TooltipEntries items = new();
 		items.AddCustomEntry("OP", panel);

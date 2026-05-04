@@ -19,16 +19,16 @@ private:
 	bool _dmaStartDelay = false;
 	bool _dmaPending = false;
 	uint32_t _dmaClockCounter = 0;
-	
+
 	uint8_t _activeChannel = 0; //Used by debugger's event viewer
 
-	SnesMemoryManager *_memoryManager;
-	
+	SnesMemoryManager* _memoryManager;
+
 	void CopyDmaByte(uint32_t addressBusA, uint16_t addressBusB, bool fromBtoA);
 
-	void RunDma(DmaChannelConfig &channel);
-	
-	void RunHdmaTransfer(DmaChannelConfig &channel);
+	void RunDma(DmaChannelConfig& channel);
+
+	void RunHdmaTransfer(DmaChannelConfig& channel);
 	bool ProcessHdmaChannels();
 	bool IsLastActiveHdmaChannel(uint8_t channel);
 	bool InitHdmaChannels();
@@ -40,7 +40,7 @@ private:
 	bool HasActiveDmaChannel();
 
 public:
-	SnesDmaController(SnesMemoryManager *memoryManager);
+	SnesDmaController(SnesMemoryManager* memoryManager);
 
 	SnesDmaControllerState& GetState();
 
@@ -59,5 +59,5 @@ public:
 	uint8_t GetActiveChannel();
 	DmaChannelConfig GetChannelConfig(uint8_t channel);
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 };

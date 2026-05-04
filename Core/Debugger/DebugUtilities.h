@@ -136,7 +136,7 @@ public:
 			case MemoryType::PceSpriteRam:
 			case MemoryType::PceSpriteRamVdc2:
 				return CpuType::Pce;
-		
+
 			case MemoryType::SmsMemory:
 			case MemoryType::SmsPrgRom:
 			case MemoryType::SmsWorkRam:
@@ -191,7 +191,7 @@ public:
 			case MemoryType::SnesCgRam:
 			case MemoryType::GbVideoRam:
 			case MemoryType::GbSpriteRam:
-			
+
 			case MemoryType::NesChrRam:
 			case MemoryType::NesChrRom:
 			case MemoryType::NesSpriteRam:
@@ -217,7 +217,7 @@ public:
 			case MemoryType::GbaPaletteRam:
 				return true;
 
-			default: 
+			default:
 				return false;
 		}
 	}

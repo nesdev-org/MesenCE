@@ -26,7 +26,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public string ByteCodeView { get; set; } = "";
 		[Reactive] public int StartAddress { get; set; }
 		[Reactive] public int BytesUsed { get; set; }
-		
+
 		[Reactive] public bool HasWarning { get; set; }
 		[Reactive] public bool IsIdentical { get; set; }
 		[Reactive] public bool OriginalSizeExceeded { get; set; }

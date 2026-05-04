@@ -6,7 +6,7 @@
 class DebugBreakHelper
 {
 private:
-	Debugger * _debugger;
+	Debugger* _debugger;
 	bool _needBreak = false;
 
 public:

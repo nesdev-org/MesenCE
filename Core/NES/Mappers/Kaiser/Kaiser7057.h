@@ -53,7 +53,10 @@ protected:
 	{
 		bool low = (addr & 0x01) == 0x00;
 		switch(addr & 0xF002) {
-			case 0x8000: case 0x8002: case 0x9000: case 0x9002:
+			case 0x8000:
+			case 0x8002:
+			case 0x9000:
+			case 0x9002:
 				SetMirroringType(value & 0x01 ? MirroringType::Vertical : MirroringType::Horizontal);
 				break;
 

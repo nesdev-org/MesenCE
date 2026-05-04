@@ -51,7 +51,7 @@ void XInputManager::UpdateDeviceList()
 bool XInputManager::IsPressed(uint8_t gamepadPort, uint8_t button)
 {
 	if(_gamePadConnected[gamepadPort]) {
-		XINPUT_GAMEPAD &gamepad = _gamePadStates[gamepadPort].Gamepad;
+		XINPUT_GAMEPAD& gamepad = _gamePadStates[gamepadPort].Gamepad;
 		bool pressed = false;
 		if(button <= 16) {
 			WORD xinputButton = 1 << (button - 1);

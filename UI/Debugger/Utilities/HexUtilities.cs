@@ -54,7 +54,7 @@ namespace Mesen.Debugger.Utilities
 				byte value = 0;
 				value |= _hexLookup[hex[i]];
 				value <<= 4;
-				value |= _hexLookup[hex[i+1]];
+				value |= _hexLookup[hex[i + 1]];
 				result[i / 2] = value;
 			}
 			return result;

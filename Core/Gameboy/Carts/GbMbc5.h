@@ -55,8 +55,8 @@ public:
 			case 0x1000:
 				_ramEnabled = (value == 0x0A);
 				break;
-			
-			case 0x2000: 
+
+			case 0x2000:
 				_prgBank = (value & 0xFF) | (_prgBank & 0x100);
 				break;
 

@@ -70,9 +70,16 @@ protected:
 	{
 		int lut[8] = { 4, 3, 5, 3, 6, 3, 7, 3 };
 		switch(addr & 0xF1FF) {
-			case 0x4022: _reg = lut[value & 0x07]; UpdateState(); break;
-			case 0x4120: _swap = value & 0x01; UpdateState(); break;
-			
+			case 0x4022:
+				_reg = lut[value & 0x07];
+				UpdateState();
+				break;
+
+			case 0x4120:
+				_swap = value & 0x01;
+				UpdateState();
+				break;
+
 			case 0x8122:
 			case 0x4122:
 				_irqEnabled = (value & 0x01) == 0x01;

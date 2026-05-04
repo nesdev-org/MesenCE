@@ -11,7 +11,7 @@ public:
 	static constexpr uint32_t AudioRamSize = 0x80;
 
 private:
-	uint8_t _internalRam[Namco163Audio::AudioRamSize] = {};
+	uint8_t* _internalRam = nullptr;
 	int16_t _channelOutput[8] = {};
 	uint8_t _ramPosition = 0;
 	bool _autoIncrement = false;
@@ -19,6 +19,7 @@ private:
 	int8_t _currentChannel = 0;
 	int16_t _lastOutput = 0;
 	bool _disableSound = false;
+	uint32_t _ramOffset = 0;
 
 	enum SoundReg
 	{
@@ -70,7 +71,7 @@ private:
 		uint8_t baseAddr = 0x40 + channel * 0x08;
 		return _internalRam[baseAddr + SoundReg::Volume] & 0x0F;
 	}
-	
+
 	uint8_t GetNumberOfChannels()
 	{
 		return (_internalRam[0x7F] >> 4) & 0x07;
@@ -85,7 +86,7 @@ private:
 		uint8_t volume = GetVolume(channel);
 
 		phase = (phase + freq) % (length << 16);
-		
+
 		uint8_t samplePosition = ((phase >> 16) + offset) & 0xFF;
 		int8_t sample;
 		if((samplePosition & 0x01)) {
@@ -118,7 +119,12 @@ protected:
 
 		SVArray(_internalRam, 0x80);
 		SVArray(_channelOutput, 8);
-		SV(_ramPosition); SV(_autoIncrement); SV(_updateCounter); SV(_currentChannel); SV(_lastOutput); SV(_disableSound);
+		SV(_ramPosition);
+		SV(_autoIncrement);
+		SV(_updateCounter);
+		SV(_currentChannel);
+		SV(_lastOutput);
+		SV(_disableSound);
 	}
 
 	void ClockAudio() override
@@ -138,11 +144,12 @@ protected:
 	}
 
 public:
-	Namco163Audio(NesConsole* console) : BaseExpansionAudio(console)
+	Namco163Audio(NesConsole* console, uint8_t* audioRam, uint32_t ramOffset = 0) : BaseExpansionAudio(console)
 	{
-		console->InitializeRam(_internalRam, Namco163Audio::AudioRamSize);
+		_internalRam = audioRam;
 		memset(_channelOutput, 0, sizeof(_channelOutput));
 		_ramPosition = 0;
+		_ramOffset = ramOffset;
 		_autoIncrement = false;
 		_updateCounter = 0;
 		_currentChannel = 7;
@@ -159,6 +166,7 @@ public:
 	{
 		switch(addr & 0xF800) {
 			case 0x4800:
+				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Write>(_ramPosition + _ramOffset, value);
 				_internalRam[_ramPosition] = value;
 				if(_autoIncrement) {
 					_ramPosition = (_ramPosition + 1) & 0x7F;
@@ -171,7 +179,6 @@ public:
 				_ramPosition = value & 0x7F;
 				_autoIncrement = (value & 0x80) == 0x80;
 				break;
-
 		}
 	}
 
@@ -181,6 +188,7 @@ public:
 		switch(addr & 0xF800) {
 			case 0x4800: {
 				value = _internalRam[_ramPosition];
+				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Read>(_ramPosition + _ramOffset, value);
 				if(_autoIncrement) {
 					_ramPosition = (_ramPosition + 1) & 0x7F;
 				}

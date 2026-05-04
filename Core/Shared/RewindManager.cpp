@@ -54,7 +54,7 @@ void RewindManager::ClearBuffer()
 	_currentHistory = {};
 }
 
-void RewindManager::ProcessNotification(ConsoleNotificationType type, void * parameter)
+void RewindManager::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
 	if(_emu->IsRunAheadFrame()) {
 		return;
@@ -87,7 +87,7 @@ void RewindManager::ProcessNotification(ConsoleNotificationType type, void * par
 						_settings->ClearFlag(EmulationFlags::MaximumSpeed);
 					}
 					break;
-			
+
 				case RewindState::Stopped:
 					_currentHistory.FrameCount++;
 					break;
@@ -110,7 +110,7 @@ RewindStats RewindManager::GetStats()
 	for(int i = (int)_history.size() - 1; i >= 0; i--) {
 		memoryUsage += _history[i].GetStateSize();
 	}
-	
+
 	RewindStats stats = {};
 	stats.MemoryUsage = memoryUsage;
 	stats.HistorySize = (uint32_t)_history.size();
@@ -182,7 +182,7 @@ void RewindManager::Start(bool forDebugger)
 		} else {
 			auto lock = _emu->AcquireLock();
 			InternalStart(forDebugger);
-		}		
+		}
 	}
 }
 
@@ -263,8 +263,7 @@ void RewindManager::Stop()
 					_historyBackup.pop_front();
 
 					_currentHistory = _historyBackup.front();
-				}
-				while(_framesToFastForward > RewindManager::BufferSize && _historyBackup.size() > 1);
+				} while(_framesToFastForward > RewindManager::BufferSize && _historyBackup.size() > 1);
 			}
 		} else {
 			//We started rewinding, but didn't actually visually rewind anything yet
@@ -347,7 +346,7 @@ void RewindManager::ProcessFrame(RenderedFrame& frame, bool forRewind)
 			_rewindState = RewindState::Started;
 			_settings->ClearFlag(EmulationFlags::MaximumSpeed);
 			if(!_videoHistory.empty()) {
-				VideoFrame &frameData = _videoHistory.back();
+				VideoFrame& frameData = _videoHistory.back();
 				RenderedFrame oldFrame(frameData.Data.data(), frameData.Width, frameData.Height, frameData.Scale, frameData.FrameNumber, frameData.InputData);
 				_emu->GetVideoRenderer()->UpdateFrame(oldFrame);
 				_videoHistory.pop_back();
@@ -371,7 +370,7 @@ void RewindManager::ProcessFrame(RenderedFrame& frame, bool forRewind)
 	}
 }
 
-bool RewindManager::ProcessAudio(int16_t * soundBuffer, uint32_t sampleCount)
+bool RewindManager::ProcessAudio(int16_t* soundBuffer, uint32_t sampleCount)
 {
 	if(_rewindState == RewindState::Starting || _rewindState == RewindState::Started) {
 		_audioHistoryBuilder.insert(_audioHistoryBuilder.end(), soundBuffer, soundBuffer + sampleCount * 2);
@@ -398,13 +397,13 @@ bool RewindManager::ProcessAudio(int16_t * soundBuffer, uint32_t sampleCount)
 void RewindManager::RecordInput(vector<shared_ptr<BaseControlDevice>> devices)
 {
 	if(_settings->GetPreferences().RewindBufferSize > 0 && _rewindState == RewindState::Stopped) {
-		for(shared_ptr<BaseControlDevice> &device : devices) {
+		for(shared_ptr<BaseControlDevice>& device : devices) {
 			_currentHistory.InputLogs[device->GetPort()].push_back(device->GetRawState());
 		}
 	}
 }
 
-bool RewindManager::SetInput(BaseControlDevice *device)
+bool RewindManager::SetInput(BaseControlDevice* device)
 {
 	uint8_t port = device->GetPort();
 	if(IsRewinding()) {

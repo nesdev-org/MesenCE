@@ -44,7 +44,7 @@ unordered_map<string, int64_t>& ExpressionEvaluator::GetSmsTokens()
 
 		{ "frame", EvalValues::PpuFrameCount },
 		{ "cycle", EvalValues::PpuCycle },
-		{ "scanline", EvalValues::PpuScanline }, 
+		{ "scanline", EvalValues::PpuScanline },
 	};
 
 	return supportedTokens;
@@ -93,7 +93,7 @@ int64_t ExpressionEvaluator::GetSmsTokenValue(int64_t token, EvalResultType& res
 
 		case EvalValues::SmsVdpAddressReg: return ppu().AddressReg;
 		case EvalValues::SmsVdpCodeReg: return ppu().CodeReg;
-		
+
 		case EvalValues::SpriteCollision: return ReturnBool(ppu().SpriteCollision, resultType);
 		case EvalValues::SpriteOverflow: return ReturnBool(ppu().SpriteOverflow, resultType);
 

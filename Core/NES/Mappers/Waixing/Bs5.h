@@ -21,8 +21,8 @@ protected:
 	{
 		int bank = (addr >> 10) & 0x03;
 		switch(addr & 0xF000) {
-			case 0x8000: 
-				SelectChrPage(bank, addr & 0x1F); 
+			case 0x8000:
+				SelectChrPage(bank, addr & 0x1F);
 				break;
 
 			case 0xA000:

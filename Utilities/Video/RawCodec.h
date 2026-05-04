@@ -28,7 +28,7 @@ public:
 		return true;
 	}
 
-	virtual int CompressFrame(bool isKeyFrame, uint8_t *frameData, uint8_t** compressedData) override
+	virtual int CompressFrame(bool isKeyFrame, uint8_t* frameData, uint8_t** compressedData) override
 	{
 		*compressedData = _buffer;
 

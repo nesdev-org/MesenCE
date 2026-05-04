@@ -71,14 +71,14 @@ bool WavReader::IsPlaybackOver()
 	return _done;
 }
 
-void WavReader::ApplySamples(int16_t *buffer, size_t sampleCount, uint32_t sampleRate)
+void WavReader::ApplySamples(int16_t* buffer, size_t sampleCount, uint32_t sampleRate)
 {
 	if(_done) {
 		return;
 	}
 
 	_resampler.SetSampleRates(_fileSampleRate, sampleRate);
-	
+
 	int32_t samplesNeeded = (int32_t)sampleCount - (int32_t)_resampler.GetPendingCount();
 
 	vector<int16_t> stereoSamples;
@@ -88,7 +88,7 @@ void WavReader::ApplySamples(int16_t *buffer, size_t sampleCount, uint32_t sampl
 			uint32_t samplesRead = 0;
 			for(uint32_t i = _fileOffset; i < _fileSize && samplesRead < samplesToLoad; i += 2) {
 				int16_t sample = _fileData[i] | (_fileData[i + 1] << 8);
-				
+
 				stereoSamples.push_back(sample);
 				stereoSamples.push_back(sample);
 

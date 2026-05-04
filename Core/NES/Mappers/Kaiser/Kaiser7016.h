@@ -18,7 +18,7 @@ protected:
 		SelectPrgPage(1, 0x0D);
 		SelectPrgPage(2, 0x0E);
 		SelectPrgPage(3, 0x0F);
-		SelectChrPage(0, 0 );
+		SelectChrPage(0, 0);
 
 		UpdateState();
 	}

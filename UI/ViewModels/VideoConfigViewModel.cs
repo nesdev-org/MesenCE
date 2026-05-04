@@ -35,7 +35,7 @@ namespace Mesen.ViewModels
 			OriginalConfig = Config.Clone();
 
 			PresetCompositeCommand = ReactiveCommand.Create(() => SetNtscPreset(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, false));
-			PresetSVideoCommand = ReactiveCommand.Create(()=> SetNtscPreset(0, 0, 0, 0, 20, 0, 20, -100, -100, 0, 15, false));
+			PresetSVideoCommand = ReactiveCommand.Create(() => SetNtscPreset(0, 0, 0, 0, 20, 0, 20, -100, -100, 0, 15, false));
 			PresetRgbCommand = ReactiveCommand.Create(() => SetNtscPreset(0, 0, 0, 0, 20, 0, 70, -100, -100, -100, 15, false));
 			PresetMonochromeCommand = ReactiveCommand.Create(() => SetNtscPreset(0, -100, 0, 0, 20, 0, 70, -20, -20, -10, 15, false));
 			ResetPictureSettingsCommand = ReactiveCommand.Create(() => ResetPictureSettings());

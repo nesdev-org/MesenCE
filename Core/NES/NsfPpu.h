@@ -9,7 +9,7 @@ public:
 	{
 	}
 
-	virtual ~NsfPpu() { }
+	virtual ~NsfPpu() {}
 
 	void UpdateTimings(ConsoleRegion region, bool overclockAllowed) override
 	{

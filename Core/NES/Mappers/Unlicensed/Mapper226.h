@@ -59,7 +59,7 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0x8001) {
-			case 0x8000: _registers[0] = value;	break;
+			case 0x8000: _registers[0] = value; break;
 			case 0x8001: _registers[1] = value; break;
 		}
 

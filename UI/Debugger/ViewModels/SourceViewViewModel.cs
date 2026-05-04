@@ -1,20 +1,20 @@
 ﻿using Avalonia;
 using Avalonia.Threading;
 using Mesen.Config;
+using Mesen.Debugger.Controls;
+using Mesen.Debugger.Disassembly;
 using Mesen.Debugger.Integration;
+using Mesen.Debugger.Utilities;
 using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Mesen.ViewModels;
-using Mesen.Debugger.Disassembly;
-using Mesen.Debugger.Utilities;
+using System.Linq;
 using System.Text;
-using Mesen.Debugger.Controls;
-using Mesen.Utilities;
+using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels;
 
@@ -189,7 +189,7 @@ public class SourceViewViewModel : DisposableViewModel, ISelectableModel
 		} else if(e.SkipCurrent) {
 			startRow++;
 		}
-		
+
 		int direction = e.Direction == SearchDirection.Backward ? -1 : 1;
 		for(int i = 0; i < file.Data.Length; i++) {
 			int index = ((i * direction) + startRow) % file.Data.Length;

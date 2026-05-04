@@ -61,7 +61,7 @@ namespace Mesen.Interop
 				CpuType.Gsu => MemoryType.SnesPrgRom,
 				CpuType.Cx4 => MemoryType.SnesPrgRom,
 				CpuType.St018 => MemoryType.St018PrgRom,
-				
+
 				CpuType.Gameboy => MemoryType.GbPrgRom,
 				CpuType.Nes => MemoryType.NesPrgRom,
 				CpuType.Pce => MemoryType.PcePrgRom,
@@ -181,10 +181,10 @@ namespace Mesen.Interop
 				case CpuType.Pce:
 				case CpuType.Sms:
 					return true;
-				
+
 				default:
 					return false;
-			};
+			}
 		}
 
 		public static bool SupportsFunctionList(this CpuType cpuType)
@@ -202,7 +202,7 @@ namespace Mesen.Interop
 
 				default:
 					return false;
-			};
+			}
 		}
 
 		public static bool SupportsCallStack(this CpuType cpuType)
@@ -213,7 +213,7 @@ namespace Mesen.Interop
 
 				default:
 					return true;
-			};
+			}
 		}
 
 		public static bool SupportsMemoryMappings(this CpuType cpuType)
@@ -228,7 +228,7 @@ namespace Mesen.Interop
 
 				default:
 					return false;
-			};
+			}
 		}
 
 		public static bool HasDummyOperations(this CpuType cpuType)
@@ -241,7 +241,7 @@ namespace Mesen.Interop
 
 				default:
 					return false;
-			};
+			}
 		}
 
 		public static byte GetNopOpCode(this CpuType cpuType)
@@ -266,7 +266,7 @@ namespace Mesen.Interop
 
 				case MemoryType.SnesPrgRom:
 					return cpuType == CpuType.Snes || cpuType == CpuType.Sa1 || cpuType == CpuType.Gsu || cpuType == CpuType.Cx4;
-				
+
 				case MemoryType.SnesSaveRam:
 					return cpuType == CpuType.Snes || cpuType == CpuType.Sa1 || cpuType == CpuType.Cx4;
 

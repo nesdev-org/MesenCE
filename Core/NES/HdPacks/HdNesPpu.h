@@ -38,7 +38,7 @@ class HdNesPpu final : public NesPpu<HdNesPpu>
 public:
 	HdNesPpu(NesConsole* console, HdPackData* hdData);
 	virtual ~HdNesPpu();
-	
+
 	void* OnBeforeSendFrame();
 
 	__forceinline bool RemoveSpriteLimit() { return _forceRemoveSpriteLimit || _console->GetNesConfig().RemoveSpriteLimit; }

@@ -13,9 +13,12 @@ private:
 	bool _spectator = false;
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
-		SV(_emuVersion); SV(_protocolVersion); SV(_hashedPassword); SV(_spectator);
+		SV(_emuVersion);
+		SV(_protocolVersion);
+		SV(_hashedPassword);
+		SV(_spectator);
 	}
 
 public:

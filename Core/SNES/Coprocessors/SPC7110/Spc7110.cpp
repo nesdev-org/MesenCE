@@ -58,9 +58,30 @@ void Spc7110::Serialize(Serializer& s)
 	SVArray(_decompBuffer, 32);
 	SVArray(_dataRomBanks, 3);
 
-	SV(_directoryBase); SV(_directoryIndex); SV(_targetOffset); SV(_dataLengthCounter); SV(_skipBytes); SV(_decompFlags); SV(_decompMode); SV(_srcAddress); SV(_decompOffset); SV(_decompStatus);
-	SV(_dividend); SV(_multiplier); SV(_divisor); SV(_multDivResult); SV(_remainder); SV(_aluState); SV(_aluFlags); SV(_sramEnabled); SV(_dataRomSize); SV(_readBase);
-	SV(_readOffset); SV(_readStep); SV(_readMode); SV(_readBuffer);
+	SV(_directoryBase);
+	SV(_directoryIndex);
+	SV(_targetOffset);
+	SV(_dataLengthCounter);
+	SV(_skipBytes);
+	SV(_decompFlags);
+	SV(_decompMode);
+	SV(_srcAddress);
+	SV(_decompOffset);
+	SV(_decompStatus);
+	SV(_dividend);
+	SV(_multiplier);
+	SV(_divisor);
+	SV(_multDivResult);
+	SV(_remainder);
+	SV(_aluState);
+	SV(_aluFlags);
+	SV(_sramEnabled);
+	SV(_dataRomSize);
+	SV(_readBase);
+	SV(_readOffset);
+	SV(_readStep);
+	SV(_readMode);
+	SV(_readBuffer);
 
 	SV(_decomp);
 	if(_rtc) {
@@ -172,12 +193,12 @@ void Spc7110::Write(uint32_t addr, uint8_t value)
 		case 0x4802: _directoryBase = (_directoryBase & 0xFF00FF) | (value << 8); break;
 		case 0x4803: _directoryBase = (_directoryBase & 0x00FFFF) | (value << 16); break;
 		case 0x4804:
-			_directoryIndex = value; 
+			_directoryIndex = value;
 			LoadEntryHeader();
 			break;
 
 		case 0x4805: _targetOffset = (_targetOffset & 0xFF00) | value; break;
-		case 0x4806: 
+		case 0x4806:
 			_targetOffset = (_targetOffset & 0x00FF) | (value << 8);
 			BeginDecompression();
 			break;
@@ -192,7 +213,7 @@ void Spc7110::Write(uint32_t addr, uint8_t value)
 		//Direct Data ROM Access (4810-481A)
 		case 0x4811: _readBase = (_readBase & 0xFFFF00) | value; break;
 		case 0x4812: _readBase = (_readBase & 0xFF00FF) | (value << 8); break;
-		case 0x4813: 
+		case 0x4813:
 			_readBase = (_readBase & 0x00FFFF) | (value << 16);
 			FillReadBuffer();
 			break;
@@ -217,7 +238,7 @@ void Spc7110::Write(uint32_t addr, uint8_t value)
 		case 0x4816: _readStep = (_readStep & 0xFF00) | value; break;
 		case 0x4817: _readStep = (_readStep & 0x00FF) | (value << 8); break;
 
-		case 0x4818: 
+		case 0x4818:
 			_readMode = value & 0x7F;
 			FillReadBuffer();
 			break;
@@ -228,9 +249,9 @@ void Spc7110::Write(uint32_t addr, uint8_t value)
 		case 0x4822: _dividend = (_dividend & 0xFF00FFFF) | (value << 16); break;
 		case 0x4823: _dividend = (_dividend & 0x00FFFFFF) | (value << 24); break;
 		case 0x4824: _multiplier = (_multiplier & 0xFF00) | value; break;
-		case 0x4825: 
+		case 0x4825:
 			_multiplier = (_multiplier & 0x00FF) | (value << 8);
-			ProcessMultiplication(); 
+			ProcessMultiplication();
 			break;
 
 		case 0x4826: _divisor = (_divisor & 0xFF00) | value; break;
@@ -239,13 +260,26 @@ void Spc7110::Write(uint32_t addr, uint8_t value)
 			ProcessDivision();
 			break;
 
-		case 0x482E:  _aluFlags = value & 0x01; break; 
+		case 0x482E: _aluFlags = value & 0x01; break;
 
 		//Memory mapping (4830-4834)
 		case 0x4830: _sramEnabled = value & 0x87; break;
-		case 0x4831: _dataRomBanks[0] = value & 0x07; UpdateMappings(); break;
-		case 0x4832: _dataRomBanks[1] = value & 0x07; UpdateMappings(); break;
-		case 0x4833: _dataRomBanks[2] = value & 0x07; UpdateMappings(); break;
+
+		case 0x4831:
+			_dataRomBanks[0] = value & 0x07;
+			UpdateMappings();
+			break;
+
+		case 0x4832:
+			_dataRomBanks[1] = value & 0x07;
+			UpdateMappings();
+			break;
+
+		case 0x4833:
+			_dataRomBanks[2] = value & 0x07;
+			UpdateMappings();
+			break;
+
 		case 0x4834: _dataRomSize = value & 0x07; break;
 
 		//RTC (4840-4842)
@@ -257,7 +291,7 @@ void Spc7110::Write(uint32_t addr, uint8_t value)
 			}
 			break;
 
-		default: 
+		default:
 			if((addr & 0xFFFF) >= 0x4800) {
 				LogDebug("[Debug] Missing write handler: $" + HexUtilities::ToHex(addr & 0xFFFF));
 			}

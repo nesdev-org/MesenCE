@@ -16,8 +16,8 @@ SmsEventManager::SmsEventManager(Debugger* debugger, SmsConsole* console, SmsCpu
 	_cpu = cpu;
 	_vdp = vdp;
 
-	_ppuBuffer = new uint16_t[256*240];
-	memset(_ppuBuffer, 0, 256*240 * sizeof(uint16_t));
+	_ppuBuffer = new uint16_t[256 * 240];
+	memset(_ppuBuffer, 0, 256 * 240 * sizeof(uint16_t));
 }
 
 SmsEventManager::~SmsEventManager()
@@ -104,7 +104,7 @@ DebugEventInfo SmsEventManager::GetEvent(uint16_t y, uint16_t x)
 	}
 
 	//If no exact match, extend to the background color
-	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--){
+	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--) {
 		DebugEventInfo& evt = _sentEvents[i];
 		if(std::abs((int)evt.Cycle - (int)x) <= 1 && std::abs((int)evt.Scanline - (int)y) <= 1) {
 			return evt;
@@ -141,14 +141,22 @@ EventViewerCategoryCfg SmsEventManager::GetEventConfig(DebugEventInfo& evt)
 					case 0x41: return _config.VdpHCounterRead;
 					case 0x80: return _config.VdpVramRead;
 					case 0x81: return _config.VdpControlPortRead;
-					case 0xC0: case 0xC1: return _config.IoRead;
+
+					case 0xC0:
+					case 0xC1:
+						return _config.IoRead;
+
 					default: return {};
 				}
 			} else {
 				switch(evt.Operation.Address & 0xC1) {
 					case 0x00: return _config.MemoryControlWrite;
 					case 0x01: return _config.IoWrite;
-					case 0x40: case 0x41: return _config.PsgWrite;
+
+					case 0x40:
+					case 0x41:
+						return _config.PsgWrite;
+
 					case 0x80: return (evt.Flags & (uint32_t)EventFlags::SmsVdpPaletteWrite) ? _config.VdpPaletteWrite : _config.VdpVramWrite;
 					case 0x81: return _config.VdpControlPortWrite;
 					default: return {};
@@ -199,11 +207,11 @@ FrameInfo SmsEventManager::GetDisplayBufferSize()
 
 void SmsEventManager::DrawScreen(uint32_t* buffer)
 {
-	uint16_t *src = _ppuBuffer;
+	uint16_t* src = _ppuBuffer;
 	for(uint32_t y = 0, len = _visibleScanlineCount * 2; y < len; y++) {
-		for(uint32_t x = 0; x < 256*2; x++) {
+		for(uint32_t x = 0; x < 256 * 2; x++) {
 			int srcOffset = (y >> 1) * 256 + (x >> 1);
-			buffer[y*SmsEventManager::ScanlineWidth + x + SmsVdp::SmsVdpLeftBorder * 2] = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
+			buffer[y * SmsEventManager::ScanlineWidth + x + SmsVdp::SmsVdpLeftBorder * 2] = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
 		}
 	}
 }

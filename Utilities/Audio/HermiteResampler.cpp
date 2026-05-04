@@ -82,7 +82,7 @@ uint32_t HermiteResampler::Resample(int16_t* in, uint32_t inSampleCount, int16_t
 	if(_rateRatio == 1.0) {
 		if(inSampleCount > 0) {
 			uint32_t count = std::min((uint32_t)maxOutSampleCount - outPos, inSampleCount * 2);
-			memcpy(out+outPos, in, count * sizeof(int16_t));
+			memcpy(out + outPos, in, count * sizeof(int16_t));
 			for(uint32_t i = count; i < inSampleCount * 2; i += 2) {
 				_pendingSamples.push_back(in[i]);
 				_pendingSamples.push_back(in[i + 1]);

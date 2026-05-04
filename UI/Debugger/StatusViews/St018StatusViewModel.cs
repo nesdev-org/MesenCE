@@ -34,7 +34,7 @@ public class St018StatusViewModel : BaseConsoleStatusViewModel
 	[Reactive] public bool FlagCarry { get; set; }
 	[Reactive] public bool FlagNegative { get; set; }
 	[Reactive] public bool FlagOverflow { get; set; }
-	
+
 	[Reactive] public bool FlagThumb { get; set; }
 	[Reactive] public bool FlagIrqDisable { get; set; }
 	[Reactive] public bool FlagFiqDisable { get; set; }

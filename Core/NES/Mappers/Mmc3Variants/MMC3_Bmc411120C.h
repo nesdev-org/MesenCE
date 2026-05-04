@@ -23,7 +23,7 @@ protected:
 		MMC3::Serialize(s);
 		SV(_exReg);
 	}
-	
+
 	void SelectChrPage(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default) override
 	{
 		MMC3::SelectChrPage(slot, page | ((_exReg & 0x03) << 7), memoryType);

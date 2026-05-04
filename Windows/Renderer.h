@@ -11,7 +11,8 @@ using namespace DirectX;
 
 class Emulator;
 
-namespace DirectX {
+namespace DirectX
+{
 	class SpriteBatch;
 }
 
@@ -83,12 +84,12 @@ private:
 
 	bool CreateHudTexture(HudRenderInfo& hud, uint32_t newWidth, uint32_t newHeight);
 	void DrawHud(HudRenderInfo& hud, RenderSurfaceInfo& hudSurface);
-		
+
 	HRESULT CreateRenderTargetView();
 	void ReleaseRenderTargetView();
 	HRESULT CreateEmuTextureBuffers();
 	void ResetTextureBuffers();
-	
+
 	DXGI_FORMAT GetTextureFormat();
 
 public:

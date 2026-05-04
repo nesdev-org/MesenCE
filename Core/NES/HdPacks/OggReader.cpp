@@ -85,7 +85,7 @@ void OggReader::ApplySamples(int16_t* buffer, size_t sampleCount, uint8_t volume
 		_resampler.SetSampleRates(_oggSampleRate, _sampleRate);
 		samplesRead = _resampler.Resample<false>(_oggBuffer, samplesLoaded, _outputBuffer, sampleCount);
 	}
-	
+
 	uint32_t samplesToProcess = (uint32_t)samplesRead * 2;
 	for(uint32_t i = 0; i < samplesToProcess; i++) {
 		buffer[i] = std::clamp<int32_t>((int32_t)(_outputBuffer[i] * volume / 255) + buffer[i], INT16_MIN, INT16_MAX);

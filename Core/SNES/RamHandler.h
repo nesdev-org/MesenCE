@@ -6,14 +6,14 @@
 class RamHandler : public IMemoryHandler
 {
 private:
-	uint8_t * _ram;
+	uint8_t* _ram;
 	uint32_t _mask;
 
 protected:
 	uint32_t _offset;
 
 public:
-	RamHandler(uint8_t *ram, uint32_t offset, uint32_t size, MemoryType memoryType) : IMemoryHandler(memoryType)
+	RamHandler(uint8_t* ram, uint32_t offset, uint32_t size, MemoryType memoryType) : IMemoryHandler(memoryType)
 	{
 		_ram = ram + offset;
 		_offset = offset;
@@ -36,7 +36,7 @@ public:
 		return _ram[addr & _mask];
 	}
 
-	void PeekBlock(uint32_t addr, uint8_t *output) override
+	void PeekBlock(uint32_t addr, uint8_t* output) override
 	{
 		if(_mask != 0xFFF) {
 			for(int i = 0; i < 0x1000; i++) {

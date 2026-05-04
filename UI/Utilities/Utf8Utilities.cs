@@ -45,5 +45,5 @@ namespace Mesen.Utilities
 				return Utf8Utilities.PtrToStringUtf8((IntPtr)ptr);
 			}
 		}
-	}	
+	}
 }

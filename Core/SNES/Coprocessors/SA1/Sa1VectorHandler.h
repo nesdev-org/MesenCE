@@ -7,7 +7,7 @@
 class Sa1VectorHandler : public IMemoryHandler
 {
 private:
-	IMemoryHandler * _handler;
+	IMemoryHandler* _handler;
 	Sa1State* _state;
 
 public:
@@ -45,7 +45,7 @@ public:
 		return Read(addr);
 	}
 
-	void PeekBlock(uint32_t addr, uint8_t *output) override
+	void PeekBlock(uint32_t addr, uint8_t* output) override
 	{
 		_handler->PeekBlock(addr, output);
 	}

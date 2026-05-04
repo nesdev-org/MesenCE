@@ -48,7 +48,7 @@ bool ShortcutKeyHandler::IsKeyPressed(EmulatorShortcut shortcut)
 
 	KeyCombination keyComb = _emu->GetSettings()->GetShortcutKey(shortcut, _keySetIndex);
 	vector<KeyCombination> supersets = _emu->GetSettings()->GetShortcutSupersets(shortcut, _keySetIndex);
-	for(KeyCombination &superset : supersets) {
+	for(KeyCombination& superset : supersets) {
 		if(IsKeyPressed(superset, blockKeyboardKeys)) {
 			//A superset is pressed, ignore this subset
 			return false;
@@ -160,10 +160,26 @@ bool ShortcutKeyHandler::IsShortcutAllowed(EmulatorShortcut shortcut, uint32_t s
 		case EmulatorShortcut::ToggleCheats:
 			return !isNetplayClient && !isMovieActive;
 
-		case EmulatorShortcut::SelectSaveSlot1: case EmulatorShortcut::SelectSaveSlot2: case EmulatorShortcut::SelectSaveSlot3: case EmulatorShortcut::SelectSaveSlot4: case EmulatorShortcut::SelectSaveSlot5:
-		case EmulatorShortcut::SelectSaveSlot6: case EmulatorShortcut::SelectSaveSlot7: case EmulatorShortcut::SelectSaveSlot8: case EmulatorShortcut::SelectSaveSlot9: case EmulatorShortcut::SelectSaveSlot10:
-		case EmulatorShortcut::SaveStateSlot1: case EmulatorShortcut::SaveStateSlot2: case EmulatorShortcut::SaveStateSlot3: case EmulatorShortcut::SaveStateSlot4: case EmulatorShortcut::SaveStateSlot5:
-		case EmulatorShortcut::SaveStateSlot6: case EmulatorShortcut::SaveStateSlot7: case EmulatorShortcut::SaveStateSlot8: case EmulatorShortcut::SaveStateSlot9: case EmulatorShortcut::SaveStateSlot10:
+		case EmulatorShortcut::SelectSaveSlot1:
+		case EmulatorShortcut::SelectSaveSlot2:
+		case EmulatorShortcut::SelectSaveSlot3:
+		case EmulatorShortcut::SelectSaveSlot4:
+		case EmulatorShortcut::SelectSaveSlot5:
+		case EmulatorShortcut::SelectSaveSlot6:
+		case EmulatorShortcut::SelectSaveSlot7:
+		case EmulatorShortcut::SelectSaveSlot8:
+		case EmulatorShortcut::SelectSaveSlot9:
+		case EmulatorShortcut::SelectSaveSlot10:
+		case EmulatorShortcut::SaveStateSlot1:
+		case EmulatorShortcut::SaveStateSlot2:
+		case EmulatorShortcut::SaveStateSlot3:
+		case EmulatorShortcut::SaveStateSlot4:
+		case EmulatorShortcut::SaveStateSlot5:
+		case EmulatorShortcut::SaveStateSlot6:
+		case EmulatorShortcut::SaveStateSlot7:
+		case EmulatorShortcut::SaveStateSlot8:
+		case EmulatorShortcut::SaveStateSlot9:
+		case EmulatorShortcut::SaveStateSlot10:
 		case EmulatorShortcut::MoveToNextStateSlot:
 		case EmulatorShortcut::MoveToPreviousStateSlot:
 		case EmulatorShortcut::SaveStateDialog:
@@ -171,8 +187,16 @@ bool ShortcutKeyHandler::IsShortcutAllowed(EmulatorShortcut shortcut, uint32_t s
 		case EmulatorShortcut::SaveState:
 			return isRunning;
 
-		case EmulatorShortcut::LoadStateSlot1: case EmulatorShortcut::LoadStateSlot2: case EmulatorShortcut::LoadStateSlot3: case EmulatorShortcut::LoadStateSlot4: case EmulatorShortcut::LoadStateSlot5:
-		case EmulatorShortcut::LoadStateSlot6: case EmulatorShortcut::LoadStateSlot7: case EmulatorShortcut::LoadStateSlot8: case EmulatorShortcut::LoadStateSlot9: case EmulatorShortcut::LoadStateSlot10:
+		case EmulatorShortcut::LoadStateSlot1:
+		case EmulatorShortcut::LoadStateSlot2:
+		case EmulatorShortcut::LoadStateSlot3:
+		case EmulatorShortcut::LoadStateSlot4:
+		case EmulatorShortcut::LoadStateSlot5:
+		case EmulatorShortcut::LoadStateSlot6:
+		case EmulatorShortcut::LoadStateSlot7:
+		case EmulatorShortcut::LoadStateSlot8:
+		case EmulatorShortcut::LoadStateSlot9:
+		case EmulatorShortcut::LoadStateSlot10:
 		case EmulatorShortcut::LoadStateSlotAuto:
 		case EmulatorShortcut::LoadStateDialog:
 		case EmulatorShortcut::LoadStateFromFile:
@@ -235,7 +259,7 @@ void ShortcutKeyHandler::ProcessShortcutPressed(EmulatorShortcut shortcut, uint3
 				_emu->Pause();
 			}
 			break;
-		
+
 		case EmulatorShortcut::ExecReset: _emu->GetSystemActionManager()->Reset(); break;
 		case EmulatorShortcut::ExecPowerCycle: _emu->GetSystemActionManager()->PowerCycle(); break;
 		case EmulatorShortcut::ExecReloadRom: _emu->ReloadRom(false); break;
@@ -250,18 +274,42 @@ void ShortcutKeyHandler::ProcessShortcutPressed(EmulatorShortcut shortcut, uint3
 			}
 			break;
 
-		case EmulatorShortcut::SelectSaveSlot1: case EmulatorShortcut::SelectSaveSlot2: case EmulatorShortcut::SelectSaveSlot3: case EmulatorShortcut::SelectSaveSlot4: case EmulatorShortcut::SelectSaveSlot5:
-		case EmulatorShortcut::SelectSaveSlot6: case EmulatorShortcut::SelectSaveSlot7: case EmulatorShortcut::SelectSaveSlot8: case EmulatorShortcut::SelectSaveSlot9: case EmulatorShortcut::SelectSaveSlot10:
+		case EmulatorShortcut::SelectSaveSlot1:
+		case EmulatorShortcut::SelectSaveSlot2:
+		case EmulatorShortcut::SelectSaveSlot3:
+		case EmulatorShortcut::SelectSaveSlot4:
+		case EmulatorShortcut::SelectSaveSlot5:
+		case EmulatorShortcut::SelectSaveSlot6:
+		case EmulatorShortcut::SelectSaveSlot7:
+		case EmulatorShortcut::SelectSaveSlot8:
+		case EmulatorShortcut::SelectSaveSlot9:
+		case EmulatorShortcut::SelectSaveSlot10:
 			_emu->GetSaveStateManager()->SelectSaveSlot((int)shortcut - (int)EmulatorShortcut::SelectSaveSlot1 + 1);
 			break;
 
-		case EmulatorShortcut::SaveStateSlot1: case EmulatorShortcut::SaveStateSlot2: case EmulatorShortcut::SaveStateSlot3: case EmulatorShortcut::SaveStateSlot4: case EmulatorShortcut::SaveStateSlot5:
-		case EmulatorShortcut::SaveStateSlot6: case EmulatorShortcut::SaveStateSlot7: case EmulatorShortcut::SaveStateSlot8: case EmulatorShortcut::SaveStateSlot9: case EmulatorShortcut::SaveStateSlot10:
+		case EmulatorShortcut::SaveStateSlot1:
+		case EmulatorShortcut::SaveStateSlot2:
+		case EmulatorShortcut::SaveStateSlot3:
+		case EmulatorShortcut::SaveStateSlot4:
+		case EmulatorShortcut::SaveStateSlot5:
+		case EmulatorShortcut::SaveStateSlot6:
+		case EmulatorShortcut::SaveStateSlot7:
+		case EmulatorShortcut::SaveStateSlot8:
+		case EmulatorShortcut::SaveStateSlot9:
+		case EmulatorShortcut::SaveStateSlot10:
 			_emu->GetSaveStateManager()->SaveState((int)shortcut - (int)EmulatorShortcut::SaveStateSlot1 + 1);
 			break;
-		
-		case EmulatorShortcut::LoadStateSlot1: case EmulatorShortcut::LoadStateSlot2: case EmulatorShortcut::LoadStateSlot3: case EmulatorShortcut::LoadStateSlot4: case EmulatorShortcut::LoadStateSlot5:
-		case EmulatorShortcut::LoadStateSlot6: case EmulatorShortcut::LoadStateSlot7: case EmulatorShortcut::LoadStateSlot8: case EmulatorShortcut::LoadStateSlot9: case EmulatorShortcut::LoadStateSlot10:
+
+		case EmulatorShortcut::LoadStateSlot1:
+		case EmulatorShortcut::LoadStateSlot2:
+		case EmulatorShortcut::LoadStateSlot3:
+		case EmulatorShortcut::LoadStateSlot4:
+		case EmulatorShortcut::LoadStateSlot5:
+		case EmulatorShortcut::LoadStateSlot6:
+		case EmulatorShortcut::LoadStateSlot7:
+		case EmulatorShortcut::LoadStateSlot8:
+		case EmulatorShortcut::LoadStateSlot9:
+		case EmulatorShortcut::LoadStateSlot10:
 		case EmulatorShortcut::LoadStateSlotAuto:
 			_emu->GetSaveStateManager()->LoadState((int)shortcut - (int)EmulatorShortcut::LoadStateSlot1 + 1);
 			break;
@@ -272,7 +320,7 @@ void ShortcutKeyHandler::ProcessShortcutPressed(EmulatorShortcut shortcut, uint3
 		case EmulatorShortcut::LoadState: _emu->GetSaveStateManager()->LoadState(); break;
 
 		case EmulatorShortcut::RunSingleFrame: ProcessRunSingleFrame(); break;
-		
+
 		case EmulatorShortcut::ToggleRewind:
 			if(_emu->GetRewindManager()->IsRewinding()) {
 				_emu->GetRewindManager()->StopRewinding();
@@ -284,7 +332,7 @@ void ShortcutKeyHandler::ProcessShortcutPressed(EmulatorShortcut shortcut, uint3
 		case EmulatorShortcut::Rewind: _emu->GetRewindManager()->StartRewinding(); break;
 		case EmulatorShortcut::RewindTenSecs: _emu->GetRewindManager()->RewindSeconds(10); break;
 		case EmulatorShortcut::RewindOneMin: _emu->GetRewindManager()->RewindSeconds(60); break;
-		
+
 		default:
 			//Anything else is managed by the UI
 			break;
@@ -301,7 +349,7 @@ void ShortcutKeyHandler::ProcessShortcutReleased(EmulatorShortcut shortcut, uint
 	switch(shortcut) {
 		case EmulatorShortcut::FastForward: settings->ClearFlag(EmulationFlags::Turbo); break;
 		case EmulatorShortcut::Rewind: _emu->GetRewindManager()->StopRewinding(); break;
-		
+
 		case EmulatorShortcut::RunSingleFrame:
 			_repeatStarted = false;
 			_needRepeat = false;

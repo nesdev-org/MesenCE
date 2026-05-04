@@ -51,17 +51,17 @@ DisassemblerSource& Disassembler::GetSource(MemoryType type)
 	return _sources[(int)type];
 }
 
-uint32_t Disassembler::BuildCache(AddressInfo &addrInfo, uint8_t cpuFlags, CpuType type)
+uint32_t Disassembler::BuildCache(AddressInfo& addrInfo, uint8_t cpuFlags, CpuType type)
 {
 	DisassemblerSource& src = GetSource(addrInfo.Type);
 
 	int returnSize = 0;
 	int32_t address = addrInfo.Address;
 	do {
-		DisassemblyInfo &disInfo = src.Cache[address];
+		DisassemblyInfo& disInfo = src.Cache[address];
 		if(!disInfo.IsInitialized() || !disInfo.IsValid(cpuFlags)) {
 			disInfo.Initialize(address, cpuFlags, type, addrInfo.Type, _memoryDumper);
-			for(int i = 1; i < disInfo.GetOpSize() && address + i < src.Cache.size() ; i++) {
+			for(int i = 1; i < disInfo.GetOpSize() && address + i < src.Cache.size(); i++) {
 				//Clear any instructions that start in the middle of this one
 				//(can happen when resizing an instruction after X/M updates)
 				src.Cache[address + i] = DisassemblyInfo();
@@ -131,7 +131,7 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 	LabelInfo labelInfo;
 	AddressInfo prevAddrInfo = {};
 	int byteCounter = 0;
-	
+
 	AddressInfo relAddress = {};
 	relAddress.Type = DebugUtilities::GetCpuMemoryType(cpuType);
 
@@ -248,7 +248,7 @@ vector<DisassemblyResult> Disassembler::Disassemble(CpuType cpuType, uint16_t ba
 			if(disassemblyInfo.IsReturnInstruction()) {
 				//End of function
 				results.push_back(DisassemblyResult(i, LineFlags::VerifiedCode | LineFlags::BlockEnd | LineFlags::Empty));
-			} 
+			}
 
 			//Move to the end of the instruction (but realign disassembly if another valid instruction is found)
 			//This can sometimes happen if the 2nd byte of BRK/COP is reused as the first byte of the next instruction
@@ -344,7 +344,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 			data.Flags |= (uint8_t)LineFlags::SaveRam;
 			break;
 	}
-	
+
 	bool showMemoryValues = _settings->GetDebugConfig().ShowMemoryValues;
 	bool isBlockStartEnd = (data.Flags & (LineFlags::BlockStart | LineFlags::BlockEnd | LineFlags::Empty)) != 0;
 	if(!isBlockStartEnd && row.Address.Address >= 0) {
@@ -383,8 +383,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 			CdlManager* cdlManager = _debugger->GetCdlManager();
 			switch(lineCpuType) {
 				case CpuType::Snes:
-				case CpuType::Sa1:
-				{
+				case CpuType::Sa1: {
 					SnesCpuState state = (SnesCpuState&)_debugger->GetCpuStateRef(lineCpuType);
 					state.PC = (uint16_t)row.CpuAddress;
 					state.K = (row.CpuAddress >> 16);
@@ -404,8 +403,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Spc:
-				{
+				case CpuType::Spc: {
 					SpcState state = (SpcState&)_debugger->GetCpuStateRef(lineCpuType);
 					state.PC = (uint16_t)row.CpuAddress;
 
@@ -423,8 +421,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Gsu:
-				{
+				case CpuType::Gsu: {
 					GsuState state = (GsuState&)_debugger->GetCpuStateRef(lineCpuType);
 					state.R[15] = (uint16_t)row.CpuAddress;
 					state.ProgramBank = (row.CpuAddress >> 16);
@@ -453,8 +450,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					data.OpSize = disInfo.GetOpSize();
 					break;
 
-				case CpuType::Cx4:
-				{
+				case CpuType::Cx4: {
 					Cx4State state = (Cx4State&)_debugger->GetCpuStateRef(lineCpuType);
 					if(!disInfo.IsInitialized()) {
 						disInfo = DisassemblyInfo(row.Address.Address, 0, type, row.Address.Type, _memoryDumper);
@@ -470,8 +466,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::St018:
-				{
+				case CpuType::St018: {
 					ArmV3CpuState state = (ArmV3CpuState&)_debugger->GetCpuStateRef(lineCpuType);
 					if(!disInfo.IsInitialized()) {
 						disInfo = DisassemblyInfo(row.Address.Address, state.CPSR.ToInt32(), CpuType::St018, row.Address.Type, _memoryDumper);
@@ -491,8 +486,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Gameboy:
-				{
+				case CpuType::Gameboy: {
 					GbCpuState state = (GbCpuState&)_debugger->GetCpuStateRef(lineCpuType);
 					state.PC = (uint16_t)row.CpuAddress;
 
@@ -511,8 +505,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Nes:
-				{
+				case CpuType::Nes: {
 					NesCpuState state = (NesCpuState&)_debugger->GetCpuStateRef(lineCpuType);
 					state.PC = (uint16_t)row.CpuAddress;
 
@@ -531,8 +524,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Pce:
-				{
+				case CpuType::Pce: {
 					PceCpuState state = (PceCpuState&)_debugger->GetCpuStateRef(lineCpuType);
 					state.PC = (uint16_t)row.CpuAddress;
 
@@ -551,8 +543,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Sms:
-				{
+				case CpuType::Sms: {
 					SmsCpuState state = (SmsCpuState&)_debugger->GetCpuStateRef(lineCpuType);
 					state.PC = (uint16_t)row.CpuAddress;
 
@@ -571,8 +562,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Gba:
-				{
+				case CpuType::Gba: {
 					GbaCpuState state = (GbaCpuState&)_debugger->GetCpuStateRef(lineCpuType);
 
 					CodeDataLogger* cdl = cdlManager->GetCodeDataLogger(row.Address.Type);
@@ -595,8 +585,7 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 					break;
 				}
 
-				case CpuType::Ws:
-				{
+				case CpuType::Ws: {
 					WsCpuState state = (WsCpuState&)_debugger->GetCpuStateRef(lineCpuType);
 					WsDisUtils::UpdateAddressCsIp(row.CpuAddress, state);
 
@@ -686,7 +675,7 @@ uint32_t Disassembler::GetDisassemblyOutput(CpuType type, uint32_t address, Code
 	uint32_t maxBank = (_memoryDumper->GetMemorySize(memType) - 1) >> 16;
 
 	int32_t row;
-	for(row = 0; row < (int32_t)rowCount; row++){
+	for(row = 0; row < (int32_t)rowCount; row++) {
 		if(row + i >= rows.size()) {
 			if(bank < maxBank) {
 				bank++;

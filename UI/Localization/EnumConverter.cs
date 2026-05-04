@@ -20,4 +20,4 @@ namespace Mesen.Localization
 			throw new NotImplementedException();
 		}
 	}
-}	
+}

@@ -6,7 +6,7 @@
 		{
 			switch(opType) {
 				default: return false;
-				
+
 				case MemoryOperationType.Read:
 				case MemoryOperationType.DmaRead:
 				case MemoryOperationType.DummyRead:

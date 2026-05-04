@@ -38,8 +38,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 	};
 
 	switch(category) {
-		case GbaThumbOpCategory::MoveShiftedRegister:
-		{
+		case GbaThumbOpCategory::MoveShiftedRegister: {
 			uint8_t op = (opCode >> 11) & 0x03;
 			uint8_t offset = (opCode >> 6) & 0x1F;
 			uint8_t rs = (opCode >> 3) & 0x07;
@@ -60,14 +59,13 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::AddSubtract:
-		{
+		case GbaThumbOpCategory::AddSubtract: {
 			bool sub = opCode & (1 << 9);
-			bool immediate = opCode &  (1 << 10);
+			bool immediate = opCode & (1 << 10);
 			uint8_t rnOffset = (opCode >> 6) & 0x7;
 			uint8_t rs = (opCode >> 3) & 0x07;
 			uint8_t rd = opCode & 0x07;
-			
+
 			str.Write(sub ? "SUB" : "ADD");
 			str.Write(' ');
 			WriteReg(str, rd);
@@ -82,8 +80,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::MoveCmpAddSub:
-		{
+		case GbaThumbOpCategory::MoveCmpAddSub: {
 			uint8_t op = (opCode >> 11) & 0x03;
 			uint8_t rd = (opCode >> 8) & 0x07;
 			uint8_t offset = opCode & 0xFF;
@@ -100,8 +97,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::AluOperation:
-		{
+		case GbaThumbOpCategory::AluOperation: {
 			uint8_t op = (opCode >> 6) & 0x0F;
 			uint8_t rs = (opCode >> 3) & 0x07;
 			uint8_t rd = opCode & 0x07;
@@ -131,8 +127,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::HiRegBranchExch:
-		{
+		case GbaThumbOpCategory::HiRegBranchExch: {
 			uint8_t op = (opCode >> 8) & 0x03;
 			uint8_t rs = ((opCode >> 3) & 0x07) | ((opCode & 0x40) >> 3);
 			uint8_t rd = (opCode & 0x07) | ((opCode & 0x80) >> 4);
@@ -143,7 +138,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 				case 2: str.Write("MOV"); break;
 				case 3: str.Write("BX"); break;
 			}
-			
+
 			str.Write(' ');
 
 			if(op < 3) {
@@ -156,11 +151,10 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::PcRelLoad:
-		{
+		case GbaThumbOpCategory::PcRelLoad: {
 			uint8_t rd = (opCode >> 8) & 0x07;
 			uint8_t immValue = opCode & 0xFF;
-			
+
 			str.Write("LDR");
 			str.Write(' ');
 			WriteReg(str, rd);
@@ -168,8 +162,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::LoadStoreRegOffset:
-		{
+		case GbaThumbOpCategory::LoadStoreRegOffset: {
 			uint8_t ro = (opCode >> 6) & 0x07;
 			uint8_t rb = (opCode >> 3) & 0x07;
 			uint8_t rd = opCode & 0x07;
@@ -191,8 +184,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::LoadStoreSignExtended:
-		{
+		case GbaThumbOpCategory::LoadStoreSignExtended: {
 			uint8_t ro = (opCode >> 6) & 0x07;
 			uint8_t rb = (opCode >> 3) & 0x07;
 			uint8_t rd = opCode & 0x07;
@@ -204,7 +196,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 				case 2: str.Write("LDSB"); break;
 				case 3: str.Write("LDSH"); break;
 			}
-			
+
 			str.Write(' ');
 			WriteReg(str, rd);
 			str.Write(", [");
@@ -215,8 +207,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::LoadStoreImmOffset:
-		{
+		case GbaThumbOpCategory::LoadStoreImmOffset: {
 			uint8_t rb = (opCode >> 3) & 0x07;
 			uint8_t rd = opCode & 0x07;
 			uint8_t offset = (opCode >> 6) & 0x1F;
@@ -241,8 +232,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::LoadStoreHalfWord:
-		{
+		case GbaThumbOpCategory::LoadStoreHalfWord: {
 			uint8_t rb = (opCode >> 3) & 0x07;
 			uint8_t rd = opCode & 0x07;
 			uint8_t offset = (opCode >> 6) & 0x1F;
@@ -259,8 +249,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::SpRelLoadStore:
-		{
+		case GbaThumbOpCategory::SpRelLoadStore: {
 			uint8_t rd = (opCode >> 8) & 0x07;
 			uint8_t immValue = opCode & 0xFF;
 			bool load = opCode & (1 << 11);
@@ -273,8 +262,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::LoadAddress:
-		{
+		case GbaThumbOpCategory::LoadAddress: {
 			uint8_t rd = (opCode >> 8) & 0x07;
 			uint8_t immValue = opCode & 0xFF;
 			bool useSp = opCode & (1 << 11);
@@ -289,8 +277,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::AddOffsetToSp:
-		{
+		case GbaThumbOpCategory::AddOffsetToSp: {
 			uint16_t immValue = (opCode & 0x7F) << 2;
 			bool sign = opCode & (1 << 7);
 
@@ -299,8 +286,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::PushPopReg:
-		{
+		case GbaThumbOpCategory::PushPopReg: {
 			uint8_t regMask = opCode & 0xFF;
 			bool storeLrLoadPc = opCode & (1 << 8);
 			bool load = opCode & (1 << 11);
@@ -320,8 +306,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::MultipleLoadStore:
-		{
+		case GbaThumbOpCategory::MultipleLoadStore: {
 			uint8_t regMask = opCode & 0xFF;
 			uint8_t rb = (opCode >> 8) & 0x07;
 			bool load = opCode & (1 << 11);
@@ -335,8 +320,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::ConditionalBranch:
-		{
+		case GbaThumbOpCategory::ConditionalBranch: {
 			int16_t offset = (((int16_t)(int8_t)(opCode & 0xFF)) << 1) + 4;
 			uint8_t cond = (opCode >> 8) & 0x0F;
 
@@ -363,8 +347,7 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::SoftwareInterrupt:
-		{
+		case GbaThumbOpCategory::SoftwareInterrupt: {
 			uint8_t value = opCode & 0xFF;
 
 			str.Write("SWI");
@@ -372,24 +355,21 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 			break;
 		}
 
-		case GbaThumbOpCategory::UnconditionalBranch:
-		{
+		case GbaThumbOpCategory::UnconditionalBranch: {
 			int16_t offset = ((int16_t)((opCode & 0x7FF) << 5)) >> 4;
 			str.Write("BAL ");
 			writeBranchTarget(memoryAddr + offset + 4);
 			break;
 		}
 
-		case GbaThumbOpCategory::LongBranchLink:
-		{
+		case GbaThumbOpCategory::LongBranchLink: {
 			uint16_t offset = opCode & 0x7FF;
 			bool high = opCode & (1 << 11);
 			str.WriteAll("BL", (high ? "H" : "L"), " #$", HexUtilities::ToHex(offset));
 			break;
 		}
 
-		case GbaThumbOpCategory::InvalidOp:
-		{
+		case GbaThumbOpCategory::InvalidOp: {
 			str.Write("INVALID");
 			break;
 		}
@@ -416,22 +396,20 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 	};
 
 	switch(category) {
-		case ArmOpCategory::Branch:
-		{
+		case ArmOpCategory::Branch: {
 			str.Write('B');
 			if(opCode & (1 << 24)) {
 				str.Write('L');
 			}
 			WriteCond(str, opCode);
 			str.Write(' ');
-			
+
 			int32_t offset = (((int32_t)opCode << 8) >> 6);
 			writeBranchTarget(memoryAddr + offset + 8);
 			break;
 		}
 
-		case ArmOpCategory::DataProcessing:
-		{
+		case ArmOpCategory::DataProcessing: {
 			bool immediate = (opCode & (1 << 25)) != 0;
 			uint8_t rn = (opCode >> 16) & 0x0F;
 			uint8_t rd = (opCode >> 12) & 0x0F;
@@ -521,8 +499,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::SingleDataTransfer:
-		{
+		case ArmOpCategory::SingleDataTransfer: {
 			bool immediate = (opCode & (1 << 25)) == 0;
 			bool pre = (opCode & (1 << 24)) != 0;
 			bool up = (opCode & (1 << 23)) != 0;
@@ -593,8 +570,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::Mrs:
-		{
+		case ArmOpCategory::Mrs: {
 			uint8_t rd = (opCode >> 12) & 0x0F;
 			bool psrSrc = opCode & (1 << 22);
 
@@ -606,8 +582,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::Msr:
-		{
+		case ArmOpCategory::Msr: {
 			bool immediate = opCode & (1 << 25);
 			bool psrDst = opCode & (1 << 22);
 			uint8_t affectedBytes = (opCode >> 16) & 0x0F;
@@ -646,8 +621,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::SingleDataSwap:
-		{
+		case ArmOpCategory::SingleDataSwap: {
 			str.Write("SWP");
 			WriteCond(str, opCode);
 
@@ -669,8 +643,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::BranchExchangeRegister:
-		{
+		case ArmOpCategory::BranchExchangeRegister: {
 			str.Write("BX");
 			WriteCond(str, opCode);
 			str.Write(' ');
@@ -679,8 +652,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::BlockDataTransfer:
-		{
+		case ArmOpCategory::BlockDataTransfer: {
 			bool pre = (opCode & (1 << 24)) != 0;
 			bool up = (opCode & (1 << 23)) != 0;
 			bool psrForceUser = (opCode & (1 << 22)) != 0;
@@ -720,8 +692,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::SignedHalfDataTransfer:
-		{
+		case ArmOpCategory::SignedHalfDataTransfer: {
 			bool pre = (opCode & (1 << 24)) != 0;
 			bool up = (opCode & (1 << 23)) != 0;
 			bool immediate = (opCode & (1 << 22)) != 0;
@@ -786,8 +757,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::Multiply:
-		{
+		case ArmOpCategory::Multiply: {
 			uint8_t rd = (opCode >> 16) & 0x0F;
 			uint8_t rn = (opCode >> 12) & 0x0F;
 			uint8_t rs = (opCode >> 8) & 0x0F;
@@ -815,8 +785,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::MultiplyLong:
-		{
+		case ArmOpCategory::MultiplyLong: {
 			uint8_t rh = (opCode >> 16) & 0x0F;
 			uint8_t rl = (opCode >> 12) & 0x0F;
 			uint8_t rs = (opCode >> 8) & 0x0F;
@@ -843,8 +812,7 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
-		case ArmOpCategory::SoftwareInterrupt:
-		{
+		case ArmOpCategory::SoftwareInterrupt: {
 			uint32_t value = opCode & 0xFFFFFF;
 			str.Write("SWI");
 			str.WriteAll(" #$", HexUtilities::ToHex24(value));
@@ -891,14 +859,15 @@ void GbaDisUtils::WriteReg(FastString& str, uint8_t reg)
 		case 13: str.Write("SP"); break;
 		case 14: str.Write("LR"); break;
 		case 15: str.Write("PC"); break;
-		default:	str.WriteAll('R', std::to_string(reg)); break;
+		default: str.WriteAll('R', std::to_string(reg)); break;
 	}
 }
 
 void GbaDisUtils::WriteCond(FastString& str, uint32_t opCode)
 {
 	switch(opCode >> 28) {
-		default: case 0: str.Write("EQ"); break;
+		default:
+		case 0: str.Write("EQ"); break;
 		case 1: str.Write("NE"); break;
 		case 2: str.Write("CS"); break;
 		case 3: str.Write("CC"); break;
@@ -1022,7 +991,7 @@ bool GbaDisUtils::IsJumpToSub(uint32_t opCode, uint8_t flags)
 
 bool GbaDisUtils::IsReturnInstruction(uint32_t opCode, uint8_t flags)
 {
-	//For GBA, this is only used to show markers at the end of functions 
+	//For GBA, this is only used to show markers at the end of functions
 	//Callstack uses a different logic in GbaDebugger itself
 	if(IsThumbMode(flags)) {
 		GbaThumbOpCategory category = GbaCpu::GetThumbOpCategory(opCode);

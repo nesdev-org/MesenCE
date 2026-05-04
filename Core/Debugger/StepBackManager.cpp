@@ -20,13 +20,14 @@ void StepBackManager::StepBack(StepBackType type)
 
 		int64_t target = 0;
 		switch(type) {
-			default: case StepBackType::Instruction: target = cfg.CurrentCycle; break;
+			default:
+			case StepBackType::Instruction: target = cfg.CurrentCycle; break;
 			case StepBackType::Scanline: target = (int64_t)cfg.CurrentCycle - cfg.CyclesPerScanline; break;
 			case StepBackType::Frame: target = (int64_t)cfg.CurrentCycle - cfg.CyclesPerFrame; break;
 		}
 
 		_targetClock = (uint64_t)std::max<int64_t>(0, target);
-		
+
 		_active = true;
 		_allowRetry = true;
 		_stateClockLimit = StepBackManager::DefaultClockLimit;

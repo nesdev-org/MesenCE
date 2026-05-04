@@ -33,7 +33,8 @@ struct SpcState : BaseState
 	SpcTimer<16> Timer2;
 };
 
-namespace SpcFlags {
+namespace SpcFlags
+{
 	enum SpcFlags : uint8_t
 	{
 		Carry = 0x01,
@@ -47,7 +48,8 @@ namespace SpcFlags {
 	};
 }
 
-namespace SpcControlFlags {
+namespace SpcControlFlags
+{
 	enum SpcControlFlags : uint8_t
 	{
 		Timer0 = 0x01,
@@ -61,7 +63,8 @@ namespace SpcControlFlags {
 	};
 }
 
-namespace SpcTestFlags {
+namespace SpcTestFlags
+{
 	enum SpcTestFlags : uint8_t
 	{
 		TimersDisabled = 0x01,

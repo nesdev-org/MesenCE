@@ -34,7 +34,7 @@ RowDataType SnesCpuTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void SnesCpuTraceLogger::GetTraceRow(string &output, SnesCpuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void SnesCpuTraceLogger::GetTraceRow(string& output, SnesCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	constexpr char activeStatusLetters[8] = { 'N', 'V', 'M', 'X', 'D', 'I', 'Z', 'C' };
 	constexpr char inactiveStatusLetters[8] = { 'n', 'v', 'm', 'x', 'd', 'i', 'z', 'c' };

@@ -19,7 +19,13 @@ protected:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_speed); SV(_gain); SV(_envelopeOff); SV(_volumeIncrease); SV(_frequency); SV(_timer); SV(_masterSpeed);
+		SV(_speed);
+		SV(_gain);
+		SV(_envelopeOff);
+		SV(_volumeIncrease);
+		SV(_frequency);
+		SV(_timer);
+		SV(_masterSpeed);
 	}
 
 public:
@@ -82,7 +88,7 @@ public:
 	{
 		return _gain;
 	}
-	
+
 	uint8_t GetMasterSpeed()
 	{
 		return _masterSpeed;

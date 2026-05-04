@@ -1,14 +1,14 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Mesen.Debugger.Controls;
+using Mesen.Interop;
 using System;
 using System.ComponentModel;
-using Avalonia.Data;
-using Mesen.Interop;
-using Mesen.Debugger.Controls;
-using Avalonia.Input;
 
 namespace Mesen.Windows
 {

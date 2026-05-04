@@ -11,13 +11,13 @@ class PceTraceLogger : public BaseTraceLogger<PceTraceLogger, PceCpuState>
 {
 private:
 	PceVdc* _vdc = nullptr;
-	
+
 protected:
 	RowDataType GetFormatTagType(string& tag) override;
 
 public:
 	PceTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, PceVdc* vdc);
-	
+
 	void GetTraceRow(string& output, PceCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
 

@@ -16,6 +16,7 @@ protected:
 		return "ABCDEFGHIJKLMNOPQRSTUVWXYZ01234567891234567890120123456789edpmdmncdsasbemglrcpcsasbteeehidududlr123";
 	}
 
+	// clang-format off
 	enum Buttons
 	{
 		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
@@ -52,6 +53,7 @@ protected:
 		NumpadMinus, NumpadPlus, NumpadMultiply, Numpad9, F10, Numpad5, NumpadDivide, NumLock,
 		Grave, Numpad6, Pause, Space, F9, Numpad3, NumpadDot, Numpad0
 	};
+	// clang-format on
 
 	void InternalSetStateFromInput() override
 	{
@@ -85,14 +87,16 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_row); SV(_column); SV(_enabled);
+		SV(_row);
+		SV(_column);
+		SV(_enabled);
 	}
 
 	void RefreshStateBuffer() override
 	{
 		_row = 0;
 		_column = 0;
-	}	
+	}
 
 public:
 	SuborKeyboard(Emulator* emu, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::SuborKeyboard, BaseControlDevice::ExpDevicePort, keyMappings)

@@ -20,10 +20,10 @@ private:
 	uint8_t _chrLowRegs[8] = {};
 	uint8_t _chrHighRegs[8] = {};
 	uint8_t _chrLatch[2] = {};
-	
+
 	uint8_t _prgMode = 0;
 	bool _enablePrgAt6000 = false;
-	
+
 	uint8_t _chrMode = 0;
 	bool _chrBlockMode = false;
 	uint8_t _chrBlock = 0;
@@ -167,8 +167,12 @@ protected:
 	void UpdatePrgState()
 	{
 		bool invertBits = (_prgMode & 0x03) == 0x03;
-		int prgRegs[4] = { InvertPrgBits(_prgRegs[0], invertBits), InvertPrgBits(_prgRegs[1], invertBits),
-								 InvertPrgBits(_prgRegs[2], invertBits), InvertPrgBits(_prgRegs[3], invertBits) };
+		int prgRegs[4] = {
+			InvertPrgBits(_prgRegs[0], invertBits),
+			InvertPrgBits(_prgRegs[1], invertBits),
+			InvertPrgBits(_prgRegs[2], invertBits),
+			InvertPrgBits(_prgRegs[3], invertBits)
+		};
 
 		switch(_prgMode & 0x03) {
 			case 0:
@@ -214,10 +218,25 @@ protected:
 			uint8_t shift = 0;
 			switch(_chrMode) {
 				default:
-				case 0: mask = 0x1F; shift = 5; break;
-				case 1: mask = 0x3F; shift = 6; break;
-				case 2: mask = 0x7F; shift = 7; break;
-				case 3: mask = 0xFF; shift = 8; break;
+				case 0:
+					mask = 0x1F;
+					shift = 5;
+					break;
+
+				case 1:
+					mask = 0x3F;
+					shift = 6;
+					break;
+
+				case 2:
+					mask = 0x7F;
+					shift = 7;
+					break;
+
+				case 3:
+					mask = 0xFF;
+					shift = 8;
+					break;
 			}
 			return (_chrLowRegs[index] & mask) | (_chrBlock << shift);
 		} else {
@@ -230,16 +249,16 @@ protected:
 		int chrRegs[8] = { GetChrReg(0), GetChrReg(1), GetChrReg(2), GetChrReg(3), GetChrReg(4), GetChrReg(5), GetChrReg(6), GetChrReg(7) };
 
 		switch(_chrMode) {
-			case 0: 
+			case 0:
 				SelectChrPage8x(0, chrRegs[0] << 3);
 				break;
 
-			case 1: 
+			case 1:
 				SelectChrPage4x(0, chrRegs[_chrLatch[0]] << 2);
 				SelectChrPage4x(1, chrRegs[_chrLatch[1]] << 2);
 				break;
 
-			case 2: 
+			case 2:
 				SelectChrPage2x(0, chrRegs[0] << 1);
 				SelectChrPage2x(1, chrRegs[2] << 1);
 				SelectChrPage2x(2, chrRegs[4] << 1);
@@ -293,26 +312,50 @@ protected:
 			}
 		} else {
 			switch(addr & 0xF007) {
-				case 0x8000: case 0x8001: case 0x8002: case 0x8003:
-				case 0x8004: case 0x8005: case 0x8006: case 0x8007:
+				case 0x8000:
+				case 0x8001:
+				case 0x8002:
+				case 0x8003:
+				case 0x8004:
+				case 0x8005:
+				case 0x8006:
+				case 0x8007:
 					_prgRegs[addr & 0x03] = value & 0x7F;
 					break;
 
-				case 0x9000: case 0x9001: case 0x9002: case 0x9003:
-				case 0x9004: case 0x9005: case 0x9006: case 0x9007:
+				case 0x9000:
+				case 0x9001:
+				case 0x9002:
+				case 0x9003:
+				case 0x9004:
+				case 0x9005:
+				case 0x9006:
+				case 0x9007:
 					_chrLowRegs[addr & 0x07] = value;
 					break;
 
-				case 0xA000: case 0xA001: case 0xA002: case 0xA003:
-				case 0xA004: case 0xA005: case 0xA006: case 0xA007:
+				case 0xA000:
+				case 0xA001:
+				case 0xA002:
+				case 0xA003:
+				case 0xA004:
+				case 0xA005:
+				case 0xA006:
+				case 0xA007:
 					_chrHighRegs[addr & 0x07] = value;
 					break;
 
-				case 0xB000: case 0xB001: case 0xB002: case 0xB003:
+				case 0xB000:
+				case 0xB001:
+				case 0xB002:
+				case 0xB003:
 					_ntLowRegs[addr & 0x03] = value;
 					break;
-				
-				case 0xB004: case 0xB005: case 0xB006: case 0xB007:
+
+				case 0xB004:
+				case 0xB005:
+				case 0xB006:
+				case 0xB007:
 					_ntHighRegs[addr & 0x03] = value;
 					break;
 
@@ -359,7 +402,6 @@ protected:
 					_chrBlockMode = (value & 0x20) == 0x00;
 					_chrBlock = ((value & 0x18) >> 2) | (value & 0x01);
 					break;
-
 			}
 		}
 

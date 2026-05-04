@@ -408,7 +408,7 @@ namespace Mesen.Debugger.Labels
 			addLabel(0x01A, 2, "BG2VOFS", "BG2 Y Scroll Offset");
 			addLabel(0x01C, 2, "BG3HOFS", "BG3 X Scroll Offset");
 			addLabel(0x01E, 2, "BG3VOFS", "BG3 Y Scroll Offset");
-			
+
 			addLabel(0x020, 2, "BG2PA", "BG2 Transform Param A");
 			addLabel(0x022, 2, "BG2PB", "BG2 Transform Param B");
 			addLabel(0x024, 2, "BG2PC", "BG2 Transform Param C");
@@ -428,10 +428,10 @@ namespace Mesen.Debugger.Labels
 
 			addLabel(0x044, 2, "WIN0V", "Window 0 Start/End Y");
 			addLabel(0x046, 2, "WIN1V", "Window 1 Start/End Y");
-			
+
 			addLabel(0x048, 2, "WININ", "Window 0/1 Config");
 			addLabel(0x04A, 2, "WINOUT", "OBJ Window/Outside Window Config");
-			
+
 			addLabel(0x04C, 2, "MOSAIC", "Mosaic Size");
 			addLabel(0x050, 2, "BLDCNT", "Blend Control");
 			addLabel(0x052, 2, "BLDALPHA", "Blend Coefficients");
@@ -501,16 +501,16 @@ namespace Mesen.Debugger.Labels
 			addLabel(0x126, 2, "SIOMULTI3", "Serial I/O Multiplayer Data 3");
 			addLabel(0x128, 2, "SIOCNT", "Serial I/O Control");
 			addLabel(0x12A, 2, "SIODATA8", "Serial I/O Data (8-bit)");
-			
+
 			addLabel(0x130, 2, "KEYINPUT", "Key Status");
 			addLabel(0x132, 2, "KEYCNT", "Key IRQ Control");
-			
+
 			addLabel(0x134, 2, "RNT", "Serial I/O Mode Select");
 			addLabel(0x140, 2, "JOYCNT", "Serial I/O JOY Bus Control");
 			addLabel(0x150, 4, "JOYRECV", "Serial I/O JOY Bus Receive Data");
 			addLabel(0x154, 4, "JOYSEND", "Serial I/O JOY Bus Send Data");
 			addLabel(0x158, 2, "JOYSTAT", "Serial I/O JOY Bus Status");
-			
+
 			addLabel(0x200, 2, "IE", "IRQ Enable");
 			addLabel(0x202, 2, "IF", "IRQ Flags");
 			addLabel(0x204, 2, "WAITCNT", "Waitstate Control");

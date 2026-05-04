@@ -59,7 +59,7 @@ struct TrackInfo
 	TrackFormat Format;
 	uint32_t FileIndex;
 	uint32_t FileOffset;
-	
+
 	uint32_t FirstSector;
 	uint32_t LastSector;
 

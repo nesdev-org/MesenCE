@@ -12,7 +12,7 @@ protected:
 	Gameboy* _gameboy = nullptr;
 	GbMemoryManager* _memoryManager = nullptr;
 	uint8_t* _cartRam = nullptr;
-	
+
 	void Map(uint16_t start, uint16_t end, GbMemoryType type, uint32_t offset, bool readonly)
 	{
 		_memoryManager->Map(start, end, type, offset, readonly);

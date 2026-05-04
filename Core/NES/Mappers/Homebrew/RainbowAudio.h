@@ -65,15 +65,21 @@ public:
 		addr &= 0x0F;
 
 		switch(addr) {
-			case 0x00: case 0x01: case 0x02:
+			case 0x00:
+			case 0x01:
+			case 0x02:
 				_pulse1.WriteReg(addr, value);
 				break;
 
-			case 0x03: case 0x04: case 0x05:
+			case 0x03:
+			case 0x04:
+			case 0x05:
 				_pulse2.WriteReg(addr - 0x03, value);
 				break;
 
-			case 0x06: case 0x07: case 0x08:
+			case 0x06:
+			case 0x07:
+			case 0x08:
 				_saw.WriteReg(addr - 0x06, value);
 				break;
 

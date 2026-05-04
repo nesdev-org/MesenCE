@@ -43,10 +43,10 @@ public:
 	void Reset(bool softReset) override;
 
 	bool IsKeyboardConnected() override;
-	
+
 	shared_ptr<BaseControlDevice> CreateControllerDevice(ControllerType type, uint8_t port) override;
 
-	void GetMemoryRanges(MemoryRanges &ranges) override
+	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		ranges.AddHandler(MemoryOperation::Read, 0x4016, 0x4017);
 		ranges.AddHandler(MemoryOperation::Write, 0x4016);
@@ -54,7 +54,7 @@ public:
 
 	uint8_t ReadRam(uint16_t addr) override;
 	void WriteRam(uint16_t addr, uint8_t value) override;
-	
+
 	__noinline void ProcessWrites();
 	__forceinline bool HasPendingWrites() { return _writePending > 0; }
 };

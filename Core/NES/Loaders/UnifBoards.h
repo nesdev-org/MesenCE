@@ -1,7 +1,8 @@
 #pragma once
 #include "pch.h"
 
-namespace UnifBoards {
+namespace UnifBoards
+{
 	enum UnifBoards
 	{
 		UnknownBoard = 32768,

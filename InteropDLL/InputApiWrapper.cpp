@@ -10,7 +10,7 @@ extern unique_ptr<IKeyManager> _keyManager;
 extern unique_ptr<IMouseManager> _mouseManager;
 extern unique_ptr<Emulator> _emu;
 
-extern "C" 
+extern "C"
 {
 	DllExport void __stdcall SetMousePosition(double x, double y)
 	{
@@ -23,10 +23,10 @@ extern "C"
 	}
 
 	DllExport void __stdcall UpdateInputDevices()
-	{ 
+	{
 		if(_keyManager) {
 			_keyManager->UpdateDevices();
-		} 
+		}
 	}
 
 	DllExport void __stdcall GetPressedKeys(uint16_t* keyBuffer)
@@ -52,7 +52,7 @@ extern "C"
 			}
 		}
 	}
-	
+
 	DllExport void __stdcall ResetKeyState()
 	{
 		if(_keyManager) {

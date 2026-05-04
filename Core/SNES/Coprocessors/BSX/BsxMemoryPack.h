@@ -35,11 +35,11 @@ public:
 
 	void ProcessCommand(uint8_t value, uint32_t page);
 	void Reset();
-	
+
 	vector<unique_ptr<IMemoryHandler>>& GetMemoryHandlers();
 	uint8_t* DebugGetMemoryPack();
 	uint32_t DebugGetMemoryPackSize();
-	
+
 	class BsxMemoryPackHandler : public RamHandler
 	{
 		BsxMemoryPack* _memPack;

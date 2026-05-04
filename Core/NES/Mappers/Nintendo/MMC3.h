@@ -182,8 +182,18 @@ protected:
 		BaseMapper::Serialize(s);
 		SVArray(_registers, 8);
 		SV(_a12LowClock);
-		SV(_state.Reg8000); SV(_state.RegA000); SV(_state.RegA001); SV(_currentRegister); SV(_chrMode); SV(_prgMode);
-		SV(_irqReloadValue); SV(_irqCounter); SV(_irqReload); SV(_irqEnabled); SV(_wramEnabled); SV(_wramWriteProtected);
+		SV(_state.Reg8000);
+		SV(_state.RegA000);
+		SV(_state.RegA001);
+		SV(_currentRegister);
+		SV(_chrMode);
+		SV(_prgMode);
+		SV(_irqReloadValue);
+		SV(_irqCounter);
+		SV(_irqReload);
+		SV(_irqEnabled);
+		SV(_wramEnabled);
+		SV(_wramWriteProtected);
 	}
 
 	uint16_t GetPrgPageSize() override { return 0x2000; }

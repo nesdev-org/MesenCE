@@ -39,12 +39,12 @@ struct RenderSurfaceInfo
 
 class IRenderingDevice
 {
-	public:
-		virtual ~IRenderingDevice() {}
-		virtual void UpdateFrame(RenderedFrame& frame) = 0;
-		virtual void ClearFrame() = 0;
-		virtual void Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud) = 0;
-		virtual void Reset() = 0;
-		virtual void OnRendererThreadStarted() {}
-		virtual void SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle) = 0;
+public:
+	virtual ~IRenderingDevice() {}
+	virtual void UpdateFrame(RenderedFrame& frame) = 0;
+	virtual void ClearFrame() = 0;
+	virtual void Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud) = 0;
+	virtual void Reset() = 0;
+	virtual void OnRendererThreadStarted() {}
+	virtual void SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle) = 0;
 };

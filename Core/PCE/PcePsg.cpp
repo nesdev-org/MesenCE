@@ -71,8 +71,11 @@ void PcePsg::Write(uint16_t addr, uint8_t value)
 			_state.LeftVolume = (value >> 4) & 0x0F;
 			break;
 
-		case 2: case 3: case 4: case 5: case 6:
-		{
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6: {
 			if(_state.ChannelSelect < 6) {
 				_channels[_state.ChannelSelect].Write(addr, value);
 			}
@@ -162,7 +165,7 @@ void PcePsg::PlayQueuedAudio()
 	blip_read_samples(_rightChannel, _soundBuffer + 1, PcePsg::MaxSamples, 1);
 	_soundMixer->PlayAudioBuffer(_soundBuffer, sampleCount, PcePsg::SampleRate);
 	_clockCounter = 0;
-	
+
 	UpdateSoundOffset();
 }
 

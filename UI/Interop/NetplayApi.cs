@@ -9,14 +9,14 @@ namespace Mesen.Interop
 	{
 		private const string DllPath = EmuApi.DllName;
 
-		[DllImport(DllPath)] public static extern void StartServer(UInt16 port, [MarshalAs(UnmanagedType.LPUTF8Str)]string password);
+		[DllImport(DllPath)] public static extern void StartServer(UInt16 port, [MarshalAs(UnmanagedType.LPUTF8Str)] string password);
 		[DllImport(DllPath)] public static extern void StopServer();
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsServerRunning();
-		[DllImport(DllPath)] public static extern void Connect([MarshalAs(UnmanagedType.LPUTF8Str)]string host, UInt16 port, [MarshalAs(UnmanagedType.LPUTF8Str)]string password, [MarshalAs(UnmanagedType.I1)]bool spectator);
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool IsServerRunning();
+		[DllImport(DllPath)] public static extern void Connect([MarshalAs(UnmanagedType.LPUTF8Str)] string host, UInt16 port, [MarshalAs(UnmanagedType.LPUTF8Str)] string password, [MarshalAs(UnmanagedType.I1)] bool spectator);
 		[DllImport(DllPath)] public static extern void Disconnect();
-		[DllImport(DllPath)] [return: MarshalAs(UnmanagedType.I1)] public static extern bool IsConnected();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool IsConnected();
 
-		[DllImport(DllPath)] private static extern void NetPlayGetControllerList([In,Out] NetplayControllerUsageInfo[] controllers, ref Int32 length);
+		[DllImport(DllPath)] private static extern void NetPlayGetControllerList([In, Out] NetplayControllerUsageInfo[] controllers, ref Int32 length);
 		public static NetplayControllerUsageInfo[] NetPlayGetControllerList()
 		{
 			NetplayControllerUsageInfo[] controllers = new NetplayControllerUsageInfo[16];

@@ -23,7 +23,7 @@ unordered_map<string, int64_t>& ExpressionEvaluator::GetGameboyTokens()
 
 		{ "frame", EvalValues::PpuFrameCount },
 		{ "cycle", EvalValues::PpuCycle },
-		{ "scanline", EvalValues::PpuScanline }, 
+		{ "scanline", EvalValues::PpuScanline },
 	};
 
 	return supportedTokens;

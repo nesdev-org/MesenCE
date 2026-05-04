@@ -68,7 +68,7 @@ T WsCpu::ReadMemory(uint16_t seg, uint16_t offset)
 {
 #ifndef DUMMYCPU
 	return _memoryManager->Read<T>(seg, offset);
-#else 
+#else
 	T value = _memoryManager->DebugCpuRead<T>(seg, offset);
 	LogMemoryOperation((seg << 4) + offset, value, MemoryOperationType::Read, MemoryType::WsMemory, std::is_same<T, uint16_t>::value);
 	return value;
@@ -80,7 +80,7 @@ void WsCpu::WriteMemory(uint16_t seg, uint16_t offset, T value)
 {
 #ifndef DUMMYCPU
 	_memoryManager->Write<T>(seg, offset, value);
-#else 
+#else
 	LogMemoryOperation((seg << 4) + offset, value, MemoryOperationType::Write, MemoryType::WsMemory, std::is_same<T, uint16_t>::value);
 #endif
 }
@@ -312,20 +312,42 @@ void WsCpu::ReadModRmByte()
 		offset = ReadCodeWord();
 	} else if(_modRm.Mode != 3) {
 		switch(_modRm.Rm) {
-			case 0x00: Idle(); offset = _state.BX + _state.SI; break;
-			case 0x01: Idle(); offset = _state.BX + _state.DI; break;
-			case 0x02: Idle(); offset = _state.BP + _state.SI; seg = GetSegment(WsSegment::SS); break;
-			case 0x03: Idle(); offset = _state.BP + _state.DI; seg = GetSegment(WsSegment::SS); break;
+			case 0x00:
+				Idle();
+				offset = _state.BX + _state.SI;
+				break;
+
+			case 0x01:
+				Idle();
+				offset = _state.BX + _state.DI;
+				break;
+
+			case 0x02:
+				Idle();
+				offset = _state.BP + _state.SI;
+				seg = GetSegment(WsSegment::SS);
+				break;
+
+			case 0x03:
+				Idle();
+				offset = _state.BP + _state.DI;
+				seg = GetSegment(WsSegment::SS);
+				break;
+
 			case 0x04: offset = _state.SI; break;
 			case 0x05: offset = _state.DI; break;
-			case 0x06: offset = _state.BP; seg = GetSegment(WsSegment::SS); break;
+
+			case 0x06:
+				offset = _state.BP;
+				seg = GetSegment(WsSegment::SS);
+				break;
+
 			case 0x07: offset = _state.BX; break;
 		}
 
 		if(_modRm.Mode == 0x01) {
 			offset += (int16_t)((int8_t)ReadCodeByte());
-		}
-		else if(_modRm.Mode == 0x02) {
+		} else if(_modRm.Mode == 0x02) {
 			offset += (int16_t)ReadCodeWord();
 		}
 	}
@@ -641,11 +663,25 @@ void WsCpu::LdsLesLeaModRm()
 			default:
 			case 0x00: offset = _state.BX + _state.AX; break;
 			case 0x01: offset = _state.BX + _state.CX; break;
-			case 0x02: offset = _state.BP + _state.DX; seg = GetSegment(WsSegment::SS); break;
-			case 0x03: offset = _state.BP + _state.BX; seg = GetSegment(WsSegment::SS); break;
+
+			case 0x02:
+				offset = _state.BP + _state.DX;
+				seg = GetSegment(WsSegment::SS);
+				break;
+
+			case 0x03:
+				offset = _state.BP + _state.BX;
+				seg = GetSegment(WsSegment::SS);
+				break;
+
 			case 0x04: offset = _state.SP + _state.SI; break;
 			case 0x05: offset = _state.BP + _state.DI; break;
-			case 0x06: offset = _state.BP + _state.SI; seg = GetSegment(WsSegment::SS); break;
+
+			case 0x06:
+				offset = _state.BP + _state.SI;
+				seg = GetSegment(WsSegment::SS);
+				break;
+
 			case 0x07: offset = _state.BX + _state.DI; break;
 		}
 		_modRm.Segment = seg;
@@ -943,9 +979,20 @@ void WsCpu::Grp2ModRm()
 	T param = GetModRm<T>();
 	uint8_t shift;
 	switch(mode) {
-		case Grp2Mode::One: shift = 1; Idle(); break;
-		case Grp2Mode::CL: shift = _state.CX & 0xFF; Idle<3>(); break;
-		case Grp2Mode::Immediate: shift = ReadCodeByte(); Idle<3>(); break;
+		case Grp2Mode::One:
+			shift = 1;
+			Idle();
+			break;
+
+		case Grp2Mode::CL:
+			shift = _state.CX & 0xFF;
+			Idle<3>();
+			break;
+
+		case Grp2Mode::Immediate:
+			shift = ReadCodeByte();
+			Idle<3>();
+			break;
 	}
 
 	shift &= 0x1F;
@@ -977,10 +1024,28 @@ void WsCpu::Grp3ModRm()
 	switch(_modRm.Register) {
 		case 0x00: And<T>(param, ReadImmediate<T>()); break; //TEST
 		case 0x01: break; //NOP
-		case 0x02: param = ~param; SetModRm(param); break;
-		case 0x03: param = Sub<T>(0, param, 0); SetModRm(param); break; //NEG
-		case 0x04: Idle<2>(); MulUnsigned<T>((T)_state.AX, param); break;
-		case 0x05: Idle<2>(); MulSigned<T>((T)_state.AX, param); break;
+
+		case 0x02:
+			param = ~param;
+			SetModRm(param);
+			break;
+
+		case 0x03:
+			//NEG
+			param = Sub<T>(0, param, 0);
+			SetModRm(param);
+			break;
+
+		case 0x04:
+			Idle<2>();
+			MulUnsigned<T>((T)_state.AX, param);
+			break;
+
+		case 0x05:
+			Idle<2>();
+			MulSigned<T>((T)_state.AX, param);
+			break;
+
 		case 0x06: DivUnsigned<T>(param); break;
 		case 0x07: DivSigned<T>(param); break;
 	}
@@ -1628,7 +1693,7 @@ void WsCpu::InStoreAx(uint16_t port)
 	} else {
 		_state.AX = (_state.AX & 0xFF00) | ReadPort<uint8_t>(port);
 	}
-	
+
 	//TODOWS
 	//The gdma_timing test seems to imply that IN instruciton might potentially
 	//be reading the port a cycle early and then spends an extra cycle
@@ -1674,8 +1739,7 @@ void WsCpu::ProcessStringCmpOperation(bool incSi)
 		if(
 			_state.CX != 0 &&
 			(_prefix.Rep != WsRepMode::NotZero || !_state.Flags.Zero) &&
-			(_prefix.Rep != WsRepMode::Zero || _state.Flags.Zero)
-			) {
+			(_prefix.Rep != WsRepMode::Zero || _state.Flags.Zero)) {
 			//Re-execute the same instruction again
 #ifndef DUMMYCPU
 			_prefetch.ProcessRep(_opCode);
@@ -1877,7 +1941,10 @@ start:
 		case 0x14: ProcessAluImm<AluOp::Adc, uint8_t>(); break;
 		case 0x15: ProcessAluImm<AluOp::Adc, uint16_t>(); break;
 		case 0x16: PushSegment(_state.SS); break;
-		case 0x17: PopSegment(_state.SS); SuppressIrq(true); break;
+		case 0x17:
+			PopSegment(_state.SS);
+			SuppressIrq(true);
+			break;
 		case 0x18: ProcessAluModRm<AluOp::Sbb, false, uint8_t>(); break;
 		case 0x19: ProcessAluModRm<AluOp::Sbb, false, uint16_t>(); break;
 		case 0x1A: ProcessAluModRm<AluOp::Sbb, true, uint8_t>(); break;
@@ -1893,7 +1960,11 @@ start:
 		case 0x23: ProcessAluModRm<AluOp::And, true, uint16_t>(); break;
 		case 0x24: ProcessAluImm<AluOp::And, uint8_t>(); break;
 		case 0x25: ProcessAluImm<AluOp::And, uint16_t>(); break;
-		case 0x26: _prefix.Segment = WsSegment::ES; _prefix.PrefixCount++; goto afterPrefix; break;
+		case 0x26:
+			_prefix.Segment = WsSegment::ES;
+			_prefix.PrefixCount++;
+			goto afterPrefix;
+			break;
 		case 0x27: DAA(); break;
 		case 0x28: ProcessAluModRm<AluOp::Sub, false, uint8_t>(); break;
 		case 0x29: ProcessAluModRm<AluOp::Sub, false, uint16_t>(); break;
@@ -1901,7 +1972,11 @@ start:
 		case 0x2B: ProcessAluModRm<AluOp::Sub, true, uint16_t>(); break;
 		case 0x2C: ProcessAluImm<AluOp::Sub, uint8_t>(); break;
 		case 0x2D: ProcessAluImm<AluOp::Sub, uint16_t>(); break;
-		case 0x2E: _prefix.Segment = WsSegment::CS; _prefix.PrefixCount++; goto afterPrefix; break;
+		case 0x2E:
+			_prefix.Segment = WsSegment::CS;
+			_prefix.PrefixCount++;
+			goto afterPrefix;
+			break;
 		case 0x2F: DAS(); break;
 
 		case 0x30: ProcessAluModRm<AluOp::Xor, false, uint8_t>(); break;
@@ -1910,7 +1985,11 @@ start:
 		case 0x33: ProcessAluModRm<AluOp::Xor, true, uint16_t>(); break;
 		case 0x34: ProcessAluImm<AluOp::Xor, uint8_t>(); break;
 		case 0x35: ProcessAluImm<AluOp::Xor, uint16_t>(); break;
-		case 0x36: _prefix.Segment = WsSegment::SS; _prefix.PrefixCount++; goto afterPrefix; break;
+		case 0x36:
+			_prefix.Segment = WsSegment::SS;
+			_prefix.PrefixCount++;
+			goto afterPrefix;
+			break;
 		case 0x37: AAA(); break;
 		case 0x38: ProcessAluModRm<AluOp::Cmp, false, uint8_t>(); break;
 		case 0x39: ProcessAluModRm<AluOp::Cmp, false, uint16_t>(); break;
@@ -1918,7 +1997,11 @@ start:
 		case 0x3B: ProcessAluModRm<AluOp::Cmp, true, uint16_t>(); break;
 		case 0x3C: ProcessAluImm<AluOp::Cmp, uint8_t>(); break;
 		case 0x3D: ProcessAluImm<AluOp::Cmp, uint16_t>(); break;
-		case 0x3E: _prefix.Segment = WsSegment::DS; _prefix.PrefixCount++; goto afterPrefix; break;
+		case 0x3E:
+			_prefix.Segment = WsSegment::DS;
+			_prefix.PrefixCount++;
+			goto afterPrefix;
+			break;
 		case 0x3F: AAS(); break;
 
 		case 0x40: Inc(_state.AX); break;
@@ -2069,8 +2152,14 @@ start:
 		case 0xC9: Leave(); break;
 		case 0xCA: RetFarImm(); break;
 		case 0xCB: RetFar(); break;
-		case 0xCC: Idle<5>(); Interrupt(3); break;
-		case 0xCD: Idle<6>(); Interrupt(ReadCodeByte()); break;
+		case 0xCC:
+			Idle<5>();
+			Interrupt(3);
+			break;
+		case 0xCD:
+			Idle<6>();
+			Interrupt(ReadCodeByte());
+			break;
 		case 0xCE: InterruptOverflow(); break;
 		case 0xCF: RetInterrupt(); break;
 
@@ -2108,10 +2197,22 @@ start:
 		case 0xEE: Out<uint8_t, 4>(_state.DX, _state.AX); break;
 		case 0xEF: Out<uint16_t, 4>(_state.DX, _state.AX); break;
 
-		case 0xF0: _prefix.Lock = true;  _prefix.PrefixCount++; goto afterPrefix; break;
+		case 0xF0:
+			_prefix.Lock = true;
+			_prefix.PrefixCount++;
+			goto afterPrefix;
+			break;
 		case 0xF1: Undefined(); break;
-		case 0xF2: _prefix.Rep = WsRepMode::NotZero; _prefix.PrefixCount++; goto afterPrefix; break;
-		case 0xF3: _prefix.Rep = WsRepMode::Zero; _prefix.PrefixCount++; goto afterPrefix; break;
+		case 0xF2:
+			_prefix.Rep = WsRepMode::NotZero;
+			_prefix.PrefixCount++;
+			goto afterPrefix;
+			break;
+		case 0xF3:
+			_prefix.Rep = WsRepMode::Zero;
+			_prefix.PrefixCount++;
+			goto afterPrefix;
+			break;
 		case 0xF4: Halt(); break;
 		case 0xF5: SetFlagValue(_state.Flags.Carry, !_state.Flags.Carry); break; //CMC
 		case 0xF6: Grp3ModRm<uint8_t>(); break;
@@ -2174,7 +2275,7 @@ void WsCpu::Serialize(Serializer& s)
 	SV(_prefix.Preserve);
 	SV(_prefix.Rep);
 	SV(_prefix.Segment);
-	
+
 	SV(_modRm.Segment);
 	SV(_modRm.Offset);
 	SV(_modRm.Mode);

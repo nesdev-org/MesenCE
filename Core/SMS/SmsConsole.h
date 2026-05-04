@@ -31,12 +31,12 @@ private:
 	SmsModel _model = SmsModel::Sms;
 	ConsoleRegion _region = ConsoleRegion::Ntsc;
 	string _filename;
-	
+
 	void UpdateRegion(bool forceUpdate);
 
 public:
 	static vector<string> GetSupportedExtensions() { return { ".sms", ".gg", ".sg", ".col" }; }
-	static vector<string> GetSupportedSignatures() { return { }; }
+	static vector<string> GetSupportedSignatures() { return {}; }
 
 	SmsConsole(Emulator* emu);
 	virtual ~SmsConsole();
@@ -84,7 +84,7 @@ public:
 	AddressInfo GetAbsoluteAddress(uint32_t relAddress);
 	AddressInfo GetAbsoluteAddress(AddressInfo& relAddress) override;
 	AddressInfo GetRelativeAddress(AddressInfo& absAddress, CpuType cpuType) override;
-	
+
 	SmsState GetState();
 	void GetConsoleState(BaseState& state, ConsoleType consoleType) override;
 

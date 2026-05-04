@@ -21,7 +21,7 @@ namespace Mesen.Debugger.Disassembly
 		}
 
 		public CpuType CpuType => _type;
-		
+
 		public int GetLineCount() => _lineCount;
 
 		public CodeLineData[] GetCodeLines(int startPosition, int rowCount)

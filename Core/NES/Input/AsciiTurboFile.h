@@ -22,7 +22,8 @@ protected:
 	{
 		BaseControlDevice::Serialize(s);
 		SVArray(_data, AsciiTurboFile::FileSize);
-		SV(_position); SV(_lastWrite);
+		SV(_position);
+		SV(_lastWrite);
 	}
 
 public:

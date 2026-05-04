@@ -23,39 +23,39 @@ void InputHud::DrawNumber(int number, int x, int y)
 {
 	switch(number) {
 		case 1:
-			_hud->DrawLine(x+1 + _xOffset, y + _yOffset, x+1 + _xOffset, 4 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x+2 + _xOffset, 4 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + 1 + _xOffset, y + _yOffset, x + 1 + _xOffset, 4 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x + 2 + _xOffset, 4 + y + _yOffset, color[0], 1);
 			_hud->DrawPixel(x + _xOffset, 1 + y + _yOffset, color[0], 1);
 			break;
 
 		case 2:
-			_hud->DrawLine(x + _xOffset, y + _yOffset, x+2 + _xOffset, y + _yOffset, color[0], 1);
-			_hud->DrawPixel(x+2 + _xOffset, 1 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x+2 + _xOffset, 2 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, y + _yOffset, x + 2 + _xOffset, y + _yOffset, color[0], 1);
+			_hud->DrawPixel(x + 2 + _xOffset, 1 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x + 2 + _xOffset, 2 + y + _yOffset, color[0], 1);
 			_hud->DrawPixel(x + _xOffset, 3 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x+2 + _xOffset, 4 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x + 2 + _xOffset, 4 + y + _yOffset, color[0], 1);
 			break;
 
 		case 3:
-			_hud->DrawLine(x + _xOffset, y + _yOffset, x+2 + _xOffset, y + _yOffset, color[0], 1);
-			_hud->DrawPixel(x+2 + _xOffset, 1 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x+2 + _xOffset, 2 + y + _yOffset, color[0], 1);
-			_hud->DrawPixel(x+2 + _xOffset, 3 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x+2 + _xOffset, 4 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, y + _yOffset, x + 2 + _xOffset, y + _yOffset, color[0], 1);
+			_hud->DrawPixel(x + 2 + _xOffset, 1 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x + 2 + _xOffset, 2 + y + _yOffset, color[0], 1);
+			_hud->DrawPixel(x + 2 + _xOffset, 3 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x + 2 + _xOffset, 4 + y + _yOffset, color[0], 1);
 			break;
 
 		case 4:
 			_hud->DrawLine(x + _xOffset, y + _yOffset, x + _xOffset, 2 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x+2 + _xOffset, y + _yOffset, x+2 + _xOffset, 4 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x+2 + _xOffset, 2 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + 2 + _xOffset, y + _yOffset, x + 2 + _xOffset, 4 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x + 2 + _xOffset, 2 + y + _yOffset, color[0], 1);
 			break;
 
 		case 5:
-			_hud->DrawLine(x + _xOffset, y + _yOffset, x+2 + _xOffset, y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, y + _yOffset, x + 2 + _xOffset, y + _yOffset, color[0], 1);
 			_hud->DrawPixel(x + _xOffset, 1 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x+2 + _xOffset, 2 + y + _yOffset, color[0], 1);
-			_hud->DrawPixel(x+2 + _xOffset, 3 + y + _yOffset, color[0], 1);
-			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x+2 + _xOffset, 4 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 2 + y + _yOffset, x + 2 + _xOffset, 2 + y + _yOffset, color[0], 1);
+			_hud->DrawPixel(x + 2 + _xOffset, 3 + y + _yOffset, color[0], 1);
+			_hud->DrawLine(x + _xOffset, 4 + y + _yOffset, x + 2 + _xOffset, 4 + y + _yOffset, color[0], 1);
 			break;
 
 		case 6:
@@ -117,7 +117,7 @@ void InputHud::DrawOutline(int width, int height)
 
 	_hud->DrawRectangle(_xOffset, _yOffset, width, height, 0x80CCCCCC, true, 1);
 	_hud->DrawRectangle(_xOffset, _yOffset, width, height, color[0], false, 1);
-	
+
 	_outlineWidth = width;
 	_outlineHeight = height;
 }
@@ -191,7 +191,7 @@ void InputHud::DrawControllers(FrameInfo size, vector<ControllerData> controller
 	}
 
 	InputConfig& cfg = _emu->GetSettings()->GetInputConfig();
-	
+
 	bool hasVisiblePort = false;
 	for(int i = 0; i < 8; i++) {
 		hasVisiblePort |= cfg.DisplayInputPort[i];
@@ -220,7 +220,7 @@ void InputHud::DrawControllers(FrameInfo size, vector<ControllerData> controller
 			_yOffset = size.Height - 1;
 			break;
 	}
-	
+
 	_controllerIndex = 0;
 	for(ControllerData& portData : controllerData) {
 		DrawController(portData, console->GetControlManager());

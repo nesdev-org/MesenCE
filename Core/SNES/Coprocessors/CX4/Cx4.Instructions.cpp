@@ -4,7 +4,7 @@
 #include "SNES/Debugger/Cx4DisUtils.h"
 #include "Utilities/HexUtilities.h"
 
-static constexpr int shiftLut[4] = { 0 , 1, 8, 16 };
+static constexpr int shiftLut[4] = { 0, 1, 8, 16 };
 
 extern const uint32_t _dataRom[1024];
 
@@ -142,8 +142,10 @@ uint32_t Cx4::GetSourceValue(uint8_t src)
 		case 0x5C: return 0x010000;
 		case 0x5D: return 0xFEFFFF;
 		case 0x5E: return 0x000100;
-		case 0x5F: return 0x00FEFF;
+		case 0x5F:
+			return 0x00FEFF;
 
+			// clang-format off
 		case 0x60: case 0x70: return _state.Regs[0];
 		case 0x61: case 0x71: return _state.Regs[1];
 		case 0x62: case 0x72: return _state.Regs[2];
@@ -160,6 +162,7 @@ uint32_t Cx4::GetSourceValue(uint8_t src)
 		case 0x6D: case 0x7D: return _state.Regs[13];
 		case 0x6E: case 0x7E: return _state.Regs[14];
 		case 0x6F: case 0x7F: return _state.Regs[15];
+			// clang-format on
 	}
 
 	return 0;
@@ -173,7 +176,7 @@ void Cx4::WriteRegister(uint8_t reg, uint32_t value)
 		case 0x02: _state.Mult = (_state.Mult & 0xFFFFFF000000) | value; break;
 		case 0x03: _state.MemoryDataReg = value; break;
 		case 0x08: _state.RomBuffer = value; break;
-		case 0x0C: 
+		case 0x0C:
 			_state.RamBuffer[0] = value;
 			_state.RamBuffer[1] = value >> 8;
 			_state.RamBuffer[2] = value >> 16;
@@ -183,7 +186,7 @@ void Cx4::WriteRegister(uint8_t reg, uint32_t value)
 		case 0x1C: _state.DataPointerReg = value; break;
 		case 0x20: _state.PC = value; break;
 		case 0x28: _state.P = (value & 0x7FFF); break;
-		
+
 		case 0x2E:
 			_state.Bus.Enabled = true;
 			_state.Bus.Writing = true;
@@ -198,6 +201,7 @@ void Cx4::WriteRegister(uint8_t reg, uint32_t value)
 			_state.Bus.Address = _state.MemoryAddressReg;
 			break;
 
+			// clang-format off
 		case 0x60: case 0x70: _state.Regs[0] = value; break;
 		case 0x61: case 0x71: _state.Regs[1] = value; break;
 		case 0x62: case 0x72: _state.Regs[2] = value; break;
@@ -214,6 +218,7 @@ void Cx4::WriteRegister(uint8_t reg, uint32_t value)
 		case 0x6D: case 0x7D: _state.Regs[13] = value; break;
 		case 0x6E: case 0x7E: _state.Regs[14] = value; break;
 		case 0x6F: case 0x7F: _state.Regs[15] = value; break;
+			// clang-format on
 	}
 }
 
@@ -643,6 +648,7 @@ void Cx4::IncMar()
 	_state.MemoryAddressReg = (_state.MemoryAddressReg + 1) & 0xFFFFFF;
 }
 
+// clang-format off
 //Data ROM that contains precalculated math lookup tables for sines, cosines, division, etc.
 const uint32_t _dataRom[1024] = {
 	0xFFFFFF, 0x800000, 0x400000, 0x2AAAAA, 0x200000, 0x199999, 0x155555, 0x124924, 0x100000, 0x0E38E3, 0x0CCCCC, 0x0BA2E8, 0x0AAAAA, 0x09D89D, 0x092492, 0x088888,
@@ -710,3 +716,4 @@ const uint32_t _dataRom[1024] = {
 	0x61F78A, 0x5F0EA4, 0x5C2214, 0x5931F7, 0x563E69, 0x534789, 0x504D72, 0x4D5043, 0x4A5018, 0x474D10, 0x444749, 0x413EE0, 0x3E33F2, 0x3B269F, 0x381704, 0x350540,
 	0x31F170, 0x2EDBB3, 0x2BC428, 0x28AAED, 0x259020, 0x2273E1, 0x1F564E, 0x1C3785, 0x1917A6, 0x15F6D0, 0x12D520, 0x0FB2B7, 0x0C8FB2, 0x096C32, 0x064855, 0x03243A
 };
+// clang-format on

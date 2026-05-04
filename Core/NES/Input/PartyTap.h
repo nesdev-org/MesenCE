@@ -13,7 +13,15 @@ private:
 	bool _enabled = false;
 
 protected:
-	enum Buttons { B1 = 0, B2, B3, B4, B5, B6 };
+	enum Buttons
+	{
+		B1 = 0,
+		B2,
+		B3,
+		B4,
+		B5,
+		B6
+	};
 
 	string GetKeyNames() override
 	{
@@ -32,7 +40,9 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_stateBuffer); SV(_readCount); SV(_enabled);
+		SV(_stateBuffer);
+		SV(_readCount);
+		SV(_enabled);
 	}
 
 public:

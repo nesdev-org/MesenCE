@@ -39,7 +39,7 @@ FrameInfo BaseVideoFilter::GetFrameInfo()
 
 void BaseVideoFilter::UpdateBufferSize()
 {
-	uint32_t newBufferSize = _frameInfo.Width*_frameInfo.Height;
+	uint32_t newBufferSize = _frameInfo.Width * _frameInfo.Height;
 	if(_bufferSize != newBufferSize) {
 		_frameLock.Acquire();
 		delete[] _outputBuffer;
@@ -89,10 +89,10 @@ FrameInfo BaseVideoFilter::GetFrameInfo(uint16_t* ppuOutputBuffer, bool enableOv
 	return frameInfo;
 }
 
-FrameInfo BaseVideoFilter::SendFrame(uint16_t *ppuOutputBuffer, uint32_t frameNumber, uint32_t videoPhase, void* frameData, bool enableOverscan)
+FrameInfo BaseVideoFilter::SendFrame(uint16_t* ppuOutputBuffer, uint32_t frameNumber, uint32_t videoPhase, void* frameData, bool enableOverscan)
 {
 	auto lock = _frameLock.AcquireSafe();
-	_overscan = enableOverscan ? _emu->GetSettings()->GetOverscan() : OverscanDimensions{};
+	_overscan = enableOverscan ? _emu->GetSettings()->GetOverscan() : OverscanDimensions {};
 	_isOddFrame = frameNumber % 2;
 	_videoPhase = videoPhase;
 	_frameData = frameData;
@@ -163,7 +163,7 @@ void BaseVideoFilter::YiqToRgb(double y, double i, double q, double& r, double& 
 	b = std::max(0.0, std::min(1.0, (y + _yiqToRgbMatrix[4] * i + _yiqToRgbMatrix[5] * q)));
 }
 
-void BaseVideoFilter::TakeScreenshot(VideoFilterType filterType, string filename, std::stringstream *stream)
+void BaseVideoFilter::TakeScreenshot(VideoFilterType filterType, string filename, std::stringstream* stream)
 {
 	uint32_t* pngBuffer;
 	FrameInfo frameInfo;
@@ -180,7 +180,7 @@ void BaseVideoFilter::TakeScreenshot(VideoFilterType filterType, string filename
 	}
 
 	pngBuffer = frameBuffer;
-	
+
 	uint8_t scale = 1;
 
 	uint32_t screenRotation = _emu->GetSettings()->GetVideoConfig().ScreenRotation;
@@ -200,7 +200,7 @@ void BaseVideoFilter::TakeScreenshot(VideoFilterType filterType, string filename
 	}
 
 	ScanlineFilter::ApplyFilter(pngBuffer, frameInfo.Width, frameInfo.Height, _emu->GetSettings()->GetVideoConfig().ScanlineIntensity, scale);
-	
+
 	if(!filename.empty()) {
 		PNGHelper::WritePNG(filename, pngBuffer, frameInfo.Width, frameInfo.Height);
 	} else {

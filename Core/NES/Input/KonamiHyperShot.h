@@ -11,7 +11,13 @@ private:
 	bool _enableP2 = true;
 
 protected:
-	enum Buttons { Player1Run = 0, Player1Jump, Player2Run, Player2Jump };
+	enum Buttons
+	{
+		Player1Run = 0,
+		Player1Jump,
+		Player2Run,
+		Player2Jump
+	};
 
 	string GetKeyNames() override
 	{
@@ -31,7 +37,8 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_enableP1); SV(_enableP2);
+		SV(_enableP1);
+		SV(_enableP2);
 	}
 
 public:

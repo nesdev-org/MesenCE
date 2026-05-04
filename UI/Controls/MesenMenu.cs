@@ -1,11 +1,11 @@
 using Avalonia;
 using Avalonia.Controls;
-using System;
-using System.Linq;
-using Avalonia.Styling;
 using Avalonia.Interactivity;
+using Avalonia.Styling;
 using Mesen.Debugger.Utilities;
+using System;
 using System.Collections;
+using System.Linq;
 
 namespace Mesen.Controls
 {
@@ -13,7 +13,8 @@ namespace Mesen.Controls
 	{
 		protected override Type StyleKeyOverride => typeof(Menu);
 
-		private void SubmenuOpened(object? sender, RoutedEventArgs e) {
+		private void SubmenuOpened(object? sender, RoutedEventArgs e)
+		{
 			MenuItem menuItem = (MenuItem)sender!;
 			IEnumerable? source = menuItem.ItemsSource ?? menuItem.Items;
 			if(source != null) {

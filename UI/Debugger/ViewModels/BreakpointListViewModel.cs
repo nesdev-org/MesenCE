@@ -1,21 +1,21 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using Avalonia.Collections;
+using Avalonia.Controls;
+using Avalonia.Controls.Selection;
+using DataBoxControl;
+using Mesen.Config;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reactive.Linq;
-using System.Linq;
-using Mesen.Interop;
-using Mesen.Debugger.Utilities;
-using Mesen.Config;
-using Mesen.Debugger.Windows;
-using Avalonia.Controls;
-using Mesen.ViewModels;
 using System.ComponentModel;
-using Mesen.Utilities;
-using System.Collections;
-using DataBoxControl;
-using Avalonia.Collections;
-using Avalonia.Controls.Selection;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace Mesen.Debugger.ViewModels
 {
@@ -56,7 +56,7 @@ namespace Mesen.Debugger.ViewModels
 			List<int> selectedIndexes = Selection.SelectedIndexes.ToList();
 
 			List<BreakpointViewModel> sortedBreakpoints = BreakpointManager.GetBreakpoints(CpuType).Select(bp => new BreakpointViewModel(bp)).ToList();
-			
+
 			if(SortState.SortOrder.Count > 0) {
 				SortHelper.SortList(sortedBreakpoints, SortState.SortOrder, _comparers, "Address");
 			}

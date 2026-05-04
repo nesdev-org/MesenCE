@@ -69,7 +69,7 @@ bool CodeDataLogger::LoadCdlFile(string cdlFilepath, bool autoResetCdl)
 				memcpy(_cdlData, cdlData.data(), _memSize);
 				InternalLoadCdlFile(cdlData.data(), (uint32_t)cdlData.size());
 			}
-			
+
 			return true;
 		}
 	}
@@ -141,14 +141,14 @@ bool CodeDataLogger::IsData(uint32_t absoluteAddr)
 	return (_cdlData[absoluteAddr] & CdlFlags::Data) != 0;
 }
 
-void CodeDataLogger::SetCdlData(uint8_t *cdlData, uint32_t length)
+void CodeDataLogger::SetCdlData(uint8_t* cdlData, uint32_t length)
 {
 	if(length <= _memSize) {
 		memcpy(_cdlData, cdlData, length);
 	}
 }
 
-void CodeDataLogger::GetCdlData(uint32_t offset, uint32_t length, uint8_t *cdlData)
+void CodeDataLogger::GetCdlData(uint32_t offset, uint32_t length, uint8_t* cdlData)
 {
 	memcpy(cdlData, _cdlData + offset, length);
 }

@@ -9,6 +9,7 @@
 #include "Utilities/FastString.h"
 #include "Utilities/HexUtilities.h"
 
+// clang-format off
 constexpr const char* _opTemplate[256] = {
 	"NOP",	"TCALL 0",	"SET1 d.0",	"BBS d.0,q",	"OR A,d",		"OR A,!a",		"OR A,(X)",		"OR A,[d+X]",	"OR A,#i",	"OR t,s",		"OR1 C,m.b",	"ASL d",			"ASL !a",	"PUSH PSW",	"TSET1 !a",		"BRK",
 	"BPL r",	"TCALL 1",	"CLR1 d.0",	"BBC d.0,q",	"OR A,d+X",		"OR A,!a+X",	"OR A,!a+Y",	"OR A,[d]+Y",	"OR e,#i",	"OR (X),(Y)",	"DECW d",		"ASL d+X",		"ASL A",		"DEC X",		"CMP X,!a",		"JMP [!a+X]",
@@ -103,8 +104,9 @@ constexpr bool _showValue[256] = {
 	false, false, true, true, true, true, true, true, false, true, true, true, true,  false, false, false,
 	false, false, true, true, true, true, true, true, true,  true, true, true, false, false, true,  false
 };
+// clang-format on
 
-void SpcDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
+void SpcDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
 	FastString str(settings->GetDebugConfig().UseLowerCaseDisassembly);
 
@@ -128,7 +130,7 @@ void SpcDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t me
 			case 'q': getOperand((uint16_t)(memoryAddr + (int8_t)byteCode[2] + GetOpSize(byteCode[0]))); break; //relative 2nd byte
 
 			case 'a': getOperand((uint16_t)(byteCode[1] | (byteCode[2] << 8))); break;
-			
+
 			case 'd': str.WriteAll('$', HexUtilities::ToHex(byteCode[1])); break;
 			case 'e': str.WriteAll('$', HexUtilities::ToHex(byteCode[2])); break; //direct 2nd byte
 
@@ -148,7 +150,7 @@ void SpcDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t me
 	out += str.ToString();
 }
 
-EffectiveAddressInfo SpcDisUtils::GetEffectiveAddress(DisassemblyInfo &info, SnesConsole *console, SpcState &state)
+EffectiveAddressInfo SpcDisUtils::GetEffectiveAddress(DisassemblyInfo& info, SnesConsole* console, SpcState& state)
 {
 	if(SpcDisUtils::IsConditionalJump(info.GetOpCode()) || SpcDisUtils::IsUnconditionalJump(info.GetOpCode())) {
 		//Show nothing for jumps
@@ -267,7 +269,7 @@ bool SpcDisUtils::IsConditionalJump(uint8_t opCode)
 
 bool SpcDisUtils::IsJumpToSub(uint8_t opCode)
 {
-	return opCode == 0x3F || opCode == 0x0F || opCode == 0x4F || (opCode&0x0F) == 0x01; //JSR, BRK, PCALL, TCALL
+	return opCode == 0x3F || opCode == 0x0F || opCode == 0x4F || (opCode & 0x0F) == 0x01; //JSR, BRK, PCALL, TCALL
 }
 
 bool SpcDisUtils::IsReturnInstruction(uint8_t opCode)

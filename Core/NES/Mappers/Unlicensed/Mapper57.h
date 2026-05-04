@@ -20,7 +20,7 @@ protected:
 	}
 
 	void Serialize(Serializer& s) override
-	{		
+	{
 		BaseMapper::Serialize(s);
 		SV(_registers[0]);
 		SV(_registers[1]);

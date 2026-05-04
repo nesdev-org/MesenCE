@@ -9,7 +9,7 @@
 #include "NES/GameDatabase.h"
 #include "Shared/RomInfo.h"
 
-void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *preloadedHeader, bool databaseEnabled)
+void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader* preloadedHeader, bool databaseEnabled)
 {
 	NesHeader header;
 	uint8_t* buffer = romFile.data();
@@ -66,7 +66,7 @@ void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *
 	uint32_t prgSize = 0;
 	uint32_t chrSize = 0;
 
-	if(!databaseEnabled || !GameDatabase::GetDbRomSize(romData.Info.Hash.PrgChrCrc32, prgSize, chrSize)) {
+	if(!databaseEnabled || romData.Info.IsNes20Header || !GameDatabase::GetDbRomSize(romData.Info.Hash.PrgChrCrc32, prgSize, chrSize)) {
 		//Fallback on header sizes when game is not in DB (or DB is disabled)
 		prgSize = header.GetPrgSize();
 		chrSize = header.GetChrSize();
@@ -104,7 +104,7 @@ void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *
 		Log("[iNes] NES 2.0 file: Yes");
 	}
 	Log("[iNes] Mapper: " + std::to_string(romData.Info.MapperID) + " Sub: " + std::to_string(romData.Info.SubMapperID));
-	
+
 	if(romData.Info.System == GameSystem::VsSystem) {
 		string type = "Vs-UniSystem";
 		switch(romData.Info.VsType) {
@@ -133,7 +133,16 @@ void iNesLoader::LoadRom(RomData& romData, vector<uint8_t>& romFile, NesHeader *
 		Log("[iNes] Save RAM: " + StringUtilities::SizeToString(romData.SaveRamSize));
 	}
 
-	Log("[iNes] Mirroring: " + string(romData.Info.Mirroring == MirroringType::Horizontal ? "Horizontal" : romData.Info.Mirroring == MirroringType::Vertical ? "Vertical" : "Four Screens"));
+	string mirroringType = "";
+	switch(romData.Info.Mirroring) {
+		case MirroringType::Horizontal: mirroringType = "Horizontal"; break;
+		case MirroringType::Vertical: mirroringType = "Vertical"; break;
+		case MirroringType::ScreenAOnly: mirroringType = "1-Screen (A)"; break;
+		case MirroringType::ScreenBOnly: mirroringType = "1-Screen (B)"; break;
+		case MirroringType::FourScreens: mirroringType = "Four Screens"; break;
+	}
+	Log("[iNes] Mirroring: " + mirroringType);
+
 	Log("[iNes] Battery: " + string(romData.Info.HasBattery ? "Yes" : "No"));
 	if(romData.Info.HasTrainer) {
 		Log("[iNes] Trainer: Yes");

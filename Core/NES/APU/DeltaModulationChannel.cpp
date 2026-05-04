@@ -44,7 +44,7 @@ void DeltaModulationChannel::Reset(bool softReset)
 	//Not sure if this is accurate, but it seems to make things better rather than worse (for dpcmletterbox)
 	//"On the real thing, I think the power-on value is 428 (or the equivalent at least - it uses a linear feedback shift register), though only the even/oddness should matter for this test."
 	_timer.SetPeriod((NesApu::GetApuRegion(_console) == ConsoleRegion::Ntsc ? _dmcPeriodLookupTableNtsc : _dmcPeriodLookupTablePal)[0] - 1);
-	
+
 	//Make sure the DMC doesn't tick on the first cycle - this is part of what keeps Sprite/DMC DMA tests working while fixing dmc_pitch.
 	_timer.SetTimer(_timer.GetPeriod());
 }
@@ -97,7 +97,7 @@ void DeltaModulationChannel::SetDmcReadBuffer(uint8_t value)
 		if(_bitsRemaining == 8 && _timer.GetTimer() == _timer.GetPeriod() && _console->GetNesConfig().EnableDmcSampleDuplicationGlitch) {
 			//When the DMA ends on the same cycle as the bit counter resets
 			//This glitch exists on all H CPUs and some G CPUs (those from around 1990 and later)
-			//In this case, a full DMA is performed on the same address, and the same sample byte 
+			//In this case, a full DMA is performed on the same address, and the same sample byte
 			//is played twice in a row by the DMC
 			_shiftRegister = _readBuffer;
 			_silenceFlag = false;
@@ -166,7 +166,7 @@ void DeltaModulationChannel::Run(uint32_t targetCycle)
 bool DeltaModulationChannel::IrqPending(uint32_t cyclesToRun)
 {
 	if(_irqEnabled && _bytesRemaining > 0) {
-		uint32_t cyclesToEmptyBuffer = (_bitsRemaining + (_bytesRemaining-1)* 8) * _timer.GetPeriod();
+		uint32_t cyclesToEmptyBuffer = (_bitsRemaining + (_bytesRemaining - 1) * 8) * _timer.GetPeriod();
 		if(cyclesToRun >= cyclesToEmptyBuffer) {
 			return true;
 		}
@@ -179,7 +179,7 @@ bool DeltaModulationChannel::GetStatus()
 	return _bytesRemaining > 0;
 }
 
-void DeltaModulationChannel::GetMemoryRanges(MemoryRanges &ranges)
+void DeltaModulationChannel::GetMemoryRanges(MemoryRanges& ranges)
 {
 	ranges.AddHandler(MemoryOperation::Write, 0x4010, 0x4013);
 }
@@ -189,7 +189,7 @@ void DeltaModulationChannel::WriteRam(uint16_t addr, uint8_t value)
 	_console->GetApu()->Run();
 
 	switch(addr & 0x03) {
-		case 0:		//4010
+		case 0: //4010
 			_irqEnabled = (value & 0x80) == 0x80;
 			_loopFlag = (value & 0x40) == 0x40;
 
@@ -202,11 +202,11 @@ void DeltaModulationChannel::WriteRam(uint16_t addr, uint8_t value)
 			}
 			break;
 
-		case 1: {		//4011
+		case 1: { //4011
 			uint8_t newValue = value & 0x7F;
 			uint8_t previousLevel = _outputLevel;
 			_outputLevel = newValue;
-			
+
 			if(_console->GetNesConfig().ReduceDmcPopping && abs(_outputLevel - previousLevel) > 50) {
 				//Reduce popping sounds for 4011 writes
 				_outputLevel -= (_outputLevel - previousLevel) / 2;
@@ -214,7 +214,7 @@ void DeltaModulationChannel::WriteRam(uint16_t addr, uint8_t value)
 
 			//4011 applies new output right away, not on the timer's reload.  This fixes bad DMC sound when playing through 4011.
 			_timer.AddOutput(_outputLevel);
-			
+
 			if(_lastValue4011 != value && newValue > 0) {
 				_console->SetNextFrameOverclockStatus(true);
 			}
@@ -223,14 +223,14 @@ void DeltaModulationChannel::WriteRam(uint16_t addr, uint8_t value)
 			break;
 		}
 
-		case 2:		//4012
+		case 2: //4012
 			_sampleAddr = 0xC000 | ((uint32_t)value << 6);
 			if(value > 0) {
 				_console->SetNextFrameOverclockStatus(false);
 			}
 			break;
 
-		case 3:		//4013
+		case 3: //4013
 			_sampleLength = (value << 4) | 0x0001;
 			if(value > 0) {
 				_console->SetNextFrameOverclockStatus(false);
@@ -260,7 +260,7 @@ void DeltaModulationChannel::SetEnabled(bool enabled)
 		_needToRun = true;
 	} else if(_bytesRemaining == 0) {
 		InitSample();
-		
+
 		//Delay a number of cycles based on odd/even cycles
 		//Allows behavior to match dmc_dma_start_test
 		if((_console->GetCpu()->GetCycleCount() & 0x01) == 0) {

@@ -95,7 +95,7 @@ void SmsVdp::UpdateConfig()
 
 	_disableBackground = _model == SmsModel::ColecoVision ? _emu->GetSettings()->GetCvConfig().DisableBackground : _emu->GetSettings()->GetSmsConfig().DisableBackground;
 	_disableSprites = _model == SmsModel::ColecoVision ? _emu->GetSettings()->GetCvConfig().DisableSprites : _emu->GetSettings()->GetSmsConfig().DisableSprites;
-	_removeSpriteLimit  = _model == SmsModel::ColecoVision ? _emu->GetSettings()->GetCvConfig().RemoveSpriteLimit : _emu->GetSettings()->GetSmsConfig().RemoveSpriteLimit;
+	_removeSpriteLimit = _model == SmsModel::ColecoVision ? _emu->GetSettings()->GetCvConfig().RemoveSpriteLimit : _emu->GetSettings()->GetSmsConfig().RemoveSpriteLimit;
 	_revision = _console->GetRevision();
 }
 
@@ -236,7 +236,7 @@ void SmsVdp::Exec()
 					ProcessSpriteEvaluation();
 				}
 			}
-		
+
 			if(_memAccess[cyc] == SmsVdpMemAccess::None) {
 				//Unused slots are available for the CPU to read/write data
 				ProcessVramAccess();
@@ -387,10 +387,10 @@ void SmsVdp::LoadBgTilesSms()
 			uint16_t addr = _revision == SmsRevision::Sms1 ? ((_bgTileAddr & _state.ColorTableAddress) | (_bgTileAddr & 0x3F)) : _bgTileAddr;
 			if(_bgHorizontalMirror) {
 				_bgShifters[0] |= ReverseBitOrder(ReadVram(addr, SmsVdpMemAccess::BgLoadTile)) << (16 - _pixelsAvailable);
-				_bgShifters[1] |= ReverseBitOrder(ReadVram(addr+1, SmsVdpMemAccess::BgLoadTile)) << (16 - _pixelsAvailable);
+				_bgShifters[1] |= ReverseBitOrder(ReadVram(addr + 1, SmsVdpMemAccess::BgLoadTile)) << (16 - _pixelsAvailable);
 			} else {
 				_bgShifters[0] |= ReadVram(addr, SmsVdpMemAccess::BgLoadTile) << (16 - _pixelsAvailable);
-				_bgShifters[1] |= ReadVram(addr+1, SmsVdpMemAccess::BgLoadTile) << (16 - _pixelsAvailable);
+				_bgShifters[1] |= ReadVram(addr + 1, SmsVdpMemAccess::BgLoadTile) << (16 - _pixelsAvailable);
 			}
 			break;
 		}
@@ -398,11 +398,11 @@ void SmsVdp::LoadBgTilesSms()
 		case 6: {
 			uint16_t addr = _revision == SmsRevision::Sms1 ? ((_bgTileAddr & _state.BgPatternTableAddress) | (_bgTileAddr & 0x7FF)) : _bgTileAddr;
 			if(_bgHorizontalMirror) {
-				_bgShifters[2] |= ReverseBitOrder(ReadVram(addr+2, SmsVdpMemAccess::BgLoadTile)) << (16 - _pixelsAvailable);
-				_bgShifters[3] |= ReverseBitOrder(ReadVram(addr+3, SmsVdpMemAccess::BgLoadTile)) << (16 - _pixelsAvailable);
+				_bgShifters[2] |= ReverseBitOrder(ReadVram(addr + 2, SmsVdpMemAccess::BgLoadTile)) << (16 - _pixelsAvailable);
+				_bgShifters[3] |= ReverseBitOrder(ReadVram(addr + 3, SmsVdpMemAccess::BgLoadTile)) << (16 - _pixelsAvailable);
 			} else {
-				_bgShifters[2] |= ReadVram(addr+2, SmsVdpMemAccess::BgLoadTile) << (16 - _pixelsAvailable);
-				_bgShifters[3] |= ReadVram(addr+3, SmsVdpMemAccess::BgLoadTile) << (16 - _pixelsAvailable);
+				_bgShifters[2] |= ReadVram(addr + 2, SmsVdpMemAccess::BgLoadTile) << (16 - _pixelsAvailable);
+				_bgShifters[3] |= ReadVram(addr + 3, SmsVdpMemAccess::BgLoadTile) << (16 - _pixelsAvailable);
 			}
 
 			if(_disableBackground) {
@@ -780,15 +780,17 @@ void SmsVdp::LoadSpriteTilesSms()
 	//Cycles 264 to 325
 	uint16_t cycle = _state.Cycle - 264;
 	switch(cycle) {
-		case 0: case 12:
-		case 34: case 46: {
+		case 0:
+		case 12:
+		case 34:
+		case 46: {
 			//Load sprite N X value
 			if(cycle == 0) {
 				_spriteCount = 0;
 			}
 
 			_spriteShifters[_spriteCount].HardwareSprite = true;
-			
+
 			uint16_t loadAddr = spriteAddr + 0x80 + _inRangeSprites[_spriteCount] * 2;
 			_spriteShifters[_spriteCount].SpriteX = ReadVram(loadAddr, SmsVdpMemAccess::SpriteLoadTable);
 			uint8_t sprTileIndex = ReadVram(loadAddr + 1, SmsVdpMemAccess::SpriteLoadTable);
@@ -796,8 +798,10 @@ void SmsVdp::LoadSpriteTilesSms()
 			break;
 		}
 
-		case 2: case 14:
-		case 36: case 48: {
+		case 2:
+		case 14:
+		case 36:
+		case 48: {
 			//Load sprite N+1 X value
 			_spriteShifters[_spriteCount + 1].HardwareSprite = true;
 
@@ -808,15 +812,19 @@ void SmsVdp::LoadSpriteTilesSms()
 			break;
 		}
 
-		case 4: case 16:
-		case 38: case 50:
+		case 4:
+		case 16:
+		case 38:
+		case 50:
 			//Load sprite N tile (1st word)
 			_spriteShifters[_spriteCount].TileData[0] = ReadVram(_spriteShifters[_spriteCount].TileAddr, SmsVdpMemAccess::SpriteLoadTile);
 			_spriteShifters[_spriteCount].TileData[1] = ReadVram(_spriteShifters[_spriteCount].TileAddr + 1, SmsVdpMemAccess::SpriteLoadTile);
 			break;
 
-		case 6: case 18:
-		case 40: case 52:
+		case 6:
+		case 18:
+		case 40:
+		case 52:
 			//Load sprite N tile (2nd word)
 			_spriteShifters[_spriteCount].TileData[2] = ReadVram(_spriteShifters[_spriteCount].TileAddr + 2, SmsVdpMemAccess::SpriteLoadTile);
 			_spriteShifters[_spriteCount].TileData[3] = ReadVram(_spriteShifters[_spriteCount].TileAddr + 3, SmsVdpMemAccess::SpriteLoadTile);
@@ -826,15 +834,19 @@ void SmsVdp::LoadSpriteTilesSms()
 			}
 			break;
 
-		case 8: case 20:
-		case 42: case 54:
+		case 8:
+		case 20:
+		case 42:
+		case 54:
 			//Load sprite N+1 tile (1st word)
 			_spriteShifters[_spriteCount + 1].TileData[0] = ReadVram(_spriteShifters[_spriteCount + 1].TileAddr, SmsVdpMemAccess::SpriteLoadTile);
 			_spriteShifters[_spriteCount + 1].TileData[1] = ReadVram(_spriteShifters[_spriteCount + 1].TileAddr + 1, SmsVdpMemAccess::SpriteLoadTile);
 			break;
 
-		case 10: case 22:
-		case 44: case 56:
+		case 10:
+		case 22:
+		case 44:
+		case 56:
 			//Load sprite N+1 tile (2nd word)
 			_spriteShifters[_spriteCount + 1].TileData[2] = ReadVram(_spriteShifters[_spriteCount + 1].TileAddr + 2, SmsVdpMemAccess::SpriteLoadTile);
 			_spriteShifters[_spriteCount + 1].TileData[3] = ReadVram(_spriteShifters[_spriteCount + 1].TileAddr + 3, SmsVdpMemAccess::SpriteLoadTile);
@@ -852,7 +864,13 @@ void SmsVdp::LoadSpriteTilesSms()
 			}
 			break;
 
-		case 24: case 26: case 28: case 30: case 32: case 58: case 60:
+		case 24:
+		case 26:
+		case 28:
+		case 30:
+		case 32:
+		case 58:
+		case 60:
 			//293, 295, 297, 299, 301, 327, 329
 			//external access slots
 			break;
@@ -864,7 +882,7 @@ void SmsVdp::LoadExtraSpritesSms()
 	uint16_t spriteAddr = _state.SpriteTableAddress & 0x3F00;
 	for(int i = 8; i < _inRangeSpriteCount; i++) {
 		_spriteShifters[i].SpriteX = _videoRam[spriteAddr + 0x80 + _inRangeSprites[i] * 2];
-		
+
 		uint8_t sprTileIndex = _videoRam[spriteAddr + 0x80 + _inRangeSprites[i] * 2 + 1];
 		uint16_t sprTileAddr = GetSmsSpriteTileAddr(sprTileIndex, _spriteShifters[i].SpriteRow, _inRangeSprites[i]);
 		_spriteShifters[i].TileData[0] = _videoRam[sprTileAddr];
@@ -893,8 +911,10 @@ void SmsVdp::LoadSpriteTilesSg()
 	//Cycles 264 to 325
 	uint16_t cycle = _state.Cycle - 264;
 	switch(cycle) {
-		case 0: case 12:
-		case 34: case 46: {
+		case 0:
+		case 12:
+		case 34:
+		case 46: {
 			//Sprite Y value
 			if(cycle == 0) {
 				_spriteCount = 0;
@@ -915,14 +935,18 @@ void SmsVdp::LoadSpriteTilesSg()
 			break;
 		}
 
-		case 2: case 14:
-		case 36: case 48:
+		case 2:
+		case 14:
+		case 36:
+		case 48:
 			//Sprite X value
 			_spriteShifters[_spriteIndex].SpriteX = ReadVram(spriteAddr + _inRangeSprites[_inRangeSpriteIndex] * 4 + 1, SmsVdpMemAccess::SpriteLoadTable);
 			break;
 
-		case 4: case 16:
-		case 38: case 50: {
+		case 4:
+		case 16:
+		case 38:
+		case 50: {
 			//Sprite tile index
 			uint16_t sprTileIndex = ReadVram(spriteAddr + _inRangeSprites[_inRangeSpriteIndex] * 4 + 2, SmsVdpMemAccess::SpriteLoadTable);
 			if(_state.UseLargeSprites) {
@@ -933,20 +957,26 @@ void SmsVdp::LoadSpriteTilesSg()
 			break;
 		}
 
-		case 6: case 18:
-		case 40: case 52:
+		case 6:
+		case 18:
+		case 40:
+		case 52:
 			//Sprite attributes
 			_spriteShifters[_spriteIndex].TileData[1] = ReadVram(spriteAddr + _inRangeSprites[_inRangeSpriteIndex] * 4 + 3, SmsVdpMemAccess::SpriteLoadTable);
 			break;
 
-		case 8: case 20:
-		case 42: case 54:
+		case 8:
+		case 20:
+		case 42:
+		case 54:
 			//Sprite tile data (first byte)
 			_spriteShifters[_spriteIndex].TileData[0] = ReadVram(_spriteShifters[_spriteIndex].TileAddr, SmsVdpMemAccess::SpriteLoadTile);
 			break;
 
-		case 10: case 22:
-		case 44: case 56: {
+		case 10:
+		case 22:
+		case 44:
+		case 56: {
 			//Sprite tile data (second byte - for large sprites only)
 			bool shiftSprite = _spriteShifters[_spriteIndex].TileData[1] & 0x80;
 			_spriteShifters[_spriteIndex].TileData[1] &= 0x0F; //sprite color
@@ -967,7 +997,7 @@ void SmsVdp::LoadSpriteTilesSg()
 				}
 				_spriteIndex++;
 			}
-			
+
 			_inRangeSpriteIndex++;
 			if(_inRangeSpriteCount > 0) {
 				_inRangeSpriteCount--;
@@ -980,7 +1010,13 @@ void SmsVdp::LoadSpriteTilesSg()
 			break;
 		}
 
-		case 24: case 26: case 28: case 30: case 32: case 58: case 60:
+		case 24:
+		case 26:
+		case 28:
+		case 30:
+		case 32:
+		case 58:
+		case 60:
 			//293, 295, 297, 299, 301, 327, 329
 			//external access slots
 			break;
@@ -1004,7 +1040,7 @@ void SmsVdp::LoadExtraSpritesSg()
 		if(_state.UseLargeSprites) {
 			sprTileIndex &= ~0x03;
 		}
-		
+
 		_spriteShifters[_spriteIndex].HardwareSprite = false;
 		_spriteShifters[_spriteIndex].TileAddr = _state.SpritePatternSelector | (sprTileIndex << 3) | _spriteShifters[_spriteIndex].SpriteRow;
 		_spriteShifters[_spriteIndex].TileData[1] = _videoRam[spriteAddr + _inRangeSprites[_inRangeSpriteIndex] * 4 + 3];
@@ -1083,12 +1119,11 @@ uint16_t SmsVdp::GetPixelColor()
 	for(int i = 0; i < _spriteCount; i++) {
 		if(xPos >= _spriteShifters[i].SpriteX && xPos < _spriteShifters[i].SpriteX + (8 << (uint8_t)IsZoomedSpriteAllowed(i))) {
 			if(_state.UseMode4) {
-				uint8_t sprColor = (
+				uint8_t sprColor =
 					((_spriteShifters[i].TileData[0] >> 7) & 0x01) |
 					((_spriteShifters[i].TileData[1] >> 6) & 0x02) |
 					((_spriteShifters[i].TileData[2] >> 5) & 0x04) |
-					((_spriteShifters[i].TileData[3] >> 4) & 0x08)
-				);
+					((_spriteShifters[i].TileData[3] >> 4) & 0x08);
 
 				if(!IsZoomedSpriteAllowed(i) || ((_spriteShifters[i].SpriteX - xPos) & 0x01)) {
 					_spriteShifters[i].TileData[0] <<= 1;
@@ -1132,12 +1167,11 @@ uint16_t SmsVdp::GetPixelColor()
 		return _internalPaletteRam[0x10 | _state.BackgroundColorIndex];
 	}
 
-	uint8_t color = (
+	uint8_t color =
 		((_bgShifters[0] >> 23) & 0x01) |
 		((_bgShifters[1] >> 22) & 0x02) |
 		((_bgShifters[2] >> 21) & 0x04) |
-		((_bgShifters[3] >> 20) & 0x08)
-	);
+		((_bgShifters[3] >> 20) & 0x08);
 
 	bool highPriority = (_bgPriority & 0x800000);
 	if(!spriteDrawn || (highPriority && color != 0) || _disableSprites) {
@@ -1230,7 +1264,7 @@ void SmsVdp::WriteGameGearPalette(uint8_t addr, uint16_t value)
 {
 	_paletteRam[addr] = value & 0xFF;
 	_paletteRam[addr + 1] = (value >> 8) & 0x0F;
-	
+
 	uint16_t rgbColor = ColorUtilities::Rgb444To555(value & 0xFFF);
 	_internalPaletteRam[addr >> 1] = rgbColor;
 
@@ -1315,12 +1349,11 @@ uint8_t SmsVdp::ReadPort(uint8_t port)
 
 		case 0x81: {
 			//Control Port
-			uint8_t value = (
+			uint8_t value =
 				(_state.VerticalBlankIrqPending ? 0x80 : 0) |
 				(_state.SpriteOverflow ? 0x40 : 0) |
 				(_state.SpriteCollision ? 0x20 : 0) |
-				(_state.UseMode4 ? (_memoryManager->GetOpenBus() & 0x1F) : _state.SpriteOverflowIndex)
-			);
+				(_state.UseMode4 ? (_memoryManager->GetOpenBus() & 0x1F) : _state.SpriteOverflowIndex);
 			_state.VerticalBlankIrqPending = false;
 			_state.ScanlineIrqPending = false;
 			_state.SpriteOverflow = false;
@@ -1347,8 +1380,7 @@ uint8_t SmsVdp::PeekPort(uint8_t port)
 				(_state.VerticalBlankIrqPending ? 0x80 : 0) |
 				(_state.SpriteOverflow ? 0x40 : 0) |
 				(_state.SpriteCollision ? 0x20 : 0) |
-				(_state.UseMode4 ? (_memoryManager->GetOpenBus() & 0x1F) : _state.SpriteOverflowIndex)
-			);
+				(_state.UseMode4 ? (_memoryManager->GetOpenBus() & 0x1F) : _state.SpriteOverflowIndex));
 	}
 	return 0;
 }
@@ -1390,11 +1422,11 @@ void SmsVdp::SetRegion(ConsoleRegion region)
 void SmsVdp::DebugSendFrame()
 {
 	int offset = std::max(0, std::min((int)GetVisiblePixelIndex(), 256)) + (_state.Scanline * 256);
-	int pixelsToClear = 256*240 - offset;
+	int pixelsToClear = 256 * 240 - offset;
 	if(pixelsToClear > 0) {
 		memset(_currentOutputBuffer + offset, 0, pixelsToClear * sizeof(uint16_t));
 	}
-	
+
 	RenderedFrame frame(_currentOutputBuffer, 256, 240, 1.0, _state.FrameCount);
 	_emu->GetVideoDecoder()->UpdateFrame(frame, false, false);
 }
@@ -1409,7 +1441,8 @@ uint32_t SmsVdp::GetPixelBrightness(uint8_t x, uint8_t y)
 int SmsVdp::GetViewportYOffset()
 {
 	switch(_state.VisibleScanlineCount) {
-		default: case 192: return 24;
+		default:
+		case 192: return 24;
 		case 224: return 8;
 		case 240: return 0;
 	}
@@ -1449,10 +1482,7 @@ void SmsVdp::InitSmsPostBiosState()
 	_state.ScanlineCounterLatch = 0xFC;
 
 	constexpr uint8_t biosPalRam[0x20] = {
-		0x00, 0x3F, 0x3E, 0x3F, 0x30, 0x30, 0x38, 0x3F,
-		0x37, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x03, 0x30, 0x0F, 0x07, 0x16, 0x3F, 0x02,
-		0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+		0x00, 0x3F, 0x3E, 0x3F, 0x30, 0x30, 0x38, 0x3F, 0x37, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x30, 0x0F, 0x07, 0x16, 0x3F, 0x02, 0x00, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
 
 	memcpy(_paletteRam, biosPalRam, 0x20);
@@ -1561,7 +1591,7 @@ void SmsVdp::Serialize(Serializer& s)
 		SV(_bgTileIndex);
 		SV(_bgPatternData);
 		SV(_textModeStep);
-		
+
 		SVArray(_memAccess, sizeof(_memAccess));
 
 		SV(_needCramDot);

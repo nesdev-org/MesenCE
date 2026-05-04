@@ -15,7 +15,7 @@ namespace Mesen.ViewModels
 	{
 		[Reactive] public AudioPlayerConfig Config { get; set; }
 		[Reactive] public bool IsPaused { get; set; }
-		
+
 		public AudioPlayerViewModel()
 		{
 			Config = ConfigManager.Config.AudioPlayer;
