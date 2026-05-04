@@ -321,8 +321,8 @@ void NesCpu::EndCpuCycle(bool forRead)
 void NesCpu::StartCpuCycle(bool forRead)
 {
 	_masterClock += forRead ? (_startClockCount - 1) : (_startClockCount + 1);
-	_state.CycleCount++;
 	_console->GetPpu()->Run(_masterClock - _ppuOffset);
+	_state.CycleCount++;
 	_console->ProcessCpuClock();
 }
 
