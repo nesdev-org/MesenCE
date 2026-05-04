@@ -273,6 +273,7 @@ namespace Mesen.Interop
 				case MemoryType.SpcRam:
 				case MemoryType.SpcRom:
 				case MemoryType.Sa1InternalRam:
+				case MemoryType.GsuWorkRam:
 				case MemoryType.St018Memory:
 				case MemoryType.St018PrgRom:
 				case MemoryType.St018DataRom:
