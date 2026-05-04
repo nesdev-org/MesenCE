@@ -270,6 +270,9 @@ namespace Mesen.Interop
 				case MemoryType.SnesSaveRam:
 					return cpuType == CpuType.Snes || cpuType == CpuType.Sa1 || cpuType == CpuType.Cx4;
 
+				case MemoryType.GsuWorkRam:
+					return cpuType == CpuType.Snes || cpuType == CpuType.Gsu;
+
 				default:
 					//All other types are specific to a single CPU type
 					return memType.ToCpuType() == cpuType;
