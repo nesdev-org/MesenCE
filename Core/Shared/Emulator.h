@@ -119,6 +119,8 @@ private:
 	int32_t _stopCode = 0;
 	bool _stopRequested = false;
 
+	bool _isDebuggerDisabled = false;
+
 	void WaitForLock();
 	void WaitForPauseEnd();
 
@@ -330,6 +332,9 @@ public:
 	void ProcessEvent(EventType type, std::optional<CpuType> cpuType = std::nullopt);
 	template<CpuType cpuType> void AddDebugEvent(DebugEventType evtType);
 	void BreakIfDebugging(CpuType sourceCpu, BreakSource source);
+
+	bool IsDebuggerDisabled();
+	void SetDebuggerDisabled(bool value);
 };
 
 enum class HashType

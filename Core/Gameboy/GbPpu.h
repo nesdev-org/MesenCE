@@ -7,6 +7,7 @@ class Emulator;
 class Gameboy;
 class GbMemoryManager;
 class GbDmaController;
+class EmuSettings;
 
 class GbPpu : public ISerializable
 {
@@ -18,7 +19,7 @@ private:
 	GbDmaController* _dmaController = nullptr;
 	uint16_t* _outputBuffers[2] = {};
 	uint16_t* _currentBuffer = nullptr;
-
+	EmuSettings* _settings = nullptr;
 	uint16_t* _eventViewerBuffers[2] = {};
 	uint16_t* _currentEventViewerBuffer = nullptr;
 	EvtColor _evtColor = EvtColor::HBlank;
@@ -96,6 +97,7 @@ private:
 	__forceinline uint16_t LcdReadObjPalette(uint8_t addr);
 
 	void SendFrame();
+	void SendLinkedFrame();
 	void UpdatePalette();
 
 	void SetMode(PpuMode mode);

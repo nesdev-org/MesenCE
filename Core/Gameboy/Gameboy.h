@@ -30,6 +30,9 @@ private:
 	SuperGameboy* _superGameboy = nullptr;
 	bool _allowSgb = false;
 
+	unique_ptr<Gameboy> _secondaryConsole;
+	Gameboy* _mainConsole = nullptr;
+
 	unique_ptr<GbMemoryManager> _memoryManager;
 	unique_ptr<GbCpu> _cpu;
 	unique_ptr<GbPpu> _ppu;
@@ -83,6 +86,7 @@ public:
 
 	Emulator* GetEmulator();
 
+	GbApu* GetApu();
 	GbPpu* GetPpu();
 	GbCpu* GetCpu();
 	GbTimer* GetTimer();
@@ -101,6 +105,7 @@ public:
 	bool IsCgb();
 	bool IsSgb();
 	SuperGameboy* GetSgb();
+	Gameboy* GetLinkedConsole();
 
 	uint64_t GetCycleCount();
 	uint64_t GetApuCycleCount();
@@ -108,6 +113,9 @@ public:
 	void ProcessEndOfFrame();
 
 	void RunApu();
+
+	void RunLinkedConsole();
+	bool IsPrimaryConsole();
 
 	void Serialize(Serializer& s) override;
 	SaveStateCompatInfo ValidateSaveStateCompatibility(ConsoleType stateConsoleType) override;

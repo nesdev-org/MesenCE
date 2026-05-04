@@ -9,8 +9,8 @@
 
 GbApu::GbApu()
 {
-	_soundBuffer = new int16_t[GbApu::MaxSamples * 2];
-	memset(_soundBuffer, 0, GbApu::MaxSamples * 2 * sizeof(int16_t));
+	_soundBuffer = new int16_t[GbApu::MaxSamples * 2 * 2]; // *2 for stereo, then *2 as a precaution against buffer overflows
+	memset(_soundBuffer, 0, GbApu::MaxSamples * 2 * 2 * sizeof(int16_t));
 
 	_leftChannel = blip_new(GbApu::MaxSamples);
 	_rightChannel = blip_new(GbApu::MaxSamples);
@@ -27,6 +27,7 @@ void GbApu::Init(Emulator* emu, Gameboy* gameboy)
 	_prevRightOutput = 0;
 	_clockCounter = 0;
 	_prevClockCount = 0;
+	_sampleCount = 0;
 
 	_emu = emu;
 	_settings = emu->GetSettings();
@@ -109,7 +110,7 @@ void GbApu::Run()
 		}
 	}
 
-	if(!_gameboy->IsSgb() && _clockCounter >= 20000) {
+	if(!_gameboy->IsSgb() && _clockCounter >= 20000 && !_gameboy->IsPrimaryConsole()) {
 		PlayQueuedAudio();
 	}
 }
@@ -148,10 +149,60 @@ void GbApu::PlayQueuedAudio()
 	blip_end_frame(_leftChannel, _clockCounter);
 	blip_end_frame(_rightChannel, _clockCounter);
 
-	uint32_t sampleCount = (uint32_t)blip_read_samples(_leftChannel, _soundBuffer, GbApu::MaxSamples, 1);
-	blip_read_samples(_rightChannel, _soundBuffer + 1, GbApu::MaxSamples, 1);
-	_soundMixer->PlayAudioBuffer(_soundBuffer, sampleCount, GbApu::SampleRate);
+	int16_t* out = _soundBuffer + (_sampleCount * 2);
+	size_t sampleCount = blip_read_samples(_leftChannel, out, GbApu::MaxSamples, 1);
+	blip_read_samples(_rightChannel, out + 1, GbApu::MaxSamples, 1);
+	_sampleCount += sampleCount;
+	if(_sampleCount > GbApu::MaxSamples) { // Hacky safeguard against buffer overflows
+		_sampleCount = GbApu::MaxSamples;
+	}
 	_clockCounter = 0;
+
+	if(!_gameboy->IsPrimaryConsole()) {
+		// For the secondary console, leave the data in the buffer for the primary console to mix into its own audio
+		return;
+	}
+
+	GameboyConfig& cfg = _emu->GetSettings()->GetGameboyConfig();
+	if(_gameboy->IsPrimaryConsole() && _gameboy->GetLinkedConsole()) {
+		ProcessLinkCableAudio();
+	}
+
+	_soundMixer->PlayAudioBuffer(_soundBuffer, (uint32_t)_sampleCount, GbApu::SampleRate);
+
+	_sampleCount = 0;
+}
+
+void GbApu::ProcessLinkCableAudio()
+{
+	GameboyConfig& cfg = _emu->GetSettings()->GetGameboyConfig();
+
+	if(cfg.LocalLinkCableAudioOutput == GbLocalLinkOutputOption::SubSystemOnly) {
+		//Mute the main system's sound
+		memset(_soundBuffer, 0, _sampleCount * sizeof(int16_t) * 2);
+	}
+
+	GbApu* subApu = _gameboy->GetLinkedConsole()->GetApu();
+	subApu->Run();
+	subApu->PlayQueuedAudio();
+
+	if(cfg.LocalLinkCableAudioOutput != GbLocalLinkOutputOption::MainSystemOnly) {
+		size_t i;
+		for(i = 0; i < _sampleCount && i < subApu->_sampleCount; i++) {
+			_soundBuffer[i * 2] += subApu->_soundBuffer[i * 2];
+			_soundBuffer[i * 2 + 1] += subApu->_soundBuffer[i * 2 + 1];
+		}
+
+		if(i < subApu->_sampleCount) {
+			size_t samplesToCopy = subApu->_sampleCount - i;
+			memmove(subApu->_soundBuffer, subApu->_soundBuffer + i * 2, samplesToCopy * 2 * sizeof(int16_t));
+			subApu->_sampleCount = samplesToCopy;
+		} else {
+			subApu->_sampleCount = 0;
+		}
+	} else {
+		subApu->_sampleCount = 0;
+	}
 }
 
 void GbApu::GetSoundSamples(int16_t*& samples, uint32_t& sampleCount)
@@ -464,6 +515,7 @@ void GbApu::Serialize(Serializer& s)
 		Run();
 	} else {
 		_clockCounter = 0;
+		_sampleCount = 0;
 		blip_clear(_leftChannel);
 		blip_clear(_rightChannel);
 	}
