@@ -12,7 +12,7 @@ private:
 	bool _modCounterDisabled = false;
 	bool _forceCarryOut = false;
 
-	uint32_t _modAccumulator = 0;		//18-bit accumulator
+	uint32_t _modAccumulator = 0; //18-bit accumulator
 	uint8_t _modM2Counter = 0;
 	uint8_t _modTable[32] = {};
 	uint8_t _modTablePosition = 0;
@@ -174,7 +174,7 @@ public:
 	{
 		return _modCounterDisabled;
 	}
-	
+
 	uint8_t GetModIncrement()
 	{
 		int16_t offset = _modLut[_modTable[_modTablePosition]];

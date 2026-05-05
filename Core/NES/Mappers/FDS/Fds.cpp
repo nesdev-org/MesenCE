@@ -256,7 +256,7 @@ void Fds::ProcessAutoDiskInsert()
 
 /**TODO:
  - Proper byte transfer flag handling (set every 1792 master cycles, or 149+1/3 CPU cycles, under normal conditions)
-   - Should allow for accurate handling of level 2->3 load bug in Ai Senshi Nicol
+	- Should allow for accurate handling of level 2->3 load bug in Ai Senshi Nicol
  - Verify End of Head handling (may affect Kosodate Gokko and FMC Disk Card Checker)
  - DRAM refresh watchdog implementation (must track PRG-RAM vs external access cycles...)
  (Ongoing research, please consult TakuikaNinja for further details)
@@ -406,7 +406,7 @@ void Fds::SetFdsControlReg(uint8_t value)
 	//TODO $4025 bit 5 is unknown, all known software sets it to 1
 	_diskReady = (value & 0x40) == 0x40;
 	_diskIrqEnabled = (value & 0x80) == 0x80;
-	
+
 	//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
 	//Fixes issues in some unlicensed games (error $20 at power on)
 	//TODO This probably depends on the bits set?
@@ -418,7 +418,7 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 	if(!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) {
 		return;
 	}
-	
+
 	//Only $4080 and $4088 seem to consistently deny/mangle writes during audio reset
 	//TODO Determine $4088 (mod table write) behaviour while in audio reset state
 	if(!_soundRegEnabled && (addr == 0x4080 || addr == 0x4088)) {
@@ -459,10 +459,10 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			}
-			
+
 			//TODO Determine/implement audio reset behaviour, should probably go in FdsAudio
 			//(Ongoing research, please consult TakuikaNinja for further details)
-			if (!_soundRegEnabled){
+			if(!_soundRegEnabled) {
 				//Guessed based on instant muting
 				//(though there seems to be some kind of analogue "resume" window?)
 				_audio->WriteRegister(0x4080, 0x80);
@@ -520,7 +520,7 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				//value |= _transferComplete ? 0x80 : 0x00;
 
 				_cpu->ClearIrqSource(IRQSource::External);
-				
+
 				//Byte transfer flag is NOT cleared by this register!
 				//_transferComplete = false;
 				//_cpu->ClearIrqSource(IRQSource::FdsDisk);

@@ -49,7 +49,6 @@ void FdsAudio::ClockAudio()
 		if(_haltWaveform) {
 			_waveAccumulator = 0;
 		} else {
-
 			if(!_waveWriteEnabled) {
 				_waveAccumulator += (frequency * _mod.GetOutput()) & 0xFFFFF;
 				if(_waveAccumulator > 0xFFFFFF) {
@@ -108,44 +107,44 @@ uint8_t FdsAudio::ReadRegister(uint16_t addr)
 				value &= 0xC0;
 				value |= _volume.GetGain();
 				break;
-				
+
 			case 0x4091:
 				//Wave accumulator
 				//value &= 0xC0;
 				value = (_waveAccumulator >> 12) & 0xFF;
 				break;
-				
+
 			case 0x4092:
 				value &= 0xC0;
 				value |= _mod.GetGain();
 				break;
-				
+
 			case 0x4093:
 				//Mod accumulator
 				value &= 0x80;
 				value |= (_mod.GetModAccumulator() >> 5) & 0x7F;
 				break;
-				
+
 			case 0x4094:
 				//Wave pitch intermediate result
 				//value &= 0xC0;
 				value = (_mod.GetOutput() >> 4) & 0xFF;
 				break;
-				
+
 			case 0x4095:
 				//Mod counter increment (lower nybble)
 				//TODO Determine upper nybble
 				value &= 0xC0;
 				value |= _mod.GetModIncrement();
 				break;
-				
+
 			case 0x4096:
 				//Wavetable value
 				//TODO PWM masking
 				value &= 0xC0;
 				value |= _waveTable[_wavePosition] & 0x3F;
 				break;
-				
+
 			case 0x4097:
 				value &= 0x80;
 				value |= _mod.GetCounter() & 0x7F;
@@ -263,5 +262,4 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4095.0-3", "Mod Counter Increment", _mod.GetModIncrement(), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4096.0-5", "Wavetable Value", (_waveTable[_wavePosition] & 0x3F), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4097.0-6", "Mod Counter Value", std::to_string(modCounter), (modCounter & 0x7F)));
-	
 }
