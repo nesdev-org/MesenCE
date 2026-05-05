@@ -101,23 +101,22 @@ public:
 
 	void UpdateCounter(int8_t value)
 	{
-		_counter = value;
-		if(_counter >= 64) {
-			_counter -= 128;
-		} else if(_counter < -64) {
-			_counter += 128;
+		//"The mod table counter is stopped, that's all.
+		//The freq mod formula is ALWAYS in effect, 4084/4085 still modify the wave frequency."
+		if(!_modCounterDisabled) {
+			_counter = value;
+			if(_counter >= 64) {
+				_counter -= 128;
+			} else if(_counter < -64) {
+				_counter += 128;
+			}
 		}
-	}
-
-	bool IsEnabled()
-	{
-		return _frequency > 0;
 	}
 
 	bool TickModulator(bool haltWaveform)
 	{
 		//$4083.7 also stops the mod table accumulator
-		if(IsEnabled() && !haltWaveform && ++_modM2Counter == 16) {
+		if(_frequency > 0 && !haltWaveform && ++_modM2Counter == 16) {
 			IncrementAccumulator(_frequency);
 
 			//"On a carry out from bit 11, update the mod counter (increment $4085 with modtable)."
@@ -179,6 +178,6 @@ public:
 	uint8_t GetModIncrement()
 	{
 		int16_t offset = _modLut[_modTable[_modTablePosition]];
-		return ModReset ? 0x0C : offset & 0x0F;
+		return offset == ModReset ? 0x0C : offset & 0x0F;
 	}
 };

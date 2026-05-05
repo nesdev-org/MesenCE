@@ -238,7 +238,7 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4084.7", "Envelope Disabled", _mod.IsEnvelopeDisabled(), MapperStateValueType::Bool));
 
 	int8_t modCounter = _mod.GetCounter();
-	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), modCounter < 0 ? (modCounter + 128) : modCounter));
+	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), (modCounter & 0x7F)));
 
 	entries.push_back(MapperStateEntry("$4086/7.0-11", "Frequency", _mod.GetFrequency(), MapperStateValueType::Number16));
 
@@ -262,6 +262,6 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4094", "Mod Counter * Gain", ((_mod.GetOutput() >> 4) & 0xFF), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4095.0-3", "Mod Counter Increment", _mod.GetModIncrement(), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4096.0-5", "Wavetable Value", (_waveTable[_wavePosition] & 0x3F), MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4097.0-6", "Mod Counter Value", (modCounter & 0x7F), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4097.0-6", "Mod Counter Value", std::to_string(modCounter), (modCounter & 0x7F)));
 	
 }
