@@ -72,8 +72,7 @@ protected:
 	__forceinline uint8_t ReadSpriteRam(uint8_t addr);
 	__forceinline void WriteSpriteRam(uint8_t addr, uint8_t value);
 
-	void SetOamCorruptionFlags();
-	void ProcessOamCorruption();
+	__forceinline void CorruptOamRow(uint8_t sourceRow, uint8_t destRow);
 
 	__forceinline uint8_t GetPixelColor();
 

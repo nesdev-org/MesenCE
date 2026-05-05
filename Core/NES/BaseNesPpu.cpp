@@ -16,6 +16,7 @@ void BaseNesPpu::GetState(NesPpuState& state)
 	state.VideoRamAddr = _videoRamAddr;
 	state.TmpVideoRamAddr = _tmpVideoRamAddr;
 	state.SpriteRamAddr = _spriteRamAddr;
+	state.SecondaryOamAddr = _secondaryOamAddr;
 	state.ScrollX = _xScroll;
 	state.WriteToggle = _writeToggle;
 

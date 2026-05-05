@@ -258,6 +258,7 @@ struct NesPpuState : public BaseState
 	uint8_t ScrollX;
 	bool WriteToggle;
 	uint8_t SpriteRamAddr;
+	uint8_t SecondaryOamAddr;
 };
 
 struct ApuLengthCounterState

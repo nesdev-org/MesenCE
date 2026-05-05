@@ -342,13 +342,13 @@
 			<Control ID="chkMapperRandomPowerOnState">Randomize power-on state for mappers</Control>
 			<Control ID="chkRandomizeCpuPpuAlignment">Randomize power-on/reset CPU/PPU alignment</Control>
 			<Control ID="chkEnableOamDecay">Enable PPU OAM decay</Control>
-			<Control ID="chkEnablePpuOamRowCorruption">Enable PPU OAM row corruption emulation</Control>
+			<Control ID="chkEnablePpuOamRowCorruption">Enable PPU rendering-toggle OAM corruption</Control>
 			<Control ID="chkEnablePpu2006ScrollGlitch">Enable PPU $2006 scroll glitch emulation</Control>
 			<Control ID="chkEnablePpu2000ScrollGlitch">Enable PPU $2000/$2005/$2006 first-write scroll glitch emulation</Control>
 			<Control ID="chkRestrictPpuAccessOnFirstFrame">Clear PPU $2000/1/5/6/7 throughout first frame after reset/power on</Control>
 
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
-			<Control ID="chkDisableOamAddrBug">Disable PPU OAMADDR bug emulation</Control>
+			<Control ID="chkDisableOamAddrBug">Disable PPU frame-start OAM corruption (2C02D and earlier)</Control>
 			<Control ID="chkDisablePaletteRead">Disable PPU palette reads</Control>
 			<Control ID="chkDisablePpu2004Reads">Disable PPU $2004 reads</Control>
 			<Control ID="chkEnablePpuSpriteEvalBug">Enable erroneous sprite pixels at X=255 (2C02B and earlier)</Control>
