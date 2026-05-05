@@ -85,7 +85,7 @@ protected:
 	uint32_t GetWorkRamPageSize() override { return 0x8000; }
 	uint32_t GetWorkRamSize() override { return 0x8000; }
 	uint16_t RegisterStartAddress() override { return 0x4020; }
-	uint16_t RegisterEndAddress() override { return 0x4092; }
+	uint16_t RegisterEndAddress() override { return 0x4097; }
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
 

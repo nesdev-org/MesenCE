@@ -27,11 +27,13 @@ private:
 	uint8_t _masterVolume = 0;
 
 	//Internal values
-	uint16_t _waveOverflowCounter = 0;
+	uint32_t _waveAccumulator = 0;		//24-bit accumulator
+	uint8_t _waveM2Counter = 0;
 	int32_t _wavePitch = 0;
 	uint8_t _wavePosition = 0;
 
 	uint8_t _lastOutput = 0;
+	uint8_t _lastGain = 0;
 
 protected:
 	void Serialize(Serializer& s) override;
