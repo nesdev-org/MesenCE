@@ -73,7 +73,7 @@ uint8_t GbWaveChannel::GetRawOutput()
 double GbWaveChannel::GetOutput()
 {
 	//"If a DAC is enabled, the digital range $0 to $F is linearly translated to the analog range -1 to 1,
-	//in arbitrary units. Importantly, the slope is negative: “digital 0” maps to “analog 1”, not “analog -1”."
+	//in arbitrary units. Importantly, the slope is negative: 'digital 0' maps to 'analog 1', not 'analog -1'."
 
 	//Return -7 to 7 "analog" range (higher digital value = lower analog value)
 	return (7 - (int8_t)_state.Output) * (double)_dac.GetDacVolume() / 100;
