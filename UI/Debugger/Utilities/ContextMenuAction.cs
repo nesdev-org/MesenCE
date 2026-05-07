@@ -616,6 +616,8 @@ namespace Mesen.Debugger.Utilities
 
 		[IconFile("Camera")]
 		TakeScreenshot,
+		[IconFile("Export")]
+		SaveSpcFile,
 
 		[IconFile("Help")]
 		OnlineHelp,

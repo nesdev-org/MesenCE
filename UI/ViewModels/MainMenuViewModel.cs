@@ -794,6 +794,14 @@ namespace Mesen.ViewModels
 				new MainMenuAction(EmulatorShortcut.TakeScreenshot) {
 					ActionType = ActionType.TakeScreenshot,
 				},
+
+				new MainMenuAction() {
+					ActionType = ActionType.SaveSpcFile,
+					IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.Spc),
+					OnClick = () => {
+						ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new SaveSpcFileWindow());
+					}
+				},
 			};
 		}
 

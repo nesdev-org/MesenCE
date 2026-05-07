@@ -91,6 +91,12 @@ void SnesConsole::ProcessEndOfFrame()
 
 void SnesConsole::Reset()
 {
+	if(_emu->GetRomInfo().Format == RomFormat::Spc) {
+		// For SPC files, reload the initial state that the SPC file started with
+		_emu->ReloadRom(true);
+		return;
+	}
+
 	_dmaController->Reset();
 	_internalRegisters->Reset();
 	_memoryManager->Reset();
