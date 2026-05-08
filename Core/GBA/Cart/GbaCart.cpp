@@ -57,7 +57,7 @@ void GbaCart::Init(Emulator* emu, GbaConsole* console, GbaMemoryManager* memoryM
 
 		case GbaSaveType::Flash64:
 		case GbaSaveType::Flash128:
-			_flash.reset(new GbaFlash(_emu, _saveRam, _saveRamSize));
+			_flash.reset(new GbaFlash(_emu, console, _saveRam, _saveRamSize));
 			break;
 
 		default: break;

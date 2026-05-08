@@ -16,6 +16,7 @@ private:
 	};
 
 	Emulator* _emu = nullptr;
+	GbaConsole* _console = nullptr;
 
 	ChipMode _mode = ChipMode::WaitingForCommand;
 	uint8_t _cycle = 0;
@@ -27,10 +28,13 @@ private:
 	uint32_t _selectedBank = 0;
 	bool _allowBanking = false;
 
+	uint64_t _commandEndMasterClock = 0;
+
 public:
-	GbaFlash(Emulator* emu, uint8_t* saveRam, uint32_t saveRamSize)
+	GbaFlash(Emulator* emu, GbaConsole* console, uint8_t* saveRam, uint32_t saveRamSize)
 	{
 		_emu = emu;
+		_console = console;
 		_saveRam = saveRam;
 		_saveRamSize = saveRamSize;
 		_allowBanking = saveRamSize >= 0x20000;
@@ -45,23 +49,33 @@ public:
 	{
 		if(_softwareId && (addr & 0x03) < 2) {
 			if(addr & 0x01) {
-				return _saveRamSize == 0x10000 ? 0x1B : 0x13;
+				return _saveRamSize == 0x10000 ? 0x1B : 0x09;
 			} else {
-				return _saveRamSize == 0x10000 ? 0x32 : 0x62;
+				return _saveRamSize == 0x10000 ? 0x32 : 0xC2;
 			}
 		}
 
-		return _saveRam[_selectedBank | (addr & 0xFFFF)];
+		uint8_t value = _saveRam[_selectedBank | (addr & 0xFFFF)];
+		if(_console->GetMasterClock() < _commandEndMasterClock) {
+			value = (value ^ 0x80) & 0x80;
+		}
+
+		return value;
 	}
 
-	void ResetState()
+	void ResetState(uint32_t clocksToCmdEnd = 0)
 	{
 		_mode = ChipMode::WaitingForCommand;
 		_cycle = 0;
+		_commandEndMasterClock = _console->GetMasterClock() + clocksToCmdEnd;
 	}
 
 	void Write(uint32_t addr, uint8_t value)
 	{
+		if(_console->GetMasterClock() < _commandEndMasterClock) {
+			return;
+		}
+
 		uint16_t cmd = addr & 0xFFFF;
 		if(_mode == ChipMode::SetMemoryBank) {
 			if(cmd == 0) {
@@ -125,7 +139,7 @@ public:
 		} else if(_mode == ChipMode::Write) {
 			//Write a single byte
 			_saveRam[_selectedBank | (addr & 0xFFFF)] &= value;
-			ResetState();
+			ResetState(value == 0xFF ? 17 : 85);
 		} else if(_mode == ChipMode::Erase) {
 			if(_cycle == 3) {
 				//4th write for erase command, $5555 = $AA
@@ -142,10 +156,13 @@ public:
 					ResetState();
 				}
 			} else if(_cycle == 5) {
+				uint32_t eraseTime = 0;
 				if(cmd == 0x5555 && value == 0x10) {
 					//Chip erase
 					_emu->DebugLog("[Flash] Chip erase");
 					memset(_saveRam, 0xFF, _saveRamSize);
+					//This has not been tested
+					eraseTime = 2000000 * (_saveRamSize == 0x10000 ? 16 : 32);
 				} else if(value == 0x30) {
 					//Sector erase
 					uint32_t offset = _selectedBank | (addr & 0xF000);
@@ -153,8 +170,11 @@ public:
 					if(offset + 0x1000 <= _saveRamSize) {
 						memset(_saveRam + offset, 0xFF, 0x1000);
 					}
+
+					//This is a rough worst case
+					eraseTime = 2000000;
 				}
-				ResetState();
+				ResetState(eraseTime);
 			}
 		}
 	}
@@ -165,5 +185,6 @@ public:
 		SV(_cycle);
 		SV(_softwareId);
 		SV(_selectedBank);
+		SV(_commandEndMasterClock);
 	}
 };
