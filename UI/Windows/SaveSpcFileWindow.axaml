@@ -28,11 +28,11 @@
 		<StackPanel Orientation="Vertical" HorizontalAlignment="Left">
 			<c:OptionSection Header="{l:Translate grpTags}" Margin="0">
 				<Grid ColumnDefinitions="Auto,1*" RowDefinitions="Auto,Auto,Auto">
-					<TextBlock Grid.Row="0" Text="{l:Translate lblGameTitle}" DockPanel.Dock="Left" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="0" Text="{l:Translate lblGameTitle}" VerticalAlignment="Center" />
 					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding GameTitle}" MaxLength="32" Width="200"/>
-					<TextBlock Grid.Row="1" Text="{l:Translate lblSongTitle}" DockPanel.Dock="Left" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="1" Text="{l:Translate lblSongTitle}" VerticalAlignment="Center" />
 					<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SongTitle}" MaxLength="32" Width="200" />
-					<TextBlock Grid.Row="2" Text="{l:Translate lblSongArtist}" DockPanel.Dock="Left" VerticalAlignment="Center" />
+					<TextBlock Grid.Row="2" Text="{l:Translate lblSongArtist}" VerticalAlignment="Center" />
 					<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SongArtist}" MaxLength="32" Width="200"/>
 				</Grid>
 			</c:OptionSection>

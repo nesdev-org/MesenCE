@@ -1,4 +1,5 @@
 ﻿using Mesen.Debugger;
+using Mesen.Debugger.Utilities;
 using Mesen.Interop;
 using ReactiveUI.Fody.Helpers;
 using System;
@@ -34,15 +35,15 @@ namespace Mesen.ViewModels
 
 		public async void SaveSpcFile(string filename)
 		{
+			bool releaseDebugger = !DebugWindowManager.HasOpenedDebugWindows();
+			bool paused = EmuApi.IsPaused();
+
 			using(FileStream stream = File.Open(filename, FileMode.Create)) {
 				using(BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8, false)) {
-					byte[] spcRam = [];
-					byte[] spcMemory = [];
-					byte[] dspRegisters = [];
 					SpcState cpu = DebugApi.GetCpuState<SpcState>(CpuType.Spc);
-					DebugApi.GetMemoryState(MemoryType.SpcRam, ref spcRam);
-					DebugApi.GetMemoryState(MemoryType.SpcMemory, ref spcMemory);
-					DebugApi.GetMemoryState(MemoryType.SpcDspRegisters, ref dspRegisters);
+					byte[] spcRam = DebugApi.GetMemoryState(MemoryType.SpcRam);
+					byte[] spcMemory = DebugApi.GetMemoryState(MemoryType.SpcMemory);
+					byte[] dspRegisters = DebugApi.GetMemoryState(MemoryType.SpcDspRegisters);
 
 					WriteFixedLengthString(writer, "SNES-SPC700 Sound File Data v0.30", 33);
 					writer.Write((short)0x1a1a);
@@ -60,7 +61,7 @@ namespace Mesen.ViewModels
 					WriteFixedLengthString(writer, "", 16); // Name of dumper
 					WriteFixedLengthString(writer, "", 32); // Comments
 					WriteFixedLengthString(writer, DateTime.Now.ToString("MM/dd/yyyy"), 11); // Date dumped
-					WriteFixedLengthString(writer, "", 3);  // Number of Seconds to play song before Fading Out
+					WriteFixedLengthString(writer, "", 3);  // Number of seconds to play song before fading out
 					WriteFixedLengthString(writer, "", 5);  // Length of fade in milliseconds
 					WriteFixedLengthString(writer, SongArtist, 32);
 					writer.Write((short)0); // No channels disabled, unknown emulator
@@ -77,6 +78,14 @@ namespace Mesen.ViewModels
 					writer.Write(dspRegisters, 0, 128);
 					WriteFixedLengthString(writer, "", 64); // Unused
 					writer.Write(spcRam, 0x10000 - 64, 64); // Last 64 bytes of RAM, in case IPL was enabled
+				}
+			}
+
+			if(releaseDebugger) {
+				//The debug calls to get SPC state will initialize the debugger - stop the debugger if no other debug window is opened
+				DebugApi.ReleaseDebugger();
+				if(paused) {
+					EmuApi.Pause();
 				}
 			}
 		}
