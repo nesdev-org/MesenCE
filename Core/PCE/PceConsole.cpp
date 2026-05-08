@@ -68,7 +68,11 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile)
 	} else {
 		romFile.ReadFile(romData);
 		crc32 = CRC32::GetCRC(romData);
-		if((romData.size() % 0x2000) == 512) {
+
+		if(romData.size() < 0x2000) {
+			//Pad ROM to 8kb when smaller (prevents crashes)
+			romData.insert(romData.end(), 0x2000 - romData.size(), 0);
+		} else if((romData.size() % 0x2000) == 512) {
 			//File probably has header, discard it
 			romData.erase(romData.begin(), romData.begin() + 512);
 		}
