@@ -112,10 +112,16 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 		_emu->RegisterMemory(MemoryType::WsBootRom, _bootRom, _bootRomSize);
 	}
 
-	_internalEepromSize = (uint32_t)(_model <= WsModel::Monochrome ? WsEepromSize::Size128 : WsEepromSize::Size2kb);
-	_internalEepromData = new uint8_t[_internalEepromSize];
-	memset(_internalEepromData, 0, _internalEepromSize);
-	_emu->RegisterMemory(MemoryType::WsInternalEeprom, _internalEepromData, _internalEepromSize);
+	switch(_model) {
+		case WsModel::PocketChallenge: _internalEepromSize = (uint32_t)WsEepromSize::Size0; break;
+		case WsModel::Monochrome: _internalEepromSize = (uint32_t)WsEepromSize::Size128; break;
+		default: _internalEepromSize = (uint32_t)WsEepromSize::Size2kb; break;
+	}
+	if(_internalEepromSize) {
+		_internalEepromData = new uint8_t[_internalEepromSize];
+		memset(_internalEepromData, 0, _internalEepromSize);
+		_emu->RegisterMemory(MemoryType::WsInternalEeprom, _internalEepromData, _internalEepromSize);
+	}
 
 	_internalEeprom.reset(new WsEeprom(_emu, this, (WsEepromSize)_internalEepromSize, _internalEepromData, true));
 
@@ -222,7 +228,13 @@ void WsConsole::InitPostBootRomState()
 	cpu.CS = 0xFFFF;
 	cpu.SP = 0x2000;
 
-	if(_model <= WsModel::Monochrome) {
+	if(_model == WsModel::PocketChallenge) {
+		// The Pocket Challenge skips most of the boot ROM.
+		// TODOWS: Figure out scanline, cycle, any missing port writes.
+		cpu.CS = 0x4000;
+		cpu.IP = 0x0010;
+		return;
+	} else if(_model == WsModel::Monochrome) {
 		cpu.AX = 0xFF85;
 		cpu.BX = 0x0040;
 		cpu.DX = 0x0005;
