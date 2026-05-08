@@ -68,6 +68,7 @@ bool MovieRecorder::Record(RecordMovieOptions options)
 			_hasSaveState = true;
 		}
 
+		_emu->GetBatteryManager()->SetBatteryProvider(nullptr);
 		_emu->GetBatteryManager()->SetBatteryRecorder(nullptr);
 		_emu->Unlock();
 
@@ -189,7 +190,7 @@ vector<uint8_t> MovieRecorder::LoadBattery(string extension)
 
 void MovieRecorder::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
-	if(type == ConsoleNotificationType::GameLoaded) {
+	if(type == ConsoleNotificationType::AfterInitConsole) {
 		_emu->RegisterInputRecorder(this);
 	}
 }

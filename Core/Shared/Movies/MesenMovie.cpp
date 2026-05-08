@@ -13,7 +13,6 @@
 #include "Shared/CheatManager.h"
 #include "Utilities/ZipReader.h"
 #include "Utilities/StringUtilities.h"
-#include "Utilities/HexUtilities.h"
 #include "Utilities/VirtualFile.h"
 #include "Utilities/magic_enum.hpp"
 #include "Utilities/Serializer.h"
@@ -95,11 +94,35 @@ vector<uint8_t> MesenMovie::LoadBattery(string extension)
 
 void MesenMovie::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
-	if(type == ConsoleNotificationType::GameLoaded) {
+	if(type == ConsoleNotificationType::AfterInitConsole) {
+		_controlManager = _emu->GetConsole()->GetControlManager();
+
 		_emu->RegisterInputProvider(this);
 		shared_ptr<IConsole> console = _emu->GetConsole();
 		if(console) {
-			console->GetControlManager()->SetPollCounter(_lastPollCounter);
+			_controlManager->SetPollCounter(_lastPollCounter + 1);
+		}
+
+		//Re-apply settings - power cycling can alter some (e.g auto-configure input types, etc.)
+		ApplySettings(_settingsData);
+
+		_originalCheats = _emu->GetCheatManager()->GetCheats();
+
+		LoadCheats();
+
+		if(!_playing) {
+			stringstream saveStateData;
+			if(_reader->GetStream("SaveState.mss", saveStateData)) {
+				if(!_emu->GetSaveStateManager()->LoadState(saveStateData)) {
+					_loadFailure = true;
+				}
+			}
+		}
+
+		_controlManager->UpdateControlDevices();
+
+		if(!_playing) {
+			_controlManager->SetPollCounter(0);
 		}
 	}
 }
@@ -114,14 +137,34 @@ bool MesenMovie::Play(VirtualFile& file)
 	_reader.reset(new ZipReader());
 	_reader->LoadArchive(ss);
 
-	stringstream settingsData, inputData;
-	if(!_reader->GetStream("GameSettings.txt", settingsData)) {
+	stringstream inputData;
+	if(!_reader->GetStream("GameSettings.txt", _settingsData)) {
 		MessageManager::Log("[Movie] File not found: GameSettings.txt");
 		return false;
 	}
 	if(!_reader->GetStream("Input.txt", inputData)) {
 		MessageManager::Log("[Movie] File not found: Input.txt");
 		return false;
+	}
+
+	ParseSettings(_settingsData);
+
+	string version = LoadString(_settings, MovieKeys::MesenVersion);
+	if(version.size() < 2 || version.substr(0, 2) == "0." || version.substr(0, 2) == "1.") {
+		//Prevent loading movies from Mesen/Mesen-S version 0.x.x or 1.x.x
+		MessageManager::DisplayMessage("Movies", "MovieIncompatibleVersion");
+		return false;
+	}
+
+	uint32_t movieVersion = LoadInt(_settings, MovieKeys::MovieFormatVersion, 0);
+	if(movieVersion < 2) {
+		MessageManager::DisplayMessage("Movies", "MovieIncompatibleVersion");
+		return false;
+	} else if(movieVersion == 2) {
+		//Version 2 of movies incorrectly skipped the first frame after recording from power on
+		//When playing back an old movie, add an extra frame of input at the start (no buttons pressed)
+		//to allow playback to match what it was before this bug was fixed.
+		_inputData.push_back({});
 	}
 
 	while(inputData) {
@@ -134,52 +177,19 @@ bool MesenMovie::Play(VirtualFile& file)
 
 	_deviceIndex = 0;
 
-	ParseSettings(settingsData);
-
-	string version = LoadString(_settings, MovieKeys::MesenVersion);
-	if(version.size() < 2 || version.substr(0, 2) == "0." || version.substr(0, 2) == "1.") {
-		//Prevent loading movies from Mesen/Mesen-S version 0.x.x or 1.x.x
-		MessageManager::DisplayMessage("Movies", "MovieIncompatibleVersion");
-		return false;
-	}
-
-	if(LoadInt(_settings, MovieKeys::MovieFormatVersion, 0) < 2) {
-		MessageManager::DisplayMessage("Movies", "MovieIncompatibleVersion");
-		return false;
-	}
-
 	auto emuLock = _emu->AcquireLock(false);
 
-	if(!ApplySettings(settingsData)) {
+	if(!ApplySettings(_settingsData)) {
 		return false;
 	}
 
 	_emu->GetBatteryManager()->SetBatteryProvider(shared_from_this());
 	_emu->GetNotificationManager()->RegisterNotificationListener(shared_from_this());
-
 	_emu->PowerCycle();
+	_emu->GetBatteryManager()->SetBatteryProvider(nullptr);
 
-	//Re-apply settings - power cycling can alter some (e.g auto-configure input types, etc.)
-	ApplySettings(settingsData);
-
-	_originalCheats = _emu->GetCheatManager()->GetCheats();
-
-	_controlManager = _emu->GetConsole()->GetControlManager();
-
-	LoadCheats();
-
-	stringstream saveStateData;
-	if(_reader->GetStream("SaveState.mss", saveStateData)) {
-		if(!_emu->GetSaveStateManager()->LoadState(saveStateData)) {
-			return false;
-		}
-	}
-
-	_controlManager->UpdateControlDevices();
-	_controlManager->SetPollCounter(0);
-	_playing = true;
-
-	return true;
+	_playing = !_loadFailure;
+	return _playing;
 }
 
 template<typename T>
