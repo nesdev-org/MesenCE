@@ -418,7 +418,7 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 				//allows the second DMA to clock the joypads again on NES-behavior consoles.
 				//Fixes dmc_dma_start_test_v2 case C with sample duplication turned on.
 				if(_needHalt) {
-					ProcessPendingDmaNoinline(readAddress, opType);
+					NoInlineProcessPendingDma(readAddress, opType);
 				}
 			} else if(_spriteDmaTransfer) {
 				//DMC DMA is not running, or not ready, run sprite DMA

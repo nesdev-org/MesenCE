@@ -64,7 +64,7 @@ private:
 
 	__forceinline void StartCpuCycle(bool forRead);
 	__forceinline void ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType);
-	__noinline void ProcessPendingDmaNoinline(uint16_t readAddress, MemoryOperationType opType)
+	__noinline void NoInlineProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 	{
 		ProcessPendingDma(readAddress, opType);
 	}
