@@ -96,10 +96,10 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 
 	_model = _emu->GetSettings()->GetWsConfig().Model;
 	if(_model == WsModel::Auto) {
-		_model = hasColorSupport ? WsModel::Color : WsModel::Monochrome;
+		_model = romFile.GetFileExtension() == ".pc2" ? WsModel::PocketChallenge : (hasColorSupport ? WsModel::Color : WsModel::Monochrome);
 	}
 
-	_workRamSize = _model == WsModel::Monochrome ? 0x4000 : 0x10000;
+	_workRamSize = _model <= WsModel::Monochrome ? 0x4000 : 0x10000;
 	_workRam = new uint8_t[_workRamSize];
 	memset(_workRam, 0, _workRamSize);
 	_emu->RegisterMemory(MemoryType::WsWorkRam, _workRam, _workRamSize);
@@ -112,7 +112,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 		_emu->RegisterMemory(MemoryType::WsBootRom, _bootRom, _bootRomSize);
 	}
 
-	_internalEepromSize = (uint32_t)(_model == WsModel::Monochrome ? WsEepromSize::Size128 : WsEepromSize::Size2kb);
+	_internalEepromSize = (uint32_t)(_model <= WsModel::Monochrome ? WsEepromSize::Size128 : WsEepromSize::Size2kb);
 	_internalEepromData = new uint8_t[_internalEepromSize];
 	memset(_internalEepromData, 0, _internalEepromSize);
 	_emu->RegisterMemory(MemoryType::WsInternalEeprom, _internalEepromData, _internalEepromSize);
@@ -210,7 +210,7 @@ void WsConsole::Reset()
 void WsConsole::InitPostBootRomState()
 {
 	//Init work ram
-	if(_model == WsModel::Monochrome) {
+	if(_model <= WsModel::Monochrome) {
 		memset(_workRam, 0, _workRamSize);
 	} else {
 		memset(_workRam, 0, 0xFE00);
@@ -222,7 +222,7 @@ void WsConsole::InitPostBootRomState()
 	cpu.CS = 0xFFFF;
 	cpu.SP = 0x2000;
 
-	if(_model == WsModel::Monochrome) {
+	if(_model <= WsModel::Monochrome) {
 		cpu.AX = 0xFF85;
 		cpu.BX = 0x0040;
 		cpu.DX = 0x0005;
@@ -243,7 +243,7 @@ void WsConsole::InitPostBootRomState()
 
 	WsPpuState& ppu = _ppu->GetState();
 	ppu.LcdEnabled = true;
-	if(_model == WsModel::Monochrome) {
+	if(_model <= WsModel::Monochrome) {
 		ppu.Scanline = 26;
 		ppu.Cycle = 53;
 
@@ -278,7 +278,7 @@ void WsConsole::InitPostBootRomState()
 	mm.SlowRom = (_prgRom[_prgRomSize - 4] & 0x08) != 0;
 
 	WsApuState& apu = _apu->GetState();
-	if(_model == WsModel::Monochrome) {
+	if(_model <= WsModel::Monochrome) {
 		apu.Ch1.Frequency = 0x7E6;
 		apu.Ch2.Frequency = 0x7E6;
 	} else {
@@ -296,7 +296,7 @@ void WsConsole::InitPostBootRomState()
 		_internalEepromData[0x76 + i] = _prgRom[_prgRomSize - 0x10 + 6 + i];
 
 		bool supportsColor = _prgRom[_prgRomSize - 0x10 + 7] & 0x01;
-		if(_model != WsModel::Monochrome && supportsColor) {
+		if(_model > WsModel::Monochrome && supportsColor) {
 			//For games that support color & color models, copy 76-78 to 80-82
 			_internalEepromData[0x80 + i] = _internalEepromData[0x76 + i];
 		}
@@ -459,8 +459,8 @@ void WsConsole::Serialize(Serializer& s)
 {
 	WsModel model = _model;
 	SV(model);
-	if(!s.IsSaving() && (model == WsModel::Monochrome) != (_model == WsModel::Monochrome)) {
-		bool isMono = _model == WsModel::Monochrome;
+	if(!s.IsSaving() && (model <= WsModel::Monochrome) != (_model <= WsModel::Monochrome)) {
+		bool isMono = _model <= WsModel::Monochrome;
 		MessageManager::DisplayMessage("SaveStates", isMono ? "Can't load WSC state in WS mode." : "Can't load WS state in WSC mode.");
 		s.SetErrorFlag();
 		return;

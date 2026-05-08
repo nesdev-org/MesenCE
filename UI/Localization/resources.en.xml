@@ -2873,6 +2873,7 @@ E
 		</Enum>
 		<Enum ID="WsModel">
 			<Value ID="Auto">Auto</Value>
+			<Value ID="PocketChallenge">Pocket Challenge V2</Value>
 			<Value ID="Monochrome">WonderSwan</Value>
 			<Value ID="Color">WonderSwan Color</Value>
 			<Value ID="SwanCrystal">SwanCrystal</Value>

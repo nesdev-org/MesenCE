@@ -23,7 +23,7 @@ WsApu::WsApu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager, 
 	_dmaController = dmaController;
 	_soundMixer = emu->GetSoundMixer();
 
-	_state.MasterVolume = _console->GetModel() == WsModel::Monochrome ? 2 : 3;
+	_state.MasterVolume = _console->GetModel() <= WsModel::Monochrome ? 2 : 3;
 	_state.InternalMasterVolume = _state.MasterVolume;
 
 	_ch1.reset(new WsApuCh1(this, _state.Ch1));
@@ -48,7 +48,7 @@ void WsApu::ChangeMasterVolume()
 {
 	if(_emu->GetSettings()->GetWsConfig().AudioMode == WsAudioMode::Speakers) {
 		if(_state.InternalMasterVolume == 0) {
-			_state.InternalMasterVolume = _console->GetModel() == WsModel::Monochrome ? 2 : 3;
+			_state.InternalMasterVolume = _console->GetModel() <= WsModel::Monochrome ? 2 : 3;
 		} else {
 			_state.InternalMasterVolume--;
 		}
@@ -132,7 +132,7 @@ void WsApu::UpdateOutput()
 			leftOutput = out;
 			rightOutput = out;
 
-			if(_console->GetModel() == WsModel::Monochrome) {
+			if(_console->GetModel() <= WsModel::Monochrome) {
 				switch(_state.InternalMasterVolume) {
 					case 0:
 						leftOutput = 0;
@@ -275,7 +275,7 @@ uint8_t WsApu::Read(uint16_t port)
 		case 0x9B: return (GetApuOutput(false) + GetApuOutput(true)) >> 8;
 
 		case 0x9E:
-			if(_console->GetModel() != WsModel::Monochrome) {
+			if(_console->GetModel() > WsModel::Monochrome) {
 				return _state.MasterVolume;
 			}
 			break;
@@ -366,7 +366,7 @@ void WsApu::Write(uint16_t port, uint8_t value)
 			break;
 
 		case 0x9E:
-			if(_console->GetModel() != WsModel::Monochrome) {
+			if(_console->GetModel() > WsModel::Monochrome) {
 				_state.InternalMasterVolume = value & 0x03;
 				_state.MasterVolume = value & 0x03;
 			}

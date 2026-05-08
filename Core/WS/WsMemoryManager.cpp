@@ -217,7 +217,7 @@ bool WsMemoryManager::IsUnmappedPort(uint16_t port)
 
 uint8_t WsMemoryManager::GetUnmappedPort()
 {
-	return _console->GetModel() == WsModel::Monochrome ? 0x90 : 0;
+	return _console->GetModel() <= WsModel::Monochrome ? 0x90 : 0;
 }
 
 uint8_t WsMemoryManager::InternalReadPort(uint16_t port, bool isWordAccess)
@@ -226,9 +226,9 @@ uint8_t WsMemoryManager::InternalReadPort(uint16_t port, bool isWordAccess)
 
 	if(port <= 0x3F) {
 		return _ppu->ReadPort(port);
-	} else if(port >= 0x40 && port <= 0x53 && _console->GetModel() != WsModel::Monochrome) {
+	} else if(port >= 0x40 && port <= 0x53 && _console->GetModel() > WsModel::Monochrome) {
 		return _state.ColorEnabled ? _dmaController->ReadPort(port) : 0;
-	} else if(port >= 0x6A && port <= 0x6B && _console->GetModel() != WsModel::Monochrome) {
+	} else if(port >= 0x6A && port <= 0x6B && _console->GetModel() > WsModel::Monochrome) {
 		return _apu->Read(port); //HyperVoice
 	} else if(port >= 0x70 && port <= 0x77 && _console->GetModel() == WsModel::SwanCrystal) {
 		return _ppu->ReadLcdConfigPort(port);
@@ -237,7 +237,7 @@ uint8_t WsMemoryManager::InternalReadPort(uint16_t port, bool isWordAccess)
 	} else if(port >= 0xA2 && port <= 0xAB && port != 0xA3) {
 		return _timer->ReadPort(port);
 	} else if(port >= 0xBA && port <= 0xBF) {
-		if(_console->GetModel() != WsModel::Monochrome || isWordAccess || !(port & 0x01)) {
+		if(_console->GetModel() > WsModel::Monochrome || isWordAccess || !(port & 0x01)) {
 			return _eeprom->ReadPort(port - 0xBA);
 		} else {
 			return GetUnmappedPort();
@@ -246,10 +246,10 @@ uint8_t WsMemoryManager::InternalReadPort(uint16_t port, bool isWordAccess)
 		return _cart->ReadPort(port);
 	} else {
 		switch(port) {
-			case 0x60: return _console->GetModel() == WsModel::Monochrome ? GetUnmappedPort() : _state.SystemControl2;
+			case 0x60: return _console->GetModel() <= WsModel::Monochrome ? GetUnmappedPort() : _state.SystemControl2;
 
 			case 0x62:
-				if(_console->GetModel() == WsModel::Monochrome) {
+				if(_console->GetModel() <= WsModel::Monochrome) {
 					return GetUnmappedPort();
 				}
 				return (
@@ -259,7 +259,7 @@ uint8_t WsMemoryManager::InternalReadPort(uint16_t port, bool isWordAccess)
 			case 0xA0:
 				return (
 					(_state.BootRomDisabled ? 0x01 : 0) |
-					(_console->GetModel() == WsModel::Monochrome ? 0 : 0x02) |
+					(_console->GetModel() <= WsModel::Monochrome ? 0 : 0x02) |
 					(_state.CartWordBus ? 0x04 : 0) |
 					(_state.SlowRom ? 0x08 : 0) |
 					0x80 //mbc authentication?
@@ -294,7 +294,7 @@ void WsMemoryManager::InternalWritePort(uint16_t port, uint8_t value, bool isWor
 		_ppu->WritePort(port, value);
 	} else if(port >= 0x40 && port <= 0x53 && _state.ColorEnabled) {
 		return _dmaController->WritePort(port, value);
-	} else if(port >= 0x64 && port <= 0x6B && _console->GetModel() != WsModel::Monochrome) {
+	} else if(port >= 0x64 && port <= 0x6B && _console->GetModel() > WsModel::Monochrome) {
 		_apu->Write(port, value); //HyperVoice
 	} else if(port >= 0x70 && port <= 0x77 && !_state.BootRomDisabled && _console->GetModel() == WsModel::SwanCrystal) {
 		_ppu->WriteLcdConfigPort(port, value);
@@ -303,7 +303,7 @@ void WsMemoryManager::InternalWritePort(uint16_t port, uint8_t value, bool isWor
 	} else if(port >= 0xA2 && port <= 0xAB && port != 0xA3) {
 		_timer->WritePort(port, value);
 	} else if(port >= 0xBA && port <= 0xBF) {
-		if(_console->GetModel() != WsModel::Monochrome || isWordAccess || !(port & 0x01)) {
+		if(_console->GetModel() > WsModel::Monochrome || isWordAccess || !(port & 0x01)) {
 			_eeprom->WritePort(port - 0xBA, value);
 		}
 	} else if(port >= 0xC0) {
@@ -311,7 +311,7 @@ void WsMemoryManager::InternalWritePort(uint16_t port, uint8_t value, bool isWor
 	} else {
 		switch(port) {
 			case 0x60:
-				if(_console->GetModel() != WsModel::Monochrome) {
+				if(_console->GetModel() > WsModel::Monochrome) {
 					_state.SystemControl2 = value & 0xEF;
 					_state.ColorEnabled = value & 0x80;
 					_state.Enable4bpp = value & 0x40;
@@ -334,7 +334,7 @@ void WsMemoryManager::InternalWritePort(uint16_t port, uint8_t value, bool isWor
 				break;
 
 			case 0x62:
-				if(_console->GetModel() != WsModel::Monochrome) {
+				if(_console->GetModel() > WsModel::Monochrome) {
 					_state.PowerOffRequested = value & 0x01;
 				}
 				break;

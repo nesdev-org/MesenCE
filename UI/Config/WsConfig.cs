@@ -106,6 +106,7 @@ public struct InteropWsConfig
 public enum WsModel : byte
 {
 	Auto,
+	PocketChallenge,
 	Monochrome,
 	Color,
 	SwanCrystal
