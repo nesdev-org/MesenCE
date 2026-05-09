@@ -52,6 +52,7 @@ public struct NesPpuState : BaseState
 	public byte ScrollX;
 	[MarshalAs(UnmanagedType.I1)] public bool WriteToggle;
 	public byte SpriteRamAddr;
+	public byte SecondaryOamAddr;
 };
 
 [Flags]

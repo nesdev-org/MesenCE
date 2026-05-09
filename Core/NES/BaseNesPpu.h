@@ -116,7 +116,6 @@ protected:
 	int32_t _openBusDecayStamp[8] = {};
 
 	uint64_t _oamDecayCycles[0x20] = {};
-	bool _corruptOamRow[32] = {};
 
 	bool IsRenderingEnabled();
 	void UpdateGrayscaleAndIntensifyBits();
