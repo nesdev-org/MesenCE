@@ -366,9 +366,13 @@ public class WsRegisterViewer
 
 		entries.AddRange(new List<RegEntry>() {
 			new RegEntry("$C0", "ROM Linear Bank", cart.SelectedBanks[0], Format.X8),
-			new RegEntry("$C1", "RAM Bank", cart.SelectedBanks[1], Format.X8),
-			new RegEntry("$C2", "ROM0 Bank", cart.SelectedBanks[2], Format.X8),
-			new RegEntry("$C3", "ROM1 Bank", cart.SelectedBanks[3], Format.X8),
+			new RegEntry("$C1", "RAM Bank", cart.SelectedBanks[1] & 0xFF, Format.X8),
+			new RegEntry("$C2", "ROM0 Bank", cart.SelectedBanks[2] & 0xFF, Format.X8),
+			new RegEntry("$C3", "ROM1 Bank", cart.SelectedBanks[3] & 0xFF, Format.X8),
+			new RegEntry("$CE.0", "ROM in RAM Bank", cart.RomInRamBank),
+			new RegEntry("$D0", "Expanded RAM Bank", cart.SelectedBanks[1], Format.X16),
+			new RegEntry("$D2", "Expanded ROM0 Bank", cart.SelectedBanks[2], Format.X16),
+			new RegEntry("$D4", "Expanded ROM1 Bank", cart.SelectedBanks[3], Format.X16),
 		});
 
 		if(ws.CartEeprom.Size != WsEepromSize.Size0) {
