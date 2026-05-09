@@ -94,6 +94,7 @@ namespace Mesen.Config
 
 			CreateMimeType("x-mesen-ws", "ws", "WonderSwan ROM", mimeTypes, cfg.AssociateWsRomFiles);
 			CreateMimeType("x-mesen-wsc", "wsc", "WonderSwan Color ROM", mimeTypes, cfg.AssociateWsRomFiles);
+			CreateMimeType("x-mesen-pc2", "pc2", "Pocket Challenge V2 ROM", mimeTypes, cfg.AssociateWsRomFiles);
 
 			//Icon used for shortcuts
 			ImageUtilities.BitmapFromAsset("Assets/MesenIcon.png").Save(Path.Combine(iconFolder, "MesenIcon.png"));
@@ -217,6 +218,7 @@ namespace Mesen.Config
 
 			FileAssociationHelper.UpdateFileAssociation("ws", cfg.AssociateWsRomFiles);
 			FileAssociationHelper.UpdateFileAssociation("wsc", cfg.AssociateWsRomFiles);
+			FileAssociationHelper.UpdateFileAssociation("pc2", cfg.AssociateWsRomFiles);
 		}
 
 		static private void UpdateFileAssociation(string extension, bool associate)

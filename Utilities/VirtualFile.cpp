@@ -19,7 +19,7 @@ const std::initializer_list<string> VirtualFile::RomExtensions = {
 	".pce", ".sgx", ".cue", ".hes",
 	".sms", ".gg", ".sg", ".col",
 	".gba",
-	".ws", ".wsc"
+	".ws", ".wsc", ".pc2"
 };
 // clang-format on
 
