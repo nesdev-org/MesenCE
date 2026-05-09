@@ -233,8 +233,8 @@ bool MovieRecorder::CreateMovie(string movieFile, deque<RewindData>& data, uint3
 
 			//Some blocks (like the first block after power cycle) can contain an extra set of inputs
 			//Check the max number of inputs to be able to export them all
-			for(int i = 0; i < BaseControlDevice::PortCount; i++) {
-				len = std::max(len, (uint32_t)rewindData.InputLogs[i].size());
+			for(int j = 0; j < BaseControlDevice::PortCount; j++) {
+				len = std::max(len, (uint32_t)rewindData.InputLogs[j].size());
 			}
 
 			for(uint32_t j = skipFirstInput ? 1 : 0; j < len; j++) {
