@@ -192,6 +192,8 @@ namespace Mesen.Interop
 
 				case MemoryType.GbBootRom:
 				case MemoryType.GbSpriteRam:
+				case MemoryType.GbBgPaletteRam:
+				case MemoryType.GbObjPaletteRam:
 
 				case MemoryType.NesSecondarySpriteRam:
 				case MemoryType.NesSpriteRam:
