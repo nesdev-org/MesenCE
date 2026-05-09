@@ -151,7 +151,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	_apu.reset(new WsApu(_emu, this, _memoryManager.get(), _dmaController.get()));
 	_cart.reset(IsWWCart() ? new WsCartFlash() : new WsCart());
 
-	_cart->Init(_memoryManager.get(), _cartEeprom.get(), _cartRtc.get());
+	_cart->Init(_memoryManager.get(), _cartEeprom.get(), _cartRtc.get(), _prgRom, _prgRomSize, _saveRam, _saveRamSize);
 	_memoryManager->Init(_emu, this, _cpu.get(), _ppu.get(), _controlManager.get(), _cart.get(), _timer.get(), _dmaController.get(), _internalEeprom.get(), _apu.get(), _serial.get());
 	_timer->Init(_memoryManager.get());
 	_dmaController->Init(_memoryManager.get(), _apu.get());
