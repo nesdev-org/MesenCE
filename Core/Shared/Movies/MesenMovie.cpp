@@ -115,6 +115,8 @@ void MesenMovie::ProcessNotification(ConsoleNotificationType type, void* paramet
 			if(_reader->GetStream("SaveState.mss", saveStateData)) {
 				if(!_emu->GetSaveStateManager()->LoadState(saveStateData)) {
 					_loadFailure = true;
+				} else {
+					_hasSaveState = true;
 				}
 			}
 		}
@@ -187,6 +189,9 @@ bool MesenMovie::Play(VirtualFile& file)
 	_emu->GetNotificationManager()->RegisterNotificationListener(shared_from_this());
 	_emu->PowerCycle();
 	_emu->GetBatteryManager()->SetBatteryProvider(nullptr);
+	if(_hasSaveState) {
+		_controlManager->SetPollCounter(0);
+	}
 
 	_playing = !_loadFailure;
 	return _playing;

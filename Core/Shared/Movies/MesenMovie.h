@@ -32,6 +32,7 @@ private:
 	string _filename;
 	bool _forTest = false;
 	bool _loadFailure = false;
+	bool _hasSaveState = false;
 
 private:
 	void ParseSettings(stringstream& data);
