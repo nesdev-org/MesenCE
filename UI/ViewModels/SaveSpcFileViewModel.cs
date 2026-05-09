@@ -21,7 +21,7 @@ namespace Mesen.ViewModels
 
 		}
 
-		public async void WriteFixedLengthString(BinaryWriter writer, string text, int length)
+		public void WriteFixedLengthString(BinaryWriter writer, string text, int length)
 		{
 			byte[] textAsBytes = Encoding.ASCII.GetBytes(text);
 			byte[] buffer = new byte[length];
@@ -33,7 +33,7 @@ namespace Mesen.ViewModels
 			writer.Write(buffer);
 		}
 
-		public async void SaveSpcFile(string filename)
+		public void SaveSpcFile(string filename)
 		{
 			bool releaseDebugger = !DebugWindowManager.HasOpenedDebugWindows();
 			bool paused = EmuApi.IsPaused();
