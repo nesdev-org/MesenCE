@@ -61,7 +61,20 @@ public:
 
 	void InternalDrawController(InputHud& hud) override
 	{
-		// TODOWS
+		hud.DrawOutline(35, 16);
+
+		hud.DrawButton(5, 5, 3, 3, IsPressed(Buttons::Up));
+		hud.DrawButton(5, 11, 3, 3, IsPressed(Buttons::Down));
+		hud.DrawButton(2, 8, 3, 3, IsPressed(Buttons::Left));
+		hud.DrawButton(8, 8, 3, 3, IsPressed(Buttons::Right));
+		hud.DrawButton(9, 2, 2, 2, IsPressed(Buttons::Esc));
+
+		hud.DrawButton(30, 5, 3, 3, IsPressed(Buttons::Clear));
+		hud.DrawButton(27, 8, 3, 3, IsPressed(Buttons::Circle));
+		hud.DrawButton(24, 11, 3, 3, IsPressed(Buttons::Pass));
+		hud.DrawButton(24, 2, 2, 2, IsPressed(Buttons::View));
+
+		hud.DrawNumber(_port + 1, 16, 2);
 	}
 
 	vector<DeviceButtonName> GetKeyNameAssociations() override
