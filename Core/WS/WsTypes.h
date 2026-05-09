@@ -446,7 +446,8 @@ struct WsEepromState
 struct WsCartState
 {
 	bool HasRtc;
-	uint8_t SelectedBanks[4];
+	bool RomInRamBank;
+	uint16_t SelectedBanks[4];
 };
 
 struct WsRtcState

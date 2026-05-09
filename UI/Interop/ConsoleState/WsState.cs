@@ -443,8 +443,9 @@ public struct WsEepromState
 public struct WsCartState
 {
 	[MarshalAs(UnmanagedType.I1)] public bool HasRtc;
+	[MarshalAs(UnmanagedType.I1)] public bool RomInRamBank;
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-	public byte[] SelectedBanks;
+	public UInt16[] SelectedBanks;
 }
 
 public struct WsRtcState
