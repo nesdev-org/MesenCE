@@ -383,6 +383,16 @@ public class WsRegisterViewer
 			});
 		}
 
+		if(cart.HasRtc) {
+			entries.AddRange(new List<RegEntry>() {
+				new RegEntry("", "Cart RTC"),
+				new RegEntry("$CA.0-3", "Command", ws.CartRtc.Command, Format.X8),
+				new RegEntry("$CA.4", "Busy", ws.CartRtc.Busy),
+				new RegEntry("$CA.7", "Ready", ws.CartRtc.Ready),
+				new RegEntry("$CB", "Data", ws.CartRtc.Data)
+			});
+		}
+
 		return new RegisterViewerTab("Cart", entries, CpuType.Ws, MemoryType.WsPort);
 	}
 

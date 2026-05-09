@@ -28,6 +28,7 @@ void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* c
 	_memoryManager = memoryManager;
 	_cartEeprom = cartEeprom;
 	_cartRtc = cartRtc;
+	_state.HasRtc = cartRtc != nullptr;
 }
 
 void WsCart::RefreshMappings()

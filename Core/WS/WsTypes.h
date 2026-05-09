@@ -445,7 +445,16 @@ struct WsEepromState
 
 struct WsCartState
 {
+	bool HasRtc;
 	uint8_t SelectedBanks[4];
+};
+
+struct WsRtcState
+{
+	uint8_t Data;
+	uint8_t Command;
+	bool Ready;
+	bool Busy;
 };
 
 struct WsState
@@ -461,6 +470,7 @@ struct WsState
 	WsEepromState InternalEeprom;
 	WsCartState Cart;
 	WsEepromState CartEeprom;
+	WsRtcState CartRtc;
 	WsModel Model;
 };
 

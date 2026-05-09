@@ -468,6 +468,9 @@ WsState WsConsole::GetState()
 	if(_cartEeprom) {
 		state.CartEeprom = _cartEeprom->GetState();
 	}
+	if(_cartRtc) {
+		state.CartRtc = _cartRtc->GetState();
+	}
 	return state;
 }
 
