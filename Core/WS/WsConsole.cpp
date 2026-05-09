@@ -38,15 +38,10 @@ WsConsole::~WsConsole()
 bool WsConsole::IsWWCart()
 {
 	//TODOWS exclude static FreyaBIOS cartridges
-	return _prgRomSize == 0x80000
-		&& _prgRom[0x70000] == 'E'   // FreyaBIOS header
-		&& _prgRom[0x70001] == 'L'
-		&& _prgRom[0x70002] == 'I'
-		&& _prgRom[0x70003] == 'S'
-		&& _prgRom[0x70004] == 'A'
-		&& _prgRom[0x7fff6] == 0x00  // Publisher ID
-		&& _prgRom[0x7fff8] == 0x00  // Game ID
-		&& _prgRom[0x7fffb] == 0x04  // Save format
+	return _prgRomSize == 0x80000 && _prgRom[0x70000] == 'E' // FreyaBIOS header
+		&& _prgRom[0x70001] == 'L' && _prgRom[0x70002] == 'I' && _prgRom[0x70003] == 'S' && _prgRom[0x70004] == 'A' && _prgRom[0x7fff6] == 0x00 // Publisher ID
+		&& _prgRom[0x7fff8] == 0x00 // Game ID
+		&& _prgRom[0x7fffb] == 0x04 // Save format
 		&& _prgRom[0x7fffd] == 0x01; // Mapper
 }
 

@@ -40,7 +40,6 @@ void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* c
 
 void WsCart::PostInit()
 {
-
 }
 
 uint32_t WsCart::GetPhysicalAddress(uint32_t addr)
