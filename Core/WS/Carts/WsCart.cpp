@@ -1,3 +1,4 @@
+#include "WS/Carts/WsKarnak.h"
 #include "pch.h"
 #include "WS/Carts/WsCart.h"
 #include "WS/WsMemoryManager.h"
@@ -22,10 +23,12 @@ WsCart::WsCart()
 	_state.SelectedBanks[3] = 0xFF;
 }
 
-void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom)
+void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsKarnak* cartKarnak)
 {
 	_memoryManager = memoryManager;
 	_cartEeprom = cartEeprom;
+	_cartKarnak = cartKarnak;
+	_state.HasKarnak = cartKarnak != nullptr;
 }
 
 void WsCart::RefreshMappings()
@@ -42,6 +45,8 @@ uint8_t WsCart::ReadPort(uint16_t port)
 		return _state.SelectedBanks[port - 0xC0];
 	} else if(port < 0xC9 && _cartEeprom) {
 		return _cartEeprom->ReadPort(port - 0xC4);
+	} else if(port >= 0xD6 && port < 0xDA && _cartKarnak) {
+		return _cartKarnak->ReadPort(port);
 	}
 
 	return _memoryManager->GetUnmappedPort();
@@ -54,6 +59,8 @@ void WsCart::WritePort(uint16_t port, uint8_t value)
 		_memoryManager->RefreshMappings();
 	} else if(port < 0xC9 && _cartEeprom) {
 		_cartEeprom->WritePort(port - 0xC4, value);
+	} else if(port >= 0xD6 && port < 0xDA && _cartKarnak) {
+		_cartKarnak->WritePort(port, value);
 	}
 }
 

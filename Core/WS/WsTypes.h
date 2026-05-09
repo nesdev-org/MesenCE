@@ -445,7 +445,15 @@ struct WsEepromState
 
 struct WsCartState
 {
+	bool HasKarnak;
 	uint8_t SelectedBanks[4];
+};
+
+struct WsKarnakState
+{
+	bool Enable;
+	uint8_t TimerPeriod;
+	uint16_t AdpcmAccumulator;
 };
 
 struct WsState
@@ -461,6 +469,7 @@ struct WsState
 	WsEepromState InternalEeprom;
 	WsCartState Cart;
 	WsEepromState CartEeprom;
+	WsKarnakState CartKarnak;
 	WsModel Model;
 };
 

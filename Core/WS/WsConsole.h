@@ -14,6 +14,7 @@ class WsMemoryManager;
 class WsControlManager;
 class WsDmaController;
 class WsEeprom;
+class WsKarnak;
 enum class WsModel : uint8_t;
 
 class WsConsole final : public IConsole
@@ -31,6 +32,7 @@ private:
 	unique_ptr<WsDmaController> _dmaController;
 	unique_ptr<WsEeprom> _internalEeprom;
 	unique_ptr<WsEeprom> _cartEeprom;
+	unique_ptr<WsKarnak> _cartKarnak;
 
 	uint8_t* _workRam = nullptr;
 	uint32_t _workRamSize = 0;
