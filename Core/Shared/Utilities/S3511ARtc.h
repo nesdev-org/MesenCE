@@ -24,18 +24,6 @@ struct S3511ARtcState
 class S3511ARtc : public ISerializable
 {
 private:
-	enum class Command : uint8_t
-	{
-		Reset,
-		Status,
-		DateTime,
-		Time,
-		Alarm1,
-		Alarm2,
-		TestStart,
-		TestEnd
-	};
-
 	S3511ARtcState _state = {};
 	uint64_t _lastUpdateTime = 0;
 
@@ -52,15 +40,28 @@ private:
 	void FromDateTime(uint64_t data, bool includeYmd);
 	uint64_t ToDateTime();
 
-	uint8_t GetCommandLength(Command cmd);
-
 	void ProcessCommand();
 
 	void Reset();
 	void UpdateTime();
 
 protected:
+	enum class Command : uint8_t
+	{
+		Reset,
+		Status,
+		DateTime,
+		Time,
+		Alarm1,
+		Alarm2,
+		TestStart,
+		TestEnd
+	};
+
 	Emulator* _emu = nullptr;
+
+	uint8_t GetCommandLength(Command cmd);
+	uint8_t GetCommandLength(uint8_t cmd);
 
 	//GBA only uses count values of 1, WS only uses 8 
 	void WriteBits(uint32_t value, int count);

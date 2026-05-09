@@ -4,6 +4,7 @@
 #include "WS/WsPpu.h"
 #include "WS/WsTimer.h"
 #include "WS/Carts/WsCart.h"
+#include "WS/Carts/WsRtc.h"
 #include "WS/WsControlManager.h"
 #include "WS/WsMemoryManager.h"
 #include "WS/WsDmaController.h"
@@ -94,6 +95,10 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 		_cartEeprom.reset(new WsEeprom(_emu, this, (WsEepromSize)_cartEepromSize, _cartEepromData, false));
 	}
 
+	if(mapperType >= 0x01) {
+		_cartRtc.reset(new WsRtc(_emu, this));
+	}
+
 	_model = _emu->GetSettings()->GetWsConfig().Model;
 	if(_model == WsModel::Auto) {
 		_model = hasColorSupport ? WsModel::Color : WsModel::Monochrome;
@@ -129,7 +134,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	_apu.reset(new WsApu(_emu, this, _memoryManager.get(), _dmaController.get()));
 	_cart.reset(new WsCart());
 
-	_cart->Init(_memoryManager.get(), _cartEeprom.get());
+	_cart->Init(_memoryManager.get(), _cartEeprom.get(), _cartRtc.get());
 	_memoryManager->Init(_emu, this, _cpu.get(), _ppu.get(), _controlManager.get(), _cart.get(), _timer.get(), _dmaController.get(), _internalEeprom.get(), _apu.get(), _serial.get());
 	_timer->Init(_memoryManager.get());
 	_dmaController->Init(_memoryManager.get(), _apu.get());
@@ -311,6 +316,9 @@ void WsConsole::LoadBattery()
 	if(_cartEeprom) {
 		_cartEeprom->LoadBattery();
 	}
+	if(_cartRtc) {
+		_cartRtc->LoadBattery();
+	}
 
 	if(_saveRam) {
 		_emu->GetBatteryManager()->LoadBattery(".sav", _saveRam, _saveRamSize);
@@ -322,6 +330,9 @@ void WsConsole::SaveBattery()
 	_internalEeprom->SaveBattery();
 	if(_cartEeprom) {
 		_cartEeprom->SaveBattery();
+	}
+	if(_cartRtc) {
+		_cartRtc->SaveBattery();
 	}
 
 	if(_saveRam) {
@@ -347,6 +358,16 @@ ConsoleType WsConsole::GetConsoleType()
 vector<CpuType> WsConsole::GetCpuTypes()
 {
 	return { CpuType::Ws };
+}
+
+uint64_t WsConsole::GetCartridgeClock()
+{
+	return _cpu->GetCycleCount() / 8;
+}
+
+uint32_t WsConsole::GetCartridgeClockRate()
+{
+	return 12288000 / 32;
 }
 
 uint64_t WsConsole::GetMasterClock()
@@ -495,5 +516,8 @@ void WsConsole::Serialize(Serializer& s)
 
 	if(_cartEeprom) {
 		SV(_cartEeprom);
+	}
+	if(_cartRtc) {
+		SV(_cartRtc);
 	}
 }
