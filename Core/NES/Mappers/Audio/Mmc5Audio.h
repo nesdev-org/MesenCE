@@ -104,6 +104,11 @@ public:
 		_pcmOutput = 0;
 	}
 
+	void PCMReadModeDataRead(char dacval) {
+		if(_pcmReadMode && dacval)
+			_pcmOutput = dacval;
+	}
+
 	uint8_t ReadRegister(uint16_t addr)
 	{
 		switch(addr) {
@@ -139,7 +144,7 @@ public:
 				break;
 
 			case 0x5010:
-				//TODO: Read mode & PCM IRQs are not implemented
+				//TODO: PCM IRQ
 				_pcmReadMode = (value & 0x01) == 0x01;
 				_pcmIrqEnabled = (value & 0x80) == 0x80;
 				break;

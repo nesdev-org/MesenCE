@@ -451,6 +451,14 @@ protected:
 		BaseMapper::WriteRam(addr, value);
 	}
 
+	uint8_t ReadRam(uint16_t addr) override
+	{
+		if((addr & 0xC000) == 0x8000) {
+			_audio->PCMReadModeDataRead(InternalReadRam(addr));
+		}
+		return BaseMapper::ReadRam(addr);
+	}
+
 	void DetectScanlineStart(uint16_t addr)
 	{
 		if(_ntReadCounter >= 2) {
