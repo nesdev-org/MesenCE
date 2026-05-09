@@ -76,7 +76,7 @@ uint8_t S3511ARtc::GetCommandLength(Command cmd)
 
 uint8_t S3511ARtc::GetCommandLength(uint8_t cmd)
 {
-	return GetCommandLength((Command) ((cmd >> 1) & 0x07));
+	return GetCommandLength((Command)((cmd >> 1) & 0x07));
 }
 
 void S3511ARtc::ResetBus()

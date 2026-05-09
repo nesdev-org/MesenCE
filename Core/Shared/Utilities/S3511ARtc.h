@@ -63,7 +63,7 @@ protected:
 	uint8_t GetCommandLength(Command cmd);
 	uint8_t GetCommandLength(uint8_t cmd);
 
-	//GBA only uses count values of 1, WS only uses 8 
+	//GBA only uses count values of 1, WS only uses 8
 	void WriteBits(uint32_t value, int count);
 	uint32_t ReadBits(int count);
 	void ResetBus();

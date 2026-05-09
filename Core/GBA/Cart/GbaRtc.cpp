@@ -40,7 +40,7 @@ void GbaRtc::Write(uint8_t value)
 	} else if(!clk && _clk) {
 		_bitOut = ReadBits(1);
 	}
-	
+
 	_clk = clk;
 }
 

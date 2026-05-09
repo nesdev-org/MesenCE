@@ -95,7 +95,7 @@ void WsRtc::Serialize(Serializer& s)
 	SV(_state.Data);
 	SV(_state.Ready);
 	SV(_state.Busy);
-	
+
 	SV(_bytesLeft);
 	SV(_commandTransferred);
 	SV(_transferClock);
