@@ -58,6 +58,7 @@ private:
 	bool _colorModel = false;
 	bool _verticalMode = false;
 
+	bool IsWWCart();
 	void InitPostBootRomState();
 
 public:
