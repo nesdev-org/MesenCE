@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "WS/WsCpu.h"
 #include "WS/APU/WsApu.h"
+#include "WS/Carts/WsCart.h"
 #include "WS/WsPpu.h"
 #include "WS/WsTypes.h"
 #include "Utilities/ISerializable.h"
@@ -9,7 +10,6 @@
 class WsConsole;
 class WsTimer;
 class WsControlManager;
-class WsCart;
 class WsSerial;
 class WsDmaController;
 class WsEeprom;
@@ -40,6 +40,7 @@ private:
 
 	WsMemoryManagerState _state = {};
 
+	bool _cartFlash;
 	uint8_t* _reads[256] = {};
 	uint8_t* _writes[256] = {};
 
@@ -57,6 +58,7 @@ public:
 
 	uint8_t GetUnmappedPort();
 
+	void SetCartFlash(bool cartFlash);
 	void Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly);
 	void Unmap(uint32_t start, uint32_t end);
 
@@ -69,10 +71,14 @@ public:
 
 	__forceinline uint8_t InternalRead(uint32_t addr)
 	{
-		uint8_t* handler = _reads[addr >> 12];
 		uint8_t value = 0x90;
-		if(handler) {
-			value = handler[addr & 0xFFF];
+		if(_cartFlash && addr >= 0x10000) {
+			value = _cart->ReadMemory(addr);
+		} else {
+			uint8_t* handler = _reads[addr >> 12];
+			if(handler) {
+				value = handler[addr & 0xFFF];
+			}
 		}
 
 		//TODOWS open bus
@@ -82,9 +88,13 @@ public:
 	__forceinline void InternalWrite(uint32_t addr, uint8_t value)
 	{
 		//TODOWS open bus
-		uint8_t* handler = _writes[addr >> 12];
-		if(handler) {
-			handler[addr & 0xFFF] = value;
+		if(_cartFlash && addr >= 0x10000) {
+			_cart->WriteMemory(addr, value);
+		} else {
+			uint8_t* handler = _writes[addr >> 12];
+			if(handler) {
+				handler[addr & 0xFFF] = value;
+			}
 		}
 	}
 
