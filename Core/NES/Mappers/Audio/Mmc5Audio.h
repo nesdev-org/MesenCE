@@ -106,7 +106,7 @@ public:
 
 	void PCMReadModeDataRead(char dacval) {
 		if(_pcmReadMode && dacval)
-			_pcmOutput = dacval;
+			_pcmOutput = dacval; //
 	}
 
 	uint8_t ReadRegister(uint16_t addr)
