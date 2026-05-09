@@ -644,6 +644,7 @@
 			<Control ID="grpControllers">Controllers</Control>
 			<Control ID="lblPlayer1Horizontal">Controller (Horizontal)</Control>
 			<Control ID="lblPlayer1Vertical">Controller (Vertical)</Control>
+			<Control ID="lblPlayer1Pcv2">Controller (Pocket Challenge V2)</Control>
 			<Control ID="btnSetup">Setup</Control>
 		</Form>
 		
@@ -2372,6 +2373,17 @@ E
 			<Value ID="Right">D-Pad - Right</Value>
 			<Value ID="R">Button - Right</Value>
 			<Value ID="L">Button - Left</Value>
+		</Enum>
+		<Enum ID="Pcv2Buttons">
+			<Value ID="Up">Up</Value>
+			<Value ID="Down">Down</Value>
+			<Value ID="Left">Left</Value>
+			<Value ID="Right">Right</Value>
+			<Value ID="Esc">Esc</Value>
+			<Value ID="View">View</Value>
+			<Value ID="Circle">Circle</Value>
+			<Value ID="Clear">Clear</Value>
+			<Value ID="Pass">Pass</Value>
 		</Enum>
 		<Enum ID="NesConsoleType">
 			<Value ID="Nes001">NES - Front loader (NES-001)</Value>

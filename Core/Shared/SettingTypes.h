@@ -239,7 +239,8 @@ enum class ControllerType
 
 	//WS
 	WsController,
-	WsControllerVertical
+	WsControllerVertical,
+	Pcv2Controller
 };
 
 struct KeyMapping
@@ -763,6 +764,7 @@ struct WsConfig
 {
 	ControllerConfig ControllerHorizontal;
 	ControllerConfig ControllerVertical;
+	ControllerConfig ControllerPcv2;
 
 	WsModel Model = WsModel::Auto;
 	bool UseBootRom = false;

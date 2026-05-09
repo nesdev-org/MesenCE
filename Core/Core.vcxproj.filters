@@ -2880,6 +2880,9 @@
     <ClInclude Include="WS\WsPpu.h">
       <Filter>WS</Filter>
     </ClInclude>
+    <ClInclude Include="WS\Pcv2Controller.h">
+      <Filter>WS</Filter>
+    </ClInclude>
     <ClInclude Include="WS\WsController.h">
       <Filter>WS</Filter>
     </ClInclude>

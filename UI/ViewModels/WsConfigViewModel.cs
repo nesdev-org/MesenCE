@@ -19,6 +19,7 @@ namespace Mesen.ViewModels
 
 		public ReactiveCommand<Button, Unit> SetupPlayerHorizontal { get; }
 		public ReactiveCommand<Button, Unit> SetupPlayerVertical { get; }
+		public ReactiveCommand<Button, Unit> SetupPlayerPcv2 { get; }
 
 		public WsConfigViewModel()
 		{
@@ -27,8 +28,10 @@ namespace Mesen.ViewModels
 
 			IObservable<bool> button1Enabled = this.WhenAnyValue(x => x.Config.ControllerHorizontal.Type, x => x.CanConfigure());
 			IObservable<bool> button2Enabled = this.WhenAnyValue(x => x.Config.ControllerVertical.Type, x => x.CanConfigure());
+			IObservable<bool> button3Enabled = this.WhenAnyValue(x => x.Config.ControllerPcv2.Type, x => x.CanConfigure());
 			SetupPlayerHorizontal = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, 0), button1Enabled);
 			SetupPlayerVertical = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, 1), button2Enabled);
+			SetupPlayerPcv2 = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, 2), button3Enabled);
 
 			if(Design.IsDesignMode) {
 				return;
@@ -41,15 +44,17 @@ namespace Mesen.ViewModels
 		{
 			PixelPoint startPosition = btn.PointToScreen(new Point(-7, btn.Bounds.Height));
 			ControllerConfigWindow wnd = new ControllerConfigWindow();
-			ControllerConfig orgCfg = port == 0 ? Config.ControllerHorizontal : Config.ControllerVertical;
-			ControllerConfig cfg = port == 0 ? Config.ControllerHorizontal.Clone() : Config.ControllerVertical.Clone();
-			wnd.DataContext = new ControllerConfigViewModel(port == 0 ? ControllerType.WsController : ControllerType.WsControllerVertical, cfg, orgCfg, port);
+			WsControllerConfig orgCfg = port == 0 ? Config.ControllerHorizontal : (port == 1 ? Config.ControllerVertical : Config.ControllerPcv2);
+			WsControllerConfig cfg = (WsControllerConfig) (port == 0 ? Config.ControllerHorizontal.Clone() : (port == 1 ? Config.ControllerVertical.Clone() : Config.ControllerPcv2.Clone()));
+			wnd.DataContext = new ControllerConfigViewModel(port == 0 ? ControllerType.WsController : (port == 1 ? ControllerType.WsControllerVertical : ControllerType.Pcv2Controller), cfg, orgCfg, port);
 
 			if(await wnd.ShowDialogAtPosition<bool>(btn.GetVisualRoot() as Visual, startPosition)) {
 				if(port == 0) {
 					Config.ControllerHorizontal = cfg;
-				} else {
+				} else if(port == 1) {
 					Config.ControllerVertical = cfg;
+				} else {
+					Config.ControllerPcv2 = cfg;
 				}
 			}
 		}
