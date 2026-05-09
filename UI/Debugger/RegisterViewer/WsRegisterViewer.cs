@@ -30,7 +30,7 @@ public class WsRegisterViewer
 		WsPpuState ppu = ws.Ppu;
 
 		byte volumeLevel = 0;
-		if(ws.Model <= WsModel.Monochrome) {
+		if(ws.Model == WsModel.Monochrome || ws.Model == WsModel.PocketChallenge) {
 			switch(ws.Apu.InternalMasterVolume) {
 				default: case 0: volumeLevel = 0; break;
 				case 1: volumeLevel = 2; break;
@@ -406,7 +406,7 @@ public class WsRegisterViewer
 
 			new RegEntry("$A0", "System Control"),
 			new RegEntry("$A0.0", "Boot ROM Disabled", mm.BootRomDisabled),
-			new RegEntry("$A0.1", "Color System", ws.Model > WsModel.Monochrome),
+			new RegEntry("$A0.1", "Color System", ws.Model != WsModel.Monochrome && ws.Model != WsModel.PocketChallenge),
 			new RegEntry("$A0.2", "16-bit ROM Bus", mm.CartWordBus),
 			new RegEntry("$A0.3", "ROM Wait State", mm.SlowRom),
 

@@ -428,10 +428,10 @@ namespace Mesen.ViewModels
 						GetPcEngineModelMenuItem(PceConsoleType.PcEngine),
 						GetPcEngineModelMenuItem(PceConsoleType.SuperGrafx),
 						GetPcEngineModelMenuItem(PceConsoleType.TurboGrafx),
-						GetWsModelMenuItem(WsModel.PocketChallenge),
 						GetWsModelMenuItem(WsModel.Monochrome),
 						GetWsModelMenuItem(WsModel.Color),
 						GetWsModelMenuItem(WsModel.SwanCrystal),
+						GetWsModelMenuItem(WsModel.PocketChallenge),
 					}
 				},
 
