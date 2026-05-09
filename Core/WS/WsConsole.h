@@ -55,6 +55,7 @@ private:
 	WsModel _model = {};
 	bool _verticalMode = false;
 
+	bool IsWWCart();
 	void InitPostBootRomState();
 
 public:

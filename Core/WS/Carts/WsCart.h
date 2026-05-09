@@ -9,9 +9,7 @@ class WsMemoryManager;
 class WsEeprom;
 class WsRtc;
 
-//TODOWS Flash
-
-class WsCart final : public ISerializable
+class WsCart : public ISerializable
 {
 protected:
 	WsCartState _state = {};
