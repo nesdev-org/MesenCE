@@ -24,12 +24,32 @@ WsCart::WsCart()
 	_state.SelectedBanks[3] = 0x3FF;
 }
 
-void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* cartRtc)
+void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* cartRtc, uint8_t* prgRom, uint32_t prgRomSize, uint8_t* saveRam, uint32_t saveRamSize)
 {
 	_memoryManager = memoryManager;
 	_cartEeprom = cartEeprom;
 	_cartRtc = cartRtc;
 	_state.HasRtc = cartRtc != nullptr;
+	_prgRom = prgRom;
+	_prgRomSize = prgRomSize;
+	_saveRam = saveRam;
+	_saveRamSize = saveRamSize;
+
+	this->PostInit();
+}
+
+void WsCart::PostInit()
+{
+
+}
+
+uint32_t WsCart::GetPhysicalAddress(uint32_t addr)
+{
+	if(addr >= 0x40000) {
+		return (_state.SelectedBanks[0] << 20) | (addr & 0xFFFFF);
+	} else {
+		return (_state.SelectedBanks[addr >> 16] << 16) | (addr & 0xFFFF);
+	}
 }
 
 void WsCart::RefreshMappings()
@@ -86,6 +106,16 @@ void WsCart::WritePort(uint16_t port, uint8_t value)
 		}
 		_memoryManager->RefreshMappings();
 	}
+}
+
+uint8_t WsCart::ReadMemory(uint32_t addr)
+{
+	assert(false);
+}
+
+void WsCart::WriteMemory(uint32_t addr, uint8_t value)
+{
+	assert(false);
 }
 
 void WsCart::Serialize(Serializer& s)
