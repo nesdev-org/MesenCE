@@ -98,8 +98,9 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	if(_model == WsModel::Auto) {
 		_model = romFile.GetFileExtension() == ".pc2" ? WsModel::PocketChallenge : (hasColorSupport ? WsModel::Color : WsModel::Monochrome);
 	}
+	_colorModel = _model == WsModel::Color || _model == WsModel::SwanCrystal;
 
-	_workRamSize = _model <= WsModel::Monochrome ? 0x4000 : 0x10000;
+	_workRamSize = _colorModel ? 0x10000 : 0x4000;
 	_workRam = new uint8_t[_workRamSize];
 	memset(_workRam, 0, _workRamSize);
 	_emu->RegisterMemory(MemoryType::WsWorkRam, _workRam, _workRamSize);
@@ -186,6 +187,11 @@ bool WsConsole::IsColorMode()
 	return _memoryManager->GetState().ColorEnabled;
 }
 
+bool WsConsole::IsColorModel()
+{
+	return _colorModel;
+}
+
 bool WsConsole::IsPowerOff()
 {
 	return _cpu->IsPowerOff();
@@ -194,6 +200,15 @@ bool WsConsole::IsPowerOff()
 bool WsConsole::IsVerticalMode()
 {
 	return _verticalMode;
+}
+
+WsAudioMode WsConsole::GetAudioMode()
+{
+	// PCv2 always uses the headphone port for sound output
+	if(_model == WsModel::PocketChallenge) {
+		return WsAudioMode::Headphones;
+	}
+	return _emu->GetSettings()->GetWsConfig().AudioMode;
 }
 
 WsModel WsConsole::GetModel()
@@ -216,11 +231,11 @@ void WsConsole::Reset()
 void WsConsole::InitPostBootRomState()
 {
 	//Init work ram
-	if(_model <= WsModel::Monochrome) {
-		memset(_workRam, 0, _workRamSize);
-	} else {
+	if(_colorModel) {
 		memset(_workRam, 0, 0xFE00);
 		memset(_workRam + 0xFE00, 0xFF, 0x200);
+	} else {
+		memset(_workRam, 0, _workRamSize);
 	}
 
 	//Init port state
@@ -255,7 +270,10 @@ void WsConsole::InitPostBootRomState()
 
 	WsPpuState& ppu = _ppu->GetState();
 	ppu.LcdEnabled = true;
-	if(_model <= WsModel::Monochrome) {
+	if(_colorModel) {
+		ppu.Scanline = 127;
+		ppu.Cycle = 232;
+	} else {
 		ppu.Scanline = 26;
 		ppu.Cycle = 53;
 
@@ -272,9 +290,6 @@ void WsConsole::InitPostBootRomState()
 
 		memcpy(ppu.BwPalettes, defaultBwPalette, sizeof(defaultBwPalette));
 		memcpy(ppu.BwShades, defaultShades, sizeof(defaultShades));
-	} else {
-		ppu.Scanline = 127;
-		ppu.Cycle = 232;
 	}
 
 	_ppu->SetOutputToBgColor();
@@ -290,12 +305,12 @@ void WsConsole::InitPostBootRomState()
 	mm.SlowRom = (_prgRom[_prgRomSize - 4] & 0x08) != 0;
 
 	WsApuState& apu = _apu->GetState();
-	if(_model <= WsModel::Monochrome) {
-		apu.Ch1.Frequency = 0x7E6;
-		apu.Ch2.Frequency = 0x7E6;
-	} else {
+	if(_colorModel) {
 		apu.InternalMasterVolume = _internalEepromData[0x83] & 0x03;
 		ppu.HighContrast = (_internalEepromData[0x83] & 0x40);
+	} else {
+		apu.Ch1.Frequency = 0x7E6;
+		apu.Ch2.Frequency = 0x7E6;
 	}
 
 	WsEepromState& eeprom = _internalEeprom->GetState();
@@ -308,7 +323,7 @@ void WsConsole::InitPostBootRomState()
 		_internalEepromData[0x76 + i] = _prgRom[_prgRomSize - 0x10 + 6 + i];
 
 		bool supportsColor = _prgRom[_prgRomSize - 0x10 + 7] & 0x01;
-		if(_model > WsModel::Monochrome && supportsColor) {
+		if(_colorModel && supportsColor) {
 			//For games that support color & color models, copy 76-78 to 80-82
 			_internalEepromData[0x80 + i] = _internalEepromData[0x76 + i];
 		}
@@ -467,13 +482,34 @@ void WsConsole::GetConsoleState(BaseState& state, ConsoleType consoleType)
 	(WsState&)state = GetState();
 }
 
+static WsModel GetModelForCompatibilityCheck(WsModel model)
+{
+	if(model == WsModel::SwanCrystal) {
+		//WSC and SC save states are currently interchangeable.
+		return WsModel::Color;
+	}
+	return model;
+}
+
+static string GetModelShortName(WsModel model)
+{
+	switch(model) {
+		case WsModel::Color:
+		case WsModel::SwanCrystal:
+			return "WSC";
+		case WsModel::PocketChallenge:
+			return "PCv2";
+		default:
+			return "WS";
+	}
+}
+
 void WsConsole::Serialize(Serializer& s)
 {
 	WsModel model = _model;
 	SV(model);
-	if(!s.IsSaving() && (model <= WsModel::Monochrome) != (_model <= WsModel::Monochrome)) {
-		bool isMono = _model <= WsModel::Monochrome;
-		MessageManager::DisplayMessage("SaveStates", isMono ? "Can't load WSC state in WS mode." : "Can't load WS state in WSC mode.");
+	if(!s.IsSaving() && GetModelForCompatibilityCheck(model) != GetModelForCompatibilityCheck(_model)) {
+		MessageManager::DisplayMessage("SaveStates", "Can't load " + GetModelShortName(model) + " state in " + GetModelShortName(_model) + " mode.");
 		s.SetErrorFlag();
 		return;
 	}

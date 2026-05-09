@@ -141,7 +141,6 @@ void WsEeprom::Run()
 			switch(cmd) {
 				case WsEepromCommand::Read:
 					if(!(uint32_t)_state.Size) {
-						//TODOWS does this return all ones when EEPROM N/C?
 						_state.ReadBuffer = 0xFFFF;
 					} else {
 						_state.ReadBuffer = _data[addr << 1] | (_data[(addr << 1) + 1] << 8);

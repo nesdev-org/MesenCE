@@ -746,12 +746,10 @@ struct CvConfig
 enum class WsModel : uint8_t
 {
 	Auto,
-	// Monochrome models
-	PocketChallenge,
 	Monochrome,
-	// Color models
 	Color,
-	SwanCrystal
+	SwanCrystal,
+	PocketChallenge
 };
 
 enum class WsAudioMode : uint8_t

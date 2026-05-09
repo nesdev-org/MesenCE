@@ -1393,7 +1393,7 @@ void WsCpu::MulUnsigned(T x, T y)
 	_state.Flags.AuxCarry = false;
 	_state.Flags.Parity = false;
 	_state.Flags.Sign = false;
-	_state.Flags.Zero = _console->GetModel() > WsModel::Monochrome;
+	_state.Flags.Zero = _console->IsColorModel();
 
 	_mulOverflow = overflow;
 

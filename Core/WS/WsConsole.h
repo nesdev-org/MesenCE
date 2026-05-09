@@ -1,4 +1,5 @@
 #pragma once
+#include "Shared/SettingTypes.h"
 #include "pch.h"
 #include "Shared/Interfaces/IConsole.h"
 #include "WS/WsTypes.h"
@@ -51,6 +52,7 @@ private:
 	uint32_t _cartEepromSize = 0;
 
 	WsModel _model = {};
+	bool _colorModel = false;
 	bool _verticalMode = false;
 
 	void InitPostBootRomState();
@@ -67,8 +69,10 @@ public:
 
 	void GetScreenRotationOverride(uint32_t& rotation) override;
 	bool IsColorMode();
+	bool IsColorModel();
 	bool IsPowerOff();
 	bool IsVerticalMode();
+	WsAudioMode GetAudioMode();
 	WsModel GetModel();
 
 	void ProcessEndOfFrame();
