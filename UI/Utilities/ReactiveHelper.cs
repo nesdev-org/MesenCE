@@ -4,18 +4,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Mesen.Utilities
 {
 	public static class ReactiveHelper
 	{
-		public static IDisposable RegisterRecursiveObserver(ReactiveObject target, PropertyChangedEventHandler handler)
+		public static IDisposable RegisterRecursiveObserver<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(T target, PropertyChangedEventHandler handler) where T : ReactiveObject
 		{
 			Dictionary<string, ReactiveObject> observableObjects = new();
 			Dictionary<string, PropertyInfo> props = new();
 
-			foreach(PropertyInfo prop in target.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+			foreach(PropertyInfo prop in typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
 				if(prop.GetCustomAttribute<ReactiveAttribute>() != null) {
 					object? value = prop.GetValue(target);
 					if(value is ReactiveObject propValue) {
@@ -55,9 +56,9 @@ namespace Mesen.Utilities
 			return new RecursiveObserver(target, handler);
 		}
 
-		public static void UnregisterRecursiveObserver(ReactiveObject target, PropertyChangedEventHandler handler)
+		public static void UnregisterRecursiveObserver<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] T>(T target, PropertyChangedEventHandler handler) where T : ReactiveObject
 		{
-			foreach(PropertyInfo prop in target.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+			foreach(PropertyInfo prop in typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
 				if(prop.GetCustomAttribute<ReactiveAttribute>() != null) {
 					object? value = prop.GetValue(target);
 					if(value is ReactiveObject propValue) {
