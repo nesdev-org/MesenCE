@@ -10,10 +10,10 @@ WsCartFlash::WsCartFlash() : WsCart()
 {
 }
 
-void WsCartFlash::PostInit()
+void WsCartFlash::RefreshMappings()
 {
-	assert(_prgRomSize == 0x80000);
-	_memoryManager->SetCartFlash(true);
+	WsCart::RefreshMappings();
+	_memoryManager->SetCartFlash((_mode[0] != Mode::Read || _mode[1] != Mode::Read) ? WsRegisterAccess::ReadWrite : WsRegisterAccess::Write);
 }
 
 uint8_t WsCartFlash::ReadMemory(uint32_t addr)
@@ -121,11 +121,13 @@ void WsCartFlash::WriteMemory(uint32_t addr, uint8_t value)
 			}
 
 			_unlock = 0;
-			if(_mode[sector] != Mode::Read) {
+			if(_mode[0] != Mode::Read && _mode[1] != Mode::Read) {
 				_mode[sector ^ 1] = Mode::Read;
 			}
 		}
 	}
+
+	_memoryManager->SetCartFlash((_mode[0] != Mode::Read || _mode[1] != Mode::Read) ? WsRegisterAccess::ReadWrite : WsRegisterAccess::Write);
 }
 
 void WsCartFlash::Serialize(Serializer& s)
