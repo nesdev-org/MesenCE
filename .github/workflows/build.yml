@@ -12,8 +12,8 @@ jobs:
       matrix:
         platform: [
           {netversion: 6.x, targetframework: net6.0, aot: false, singleFile: true, aotString: ""},
-          {netversion: 8.x, targetframework: net8.0, aot: false, singleFile: true, aotString: ""},
-          {netversion: 8.x, targetframework: net8.0, aot: true, singleFile: false, aotString: " - AoT"}
+          {netversion: 10.x, targetframework: net10.0, aot: false, singleFile: true, aotString: ""},
+          {netversion: 10.x, targetframework: net10.0, aot: true, singleFile: false, aotString: " - AoT"}
         ]
       fail-fast: false
     runs-on: windows-latest
@@ -59,8 +59,8 @@ jobs:
       matrix:
         compiler: [gcc, clang, clang_aot]
         platform: [
-          {os: ubuntu-22.04, path: x64},
-          {os: ubuntu-22.04-arm, path: arm64}
+          {os: ubuntu-24.04, path: x64},
+          {os: ubuntu-24.04-arm, path: arm64}
         ]
         include:
           - compiler: gcc
@@ -81,7 +81,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |
@@ -111,8 +111,8 @@ jobs:
       matrix:
         compiler: [clang_appimage]
         platform: [
-          {os: ubuntu-22.04, name: x64, script: Linux/appimage/appimage.sh},
-          {os: ubuntu-22.04-arm, name: ARM64, script: Linux/appimage/appimage-arm64.sh}
+          {os: ubuntu-24.04, name: x64, script: Linux/appimage/appimage.sh},
+          {os: ubuntu-24.04-arm, name: ARM64, script: Linux/appimage/appimage-arm64.sh}
         ]
     runs-on: ${{ matrix.platform.os }}
 
@@ -125,7 +125,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |
@@ -173,7 +173,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |
