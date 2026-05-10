@@ -359,6 +359,9 @@ void WsConsole::LoadBattery()
 		_cartRtc->LoadBattery();
 	}
 
+	if(IsWWCart()) {
+		_emu->GetBatteryManager()->LoadBattery(".flash", _prgRom, _prgRomSize);
+	}
 	if(_saveRam) {
 		_emu->GetBatteryManager()->LoadBattery(".sav", _saveRam, _saveRamSize);
 	}
@@ -374,6 +377,9 @@ void WsConsole::SaveBattery()
 		_cartRtc->SaveBattery();
 	}
 
+	if(IsWWCart()) {
+		_emu->GetBatteryManager()->SaveBattery(".flash", _prgRom, _prgRomSize);
+	}
 	if(_saveRam) {
 		_emu->GetBatteryManager()->SaveBattery(".sav", _saveRam, _saveRamSize);
 	}
