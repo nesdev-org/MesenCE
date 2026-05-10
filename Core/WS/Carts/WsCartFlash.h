@@ -25,7 +25,7 @@ public:
 	WsCartFlash();
 	virtual ~WsCartFlash() {}
 
-	void PostInit() override;
+	void RefreshMappings() override;
 
 	uint8_t ReadMemory(uint32_t addr) override;
 	void WriteMemory(uint32_t addr, uint8_t value) override;

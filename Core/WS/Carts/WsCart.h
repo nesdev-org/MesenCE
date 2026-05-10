@@ -26,8 +26,6 @@ protected:
 	void Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly);
 	void Unmap(uint32_t start, uint32_t end);
 
-	virtual void PostInit();
-
 	uint32_t GetPhysicalAddress(uint32_t addr);
 
 public:
@@ -35,7 +33,7 @@ public:
 	virtual ~WsCart() {}
 
 	virtual void Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* cartRtc, uint8_t* prgRom, uint32_t prgRomSize, uint8_t* saveRam, uint32_t saveRamSize);
-	void RefreshMappings();
+	virtual void RefreshMappings();
 
 	WsCartState& GetState() { return _state; }
 	WsEeprom* GetEeprom() { return _cartEeprom; }
