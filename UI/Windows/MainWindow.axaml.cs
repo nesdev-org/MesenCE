@@ -196,7 +196,7 @@ namespace Mesen.Windows
 
 		private void OnDrop(object? sender, DragEventArgs e)
 		{
-			string? filename = e.Data.GetFiles()?.FirstOrDefault()?.Path.LocalPath;
+			string? filename = e.DataTransfer.TryGetFiles()?.FirstOrDefault()?.Path.LocalPath;
 			if(filename != null) {
 				if(File.Exists(filename)) {
 					LoadRomHelper.LoadFile(filename);

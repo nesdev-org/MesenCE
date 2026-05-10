@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Media;
 using Mesen.Config;
 using Mesen.Debugger.Utilities;
@@ -413,7 +414,7 @@ namespace Mesen.Debugger.Controls
 		{
 			var clipboard = ApplicationHelper.GetMainWindow()?.Clipboard;
 			if(clipboard != null) {
-				string? text = await clipboard.GetTextAsync();
+				string? text = await clipboard.TryGetTextAsync();
 				if(text != null) {
 					text = text.Replace("\n", "").Replace("\r", "");
 					if(Regex.IsMatch(text, "^[ a-f0-9]+$", RegexOptions.IgnoreCase)) {

@@ -141,9 +141,9 @@
 						and causes exceptions when trying to bind the values (including in tooltips
 						attached to a control in the dock control)
 					-->
-					<ItemsControl ItemsSource="{ReflectionBinding VisibleDockables}" Name="DockItemsControl">
+					<ItemsControl ItemsSource="{ReflectionBinding VisibleDockables}" Name="PART_ItemsControl">
 						<ItemsControl.Styles>
-							<Style Selector="ItemsControl#DockItemsControl > ContentPresenter">
+							<Style Selector="ItemsControl#PART_ItemsControl > ContentPresenter">
 								<Setter x:DataType="core:IDock" Property="(ProportionalStackPanel.Proportion)" Value="{Binding Proportion}" />
 
 								<!-- prevent error in binding -->
