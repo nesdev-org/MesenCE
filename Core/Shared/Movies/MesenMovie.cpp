@@ -115,8 +115,6 @@ void MesenMovie::ProcessNotification(ConsoleNotificationType type, void* paramet
 			if(_reader->GetStream("SaveState.mss", saveStateData)) {
 				if(!_emu->GetSaveStateManager()->LoadState(saveStateData)) {
 					_loadFailure = true;
-				} else {
-					_hasSaveState = true;
 				}
 			}
 		}
@@ -138,6 +136,8 @@ bool MesenMovie::Play(VirtualFile& file)
 
 	_reader.reset(new ZipReader());
 	_reader->LoadArchive(ss);
+
+	_hasSaveState = _reader->CheckFile("SaveState.mss");
 
 	stringstream inputData;
 	if(!_reader->GetStream("GameSettings.txt", _settingsData)) {
@@ -162,18 +162,20 @@ bool MesenMovie::Play(VirtualFile& file)
 	if(movieVersion < 2) {
 		MessageManager::DisplayMessage("Movies", "MovieIncompatibleVersion");
 		return false;
-	} else if(movieVersion == 2) {
-		//Version 2 of movies incorrectly skipped the first frame after recording from power on
-		//When playing back an old movie, add an extra frame of input at the start (no buttons pressed)
-		//to allow playback to match what it was before this bug was fixed.
-		_inputData.push_back({});
 	}
 
 	while(inputData) {
 		string line;
 		std::getline(inputData, line);
 		if(line.substr(0, 1) == "|") {
-			_inputData.push_back(StringUtilities::Split(line.substr(1), '|'));
+			vector<string> lineInputData = StringUtilities::Split(line.substr(1), '|');
+			if(movieVersion == 2 && _inputData.empty() && !_hasSaveState) {
+				//Version 2 of movies incorrectly skipped the first frame after recording from power on
+				//When playing back an old movie, add an extra frame of input at the start (no buttons pressed)
+				//to allow playback to match what it was before this bug was fixed.
+				_inputData.push_back(vector<string>(lineInputData.size(), ""));
+			}
+			_inputData.push_back(lineInputData);
 		}
 	}
 
