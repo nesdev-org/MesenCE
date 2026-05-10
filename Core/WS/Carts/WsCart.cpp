@@ -34,12 +34,6 @@ void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* c
 	_prgRomSize = prgRomSize;
 	_saveRam = saveRam;
 	_saveRamSize = saveRamSize;
-
-	this->PostInit();
-}
-
-void WsCart::PostInit()
-{
 }
 
 uint32_t WsCart::GetPhysicalAddress(uint32_t addr)

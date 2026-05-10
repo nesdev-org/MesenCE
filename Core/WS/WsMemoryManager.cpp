@@ -54,7 +54,7 @@ void WsMemoryManager::RefreshMappings()
 	}
 }
 
-void WsMemoryManager::SetCartFlash(bool cartFlash)
+void WsMemoryManager::SetCartFlash(WsRegisterAccess cartFlash)
 {
 	_cartFlash = cartFlash;
 }
@@ -98,7 +98,7 @@ void WsMemoryManager::Unmap(uint32_t start, uint32_t end)
 
 uint8_t WsMemoryManager::DebugRead(uint32_t addr)
 {
-	if(_cartFlash && addr >= 0x10000) {
+	if(((int)_cartFlash & (int)WsRegisterAccess::Read) && addr >= 0x10000) {
 		return _cart->ReadMemory(addr);
 	}
 	uint8_t* handler = _reads[addr >> 12];
@@ -110,7 +110,7 @@ uint8_t WsMemoryManager::DebugRead(uint32_t addr)
 
 void WsMemoryManager::DebugWrite(uint32_t addr, uint8_t value)
 {
-	if(_cartFlash && addr >= 0x10000) {
+	if(((int)_cartFlash & (int)WsRegisterAccess::Write) && addr >= 0x10000) {
 		_cart->WriteMemory(addr, value);
 		return;
 	}
