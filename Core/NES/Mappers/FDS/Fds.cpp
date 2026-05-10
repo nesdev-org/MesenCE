@@ -419,9 +419,12 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 		return;
 	}
 
-	//Only $4080 and $4088 seem to consistently deny/mangle writes during audio reset
-	//TODO Determine $4088 (mod table write) behaviour while in audio reset state
-	if(!_soundRegEnabled && (addr == 0x4080 || addr == 0x4088)) {
+	/**Only $4080 (volume envelope) seems to consistently deny writes during audio reset
+	TODO:
+	 - $4085 (mod counter) denies writes too, but there is an unknown delay before being forced to 0
+	 - Determine $4088 (mod table write) behaviour while in audio reset state
+	**/
+	if(!_soundRegEnabled && (addr == 0x4080 || addr == 0x4085 || addr == 0x4088)) {
 		return;
 	}
 
@@ -460,15 +463,16 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			}
 
-			//TODO Determine/implement audio reset behaviour, should probably go in FdsAudio
-			//(Ongoing research, please consult TakuikaNinja for further details)
+			/**TODO Determine/implement audio reset behaviour, should probably go in FdsAudio:
+			 - Proper method of resetting modulation state ($4085 write below doesn't always work)
+			 - Reset wave accumulator to 0
+			 - Mod table appears to init with (or decay to) all 0s?
+			 - There seems to be some kind of analogue "resume" window?
+			(Ongoing research, please consult TakuikaNinja for further details)
+			**/
 			if(!_soundRegEnabled) {
-				//Guessed based on instant muting
-				//(though there seems to be some kind of analogue "resume" window?)
-				_audio->WriteRegister(0x4080, 0x80);
-				_audio->WriteRegister(0x4085, 0x00); // based on $4097 state
-				// need to set wave accumulator to 0...
-				// mod table init?
+				_audio->WriteRegister(0x4080, 0x80); //Based on instant muting
+				_audio->WriteRegister(0x4085, 0x00); //Based on $4097 state
 			}
 			break;
 
