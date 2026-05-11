@@ -2,6 +2,17 @@
 #include "pch.h"
 #include "Utilities/Audio/HermiteResampler.h"
 
+struct WavHeader
+{
+	bool Valid;
+	uint32_t HeaderSize;
+	uint32_t FmtSize;
+	uint32_t DataSize;
+	uint32_t SampleRate;
+	uint32_t BitsPerSample;
+	uint32_t ChannelCount;
+};
+
 class WavReader
 {
 private:
@@ -22,6 +33,8 @@ private:
 public:
 	static unique_ptr<WavReader> Create(uint8_t* wavData, uint32_t length);
 	~WavReader();
+
+	static WavHeader GetHeader(uint8_t* wavData, uint32_t dataLength, uint32_t fileLength);
 
 	void Play(uint32_t startSample);
 	bool IsPlaybackOver();
