@@ -157,7 +157,6 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 		}
 	}
 
-	uint32_t totalPregapLbaLength = 0;
 	for(size_t i = 0; i < files.size(); i++) {
 		VirtualFile physicalFile = files[i].Filename;
 		if(!physicalFile.IsValid()) {
@@ -171,21 +170,19 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 			CueTrackEntry entry = files[i].Tracks[j];
 			TrackInfo trk = {};
 
-			if(entry.PreGap.HasGap) {
-				totalPregapLbaLength += entry.PreGap.Length.ToLba();
-			}
+			uint32_t pregapLength = entry.PreGap.HasGap ? entry.PreGap.Length.ToLba() : 0;
 
 			DiscPosition startPos;
 			for(CueIndexEntry& idx : entry.Indexes) {
 				if(idx.Number == 0) {
 					trk.HasLeadIn = true;
-					trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + startSector);
+					trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + pregapLength + startSector);
 				} else if(idx.Number == 1) {
 					if(entry.PreGap.HasGap) {
 						trk.HasLeadIn = true;
-						trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + totalPregapLbaLength - entry.PreGap.Length.ToLba() + startSector);
+						trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + startSector);
 					}
-					trk.StartPosition = DiscPosition::FromLba(idx.Position.ToLba() + totalPregapLbaLength + startSector);
+					trk.StartPosition = DiscPosition::FromLba(idx.Position.ToLba() + pregapLength + startSector);
 					startPos = idx.Position;
 				} else {
 					MessageManager::Log("[CUE] Unsupported index number: " + std::to_string(idx.Number));
@@ -223,6 +220,7 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 			}
 
 			if(trk.HasLeadIn && !entry.PreGap.HasGap) {
+				//Index 0 is part of the file on the disc, but PREGAPs aren't.
 				trk.FileOffset += (trk.StartPosition.ToLba() - trk.LeadInPosition.ToLba()) * trk.GetSectorSize();
 			}
 			trk.FileIndex = (uint32_t)disc.Files.size() - 1;
