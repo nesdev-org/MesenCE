@@ -161,7 +161,6 @@ void GbApu::PlayQueuedAudio()
 		return;
 	}
 
-	GameboyConfig& cfg = _emu->GetSettings()->GetGameboyConfig();
 	if(_gameboy->IsPrimaryConsole() && _gameboy->GetLinkedConsole()) {
 		ProcessLinkCableAudio();
 	}
