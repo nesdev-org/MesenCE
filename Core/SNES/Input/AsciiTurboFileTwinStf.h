@@ -14,6 +14,7 @@ private:
 	uint32_t _position = 0;
 	uint8_t _data[AsciiTurboFileTwinStf::FileSize] = {};
 	uint8_t _currentByte = 0; // 8-bit shift register; current read/write byte
+	uint8_t _mostRecentByte; // Byte most recently read or written
 
 	// Command state
 	bool _writeMode = false;
@@ -34,6 +35,7 @@ protected:
 		BaseControlDevice::Serialize(s);
 		SVArray(_data, AsciiTurboFileTwinStf::FileSize);
 		SV(_currentByte);
+		SV(_mostRecentByte);
 		SV(_position);
 		SV(_writeMode);
 		SV(_readMode);
@@ -131,6 +133,7 @@ public:
 				}
 				_firstAccess = true;
 				_didWriteAnything = false;
+				_currentByte = _mostRecentByte;
 			} else {
 				// Don't do a read or write the first time the strobe is turned on and off
 				// (Allows the program to get a status report and confirm the read/write command worked before accessing data)
@@ -138,12 +141,14 @@ public:
 					if(_writeMode) {
 						if(_didReadWithStrobe) {
 							_data[_position % FileSize] = _currentByte;
+							_mostRecentByte = _currentByte;
 							_didWriteAnything = true;
 						} else {
 							_writeMode = false;
 						}
 					} else if(_readMode) {
-						_currentByte = _data[_position % FileSize];
+						_mostRecentByte = _data[_position % FileSize];
+						_currentByte = _mostRecentByte;
 					}
 					_position++;
 				}
