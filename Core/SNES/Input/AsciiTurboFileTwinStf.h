@@ -20,6 +20,7 @@ private:
 	bool _readMode = false;
 	bool _firstAccess = false; // First data access after entering write mode or read mode
 	bool _didReadWithStrobe = false; // Were any $4017 reads done while strobe was on?
+	bool _didWriteAnything = false; // Have any writes actually gone through?
 	uint32_t _newCommand = 0; // 28-bit shift register
 
 	// Status report
@@ -38,6 +39,7 @@ protected:
 		SV(_readMode);
 		SV(_firstAccess);
 		SV(_didReadWithStrobe);
+		SV(_didWriteAnything);
 		SV(_newCommand);
 	}
 
@@ -61,7 +63,7 @@ public:
 	void RefreshStateBuffer() override
 	{
 		_stateBuffer = 0b011111110111000000000000 | // Controller type $E, and then disambiguated with $FE
-			((uint8_t)_writeMode << 24) |
+			((uint8_t)(_writeMode & !_didWriteAnything) << 24) |
 			((uint8_t)_readMode << 25);
 		// Bit 26 is 1 if batteries are missing?
 		// Bit 27 is 1 if write protect is on
@@ -117,6 +119,7 @@ public:
 		}
 
 		if(prevStrobe && !_strobe) {
+			RefreshStateBuffer();
 			if(!_writeMode && !_readMode) {
 				// Potentially start a new command
 				_position = _newCommand >> 8;
@@ -126,6 +129,7 @@ public:
 					_writeMode = true;
 				}
 				_firstAccess = true;
+				_didWriteAnything = false;
 			} else {
 				// Don't do a read or write the first time the strobe is turned on and off
 				// (Allows the program to get a status report and confirm the read/write command worked before accessing data)
@@ -133,6 +137,7 @@ public:
 					if(_writeMode) {
 						if(_didReadWithStrobe) {
 							_data[_position % FileSize] = _currentByte;
+							_didWriteAnything = true;
 						} else {
 							_writeMode = false;
 						}
@@ -144,7 +149,6 @@ public:
 				_firstAccess = false;
 			}
 			_newCommand = 0;
-			RefreshStateBuffer();
 		}
 	}
 };
