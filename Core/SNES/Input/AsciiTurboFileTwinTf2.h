@@ -5,6 +5,7 @@
 #include "Shared/BatteryManager.h"
 #include "Shared/Interfaces/IBattery.h"
 #include "Utilities/Serializer.h"
+#include "Utilities/BitUtilities.h"
 
 class AsciiTurboFileTwinTf2 : public BaseControlDevice, public IBattery
 {
@@ -75,9 +76,8 @@ public:
 			_stateBuffer |= 1 << 23; // All bits after the first 24 are 1s in TFII mode
 
 			// Get current bit in the Turbo File data
-			output |= ((_data[_position / 8] >> (_position % 8)) & 0x01) << 1;
+			output |= BitUtilities::GetBitInArray(_data, FileSize, _position) << 1;
 		}
-
 		return output;
 	}
 
@@ -92,8 +92,7 @@ public:
 			if(_unlocked) {
 				//Perform write and increase position
 				uint8_t ioPort = _console->GetInternalRegisters()->GetIoPortOutput();
-				_data[_position / 8] &= ~(1 << (_position % 8));
-				_data[_position / 8] |= ((ioPort & 0x80) ? 0x01 : 0x00) << (_position % 8);
+				BitUtilities::SetBitInArray(_data, FileSize, _position, (ioPort & 0x80) == 0x80);
 				_position = (_position + 1) & (AsciiTurboFileTwinTf2::BitCount - 1);
 			}
 		}

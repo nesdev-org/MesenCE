@@ -15,4 +15,20 @@ public:
 	{
 		return (uint8_t)(value >> bitNumber);
 	}
+
+	template<typename T>
+	__forceinline static void SetBitInArray(T array[], size_t byteCount, size_t position, bool value)
+	{
+		position %= byteCount;
+		array[position / 8] &= ~(1 << (position % 8));
+		if(value) {
+			array[position / 8] |= 1 << (position % 8);
+		}
+	}
+
+	template<typename T>
+	__forceinline static uint8_t GetBitInArray(T array[], size_t byteCount, size_t position)
+	{
+		return (uint8_t)((array[(position / 8) % byteCount] >> (position % 8)) & 0x01);
+	}
 };

@@ -65,7 +65,8 @@ public:
 		_stateBuffer = 0b011111110111000000000000 | // Controller type $E, and then disambiguated with $FE
 			((uint8_t)(_writeMode & !_didWriteAnything) << 24) |
 			((uint8_t)_readMode << 25);
-		// Bit 26 is 1 if batteries are missing?
+		// Bit 26 is 1 if batteries are missing
+		// TODOSNES - Verify behavior of bit 26; it may actually be a "low battery" flag, but so far it's only been confirmed that it is 1 when the Turbo File Twin has no batteries in it
 		// Bit 27 is 1 if write protect is on
 		// Bits 28-31 are capacity; 0 = 128 KiB
 	}
