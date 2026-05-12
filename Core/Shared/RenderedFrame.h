@@ -1,6 +1,5 @@
 #pragma once
 #include "pch.h"
-#include "Shared/SettingTypes.h"
 #include "Shared/ControlDeviceState.h"
 
 struct RenderedFrame

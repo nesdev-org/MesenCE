@@ -17,6 +17,7 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Serializer.h"
 #include "Shared/EventType.h"
+#include "Shared/Utilities/AvMergeUtilities.h"
 
 constexpr uint16_t evtColors[6] = { 0x18C6, 0x294A, 0x108C, 0x4210, 0x3084, 0x1184 };
 
@@ -823,9 +824,8 @@ void GbPpu::SendFrame()
 	_isFirstFrame = false;
 
 	RenderedFrame frame(_currentBuffer, GbConstants::ScreenWidth, GbConstants::ScreenHeight, 1.0, _state.FrameCount, _gameboy->GetControlManager()->GetPortStates());
-
 	if(_gameboy->GetLinkedConsole()) {
-		SendLinkedFrame();
+		SendLinkedFrame(frame);
 		if(_gameboy->IsPrimaryConsole()) {
 			_emu->ProcessEndOfFrame();
 		}
@@ -840,12 +840,10 @@ void GbPpu::SendFrame()
 	_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
 }
 
-void GbPpu::SendLinkedFrame()
+void GbPpu::SendLinkedFrame(RenderedFrame& frame)
 {
 	GameboyConfig& cfg = _settings->GetGameboyConfig();
 	bool forRewind = _emu->GetRewindManager()->IsRewinding();
-
-	RenderedFrame frame(_currentBuffer, GbConstants::ScreenWidth, GbConstants::ScreenHeight, 1.0, _state.FrameCount, _gameboy->GetControlManager()->GetPortStates());
 
 	if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::MainSystemOnly && _gameboy->IsPrimaryConsole()) {
 		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
@@ -853,23 +851,18 @@ void GbPpu::SendLinkedFrame()
 		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
 	} else if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::Both) {
 		if(_gameboy->IsPrimaryConsole()) {
-			uint16_t* mergedBuffer = new uint16_t[GbConstants::ScreenWidth * GbConstants::ScreenHeight * 2];
-
-			uint16_t* in1 = _currentBuffer;
-			uint16_t* in2 = ((GbPpu*)_gameboy->GetLinkedConsole()->GetPpu())->_currentBuffer;
-			uint16_t* out = mergedBuffer;
-			for(int i = 0; i < GbConstants::ScreenHeight; i++) {
-				memcpy(out, in1, GbConstants::ScreenWidth * sizeof(uint16_t));
-				out += GbConstants::ScreenWidth;
-				in1 += GbConstants::ScreenWidth;
-				memcpy(out, in2, GbConstants::ScreenWidth * sizeof(uint16_t));
-				out += GbConstants::ScreenWidth;
-				in2 += GbConstants::ScreenWidth;
+			GbPpu* otherPpu = _gameboy->GetLinkedConsole()->GetPpu();
+			uint16_t* otherFrame;
+			if(otherPpu->GetScanline() >= GetScanline() || (otherPpu->GetMode() == PpuMode::HBlank && otherPpu->GetScanline() == GetScanline() - 1)) {
+				//When both PPUs are in vblank (or at least, done drawing the current frame), use the latest frame
+				otherFrame = otherPpu->GetOutputBuffer();
+			} else {
+				//When the other PPU is not in vblank, use the previous frame's output to avoid screen tearing
+				otherFrame = otherPpu->_currentBuffer == otherPpu->_outputBuffers[0] ? otherPpu->_outputBuffers[1] : otherPpu->_outputBuffers[0];
 			}
 
-			RenderedFrame mergedFrame(mergedBuffer, GbConstants::ScreenWidth * 2, GbConstants::ScreenHeight, 1.0, _state.FrameCount, _gameboy->GetControlManager()->GetPortStates());
-			_emu->GetVideoDecoder()->UpdateFrame(mergedFrame, true, forRewind);
-			delete[] mergedBuffer;
+			VideoMergeResult merged = AvMergeUtilities::MergeFrames(frame, otherFrame);
+			_emu->GetVideoDecoder()->UpdateFrame(merged.Frame, true, forRewind);
 		}
 	}
 }

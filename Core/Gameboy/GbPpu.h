@@ -8,6 +8,7 @@ class Gameboy;
 class GbMemoryManager;
 class GbDmaController;
 class EmuSettings;
+struct RenderedFrame;
 
 class GbPpu : public ISerializable
 {
@@ -97,7 +98,7 @@ private:
 	__forceinline uint16_t LcdReadObjPalette(uint8_t addr);
 
 	void SendFrame();
-	void SendLinkedFrame();
+	void SendLinkedFrame(RenderedFrame& frame);
 	void UpdatePalette();
 
 	void SetMode(PpuMode mode);

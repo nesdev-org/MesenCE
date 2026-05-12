@@ -2985,6 +2985,9 @@
     <ClInclude Include="SNES\Input\SnesRumbleController.h">
       <Filter>SNES\Input</Filter>
     </ClInclude>
+    <ClInclude Include="Shared\Utilities\AvMergeUtilities.h">
+      <Filter>Shared\Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Video\RotateFilter.cpp">

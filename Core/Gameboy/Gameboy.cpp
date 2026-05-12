@@ -623,15 +623,9 @@ void Gameboy::RunFrame()
 void Gameboy::RunLinkedConsole()
 {
 	_emu->SetDebuggerDisabled(true);
-	int64_t cycleGap;
-	while(true) {
+	while((int64_t)(_cpu->GetCycleCount() - _secondaryConsole->_cpu->GetCycleCount()) > 5) {
 		//Run the sub console until it catches up to the main CPU
-		cycleGap = (int64_t)(_cpu->GetCycleCount() - _secondaryConsole->_cpu->GetCycleCount());
-		if(cycleGap > 5 || _ppu->GetFrameCount() > _secondaryConsole->_ppu->GetFrameCount()) {
-			_secondaryConsole->_cpu->Exec();
-		} else {
-			break;
-		}
+		_secondaryConsole->_cpu->Exec();
 	}
 	_emu->SetDebuggerDisabled(false);
 }

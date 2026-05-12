@@ -5,12 +5,13 @@
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/Audio/SoundMixer.h"
+#include "Shared/Utilities/AvMergeUtilities.h"
 #include "Utilities/Serializer.h"
 
 GbApu::GbApu()
 {
-	_soundBuffer = new int16_t[GbApu::MaxSamples * 2 * 2]; // *2 for stereo, then *2 as a precaution against buffer overflows
-	memset(_soundBuffer, 0, GbApu::MaxSamples * 2 * 2 * sizeof(int16_t));
+	_soundBuffer = new int16_t[GbApu::MaxSamples * 2];
+	memset(_soundBuffer, 0, GbApu::MaxSamples * 2 * sizeof(int16_t));
 
 	_leftChannel = blip_new(GbApu::MaxSamples);
 	_rightChannel = blip_new(GbApu::MaxSamples);
@@ -110,7 +111,7 @@ void GbApu::Run()
 		}
 	}
 
-	if(!_gameboy->IsSgb() && _clockCounter >= 20000 && !_gameboy->IsPrimaryConsole()) {
+	if(_gameboy->IsPrimaryConsole() && !_gameboy->IsSgb() && _clockCounter >= 20000) {
 		PlayQueuedAudio();
 	}
 }
@@ -153,9 +154,6 @@ void GbApu::PlayQueuedAudio()
 	size_t sampleCount = blip_read_samples(_leftChannel, out, GbApu::MaxSamples, 1);
 	blip_read_samples(_rightChannel, out + 1, GbApu::MaxSamples, 1);
 	_sampleCount += sampleCount;
-	if(_sampleCount > GbApu::MaxSamples) { // Hacky safeguard against buffer overflows
-		_sampleCount = GbApu::MaxSamples;
-	}
 	_clockCounter = 0;
 
 	if(!_gameboy->IsPrimaryConsole()) {
@@ -187,19 +185,7 @@ void GbApu::ProcessLinkCableAudio()
 	subApu->PlayQueuedAudio();
 
 	if(cfg.LocalLinkCableAudioOutput != GbLocalLinkOutputOption::MainSystemOnly) {
-		size_t i;
-		for(i = 0; i < _sampleCount && i < subApu->_sampleCount; i++) {
-			_soundBuffer[i * 2] += subApu->_soundBuffer[i * 2];
-			_soundBuffer[i * 2 + 1] += subApu->_soundBuffer[i * 2 + 1];
-		}
-
-		if(i < subApu->_sampleCount) {
-			size_t samplesToCopy = subApu->_sampleCount - i;
-			memmove(subApu->_soundBuffer, subApu->_soundBuffer + i * 2, samplesToCopy * 2 * sizeof(int16_t));
-			subApu->_sampleCount = samplesToCopy;
-		} else {
-			subApu->_sampleCount = 0;
-		}
+		AvMergeUtilities::MergeAudio(_soundBuffer, _sampleCount, subApu->_soundBuffer, subApu->_sampleCount);
 	} else {
 		subApu->_sampleCount = 0;
 	}

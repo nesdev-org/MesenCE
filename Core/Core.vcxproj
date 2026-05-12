@@ -29,6 +29,7 @@
     <ClInclude Include="NES\Mappers\Nintendo\CnromProtect.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper487.h" />
     <ClInclude Include="NES\OpnInterface.h" />
+    <ClInclude Include="Shared\Utilities\AvMergeUtilities.h" />
     <ClInclude Include="SMS\Input\ColecoVisionController.h" />
     <ClInclude Include="Debugger\AddressInfo.h" />
     <ClInclude Include="Debugger\Base6502Assembler.h" />
