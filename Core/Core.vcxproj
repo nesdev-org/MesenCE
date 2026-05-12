@@ -29,6 +29,8 @@
     <ClInclude Include="NES\Mappers\Nintendo\CnromProtect.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper487.h" />
     <ClInclude Include="NES\OpnInterface.h" />
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinStf.h" />
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinTf2.h" />
     <ClInclude Include="SNES\Input\SnesNttDataKeypad.h" />
     <ClInclude Include="SMS\Input\ColecoVisionController.h" />
     <ClInclude Include="Debugger\AddressInfo.h" />

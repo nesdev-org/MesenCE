@@ -30,6 +30,8 @@ namespace Mesen.ViewModels
 			ControllerType.SnesMouse,
 			ControllerType.SuperScope,
 			ControllerType.SnesNttDataKeypad,
+			ControllerType.AsciiTurboFileTwinTf2,
+			ControllerType.AsciiTurboFileTwinStf,
 			ControllerType.Multitap,
 		};
 

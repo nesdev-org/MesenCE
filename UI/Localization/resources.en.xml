@@ -2019,6 +2019,8 @@ E
 			<Value ID="SuperScope">Super Scope</Value>
 			<Value ID="Multitap">Super Multitap</Value>
 			<Value ID="SnesNttDataKeypad">SNES NTT Data Keypad</Value>
+			<Value ID="AsciiTurboFileTwinTf2">Turbo File Twin (TFII mode)</Value>
+			<Value ID="AsciiTurboFileTwinStf">Turbo File Twin (STF mode)</Value>
 
 			<Value ID="NesController">NES Controller</Value>
 			<Value ID="FamicomController">Famicom Controller</Value>
