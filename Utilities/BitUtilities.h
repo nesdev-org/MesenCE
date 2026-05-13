@@ -19,7 +19,7 @@ public:
 	template<typename T>
 	__forceinline static void SetBitInArray(T array[], size_t byteCount, size_t position, bool value)
 	{
-		position %= byteCount;
+		position %= byteCount * 8;
 		array[position / 8] &= ~(1 << (position % 8));
 		if(value) {
 			array[position / 8] |= 1 << (position % 8);
