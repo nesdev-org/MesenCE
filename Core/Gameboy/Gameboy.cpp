@@ -498,14 +498,15 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 			EmuSettings* settings = _emu->GetSettings();
 			GameboyConfig cfg = settings->GetGameboyConfig();
 			if(!_mainConsole && cfg.UseLocalLinkCable && !_allowSgb) { // Don't allow link cable with SGB for now
-				_emu->SetDebuggerDisabled(true);
 
 				// Create second console and link it with this one
 				_secondaryConsole.reset(new Gameboy(_emu));
 				_secondaryConsole->_mainConsole = this;
-				LoadRomResult result = _secondaryConsole->LoadRom(romFile);
 
+				_emu->SetDebuggerDisabled(true);
+				LoadRomResult result = _secondaryConsole->LoadRom(romFile);
 				_emu->SetDebuggerDisabled(false);
+
 				if(result != LoadRomResult::Success) {
 					return result;
 				}

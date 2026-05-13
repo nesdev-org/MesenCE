@@ -119,6 +119,10 @@ private:
 	int32_t _stopCode = 0;
 	bool _stopRequested = false;
 
+	//For VS DualSystem, or when running e.g 2 Game Boys at once, this is used to
+	//disable all debugger hooks and memory registration for one of the 2 consoles.
+	//This is needed until the debugger tools are able to handle debugging 2 identical
+	//consoles at the same time.
 	bool _isDebuggerDisabled = false;
 
 	void WaitForLock();

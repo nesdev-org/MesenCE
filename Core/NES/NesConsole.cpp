@@ -30,7 +30,6 @@
 #include "Shared/CheatManager.h"
 #include "Shared/Movies/MovieManager.h"
 #include "Shared/BaseControlManager.h"
-#include "Shared/Interfaces/IBattery.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/NotificationManager.h"
 #include "Netplay/GameClient.h"
@@ -163,7 +162,9 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile)
 			//Create 2nd console (sub) dualsystem games
 			_vsSubConsole.reset(new NesConsole(_emu));
 			_vsSubConsole->_vsMainConsole = this;
+			_emu->SetDebuggerDisabled(true);
 			result = _vsSubConsole->LoadRom(romFile);
+			_emu->SetDebuggerDisabled(false);
 			if(result != LoadRomResult::Success) {
 				return result;
 			}
@@ -307,6 +308,7 @@ void NesConsole::RunFrame()
 
 void NesConsole::RunVsSubConsole()
 {
+	_emu->SetDebuggerDisabled(true);
 	int64_t cycleGap;
 	while(true) {
 		//Run the sub console until it catches up to the main CPU
@@ -317,6 +319,7 @@ void NesConsole::RunVsSubConsole()
 			break;
 		}
 	}
+	_emu->SetDebuggerDisabled(false);
 }
 
 void NesConsole::SetNextFrameOverclockStatus(bool disabled)
