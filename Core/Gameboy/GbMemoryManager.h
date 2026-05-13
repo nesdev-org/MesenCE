@@ -41,6 +41,9 @@ private:
 
 	__forceinline void ExecTimerDmaSerial();
 
+	void RunSerialTransfer();
+	bool ExchangeSerialBits(bool serialBit);
+
 public:
 	virtual ~GbMemoryManager();
 
@@ -82,9 +85,6 @@ public:
 	bool IsBootRomDisabled();
 
 	uint64_t GetApuCycleCount();
-
-	void RunSerialTransfer();
-	bool ExchangeSerialBits(bool serialBit);
 
 	uint8_t DebugRead(uint16_t addr);
 	void DebugWrite(uint16_t addr, uint8_t value);

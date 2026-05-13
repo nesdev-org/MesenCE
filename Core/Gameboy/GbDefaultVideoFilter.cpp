@@ -2,7 +2,6 @@
 #include "Gameboy/GbDefaultVideoFilter.h"
 #include "Gameboy/GbConstants.h"
 #include "Gameboy/Gameboy.h"
-#include "Shared/Video/DebugHud.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/RewindManager.h"

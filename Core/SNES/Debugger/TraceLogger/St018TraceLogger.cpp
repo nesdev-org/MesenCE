@@ -5,7 +5,7 @@
 #include "Debugger/DisassemblyInfo.h"
 #include "Debugger/Debugger.h"
 #include "Debugger/DebugTypes.h"
-#include "Utilities/HexUtilities.h"
+#include "Utilities/FastString.h"
 
 St018TraceLogger::St018TraceLogger(Debugger* debugger, IDebugger* cpuDebugger, SnesPpu* ppu) : BaseTraceLogger(debugger, cpuDebugger, CpuType::St018)
 {

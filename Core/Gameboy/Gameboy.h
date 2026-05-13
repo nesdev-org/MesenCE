@@ -79,7 +79,7 @@ public:
 
 	void PowerOn(SuperGameboy* sgb);
 
-	void Run(uint64_t runUntilClock);
+	void RunSgb(uint64_t runUntilClock);
 
 	void LoadBattery();
 	void SaveBattery() override;
