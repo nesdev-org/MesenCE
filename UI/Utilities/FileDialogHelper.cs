@@ -36,6 +36,7 @@ namespace Mesen.Utilities
 		public const string BinExt = "bin";
 		public const string NesExt = "nes";
 		public const string SufamiTurboExt = "st";
+		public const string SpcExt = "spc";
 
 		public static async Task<string?> OpenFile(string? initialFolder, IRenderRoot? parent, params string[] extensions)
 		{

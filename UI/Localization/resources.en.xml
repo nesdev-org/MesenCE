@@ -1023,6 +1023,18 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		
+		<Form ID="SaveSpcFileWindow">
+			<Control ID="wndTitle">Save a .SPC file</Control>
+
+			<Control ID="grpTags">ID666 tags</Control>
+			<Control ID="lblSongTitle">Song title</Control>
+			<Control ID="lblGameTitle">Game title</Control>
+			<Control ID="lblSongArtist">Artist</Control>
+
+			<Control ID="btnOK">Save file</Control>
+			<Control ID="btnCancel">Cancel</Control>
+		</Form>
+		
 		<Form ID="CheckBoxWarning">
 			<Control ID="Hint">(not recommended)</Control>
 		</Form>
@@ -2013,6 +2025,7 @@ E
 			<Value ID="SnesMouse">SNES Mouse</Value>
 			<Value ID="SuperScope">Super Scope</Value>
 			<Value ID="Multitap">Super Multitap</Value>
+			<Value ID="SnesNttDataKeypad">SNES NTT Data Keypad</Value>
 
 			<Value ID="NesController">NES Controller</Value>
 			<Value ID="FamicomController">Famicom Controller</Value>
@@ -2379,6 +2392,23 @@ E
 			<Value ID="Right">D-Pad - Right</Value>
 			<Value ID="R">Button - Right</Value>
 			<Value ID="L">Button - Left</Value>
+		</Enum>
+		<Enum ID="SnesNttDataKeypadButtons">
+			<Value ID="Num0">Number 0</Value>
+			<Value ID="Num1">Number 1</Value>
+			<Value ID="Num2">Number 2</Value>
+			<Value ID="Num3">Number 3</Value>
+			<Value ID="Num4">Number 4</Value>
+			<Value ID="Num5">Number 5</Value>
+			<Value ID="Num6">Number 6</Value>
+			<Value ID="Num7">Number 7</Value>
+			<Value ID="Num8">Number 8</Value>
+			<Value ID="Num9">Number 9</Value>
+			<Value ID="Star">Star (*)</Value>
+			<Value ID="Pound">Pound (#)</Value>
+			<Value ID="Period">Period (.)</Value>
+			<Value ID="C">C</Value>
+			<Value ID="EndComunication">End communication</Value>
 		</Enum>
 		<Enum ID="NesConsoleType">
 			<Value ID="Nes001">NES - Front loader (NES-001)</Value>
@@ -2815,6 +2845,8 @@ E
 			<Value ID="GbBootRom">GB - Boot ROM</Value>
 			<Value ID="GbVideoRam">GB - Video RAM</Value>
 			<Value ID="GbSpriteRam">GB - Sprite RAM</Value>
+			<Value ID="GbBgPaletteRam">GB - Background Palette RAM</Value>
+			<Value ID="GbObjPaletteRam">GB - Sprite Palette RAM</Value>
 
 			<Value ID="NesMemory">CPU Memory</Value>
 			<Value ID="NesPpuMemory">PPU Memory</Value>
@@ -3558,6 +3590,7 @@ E
 			<Value ID="InstallHdPack">Install HD Pack</Value>
 			<Value ID="HdPackBuilder">HD Pack Builder</Value>
 			<Value ID="TakeScreenshot">Take Screenshot</Value>
+			<Value ID="SaveSpcFile">Save .SPC File</Value>
 
 			<Value ID="OnlineHelp">Online Help</Value>
 			<Value ID="CommandLineHelp">Command-line options</Value>

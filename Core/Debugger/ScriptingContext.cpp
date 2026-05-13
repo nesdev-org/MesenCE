@@ -132,14 +132,25 @@ string ScriptingContext::SerializeTable()
 	bool firstKey = true;
 	lua_pushnil(_lua);
 	while(lua_next(_lua, -2) != 0) {
-		if(lua_type(_lua, -2) == LUA_TSTRING) {
-			size_t len = 0;
-			const char* cstr = lua_tolstring(_lua, -2, &len);
+		int keyType = lua_type(_lua, -2);
+		if(keyType == LUA_TSTRING || keyType == LUA_TNUMBER) {
 			if(!firstKey) {
 				result += ", ";
 			}
 			firstKey = false;
-			result += string(cstr, len);
+			if(keyType == LUA_TSTRING) {
+				size_t len = 0;
+				const char* cstr = lua_tolstring(_lua, -2, &len);
+				result += string(cstr, len);
+			} else {
+				if(lua_isinteger(_lua, -2)) {
+					lua_Integer integer = lua_tointeger(_lua, -2);
+					result += std::to_string(integer);
+				} else {
+					lua_Number number = lua_tonumber(_lua, -2);
+					result += std::to_string(number);
+				}
+			}
 			result += " = ";
 
 			if(lua_type(_lua, -1) == LUA_TSTRING) {

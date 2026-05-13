@@ -15,6 +15,7 @@
 #include "NES/Input/NesController.h"
 #include "SNES/Input/SnesController.h"
 #include "SNES/Input/SnesMouse.h"
+#include "SNES/Input/SnesNttDataKeypad.h"
 #include "NES/Input/Zapper.h"
 #include "NES/Input/ArkanoidController.h"
 #include "NES/Input/OekaKidsTablet.h"
@@ -88,6 +89,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 
 		case ControllerType::NesArkanoidController: device.reset(new ArkanoidController(_emu, type, port, keys)); break;
 		case ControllerType::SnesController: device.reset(new SnesController(_emu, port, keys)); break;
+		case ControllerType::SnesNttDataKeypad: device.reset(new SnesNttDataKeypad(_emu, port, keys)); break;
 
 		case ControllerType::PowerPadSideA:
 		case ControllerType::PowerPadSideB:

@@ -44,6 +44,8 @@ namespace Mesen.Interop
 				case MemoryType.GbBootRom:
 				case MemoryType.GbVideoRam:
 				case MemoryType.GbSpriteRam:
+				case MemoryType.GbBgPaletteRam:
+				case MemoryType.GbObjPaletteRam:
 				case MemoryType.GameboyMemory:
 					return CpuType.Gameboy;
 
@@ -137,6 +139,8 @@ namespace Mesen.Interop
 
 				case MemoryType.GbVideoRam:
 				case MemoryType.GbSpriteRam:
+				case MemoryType.GbBgPaletteRam:
+				case MemoryType.GbObjPaletteRam:
 
 				case MemoryType.NesPpuMemory:
 				case MemoryType.NesSecondarySpriteRam:
@@ -188,6 +192,8 @@ namespace Mesen.Interop
 
 				case MemoryType.GbBootRom:
 				case MemoryType.GbSpriteRam:
+				case MemoryType.GbBgPaletteRam:
+				case MemoryType.GbObjPaletteRam:
 
 				case MemoryType.NesSecondarySpriteRam:
 				case MemoryType.NesSpriteRam:
@@ -482,6 +488,8 @@ namespace Mesen.Interop
 				MemoryType.GbBootRom => "BOOT",
 				MemoryType.GbVideoRam => "VRAM",
 				MemoryType.GbSpriteRam => "OAM",
+				MemoryType.GbBgPaletteRam => "BG PAL",
+				MemoryType.GbObjPaletteRam => "OBJ PAL",
 
 				MemoryType.NesMemory => "CPU",
 				MemoryType.NesPpuMemory => "PPU",

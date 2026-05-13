@@ -441,6 +441,15 @@ protected:
 		}
 	}
 
+	uint8_t ReadRam(uint16_t addr) override
+	{
+		uint8_t value = BaseMapper::ReadRam(addr);
+		if(_audio->GetPcmReadMode()) {
+			_audio->HandlePcmRead(addr, value);
+		}
+		return value;
+	}
+
 	void WriteRam(uint16_t addr, uint8_t value) override
 	{
 		if(addr >= 0x5C00 && addr <= 0x5FFF && _extendedRamMode <= 1 && !_ppuInFrame) {

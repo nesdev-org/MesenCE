@@ -352,6 +352,7 @@ namespace Mesen.Config
 		SuperScope,
 		Multitap,
 		SnesRumbleController,
+		SnesNttDataKeypad,
 
 		//NES controllers
 		NesController,
@@ -419,6 +420,7 @@ namespace Mesen.Config
 			switch(type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
+				case ControllerType.SnesNttDataKeypad:
 				case ControllerType.NesController:
 				case ControllerType.FamicomController:
 				case ControllerType.FamicomControllerP2:
@@ -443,6 +445,7 @@ namespace Mesen.Config
 			switch(type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
+				case ControllerType.SnesNttDataKeypad:
 				case ControllerType.NesController:
 				case ControllerType.FamicomController:
 				case ControllerType.FamicomControllerP2:
@@ -465,6 +468,7 @@ namespace Mesen.Config
 			switch(type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
+				case ControllerType.SnesNttDataKeypad:
 				case ControllerType.NesController:
 				case ControllerType.FamicomController:
 				case ControllerType.FamicomControllerP2:

@@ -49,6 +49,8 @@ enum class MemoryType
 	GbBootRom,
 	GbVideoRam,
 	GbSpriteRam,
+	GbBgPaletteRam,
+	GbObjPaletteRam,
 
 	NesPrgRom,
 	NesInternalRam,

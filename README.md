@@ -45,6 +45,10 @@ Other builds are also available in the [Actions](https://github.com/nesdev-org/M
 
 See [COMPILING.md](COMPILING.md)
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md)
+
 ## License
 
 Mesen is available under the GPL V3 license.  Full text here: <http://www.gnu.org/licenses/gpl-3.0.en.html>

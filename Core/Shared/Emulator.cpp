@@ -490,6 +490,8 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 	//Restore pollcounter (used by movies when a power cycle is in the movie)
 	_console->GetControlManager()->SetPollCounter(pollCounter);
 
+	_notificationManager->SendNotification(ConsoleNotificationType::AfterInitConsole);
+
 	_rewindManager->InitHistory();
 
 	if(debuggerActive || _settings->CheckFlag(EmulationFlags::ConsoleMode)) {

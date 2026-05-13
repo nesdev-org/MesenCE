@@ -14,6 +14,7 @@
 #include "SNES/Input/SnesMouse.h"
 #include "SNES/Input/Multitap.h"
 #include "SNES/Input/SuperScope.h"
+#include "SNES/Input/SnesNttDataKeypad.h"
 #include "Shared/EventType.h"
 #include "Utilities/Serializer.h"
 #include "Shared/SystemActionManager.h"
@@ -66,6 +67,10 @@ shared_ptr<BaseControlDevice> SnesControlManager::CreateControllerDevice(Control
 
 		case ControllerType::SnesRumbleController:
 			device.reset(new SnesRumbleController(_emu, _console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
+			break;
+
+		case ControllerType::SnesNttDataKeypad:
+			device.reset(new SnesNttDataKeypad(_emu, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
 			break;
 	}
 

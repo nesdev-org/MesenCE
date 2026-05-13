@@ -19,6 +19,7 @@ namespace Mesen.Views
 			if(mappings != null) {
 				return mappings.Type switch {
 					ControllerType.SnesController or ControllerType.SnesRumbleController => new SnesControllerView(),
+					ControllerType.SnesNttDataKeypad => new SnesNttDataKeypadControllerView(),
 					ControllerType.NesController => new NesControllerView(),
 					ControllerType.FamicomController => new NesControllerView(),
 					ControllerType.FamicomControllerP2 => new NesControllerView(true),

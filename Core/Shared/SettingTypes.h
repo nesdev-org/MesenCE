@@ -182,6 +182,7 @@ enum class ControllerType
 	SuperScope,
 	Multitap,
 	SnesRumbleController,
+	SnesNttDataKeypad,
 
 	//NES controllers
 	NesController,

@@ -30,6 +30,7 @@
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper487.h" />
     <ClInclude Include="NES\OpnInterface.h" />
     <ClInclude Include="Shared\Utilities\AvMergeUtilities.h" />
+    <ClInclude Include="SNES\Input\SnesNttDataKeypad.h" />
     <ClInclude Include="SMS\Input\ColecoVisionController.h" />
     <ClInclude Include="Debugger\AddressInfo.h" />
     <ClInclude Include="Debugger\Base6502Assembler.h" />
@@ -874,6 +875,7 @@
     <ClCompile Include="NES\Loaders\StudyBoxLoader.cpp" />
     <ClCompile Include="NES\Loaders\UnifLoader.cpp" />
     <ClCompile Include="NES\Mappers\Homebrew\Rainbow.cpp" />
+    <ClCompile Include="SNES\Input\SnesNttDataKeypad.cpp" />
     <ClCompile Include="Shared\Utilities\emu2413.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PGO Profile|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

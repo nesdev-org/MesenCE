@@ -27,9 +27,12 @@ private:
 	vector<string> _cheats;
 	vector<CheatCode> _originalCheats;
 	stringstream _emuSettingsBackup;
+	stringstream _settingsData;
 	unordered_map<string, string> _settings;
 	string _filename;
 	bool _forTest = false;
+	bool _loadFailure = false;
+	bool _hasSaveState = false;
 
 private:
 	void ParseSettings(stringstream& data);

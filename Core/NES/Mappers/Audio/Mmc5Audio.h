@@ -84,7 +84,7 @@ protected:
 
 		//"The sound output of the square channels are equivalent in volume to the corresponding APU channels"
 		//"The polarity of all MMC5 channels is reversed compared to the APU."
-		int16_t summedOutput = -(_square1.GetOutput() + _square2.GetOutput() + _pcmOutput);
+		int16_t summedOutput = -(_square1.GetOutput() * 3 + _square2.GetOutput() * 3 + _pcmOutput);
 		if(summedOutput != _lastOutput) {
 			_console->GetApu()->AddExpansionAudioDelta(AudioChannel::MMC5, summedOutput - _lastOutput);
 			_lastOutput = summedOutput;
@@ -102,6 +102,14 @@ public:
 		_pcmReadMode = false;
 		_pcmIrqEnabled = false;
 		_pcmOutput = 0;
+	}
+
+	__forceinline bool GetPcmReadMode() { return _pcmReadMode; }
+	void HandlePcmRead(uint16_t addr, uint8_t value)
+	{
+		if((addr & 0xC000) == 0x8000 && value) {
+			_pcmOutput = value;
+		}
 	}
 
 	uint8_t ReadRegister(uint16_t addr)
@@ -139,7 +147,7 @@ public:
 				break;
 
 			case 0x5010:
-				//TODO: Read mode & PCM IRQs are not implemented
+				//TODO: PCM IRQs
 				_pcmReadMode = (value & 0x01) == 0x01;
 				_pcmIrqEnabled = (value & 0x80) == 0x80;
 				break;
