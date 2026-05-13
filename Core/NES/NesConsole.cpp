@@ -400,10 +400,6 @@ void NesConsole::SaveBattery()
 	if(_mapper) {
 		_mapper->SaveBattery();
 	}
-
-	if(_controlManager) {
-		_controlManager->SaveBattery();
-	}
 }
 
 ShortcutState NesConsole::IsShortcutAllowed(EmulatorShortcut shortcut, uint32_t shortcutParam)
