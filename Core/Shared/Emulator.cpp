@@ -927,18 +927,24 @@ DeserializeResult Emulator::Deserialize(istream& in, uint32_t fileFormatVersion,
 		return DeserializeResult::InvalidFile;
 	}
 
-	if(includeSettings) {
-		SV(_settings);
+	//ValidateSaveStateCompatibility is used to validate if save states can be loaded
+	//This can be rejected is usually if the console type is different (e.g NES vs SNES) but can sometimes
+	//be allowed (e.g loading a SNES+SGB save state on a GB)
+	//Sometimes the save state will be rejected even on the same system (for example loading a regular NES save state while in VS DualSystem mode).
+	//Note: These checks are only done when called from SaveStateManager (not internally via the RewindManager, etc.)
+	optional<SaveStateCompatInfo> optCompatInfo = srcConsoleType.has_value() ? _console->ValidateSaveStateCompatibility(s, srcConsoleType.value()) : std::nullopt;
+	if(optCompatInfo.has_value() && !optCompatInfo.value().IsCompatible) {
+		MessageManager::DisplayMessage("SaveStates", "SaveStateWrongSystem");
+		return DeserializeResult::SpecificError;
 	}
 
 	if(srcConsoleType.has_value() && srcConsoleType.value() != _console->GetConsoleType()) {
-		//Used to allow save states taken on GB/GBC/SGB to be loaded on any of the 3 systems
-		SaveStateCompatInfo compatInfo = _console->ValidateSaveStateCompatibility(srcConsoleType.value());
-		if(!compatInfo.IsCompatible) {
+		if(!optCompatInfo.has_value()) {
 			MessageManager::DisplayMessage("SaveStates", "SaveStateWrongSystem");
 			return DeserializeResult::SpecificError;
 		}
 
+		SaveStateCompatInfo compatInfo = optCompatInfo.value();
 		s.RemoveKeys(compatInfo.FieldsToRemove);
 
 		if(!compatInfo.PrefixToAdd.empty()) {
@@ -951,6 +957,10 @@ DeserializeResult Emulator::Deserialize(istream& in, uint32_t fileFormatVersion,
 			MessageManager::DisplayMessage("SaveStates", "SaveStateWrongSystem");
 			return DeserializeResult::SpecificError;
 		}
+	}
+
+	if(includeSettings) {
+		SV(_settings);
 	}
 
 	s.Stream(_console, "");
@@ -1170,11 +1180,6 @@ void Emulator::BreakIfDebugging(CpuType sourceCpu, BreakSource source)
 	if(_debugger) {
 		_debugger->BreakImmediately(sourceCpu, source);
 	}
-}
-
-bool Emulator::IsDebuggerDisabled()
-{
-	return _isDebuggerDisabled;
 }
 
 void Emulator::SetDebuggerDisabled(bool value)

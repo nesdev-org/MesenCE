@@ -333,7 +333,7 @@ public:
 	template<CpuType cpuType> void AddDebugEvent(DebugEventType evtType);
 	void BreakIfDebugging(CpuType sourceCpu, BreakSource source);
 
-	bool IsDebuggerDisabled();
+	__forceinline bool IsDebuggerDisabled() { return _isDebuggerDisabled; }
 	void SetDebuggerDisabled(bool value);
 };
 

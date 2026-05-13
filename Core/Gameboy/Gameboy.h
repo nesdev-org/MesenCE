@@ -118,7 +118,7 @@ public:
 	bool IsPrimaryConsole();
 
 	void Serialize(Serializer& s) override;
-	SaveStateCompatInfo ValidateSaveStateCompatibility(ConsoleType stateConsoleType) override;
+	optional<SaveStateCompatInfo> ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType) override;
 
 	// Inherited via IConsole
 	void Reset() override;

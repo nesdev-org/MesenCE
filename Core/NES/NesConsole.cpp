@@ -122,6 +122,16 @@ void NesConsole::Serialize(Serializer& s)
 	}
 }
 
+optional<SaveStateCompatInfo> NesConsole::ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType)
+{
+	if(_vsSubConsole && !s.ContainsPrefix("vsSubConsole")) {
+		//Only allow loading VS DualSystem save states when a VS DualSystem game is loaded
+		return SaveStateCompatInfo { false };
+	}
+
+	return {};
+}
+
 void NesConsole::Reset()
 {
 	_memoryManager->Reset(true);

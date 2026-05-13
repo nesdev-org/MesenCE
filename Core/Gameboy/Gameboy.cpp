@@ -393,12 +393,15 @@ void Gameboy::Serialize(Serializer& s)
 	}
 }
 
-SaveStateCompatInfo Gameboy::ValidateSaveStateCompatibility(ConsoleType stateConsoleType)
+optional<SaveStateCompatInfo> Gameboy::ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType)
 {
-	if(stateConsoleType == ConsoleType::Snes) {
-		return { true, "", "cart.gameboy." };
+	if(_secondaryConsole && !s.ContainsPrefix("secondaryConsole")) {
+		//Only allow loading save states that contain 2 GBs when 2 GBs are active
+		return SaveStateCompatInfo { false };
+	} else if(stateConsoleType == ConsoleType::Snes) {
+		//Allow loading SGB save state when running a GB
+		return SaveStateCompatInfo { true, "", "cart.gameboy." };
 	}
-
 	return {};
 }
 

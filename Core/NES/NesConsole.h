@@ -90,6 +90,7 @@ public:
 
 	// Inherited via IConsole
 	void Serialize(Serializer& s) override;
+	optional<SaveStateCompatInfo> ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType) override;
 	void Reset() override;
 	LoadRomResult LoadRom(VirtualFile& romFile) override;
 	void RunFrame() override;

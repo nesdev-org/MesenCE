@@ -62,7 +62,7 @@ public:
 		memcpy(outBuffer, str.c_str(), std::min<uint32_t>((uint32_t)str.size(), maxSize));
 	}
 
-	static bool StartsWith(string& str, const char* content)
+	static bool StartsWith(const string& str, const char* content)
 	{
 		size_t length = strlen(content);
 		if(str.size() < length) {
@@ -77,7 +77,7 @@ public:
 		return true;
 	}
 
-	static bool EndsWith(string& str, const char* content)
+	static bool EndsWith(const string& str, const char* content)
 	{
 		size_t length = strlen(content);
 		if(str.size() < length) {
@@ -94,7 +94,7 @@ public:
 		return true;
 	}
 
-	static bool Contains(string& str, const char* content)
+	static bool Contains(const string& str, const char* content)
 	{
 		size_t length = strlen(content);
 		return std::search(str.begin(), str.end(), content, content + length) != str.end();
