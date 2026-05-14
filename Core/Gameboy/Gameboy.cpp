@@ -607,11 +607,21 @@ GameboyModel Gameboy::GetEffectiveModel(GameboyHeader& header)
 
 void Gameboy::RunFrame()
 {
+	if(_secondaryConsole) {
+		InternalRunFrame<true>();
+	} else {
+		InternalRunFrame<false>();
+	}
+}
+
+template<bool hasLink>
+void Gameboy::InternalRunFrame()
+{
 	uint32_t frameCount = _ppu->GetFrameCount();
 
 	while(frameCount == _ppu->GetFrameCount()) {
 		_cpu->Exec();
-		if(_secondaryConsole) {
+		if constexpr(hasLink) {
 			RunLinkedConsole();
 		}
 	}

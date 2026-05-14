@@ -277,8 +277,17 @@ void NesConsole::UpdateRegion(bool forceUpdate)
 		_mixer->SetRegion(_region);
 	}
 }
-
 void NesConsole::RunFrame()
+{
+	if(_vsSubConsole) {
+		InternalRunFrame<true>();
+	} else {
+		InternalRunFrame<false>();
+	}
+}
+
+template<bool isDualSystem>
+void NesConsole::InternalRunFrame()
 {
 	UpdateRegion();
 
@@ -293,7 +302,7 @@ void NesConsole::RunFrame()
 
 	while(frame == _ppu->GetFrameCount()) {
 		_cpu->Exec();
-		if(_vsSubConsole) {
+		if constexpr(isDualSystem) {
 			RunVsSubConsole();
 		}
 	}

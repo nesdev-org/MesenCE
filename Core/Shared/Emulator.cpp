@@ -443,6 +443,7 @@ bool Emulator::InternalLoadRom(VirtualFile romFile, VirtualFile patchFile, bool 
 		MessageManager::DisplayMessage("Error", "CouldNotLoadFile", romFile.GetFileName());
 		if(debugger) {
 			_debugger.reset(debugger);
+			_internalDebugger = _debugger.get();
 			debugger->ResetSuspendCounter();
 		}
 		_blockDebuggerRequestCount--;
@@ -1065,10 +1066,12 @@ void Emulator::ResetDebugger(bool startDebugger)
 
 	if(_emulationThreadId == std::this_thread::get_id()) {
 		_debugger.reset(startDebugger ? new Debugger(this, _console.get()) : nullptr);
+		_internalDebugger = _debugger.get();
 	} else {
 		//Need to pause emulator to change _debugger (when not called from the emulation thread)
 		auto emuLock = AcquireLock();
 		_debugger.reset(startDebugger ? new Debugger(this, _console.get()) : nullptr);
+		_internalDebugger = _debugger.get();
 	}
 }
 
@@ -1164,29 +1167,30 @@ void Emulator::ProcessAudioPlayerAction(AudioPlayerActionParams p)
 
 void Emulator::ProcessEvent(EventType type, std::optional<CpuType> cpuType)
 {
-	if(_debugger) {
-		_debugger->ProcessEvent(type, cpuType);
+	if(_internalDebugger) {
+		_internalDebugger->ProcessEvent(type, cpuType);
 	}
 }
 
 template<CpuType cpuType>
 void Emulator::AddDebugEvent(DebugEventType evtType)
 {
-	if(_debugger) {
-		_debugger->GetEventManager(cpuType)->AddEvent(evtType);
+	if(_internalDebugger) {
+		_internalDebugger->GetEventManager(cpuType)->AddEvent(evtType);
 	}
 }
 
 void Emulator::BreakIfDebugging(CpuType sourceCpu, BreakSource source)
 {
-	if(_debugger) {
-		_debugger->BreakImmediately(sourceCpu, source);
+	if(_internalDebugger) {
+		_internalDebugger->BreakImmediately(sourceCpu, source);
 	}
 }
 
-void Emulator::SetDebuggerDisabled(bool value)
+void Emulator::SetDebuggerDisabled(bool disabled)
 {
-	_isDebuggerDisabled = value;
+	_isDebuggerDisabled = disabled;
+	_internalDebugger = disabled ? nullptr : _debugger.get();
 }
 
 template void Emulator::AddDebugEvent<CpuType::Snes>(DebugEventType evtType);

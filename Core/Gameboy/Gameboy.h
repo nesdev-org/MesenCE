@@ -68,6 +68,8 @@ private:
 	GameboyModel GetEffectiveModel(GameboyHeader& header);
 	static GameboyHeader GetHeader(uint8_t* romData, uint32_t romSize);
 
+	template<bool hasLink> void InternalRunFrame();
+
 public:
 	static constexpr int HeaderOffset = 0x134;
 

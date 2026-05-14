@@ -61,13 +61,18 @@ private:
 	friend class DebuggerRequest;
 	friend class EmulatorLock;
 
-	unique_ptr<thread> _emuThread;
-	unique_ptr<AudioPlayerHud> _audioPlayerHud;
 	safe_ptr<IConsole> _console;
 
-	shared_ptr<ShortcutKeyHandler> _shortcutKeyHandler;
+	//Used by the Process[..] debugger hooks which run exclusively on the emulation thread.
+	//Temporarily set to null while executing the secondary console for e.g VS DualSystem or dual GB modes.
+	//This prevents the secondary console from interacting with the debugger (because this does not work properly at the moment)
+	Debugger* _internalDebugger = nullptr;
+
+	unique_ptr<thread> _emuThread;
+	unique_ptr<AudioPlayerHud> _audioPlayerHud;
 	safe_ptr<Debugger> _debugger;
 	shared_ptr<SystemActionManager> _systemActionManager;
+	shared_ptr<ShortcutKeyHandler> _shortcutKeyHandler;
 
 	const unique_ptr<EmuSettings> _settings;
 	const unique_ptr<DebugHud> _debugHud;
@@ -257,79 +262,79 @@ public:
 
 	template<CpuType type> __forceinline void ProcessInstruction()
 	{
-		if(_debugger) {
-			_debugger->ProcessInstruction<type>();
+		if(_internalDebugger) {
+			_internalDebugger->ProcessInstruction<type>();
 		}
 	}
 
 	template<CpuType type, uint8_t accessWidth = 1, MemoryAccessFlags flags = MemoryAccessFlags::None, typename T> __forceinline void ProcessMemoryRead(uint32_t addr, T& value, MemoryOperationType opType)
 	{
-		if(_debugger) {
-			_debugger->ProcessMemoryRead<type, accessWidth, flags>(addr, value, opType);
+		if(_internalDebugger) {
+			_internalDebugger->ProcessMemoryRead<type, accessWidth, flags>(addr, value, opType);
 		}
 	}
 
 	template<CpuType type, uint8_t accessWidth = 1, MemoryAccessFlags flags = MemoryAccessFlags::None, typename T> __forceinline bool ProcessMemoryWrite(uint32_t addr, T& value, MemoryOperationType opType)
 	{
-		if(_debugger) {
-			return _debugger->ProcessMemoryWrite<type, accessWidth, flags>(addr, value, opType);
+		if(_internalDebugger) {
+			return _internalDebugger->ProcessMemoryWrite<type, accessWidth, flags>(addr, value, opType);
 		}
 		return true;
 	}
 
 	template<CpuType cpuType, MemoryType memType, MemoryOperationType opType, typename T> __forceinline void ProcessMemoryAccess(uint32_t addr, T value)
 	{
-		if(_debugger) {
-			_debugger->ProcessMemoryAccess<cpuType, memType, opType, T>(addr, value);
+		if(_internalDebugger) {
+			_internalDebugger->ProcessMemoryAccess<cpuType, memType, opType, T>(addr, value);
 		}
 	}
 
 	template<CpuType type> __forceinline void ProcessIdleCycle()
 	{
-		if(_debugger) {
-			_debugger->ProcessIdleCycle<type>();
+		if(_internalDebugger) {
+			_internalDebugger->ProcessIdleCycle<type>();
 		}
 	}
 
 	template<CpuType type> __forceinline void ProcessHaltedCpu()
 	{
-		if(_debugger) {
-			_debugger->ProcessHaltedCpu<type>();
+		if(_internalDebugger) {
+			_internalDebugger->ProcessHaltedCpu<type>();
 		}
 	}
 
 	template<CpuType type, typename T> __forceinline void ProcessPpuRead(uint32_t addr, T& value, MemoryType memoryType, MemoryOperationType opType = MemoryOperationType::Read)
 	{
-		if(_debugger) {
-			_debugger->ProcessPpuRead<type>(addr, value, memoryType, opType);
+		if(_internalDebugger) {
+			_internalDebugger->ProcessPpuRead<type>(addr, value, memoryType, opType);
 		}
 	}
 
 	template<CpuType type, typename T> __forceinline void ProcessPpuWrite(uint32_t addr, T& value, MemoryType memoryType)
 	{
-		if(_debugger) {
-			_debugger->ProcessPpuWrite<type>(addr, value, memoryType);
+		if(_internalDebugger) {
+			_internalDebugger->ProcessPpuWrite<type>(addr, value, memoryType);
 		}
 	}
 
 	template<CpuType type> __forceinline void ProcessPpuCycle()
 	{
-		if(_debugger) {
-			_debugger->ProcessPpuCycle<type>();
+		if(_internalDebugger) {
+			_internalDebugger->ProcessPpuCycle<type>();
 		}
 	}
 
 	template<CpuType type> void ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool forNmi)
 	{
-		if(_debugger) {
-			_debugger->ProcessInterrupt<type>(originalPc, currentPc, forNmi);
+		if(_internalDebugger) {
+			_internalDebugger->ProcessInterrupt<type>(originalPc, currentPc, forNmi);
 		}
 	}
 
 	__forceinline void DebugLog(string log)
 	{
-		if(_debugger) {
-			_debugger->Log(log);
+		if(_internalDebugger) {
+			_internalDebugger->Log(log);
 		}
 	}
 
@@ -338,7 +343,7 @@ public:
 	void BreakIfDebugging(CpuType sourceCpu, BreakSource source);
 
 	__forceinline bool IsDebuggerDisabled() { return _isDebuggerDisabled; }
-	void SetDebuggerDisabled(bool value);
+	void SetDebuggerDisabled(bool disabled);
 };
 
 enum class HashType
