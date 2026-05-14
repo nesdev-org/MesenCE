@@ -14,7 +14,7 @@ private:
 	static constexpr int BitCount = FileSize * 8;
 	uint16_t _position = 0;
 	uint8_t _data[AsciiTurboFileTwinTf2::FileSize] = {};
-	uint8_t _unlockCounter = 0; // 4-bit counter - consistently 0 at power on
+	uint8_t _unlockCounter = 0; // 4-bit counter
 	bool _unlocked = false; // Memory access is allowed when true
 
 	SnesConsole* _console = nullptr;
@@ -51,7 +51,7 @@ public:
 	void RefreshStateBuffer() override
 	{
 		_stateBuffer = 0b111111110111000000000000; // Controller type $E, and then disambiguated with $FF
-		if(_unlocked) {
+		if(_unlocked) { // TODOSNES - This bit can also get set without doing a non-strobe $4017 read to actually finish unlocking; further research required
 			_stateBuffer |= 1 << 11;
 		}
 	}
@@ -66,6 +66,7 @@ public:
 			if(_strobe) {
 				_unlockCounter = (_unlockCounter + 1) & 0xF;
 				_position = 0;
+				_unlocked = false; // TODOSNES - Verify that this actually locks it
 			} else {
 				_unlocked = _unlockCounter == 0xF;
 			}
