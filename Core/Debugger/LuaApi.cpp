@@ -8,6 +8,7 @@
 #include "Debugger/ScriptingContext.h"
 #include "Debugger/MemoryAccessCounter.h"
 #include "Debugger/CdlManager.h"
+#include "Debugger/Disassembler.h"
 #include "Debugger/LabelManager.h"
 #include "Shared/SystemActionManager.h"
 #include "Shared/Video/DebugHud.h"
@@ -54,6 +55,8 @@
 #define checkminparams(x) if(!l.CheckParamCount(x)) { return 0; }
 #define checkinitdone() if(!_context->CheckInitDone()) { error("This function cannot be called outside a callback"); }
 #define checksavestateconditions() if(!_context->IsSaveStateAllowed()) { error("This function must be called inside an exec memory operation callback for the main CPU"); }
+
+static constexpr uint32_t MaxLuaDisassemblyRows = 10000;
 
 Debugger* LuaApi::_debugger = nullptr;
 Emulator* LuaApi::_emu = nullptr;
@@ -145,6 +148,9 @@ int LuaApi::GetLibrary(lua_State* lua)
 		{ "resetAccessCounters", LuaApi::ResetAccessCounters },
 
 		{ "getCdlData", LuaApi::GetCdlData },
+
+		{ "getDisassemblyRows", LuaApi::GetDisassemblyRows },
+		{ "getDisassemblyRowAddress", LuaApi::GetDisassemblyRowAddress },
 
 		{ "addCheat", LuaApi::AddCheat },
 		{ "clearCheats", LuaApi::ClearCheats },
@@ -981,6 +987,91 @@ int LuaApi::GetCdlData(lua_State* lua)
 		lua_rawseti(lua, -2, i);
 	}
 
+	return 1;
+}
+
+static void LuaPushAddressInfo(lua_State* lua, const char* name, const AddressInfo& address)
+{
+	lua_pushstring(lua, name);
+	lua_newtable(lua);
+	lua_pushintvalue(address, address.Address);
+	lua_pushintvalue(type, (int)address.Type);
+	lua_settable(lua, -3);
+}
+
+static void LuaPushEffectiveAddressInfo(lua_State* lua, const EffectiveAddressInfo& effectiveAddress)
+{
+	lua_newtable(lua);
+	lua_pushliteral(lua, "address"); lua_pushinteger(lua, effectiveAddress.Address); lua_settable(lua, -3);
+	lua_pushintvalue(memoryType, (int)effectiveAddress.Type);
+	lua_pushintvalue(valueSize, effectiveAddress.ValueSize);
+	lua_pushboolvalue(showAddress, effectiveAddress.ShowAddress);
+}
+
+static void LuaPushCodeLineData(lua_State* lua, const CodeLineData& row)
+{
+	lua_newtable(lua);
+	lua_pushintvalue(address, row.Address);
+	LuaPushAddressInfo(lua, "absoluteAddress", row.AbsoluteAddress);
+	lua_pushintvalue(opSize, row.OpSize);
+	lua_pushintvalue(flags, row.Flags);
+
+	lua_pushliteral(lua, "effectiveAddress");
+	LuaPushEffectiveAddressInfo(lua, row.EffectiveAddress);
+	lua_settable(lua, -3);
+
+	lua_pushintvalue(value, row.Value);
+	lua_pushintvalue(lineCpuType, (int)row.LineCpuType);
+
+	lua_pushliteral(lua, "byteCode");
+	lua_newtable(lua);
+	for(uint32_t i = 0; i < row.OpSize && i < sizeof(row.ByteCode); i++) {
+		lua_pusharrayvalue(i + 1, row.ByteCode[i]);
+	}
+	lua_settable(lua, -3);
+
+	lua_pushliteral(lua, "text");
+	lua_pushlstring(lua, row.Text, strnlen(row.Text, sizeof(row.Text)));
+	lua_settable(lua, -3);
+	lua_pushliteral(lua, "comment");
+	lua_pushlstring(lua, row.Comment, strnlen(row.Comment, sizeof(row.Comment)));
+	lua_settable(lua, -3);
+}
+
+int LuaApi::GetDisassemblyRows(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	uint32_t rowCount = l.ReadInteger();
+	uint32_t startAddress = l.ReadInteger();
+	CpuType cpuType = (CpuType)l.ReadInteger();
+	checkEnum(CpuType, cpuType, "invalid cpu type");
+	checkparams();
+	errorCond(!_debugger->HasCpuType(cpuType), "This CPU type is not available for the current system");
+	errorCond(rowCount > MaxLuaDisassemblyRows, "Maximum disassembly row count is 10000");
+
+	vector<CodeLineData> rows;
+	rows.resize(rowCount, {});
+	uint32_t returnedRows = rowCount > 0 ? _debugger->GetDisassembler()->GetDisassemblyOutput(cpuType, startAddress, rows.data(), rowCount) : 0;
+
+	lua_newtable(lua);
+	for(uint32_t i = 0; i < returnedRows; i++) {
+		LuaPushCodeLineData(lua, rows[i]);
+		lua_rawseti(lua, -2, i + 1);
+	}
+	return 1;
+}
+
+int LuaApi::GetDisassemblyRowAddress(lua_State* lua)
+{
+	LuaCallHelper l(lua);
+	int32_t rowOffset = (int32_t)l.ReadInteger();
+	uint32_t address = l.ReadInteger();
+	CpuType cpuType = (CpuType)l.ReadInteger();
+	checkEnum(CpuType, cpuType, "invalid cpu type");
+	checkparams();
+	errorCond(!_debugger->HasCpuType(cpuType), "This CPU type is not available for the current system");
+
+	lua_pushinteger(lua, _debugger->GetDisassembler()->GetDisassemblyRowAddress(cpuType, address, rowOffset));
 	return 1;
 }
 

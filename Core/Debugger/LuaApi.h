@@ -102,6 +102,9 @@ public:
 
 	static int GetCdlData(lua_State* lua);
 
+	static int GetDisassemblyRows(lua_State* lua);
+	static int GetDisassemblyRowAddress(lua_State* lua);
+
 private:
 	static FrameInfo InternalGetScreenSize();
 
