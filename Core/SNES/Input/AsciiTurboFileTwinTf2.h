@@ -51,7 +51,9 @@ public:
 	void RefreshStateBuffer() override
 	{
 		_stateBuffer = 0b111111110111000000000000; // Controller type $E, and then disambiguated with $FF
-		if(_unlocked) { // TODOSNES - This bit can also get set without doing a non-strobe $4017 read to actually finish unlocking; further research required
+		if(_unlocked) {
+			// TODOSNES - When a game increments _unlockCounter without doing a $4017 read without strobe,
+			// this bit can somehow get set. That's not implemented here.
 			_stateBuffer |= 1 << 11;
 		}
 	}
@@ -63,10 +65,13 @@ public:
 		if(addr == 0x4017) {
 			StrobeProcessRead();
 
+			// TODOSNES - The unlock and position reset logic does not match hardware in all cases,
+			// but does seem to match what happens when games read $4017 without strobe after changing _unlockCounter,
+			// which ASCII games do. More research is required to figure out what really happens.
 			if(_strobe) {
 				_unlockCounter = (_unlockCounter + 1) & 0xF;
 				_position = 0;
-				_unlocked = false; // TODOSNES - Verify that this actually locks it
+				_unlocked = false;
 			} else {
 				_unlocked = _unlockCounter == 0xF;
 			}
@@ -91,7 +96,10 @@ public:
 			RefreshStateBuffer();
 
 			if(_unlocked) {
-				//Perform write and increase position
+				// TODOSNES - The 32 KiB of memory that TFII has access to is 8-bit memory, and it seems to be possible
+				// to write to unintended bits when the program stops writing at a position that's not at a byte boundary.
+
+				// Perform write and increase position
 				uint8_t ioPort = _console->GetInternalRegisters()->GetIoPortOutput();
 				BitUtilities::SetBitInArray(_data, FileSize, _position, (ioPort & 0x80) == 0x80);
 				_position = (_position + 1) & (AsciiTurboFileTwinTf2::BitCount - 1);

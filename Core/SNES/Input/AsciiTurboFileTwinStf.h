@@ -25,7 +25,7 @@ private:
 	uint32_t _newCommand = 0; // 28-bit shift register
 
 	// Status report
-	uint32_t _stateBuffer = 0; // For the status report
+	uint32_t _stateBuffer = 0;
 
 	SnesConsole* _console = nullptr;
 
