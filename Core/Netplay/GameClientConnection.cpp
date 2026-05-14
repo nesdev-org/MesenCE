@@ -225,9 +225,7 @@ void GameClientConnection::InitControlDevice()
 
 void GameClientConnection::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
-	if(type == ConsoleNotificationType::ConfigChanged) {
-		InitControlDevice();
-	} else if(type == ConsoleNotificationType::GameLoaded) {
+	if(type == ConsoleNotificationType::GameLoaded) {
 		_emu->RegisterInputProvider(this);
 	}
 }

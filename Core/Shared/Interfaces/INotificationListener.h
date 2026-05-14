@@ -14,7 +14,6 @@ enum class ConsoleNotificationType
 	DebuggerResumed,
 	PpuFrameDone,
 	ResolutionChanged,
-	ConfigChanged,
 	ExecuteShortcut,
 	ReleaseShortcut,
 	EmulationStopped,

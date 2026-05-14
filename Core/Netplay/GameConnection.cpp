@@ -95,6 +95,9 @@ bool GameConnection::ConnectionError()
 void GameConnection::ProcessMessages()
 {
 	NetMessage* message;
+
+	ProcessPendingEvents();
+
 	while((message = ReadMessage()) != nullptr) {
 		//Loop until all messages have been processed
 		message->Initialize();
