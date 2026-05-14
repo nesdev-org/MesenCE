@@ -19,7 +19,7 @@ namespace Mesen.Config
 		[Reactive] public GameboyModel Model { get; set; } = GameboyModel.AutoFavorBest;
 		[Reactive] public bool UseSgb2 { get; set; } = true;
 
-		[Reactive] public bool UseLocalLinkCable { get; set; } = true;
+		[Reactive] public bool UseLocalLinkCable { get; set; } = false;
 		[Reactive] public GbLocalLinkOutputOption LocalLinkCableVideoOutput { get; set; } = GbLocalLinkOutputOption.Both;
 		[Reactive] public GbLocalLinkOutputOption LocalLinkCableAudioOutput { get; set; } = GbLocalLinkOutputOption.Both;
 
