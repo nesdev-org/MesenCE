@@ -12,7 +12,7 @@ private:
 	// Data access
 	static constexpr int FileSize = 128 * 1024;
 	uint32_t _position = 0;
-	uint8_t _data[AsciiTurboFileTwinStf::FileSize] = {};
+	uint8_t* _data = nullptr;
 	uint8_t _currentByte = 0; // 8-bit shift register; current read/write byte
 	uint8_t _mostRecentByte; // Byte most recently read or written
 
@@ -49,6 +49,12 @@ public:
 	AsciiTurboFileTwinStf(SnesConsole* console) : BaseControlDevice(console->GetEmulator(), ControllerType::AsciiTurboFileTwinStf, BaseControlDevice::ExpDevicePort)
 	{
 		_console = console;
+		_data = new uint8_t[AsciiTurboFileTwinStf::FileSize];
+	}
+
+	~AsciiTurboFileTwinStf()
+	{
+		delete[] _data;
 	}
 
 	void Init() override
@@ -140,17 +146,21 @@ public:
 				if(!_firstAccess) {
 					if(_writeMode) {
 						if(_didReadWithStrobe) {
-							_data[_position % FileSize] = _currentByte;
+							if(_position < FileSize) { // Turbo File Twin ignores writes at out-of-range addresses
+								_data[_position] = _currentByte;
+							}
 							_mostRecentByte = _currentByte;
 							_didWriteAnything = true;
 						} else {
 							_writeMode = false;
 						}
 					} else if(_readMode) {
-						_mostRecentByte = _data[_position % FileSize];
+						if(_position < FileSize) { // Turbo File Twin ignores reads at out-of-range addresses
+							_mostRecentByte = _data[_position];
+						}
 						_currentByte = _mostRecentByte;
 					}
-					_position++;
+					_position = (_position + 1) & 0xFFFFF;
 				}
 				_firstAccess = false;
 			}
