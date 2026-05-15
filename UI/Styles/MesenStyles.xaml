@@ -8,7 +8,7 @@
 	<StyleInclude Source="/Styles/MesenStyles.Light.xaml" />
 	<StyleInclude Source="/Styles/MesenStyles.Dark.xaml" />
 
-	<StyleInclude Source="avares://Dock.Avalonia.Themes.Fluent/DockFluentTheme.axaml" />
+	<StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml" />
 	<StyleInclude Source="/ThirdParty/DataBox/Themes/Fluent.axaml" />
 	<StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
 	<StyleInclude Source="/Styles/DockStyles.xaml" />
