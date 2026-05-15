@@ -17,6 +17,7 @@ protected:
 
 	WsMemoryManager* _memoryManager = nullptr;
 	WsEeprom* _cartEeprom = nullptr;
+	WsKarnak* _cartKarnak = nullptr;
 
 	void Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly);
 	void Unmap(uint32_t start, uint32_t end);
@@ -25,7 +26,7 @@ public:
 	WsCart();
 	virtual ~WsCart() {}
 
-	void Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom);
+	void Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsKarnak* cartKarnak);
 	void RefreshMappings();
 
 	WsCartState& GetState() { return _state; }

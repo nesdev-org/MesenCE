@@ -383,6 +383,15 @@ public class WsRegisterViewer
 			});
 		}
 
+		if(ws.Cart.HasKarnak) {
+			entries.AddRange(new List<RegEntry>() {
+				new RegEntry("", "Cart Karnak"),
+				new RegEntry("$D6.7", "Enabled", ws.CartKarnak.Enable),
+				new RegEntry("$D6.0-6", "Timer Period", ws.CartKarnak.TimerPeriod, Format.X8),
+				new RegEntry("$D9", "ADPCM Output", ws.CartKarnak.AdpcmAccumulator >= 0x300 ? 0x00 : (ws.CartKarnak.AdpcmAccumulator >= 0x200 ? 0xFF : (ws.CartKarnak.AdpcmAccumulator >> 1)), Format.X8)
+			});
+		}
+
 		return new RegisterViewerTab("Cart", entries, CpuType.Ws, MemoryType.WsPort);
 	}
 

@@ -4,6 +4,7 @@
 #include "WS/WsPpu.h"
 #include "WS/WsTimer.h"
 #include "WS/Carts/WsCart.h"
+#include "WS/Carts/WsKarnak.h"
 #include "WS/WsControlManager.h"
 #include "WS/WsMemoryManager.h"
 #include "WS/WsDmaController.h"
@@ -128,8 +129,9 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	_ppu.reset(new WsPpu(_emu, this, _memoryManager.get(), _timer.get(), _workRam));
 	_apu.reset(new WsApu(_emu, this, _memoryManager.get(), _dmaController.get()));
 	_cart.reset(new WsCart());
+	_cartKarnak.reset(new WsKarnak());
 
-	_cart->Init(_memoryManager.get(), _cartEeprom.get());
+	_cart->Init(_memoryManager.get(), _cartEeprom.get(), _cartKarnak.get());
 	_memoryManager->Init(_emu, this, _cpu.get(), _ppu.get(), _controlManager.get(), _cart.get(), _timer.get(), _dmaController.get(), _internalEeprom.get(), _apu.get(), _serial.get());
 	_timer->Init(_memoryManager.get());
 	_dmaController->Init(_memoryManager.get(), _apu.get());
@@ -447,6 +449,9 @@ WsState WsConsole::GetState()
 	if(_cartEeprom) {
 		state.CartEeprom = _cartEeprom->GetState();
 	}
+	if(_cartKarnak) {
+		state.CartKarnak = _cartKarnak->GetState();
+	}
 	return state;
 }
 
@@ -495,5 +500,8 @@ void WsConsole::Serialize(Serializer& s)
 
 	if(_cartEeprom) {
 		SV(_cartEeprom);
+	}
+	if(_cartKarnak) {
+		SV(_cartKarnak);
 	}
 }

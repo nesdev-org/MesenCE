@@ -442,8 +442,16 @@ public struct WsEepromState
 
 public struct WsCartState
 {
+	[MarshalAs(UnmanagedType.I1)] public bool HasKarnak;
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 	public byte[] SelectedBanks;
+}
+
+public struct WsKarnakState
+{
+	[MarshalAs(UnmanagedType.I1)] public bool Enable;
+	public byte TimerPeriod;
+	public UInt16 AdpcmAccumulator;
 }
 
 public struct WsState : BaseState
@@ -459,5 +467,6 @@ public struct WsState : BaseState
 	public WsEepromState InternalEeprom;
 	public WsCartState Cart;
 	public WsEepromState CartEeprom;
+	public WsKarnakState CartKarnak;
 	public WsModel Model;
 }
