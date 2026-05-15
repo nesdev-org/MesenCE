@@ -1,5 +1,13 @@
 name: dotnet format check
-on: [push, pull_request]
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+      - '*'
+
 jobs:
   dotnet-format:
     runs-on: windows-latest
