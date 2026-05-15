@@ -353,6 +353,8 @@ namespace Mesen.Config
 		Multitap,
 		SnesRumbleController,
 		SnesNttDataKeypad,
+		AsciiTurboFileTwinTf2,
+		AsciiTurboFileTwinStf,
 
 		//NES controllers
 		NesController,

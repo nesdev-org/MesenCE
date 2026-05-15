@@ -183,6 +183,8 @@ enum class ControllerType
 	Multitap,
 	SnesRumbleController,
 	SnesNttDataKeypad,
+	AsciiTurboFileTwinTf2,
+	AsciiTurboFileTwinStf,
 
 	//NES controllers
 	NesController,

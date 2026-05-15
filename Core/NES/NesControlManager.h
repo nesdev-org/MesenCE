@@ -38,8 +38,6 @@ public:
 	void UpdateControlDevices() override;
 	void UpdateInputState() override;
 
-	void SaveBattery();
-
 	void Reset(bool softReset) override;
 
 	bool IsKeyboardConnected() override;

@@ -2991,6 +2991,12 @@
     <ClInclude Include="SNES\Input\SnesNttDataKeypad.h">
       <Filter>SNES\Input</Filter>
     </ClInclude>
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinStf.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinTf2.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Video\RotateFilter.cpp">

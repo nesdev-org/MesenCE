@@ -72,7 +72,6 @@ namespace Mesen.Interop
 		DebuggerResumed,
 		PpuFrameDone,
 		ResolutionChanged,
-		ConfigChanged,
 		ExecuteShortcut,
 		ReleaseShortcut,
 		EmulationStopped,

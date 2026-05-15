@@ -1508,19 +1508,30 @@ void SmsVdp::Serialize(Serializer& s)
 	SV(_state.Cycle);
 	SV(_state.Scanline);
 	SV(_state.VCounter);
+
 	SV(_state.AddressReg);
 	SV(_state.CodeReg);
 	SV(_state.ControlPortMsbToggle);
+
 	SV(_state.VramBuffer);
+	SV(_state.PaletteLatch);
 	SV(_state.HCounterLatch);
+
 	SV(_state.VerticalBlankIrqPending);
 	SV(_state.ScanlineIrqPending);
 	SV(_state.SpriteOverflow);
 	SV(_state.SpriteCollision);
+	SV(_state.SpriteOverflowIndex);
+
+	SV(_state.ColorTableAddress);
+	SV(_state.BgPatternTableAddress);
+
 	SV(_state.SpriteTableAddress);
 	SV(_state.SpritePatternSelector);
+
 	SV(_state.NametableHeight);
 	SV(_state.VisibleScanlineCount);
+
 	SV(_state.TextColorIndex);
 	SV(_state.BackgroundColorIndex);
 	SV(_state.HorizontalScroll);
@@ -1529,6 +1540,7 @@ void SmsVdp::Serialize(Serializer& s)
 	SV(_state.VerticalScrollLatch);
 	SV(_state.ScanlineCounter);
 	SV(_state.ScanlineCounterLatch);
+
 	SV(_state.SyncDisabled);
 	SV(_state.M2_AllowHeightChange);
 	SV(_state.UseMode4);
@@ -1537,6 +1549,7 @@ void SmsVdp::Serialize(Serializer& s)
 	SV(_state.MaskFirstColumn);
 	SV(_state.HorizontalScrollLock);
 	SV(_state.VerticalScrollLock);
+
 	SV(_state.Sg16KVramMode);
 	SV(_state.RenderingEnabled);
 	SV(_state.EnableVerticalBlankIrq);
@@ -1544,15 +1557,24 @@ void SmsVdp::Serialize(Serializer& s)
 	SV(_state.M3_Use240LineMode);
 	SV(_state.UseLargeSprites);
 	SV(_state.EnableDoubleSpriteSize);
+
 	SV(_state.NametableAddress);
 	SV(_state.EffectiveNametableAddress);
 	SV(_state.NametableAddressMask);
-	SV(_state.ColorTableAddress);
-	SV(_state.BgPatternTableAddress);
 
 	if(s.GetFormat() != SerializeFormat::Map) {
 		//Hide these entries from the Lua API
+		SV(_revision);
+		SV(_lastMasterClock);
+
 		SVArray(_bgShifters, 4);
+		SV(_bgPriority);
+		SV(_bgPalette);
+		SV(_bgTileAddr);
+		SV(_bgOffsetY);
+		SV(_minDrawCycle);
+		SV(_pixelsAvailable);
+		SV(_bgHorizontalMirror);
 
 		SV(_evalCounter);
 		SV(_inRangeSpriteCount);
@@ -1573,28 +1595,22 @@ void SmsVdp::Serialize(Serializer& s)
 			SVI(_spriteShifters[i].TileData[3]);
 		}
 
-		SV(_lastMasterClock);
-		SV(_bgPriority);
-		SV(_bgPalette);
-		SV(_bgTileAddr);
-		SV(_bgOffsetY);
-		SV(_minDrawCycle);
-		SV(_pixelsAvailable);
-		SV(_bgHorizontalMirror);
 		SV(_scanlineCount);
 		SV(_region);
-		SV(_revision);
+
+		SV(_writePending);
+		SV(_readPending);
+
 		SV(_latchRequest);
 		SV(_latchPos);
-		SV(_readPending);
-		SV(_writePending);
+
+		SV(_needCramDot);
+		SV(_cramDotColor);
+
 		SV(_bgTileIndex);
 		SV(_bgPatternData);
 		SV(_textModeStep);
 
 		SVArray(_memAccess, sizeof(_memAccess));
-
-		SV(_needCramDot);
-		SV(_cramDotColor);
 	}
 }

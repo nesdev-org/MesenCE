@@ -15,6 +15,8 @@
 #include "SNES/Input/Multitap.h"
 #include "SNES/Input/SuperScope.h"
 #include "SNES/Input/SnesNttDataKeypad.h"
+#include "SNES/Input/AsciiTurboFileTwinTf2.h"
+#include "SNES/Input/AsciiTurboFileTwinStf.h"
 #include "Shared/EventType.h"
 #include "Utilities/Serializer.h"
 #include "Shared/SystemActionManager.h"
@@ -72,6 +74,13 @@ shared_ptr<BaseControlDevice> SnesControlManager::CreateControllerDevice(Control
 		case ControllerType::SnesNttDataKeypad:
 			device.reset(new SnesNttDataKeypad(_emu, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
 			break;
+
+		case ControllerType::AsciiTurboFileTwinTf2:
+			device.reset(new AsciiTurboFileTwinTf2(_console));
+			break;
+		case ControllerType::AsciiTurboFileTwinStf:
+			device.reset(new AsciiTurboFileTwinStf(_console));
+			break;
 	}
 
 	return device;
@@ -86,6 +95,7 @@ void SnesControlManager::UpdateControlDevices()
 	}
 
 	auto lock = _deviceLock.AcquireSafe();
+	SaveBattery();
 	ClearDevices();
 	for(int i = 0; i < 2; i++) {
 		shared_ptr<BaseControlDevice> device = CreateControllerDevice(i == 0 ? cfg.Port1.Type : cfg.Port2.Type, i);

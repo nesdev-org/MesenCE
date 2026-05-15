@@ -58,6 +58,7 @@ void GameServerConnection::SendGameInformation()
 	SendNetMessage(gameInfo);
 	SaveStateMessage saveState(_emu);
 	SendNetMessage(saveState);
+	_previousConfig = GetSerializedConfig();
 }
 
 void GameServerConnection::SendMovieData(uint8_t port, ControlDeviceState state)
@@ -146,6 +147,14 @@ void GameServerConnection::ProcessMessage(NetMessage* message)
 	}
 }
 
+void GameServerConnection::ProcessPendingEvents()
+{
+	if(_needSendGameInfo) {
+		SendGameInformation();
+		_needSendGameInfo = false;
+	}
+}
+
 void GameServerConnection::SelectControllerPort(NetplayControllerInfo controller)
 {
 	auto lock = _emu->AcquireLock();
@@ -179,23 +188,16 @@ void GameServerConnection::ProcessNotification(ConsoleNotificationType type, voi
 		case ConsoleNotificationType::GameReset:
 		case ConsoleNotificationType::StateLoaded:
 		case ConsoleNotificationType::CheatsChanged:
-		case ConsoleNotificationType::ConfigChanged:
 			SendGameInformation();
 			break;
 
 		case ConsoleNotificationType::PpuFrameDone: {
 			//Detect any configuration change that impacts emulation
 			//Send a save state to clients if any change is done
-			Serializer s(0, true);
-			EmuSettings* settings = _emu->GetSettings();
-			s.Stream(*settings, "", -1);
-			stringstream currentConfig;
-			s.SaveTo(currentConfig, 0);
-
-			if(_previousConfig != currentConfig.str()) {
-				SendGameInformation();
+			string cfg = GetSerializedConfig();
+			if(_previousConfig != cfg) {
+				_needSendGameInfo = true;
 			}
-			_previousConfig = currentConfig.str();
 			break;
 		}
 
@@ -214,4 +216,14 @@ void GameServerConnection::ProcessNotification(ConsoleNotificationType type, voi
 NetplayControllerInfo GameServerConnection::GetControllerPort()
 {
 	return _controllerPort;
+}
+
+string GameServerConnection::GetSerializedConfig()
+{
+	Serializer s(0, true);
+	EmuSettings* settings = _emu->GetSettings();
+	s.Stream(*settings, "", -1);
+	stringstream cfg;
+	s.SaveTo(cfg, 0);
+	return cfg.str();
 }

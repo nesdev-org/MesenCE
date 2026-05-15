@@ -1,6 +1,6 @@
 name: Build Mesen
 
-on: [push]
+on: [push, pull_request]
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -48,6 +48,7 @@ jobs:
 
       - name: Upload Mesen
         uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (Windows - ${{ matrix.platform.targetframework }}${{ matrix.platform.aotString }})
           path: |
@@ -102,6 +103,7 @@ jobs:
 
       - name: Upload Mesen
         uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (Linux - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
           path: bin/linux-${{ matrix.platform.path }}/Release/linux-${{ matrix.platform.path }}/publish/Mesen
@@ -143,6 +145,7 @@ jobs:
           ${{ matrix.platform.script }}
       - name: Upload Mesen (AppImage)
         uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (Linux ${{ matrix.platform.name }} - AppImage)
           path: Mesen.AppImage
@@ -228,6 +231,7 @@ jobs:
 
       - name: Upload Mesen
         uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (macOS - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
           path: bin/osx-${{ matrix.platform.arch }}/Release/Mesen.app.zip

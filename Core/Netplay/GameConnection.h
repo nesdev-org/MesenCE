@@ -29,6 +29,7 @@ private:
 
 protected:
 	void Disconnect();
+	virtual void ProcessPendingEvents() {}
 
 public:
 	static constexpr uint8_t SpectatorPort = 0xFF;

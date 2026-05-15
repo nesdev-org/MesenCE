@@ -8,7 +8,6 @@
 #include "Shared/Interfaces/IInputProvider.h"
 #include "Shared/Interfaces/IInputRecorder.h"
 #include "Shared/MessageManager.h"
-#include "Shared/BatteryManager.h"
 #include "Shared/Emulator.h"
 #include "Shared/KeyManager.h"
 #include "Shared/SystemActionManager.h"
@@ -225,16 +224,6 @@ void NesControlManager::UpdateInputState()
 
 	//Used by VS System games
 	RemapControllerButtons();
-}
-
-void NesControlManager::SaveBattery()
-{
-	for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
-		shared_ptr<IBattery> batteryDevice = std::dynamic_pointer_cast<IBattery>(device);
-		if(batteryDevice) {
-			batteryDevice->SaveBattery();
-		}
-	}
 }
 
 uint8_t NesControlManager::ReadRam(uint16_t addr)
