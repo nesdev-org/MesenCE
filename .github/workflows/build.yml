@@ -143,6 +143,7 @@ jobs:
       - name: Build Mesen (AppImage)
         run: |
           ${{ matrix.platform.script }}
+
       - name: Upload Mesen (AppImage)
         uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'
@@ -201,6 +202,7 @@ jobs:
           ${{ matrix.make_flags }} make -j$(sysctl -n hw.logicalcpu)
 
       - name: Sign binary
+        if: github.event_name != 'pull_request'
         env:
           APP_NAME: bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Mesen.app
           CERT_DATA: ${{ secrets.MACOS_CERTIFICATE }}
@@ -226,6 +228,7 @@ jobs:
           codesign --force --deep --timestamp --keychain macos-build.keychain --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_NAME"
 
       - name: Zip Mesen.app
+        if: github.event_name != 'pull_request'
         run: |
           ditto -c -k --sequesterRsrc --keepParent bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Mesen.app bin/osx-${{ matrix.platform.arch }}/Release/Mesen.app.zip
 
