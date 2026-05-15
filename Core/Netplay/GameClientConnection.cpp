@@ -41,6 +41,7 @@ void GameClientConnection::Shutdown()
 
 		_emu->UnregisterInputProvider(this);
 
+		_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::NetplayStopped);
 		MessageManager::DisplayMessage("NetPlay", "ConnectionLost");
 		_emu->GetSettings()->ClearFlag(EmulationFlags::MaximumSpeed);
 	}

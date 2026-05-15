@@ -29,7 +29,7 @@ private:
 
 	void PushState(ControlDeviceState state);
 	void SendServerInformation();
-	void SendGameInformation();
+	void SendGameInformation(bool forceReload);
 	void SelectControllerPort(NetplayControllerInfo port);
 
 	void SendForceDisconnectMessage(string disconnectMessage);

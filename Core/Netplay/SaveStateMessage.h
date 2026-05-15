@@ -10,11 +10,13 @@ class SaveStateMessage : public NetMessage
 private:
 	vector<CheatCode> _activeCheats;
 	vector<uint8_t> _stateData;
-	ConsoleType _consoleType;
+	ConsoleType _consoleType = {};
+	bool _forceReload = false;
 
 protected:
 	void Serialize(Serializer& s) override
 	{
+		SV(_forceReload);
 		SV(_consoleType);
 		SVVector(_stateData);
 		SVVector(_activeCheats);
@@ -23,7 +25,7 @@ protected:
 public:
 	SaveStateMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
 
-	SaveStateMessage(Emulator* emu) : NetMessage(MessageType::SaveState)
+	SaveStateMessage(Emulator* emu, bool forceReload) : NetMessage(MessageType::SaveState)
 	{
 		//Used when sending state to clients
 		stringstream state;
@@ -37,12 +39,17 @@ public:
 		_stateData.resize(dataSize);
 		state.read((char*)_stateData.data(), dataSize);
 
+		_forceReload = forceReload;
 		_consoleType = emu->GetConsoleType();
 	}
 
 	void LoadState(Emulator* emu)
 	{
 		std::stringstream ss;
+		if(_forceReload) {
+			emu->ReloadRom(false);
+		}
+
 		ss.write((char*)_stateData.data(), _stateData.size());
 		emu->Deserialize(ss, SaveStateManager::FileFormatVersion, true, _consoleType, false);
 

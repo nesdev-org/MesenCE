@@ -85,7 +85,9 @@ namespace Mesen.Interop
 		GameLoadFailed,
 		CheatsChanged,
 		RequestConfigChange,
-		RefreshSoftwareRenderer
+		RefreshSoftwareRenderer,
+		AfterInitConsole,
+		NetplayStopped
 	}
 
 	public struct GameLoadedEventParams

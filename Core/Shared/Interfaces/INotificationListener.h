@@ -29,6 +29,7 @@ enum class ConsoleNotificationType
 	RequestConfigChange,
 	RefreshSoftwareRenderer,
 	AfterInitConsole,
+	NetplayStopped,
 };
 
 struct GameLoadedEventParams
