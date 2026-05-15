@@ -1,6 +1,12 @@
 name: Build Mesen
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    branches:
+	   - '*'
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
