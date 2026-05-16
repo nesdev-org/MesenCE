@@ -115,7 +115,7 @@ protected:
 	uint32_t _ignoreVramRead = 0;
 	int32_t _openBusDecayStamp[8] = {};
 
-	uint64_t _oamDecayCycles[0x40] = {};
+	uint64_t _oamDecayCycles[0x20] = {};
 	bool _corruptOamRow[32] = {};
 
 	bool IsRenderingEnabled();
