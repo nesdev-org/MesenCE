@@ -2,9 +2,9 @@
 #include "WS/WsConsole.h"
 #include "WS/WsControlManager.h"
 #include "WS/WsMemoryManager.h"
-#include "WS/WsController.h"
-#include "WS/Pcv2Controller.h"
-#include "Shared/KeyManager.h"
+#include "WS/Input/WsController.h"
+#include "WS/Input/Pcv2Controller.h"
+#include "Shared/EmuSettings.h"
 
 WsControlManager::WsControlManager(Emulator* emu, WsConsole* console) : BaseControlManager(emu, CpuType::Ws)
 {
@@ -27,7 +27,7 @@ shared_ptr<BaseControlDevice> WsControlManager::CreateControllerDevice(Controlle
 			break;
 
 		case ControllerType::Pcv2Controller:
-			device.reset(new Pcv2Controller(_emu, _console, port, cfg.ControllerPcv2.Keys));
+			device.reset(new Pcv2Controller(_emu, port, cfg.ControllerPcv2.Keys));
 			break;
 	}
 
@@ -57,7 +57,11 @@ uint8_t WsControlManager::Read()
 	uint8_t result = _state.InputSelect;
 
 	for(shared_ptr<BaseControlDevice>& controller : _controlDevices) {
-		if(controller->GetPort() == 0 && controller->GetControllerType() == ControllerType::WsController) {
+		if(controller->GetPort() != 0) {
+			continue;
+		}
+
+		if(controller->GetControllerType() == ControllerType::WsController) {
 			if(_state.InputSelect & 0x10) {
 				result |= controller->IsPressed(WsController::Up2) ? 0x01 : 0;
 				result |= controller->IsPressed(WsController::Right2) ? 0x02 : 0;
@@ -75,7 +79,7 @@ uint8_t WsControlManager::Read()
 				result |= controller->IsPressed(WsController::A) ? 0x04 : 0;
 				result |= controller->IsPressed(WsController::B) ? 0x08 : 0;
 			}
-		} else if(controller->GetPort() == 0 && controller->GetControllerType() == ControllerType::Pcv2Controller) {
+		} else if(controller->GetControllerType() == ControllerType::Pcv2Controller) {
 			result |= 0x02;
 			if(_state.InputSelect & 0x10) {
 				result |= controller->IsPressed(Pcv2Controller::Clear) ? 0x01 : 0;

@@ -789,9 +789,9 @@
     <ClInclude Include="WS\Debugger\WsPpuTools.h" />
     <ClInclude Include="WS\Debugger\WsTraceLogger.h" />
     <ClInclude Include="WS\APU\WsApu.h" />
-    <ClInclude Include="WS\Pcv2Controller.h" />
+    <ClInclude Include="WS\Input\Pcv2Controller.h" />
     <ClInclude Include="WS\WsConsole.h" />
-    <ClInclude Include="WS\WsController.h" />
+    <ClInclude Include="WS\Input\WsController.h" />
     <ClInclude Include="WS\WsControlManager.h" />
     <ClInclude Include="WS\WsCpu.h" />
     <ClInclude Include="WS\WsCpuPrefetch.h" />

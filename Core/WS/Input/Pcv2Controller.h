@@ -1,16 +1,13 @@
 #pragma once
 #include "pch.h"
-#include "WS/WsConsole.h"
 #include "Shared/BaseControlDevice.h"
 #include "Shared/Emulator.h"
-#include "Shared/EmuSettings.h"
 #include "Shared/InputHud.h"
-#include "Utilities/Serializer.h"
 
 class Pcv2Controller : public BaseControlDevice
 {
 private:
-	WsConsole* _console = nullptr;
+	uint32_t _turboSpeed = 0;
 
 protected:
 	string GetKeyNames() override
@@ -22,13 +19,25 @@ protected:
 	{
 		for(KeyMapping& keyMapping : _keyMappings) {
 			for(int i = Buttons::Up; i <= Buttons::View; i++) {
-				SetPressedState(i, keyMapping.CustomKeys[i]);
+				SetPressedState(Buttons::Clear, keyMapping.A);
+				SetPressedState(Buttons::Circle, keyMapping.B);
+				SetPressedState(Buttons::Pass, keyMapping.X);
+				SetPressedState(Buttons::Esc, keyMapping.Select);
+				SetPressedState(Buttons::View, keyMapping.Start);
+				SetPressedState(Buttons::Up, keyMapping.Up);
+				SetPressedState(Buttons::Down, keyMapping.Down);
+				SetPressedState(Buttons::Left, keyMapping.Left);
+				SetPressedState(Buttons::Right, keyMapping.Right);
+			}
+
+			uint8_t turboFreq = 1 << (4 - _turboSpeed);
+			bool turboOn = (uint8_t)(_emu->GetFrameCount() % turboFreq) < turboFreq / 2;
+			if(turboOn) {
+				SetPressedState(Buttons::Clear, keyMapping.TurboA);
+				SetPressedState(Buttons::Circle, keyMapping.TurboB);
+				SetPressedState(Buttons::Pass, keyMapping.TurboX);
 			}
 		}
-	}
-
-	void RefreshStateBuffer() override
-	{
 	}
 
 public:
@@ -45,9 +54,9 @@ public:
 		View
 	};
 
-	Pcv2Controller(Emulator* emu, WsConsole* console, uint8_t port, KeyMappingSet mappings) : BaseControlDevice(emu, ControllerType::Pcv2Controller, port, mappings)
+	Pcv2Controller(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::Pcv2Controller, port, keyMappings)
 	{
-		_console = console;
+		_turboSpeed = keyMappings.TurboSpeed;
 	}
 
 	uint8_t ReadRam(uint16_t addr) override

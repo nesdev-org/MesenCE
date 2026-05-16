@@ -29,9 +29,9 @@ namespace Mesen.ViewModels
 			IObservable<bool> button1Enabled = this.WhenAnyValue(x => x.Config.ControllerHorizontal.Type, x => x.CanConfigure());
 			IObservable<bool> button2Enabled = this.WhenAnyValue(x => x.Config.ControllerVertical.Type, x => x.CanConfigure());
 			IObservable<bool> button3Enabled = this.WhenAnyValue(x => x.Config.ControllerPcv2.Type, x => x.CanConfigure());
-			SetupPlayerHorizontal = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, 0), button1Enabled);
-			SetupPlayerVertical = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, 1), button2Enabled);
-			SetupPlayerPcv2 = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, 2), button3Enabled);
+			SetupPlayerHorizontal = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, ControllerType.WsController), button1Enabled);
+			SetupPlayerVertical = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, ControllerType.WsControllerVertical), button2Enabled);
+			SetupPlayerPcv2 = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, ControllerType.Pcv2Controller), button3Enabled);
 
 			if(Design.IsDesignMode) {
 				return;
@@ -40,21 +40,26 @@ namespace Mesen.ViewModels
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
 		}
 
-		private async void OpenSetup(Button btn, int port)
+		private async void OpenSetup(Button btn, ControllerType type)
 		{
 			PixelPoint startPosition = btn.PointToScreen(new Point(-7, btn.Bounds.Height));
 			ControllerConfigWindow wnd = new ControllerConfigWindow();
-			WsControllerConfig orgCfg = port == 0 ? Config.ControllerHorizontal : (port == 1 ? Config.ControllerVertical : Config.ControllerPcv2);
-			WsControllerConfig cfg = (WsControllerConfig) (port == 0 ? Config.ControllerHorizontal.Clone() : (port == 1 ? Config.ControllerVertical.Clone() : Config.ControllerPcv2.Clone()));
-			wnd.DataContext = new ControllerConfigViewModel(port == 0 ? ControllerType.WsController : (port == 1 ? ControllerType.WsControllerVertical : ControllerType.Pcv2Controller), cfg, orgCfg, port);
+			ControllerConfig orgCfg = type switch {
+				ControllerType.WsController => Config.ControllerHorizontal,
+				ControllerType.WsControllerVertical => Config.ControllerVertical,
+				ControllerType.Pcv2Controller => Config.ControllerPcv2,
+				_ => throw new NotImplementedException()
+			};
+
+			ControllerConfig cfg = orgCfg.Clone();
+
+			wnd.DataContext = new ControllerConfigViewModel(type, cfg, orgCfg, 0);
 
 			if(await wnd.ShowDialogAtPosition<bool>(btn.GetVisualRoot() as Visual, startPosition)) {
-				if(port == 0) {
-					Config.ControllerHorizontal = cfg;
-				} else if(port == 1) {
-					Config.ControllerVertical = cfg;
-				} else {
-					Config.ControllerPcv2 = cfg;
+				switch(type) {
+					case ControllerType.WsController: Config.ControllerHorizontal = cfg; break;
+					case ControllerType.WsControllerVertical: Config.ControllerVertical = cfg; break;
+					case ControllerType.Pcv2Controller: Config.ControllerPcv2 = cfg; break;
 				}
 			}
 		}

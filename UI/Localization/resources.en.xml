@@ -728,7 +728,7 @@
 			<Control ID="chkGameGearRomFiles">Game Gear roms: .gg</Control>
 			<Control ID="chkSgRomFiles">SG-1000 roms: .sg</Control>
 			<Control ID="chkCvRomFiles">ColecoVision roms: .col</Control>
-			<Control ID="chkWsRomFiles">WonderSwan roms: .ws, .wsc</Control>
+			<Control ID="chkWsRomFiles">WonderSwan roms: .ws, .wsc, .pc2</Control>
 
 			<Control ID="grpDataStorageLocation">Data Storage Folder</Control>
 			<Control ID="btnChangeStorageFolder">Change folder...</Control>
@@ -2373,17 +2373,6 @@ E
 			<Value ID="Right">D-Pad - Right</Value>
 			<Value ID="R">Button - Right</Value>
 			<Value ID="L">Button - Left</Value>
-		</Enum>
-		<Enum ID="Pcv2Buttons">
-			<Value ID="Up">Up</Value>
-			<Value ID="Down">Down</Value>
-			<Value ID="Left">Left</Value>
-			<Value ID="Right">Right</Value>
-			<Value ID="Esc">Esc</Value>
-			<Value ID="View">View</Value>
-			<Value ID="Circle">Circle</Value>
-			<Value ID="Clear">Clear</Value>
-			<Value ID="Pass">Pass</Value>
 		</Enum>
 		<Enum ID="NesConsoleType">
 			<Value ID="Nes001">NES - Front loader (NES-001)</Value>
