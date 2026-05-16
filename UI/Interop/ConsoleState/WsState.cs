@@ -442,8 +442,18 @@ public struct WsEepromState
 
 public struct WsCartState
 {
+	[MarshalAs(UnmanagedType.I1)] public bool HasRtc;
+	[MarshalAs(UnmanagedType.I1)] public bool RomInRamBank;
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-	public byte[] SelectedBanks;
+	public UInt16[] SelectedBanks;
+}
+
+public struct WsRtcState
+{
+	public byte Data;
+	public byte Command;
+	[MarshalAs(UnmanagedType.I1)] public bool Ready;
+	[MarshalAs(UnmanagedType.I1)] public bool Busy;
 }
 
 public struct WsState : BaseState
@@ -459,5 +469,6 @@ public struct WsState : BaseState
 	public WsEepromState InternalEeprom;
 	public WsCartState Cart;
 	public WsEepromState CartEeprom;
+	public WsRtcState CartRtc;
 	public WsModel Model;
 }

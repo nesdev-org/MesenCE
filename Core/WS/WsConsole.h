@@ -14,6 +14,7 @@ class WsMemoryManager;
 class WsControlManager;
 class WsDmaController;
 class WsEeprom;
+class WsRtc;
 enum class WsModel : uint8_t;
 
 class WsConsole final : public IConsole
@@ -31,6 +32,7 @@ private:
 	unique_ptr<WsDmaController> _dmaController;
 	unique_ptr<WsEeprom> _internalEeprom;
 	unique_ptr<WsEeprom> _cartEeprom;
+	unique_ptr<WsRtc> _cartRtc;
 
 	uint8_t* _workRam = nullptr;
 	uint32_t _workRamSize = 0;
@@ -53,6 +55,7 @@ private:
 	WsModel _model = {};
 	bool _verticalMode = false;
 
+	bool IsWWCart();
 	void InitPostBootRomState();
 
 public:
@@ -81,6 +84,8 @@ public:
 	ConsoleRegion GetRegion() override;
 	ConsoleType GetConsoleType() override;
 	vector<CpuType> GetCpuTypes() override;
+	uint64_t GetCartridgeClock();
+	uint32_t GetCartridgeClockRate();
 	uint64_t GetMasterClock() override;
 	uint32_t GetMasterClockRate() override;
 	double GetFps() override;
