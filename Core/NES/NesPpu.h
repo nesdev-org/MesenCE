@@ -33,7 +33,7 @@ template<class T>
 class NesPpu : public BaseNesPpu
 {
 private:
-	static constexpr int32_t OamDecayCycleCount = 3000;
+	static constexpr int32_t OamDecayCycleCount = 4500; //About 40 scanlines.
 
 protected:
 	void UpdateStatusFlag();
