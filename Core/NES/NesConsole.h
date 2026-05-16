@@ -56,6 +56,8 @@ private:
 	void UpdateRegion(bool forceUpdate = false);
 	void LoadHdPack(VirtualFile& romFile);
 
+	template<bool isDualSystem> void InternalRunFrame();
+
 	void InitializeInputDevices(GameInputType inputType, GameSystem system);
 
 	void StartRecordingHdPack(HdPackBuilderOptions options);
@@ -90,6 +92,7 @@ public:
 
 	// Inherited via IConsole
 	void Serialize(Serializer& s) override;
+	optional<SaveStateCompatInfo> ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType) override;
 	void Reset() override;
 	LoadRomResult LoadRom(VirtualFile& romFile) override;
 	void RunFrame() override;

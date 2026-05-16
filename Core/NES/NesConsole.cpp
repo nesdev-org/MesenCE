@@ -30,7 +30,6 @@
 #include "Shared/CheatManager.h"
 #include "Shared/Movies/MovieManager.h"
 #include "Shared/BaseControlManager.h"
-#include "Shared/Interfaces/IBattery.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/NotificationManager.h"
 #include "Netplay/GameClient.h"
@@ -122,6 +121,16 @@ void NesConsole::Serialize(Serializer& s)
 	}
 }
 
+optional<SaveStateCompatInfo> NesConsole::ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType)
+{
+	if(_vsSubConsole && !s.ContainsPrefix("vsSubConsole")) {
+		//Only allow loading VS DualSystem save states when a VS DualSystem game is loaded
+		return SaveStateCompatInfo { false };
+	}
+
+	return {};
+}
+
 void NesConsole::Reset()
 {
 	_memoryManager->Reset(true);
@@ -153,7 +162,9 @@ LoadRomResult NesConsole::LoadRom(VirtualFile& romFile)
 			//Create 2nd console (sub) dualsystem games
 			_vsSubConsole.reset(new NesConsole(_emu));
 			_vsSubConsole->_vsMainConsole = this;
+			_emu->SetDebuggerDisabled(true);
 			result = _vsSubConsole->LoadRom(romFile);
+			_emu->SetDebuggerDisabled(false);
 			if(result != LoadRomResult::Success) {
 				return result;
 			}
@@ -266,8 +277,17 @@ void NesConsole::UpdateRegion(bool forceUpdate)
 		_mixer->SetRegion(_region);
 	}
 }
-
 void NesConsole::RunFrame()
+{
+	if(_vsSubConsole) {
+		InternalRunFrame<true>();
+	} else {
+		InternalRunFrame<false>();
+	}
+}
+
+template<bool isDualSystem>
+void NesConsole::InternalRunFrame()
 {
 	UpdateRegion();
 
@@ -282,7 +302,7 @@ void NesConsole::RunFrame()
 
 	while(frame == _ppu->GetFrameCount()) {
 		_cpu->Exec();
-		if(_vsSubConsole) {
+		if constexpr(isDualSystem) {
 			RunVsSubConsole();
 		}
 	}
@@ -297,6 +317,7 @@ void NesConsole::RunFrame()
 
 void NesConsole::RunVsSubConsole()
 {
+	_emu->SetDebuggerDisabled(true);
 	int64_t cycleGap;
 	while(true) {
 		//Run the sub console until it catches up to the main CPU
@@ -307,6 +328,7 @@ void NesConsole::RunVsSubConsole()
 			break;
 		}
 	}
+	_emu->SetDebuggerDisabled(false);
 }
 
 void NesConsole::SetNextFrameOverclockStatus(bool disabled)
@@ -399,10 +421,6 @@ void NesConsole::SaveBattery()
 {
 	if(_mapper) {
 		_mapper->SaveBattery();
-	}
-
-	if(_controlManager) {
-		_controlManager->SaveBattery();
 	}
 }
 

@@ -14,7 +14,6 @@ enum class ConsoleNotificationType
 	DebuggerResumed,
 	PpuFrameDone,
 	ResolutionChanged,
-	ConfigChanged,
 	ExecuteShortcut,
 	ReleaseShortcut,
 	EmulationStopped,
@@ -29,6 +28,8 @@ enum class ConsoleNotificationType
 	CheatsChanged,
 	RequestConfigChange,
 	RefreshSoftwareRenderer,
+	AfterInitConsole,
+	NetplayStopped,
 };
 
 struct GameLoadedEventParams

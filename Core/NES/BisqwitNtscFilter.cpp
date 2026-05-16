@@ -4,9 +4,8 @@
 #include "pch.h"
 #include <cmath>
 #include "NES/BisqwitNtscFilter.h"
-#include "NES/NesPpu.h"
-#include "NES/NesConsole.h"
 #include "NES/NesDefaultVideoFilter.h"
+#include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 
 BisqwitNtscFilter::BisqwitNtscFilter(Emulator* emu) : BaseVideoFilter(emu)

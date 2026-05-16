@@ -118,7 +118,6 @@ namespace Mesen.Debugger.Utilities
 				case ConsoleNotificationType.ReleaseShortcut:
 				case ConsoleNotificationType.RefreshSoftwareRenderer:
 				case ConsoleNotificationType.CheatsChanged:
-				case ConsoleNotificationType.ConfigChanged:
 				case ConsoleNotificationType.MissingFirmware:
 				case ConsoleNotificationType.RequestConfigChange:
 				case ConsoleNotificationType.ResolutionChanged:

@@ -14,7 +14,7 @@ class Emulator;
 class MovieRecorder final : public INotificationListener, public IInputRecorder, public IBatteryRecorder, public IBatteryProvider, public std::enable_shared_from_this<MovieRecorder>
 {
 private:
-	static const uint32_t MovieFormatVersion = 2;
+	static const uint32_t MovieFormatVersion = 3;
 
 	Emulator* _emu;
 	string _filename;

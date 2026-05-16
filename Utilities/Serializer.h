@@ -2,9 +2,9 @@
 
 #include "pch.h"
 #include "Utilities/ISerializable.h"
-#include "Utilities/FastString.h"
 #include "Utilities/magic_enum.hpp"
 #include "Utilities/safe_ptr.h"
+#include "Utilities/StringUtilities.h"
 
 class Serializer;
 
@@ -481,6 +481,16 @@ public:
 	{
 		string key = GetKey(name, -1);
 		return _values.find(key) != _values.end();
+	}
+
+	bool ContainsPrefix(const char* name)
+	{
+		for(auto& key : _values) {
+			if(StringUtilities::StartsWith(key.first, name)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	void PushNamePrefix(const char* name, int index = -1);

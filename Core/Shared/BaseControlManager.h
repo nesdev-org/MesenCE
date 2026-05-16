@@ -55,6 +55,8 @@ public:
 	uint32_t GetPollCounter();
 	void SetPollCounter(uint32_t value);
 
+	void SaveBattery();
+
 	virtual void Reset(bool softReset) {}
 
 	void RegisterInputProvider(IInputProvider* provider);

@@ -1,11 +1,8 @@
 #pragma once
 
 #include "pch.h"
-#include "Utilities/ISerializable.h"
 #include "NES/NesTypes.h"
 #include "NES/BaseNesPpu.h"
-#include "NES/BaseMapper.h"
-#include "NES/NesTypes.h"
 #include "NES/INesMemoryHandler.h"
 #include "Shared/MemoryOperationType.h"
 
@@ -15,6 +12,7 @@ class Emulator;
 class SnesControlManager;
 class NesConsole;
 class EmuSettings;
+struct RenderedFrame;
 
 enum PpuRegisters
 {
@@ -79,7 +77,7 @@ protected:
 
 	void SendFrame();
 
-	void SendFrameVsDualSystem();
+	void SendFrameVsDualSystem(RenderedFrame& frame);
 
 	void UpdateState();
 

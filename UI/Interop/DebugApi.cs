@@ -632,6 +632,8 @@ namespace Mesen.Interop
 		GbBootRom,
 		GbVideoRam,
 		GbSpriteRam,
+		GbBgPaletteRam,
+		GbObjPaletteRam,
 
 		NesPrgRom,
 		NesInternalRam,

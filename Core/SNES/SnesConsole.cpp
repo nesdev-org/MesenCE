@@ -91,6 +91,12 @@ void SnesConsole::ProcessEndOfFrame()
 
 void SnesConsole::Reset()
 {
+	if(_emu->GetRomInfo().Format == RomFormat::Spc) {
+		// For SPC files, reload the initial state that the SPC file started with
+		_emu->ReloadRom(true);
+		return;
+	}
+
 	_dmaController->Reset();
 	_internalRegisters->Reset();
 	_memoryManager->Reset();
@@ -358,7 +364,7 @@ void SnesConsole::Serialize(Serializer& s)
 	SV(_controlManager);
 }
 
-SaveStateCompatInfo SnesConsole::ValidateSaveStateCompatibility(ConsoleType stateConsoleType)
+optional<SaveStateCompatInfo> SnesConsole::ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType)
 {
 	if(stateConsoleType == ConsoleType::Gameboy) {
 		//Keep all clock counters as-is when loading a GB/GBC state
@@ -371,7 +377,7 @@ SaveStateCompatInfo SnesConsole::ValidateSaveStateCompatibility(ConsoleType stat
 			"memoryManager.apuCycleCount"
 		};
 
-		return { true, "cart.gameboy.", "", fieldsToRemove };
+		return SaveStateCompatInfo { true, "cart.gameboy.", "", fieldsToRemove };
 	}
 
 	return {};

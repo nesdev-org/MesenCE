@@ -41,6 +41,9 @@ private:
 
 	__forceinline void ExecTimerDmaSerial();
 
+	void RunSerialTransfer();
+	bool ExchangeSerialBits(bool serialBit);
+
 public:
 	virtual ~GbMemoryManager();
 

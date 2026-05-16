@@ -182,6 +182,9 @@ enum class ControllerType
 	SuperScope,
 	Multitap,
 	SnesRumbleController,
+	SnesNttDataKeypad,
+	AsciiTurboFileTwinTf2,
+	AsciiTurboFileTwinStf,
 
 	//NES controllers
 	NesController,
@@ -403,12 +406,24 @@ struct GameConfig
 	OverscanDimensions Overscan = {};
 };
 
+enum class GbLocalLinkOutputOption
+{
+	Both = 0,
+	MainSystemOnly = 1,
+	SubSystemOnly = 2
+};
+
 struct GameboyConfig
 {
 	ControllerConfig Controller;
+	ControllerConfig LinkedController;
 
 	GameboyModel Model = GameboyModel::AutoFavorGbc;
 	bool UseSgb2 = true;
+
+	bool UseLocalLinkCable = false;
+	GbLocalLinkOutputOption LocalLinkCableVideoOutput = GbLocalLinkOutputOption::Both;
+	GbLocalLinkOutputOption LocalLinkCableAudioOutput = GbLocalLinkOutputOption::Both;
 
 	bool BlendFrames = true;
 	bool GbcAdjustColors = true;

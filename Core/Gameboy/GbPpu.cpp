@@ -17,6 +17,7 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Serializer.h"
 #include "Shared/EventType.h"
+#include "Shared/Utilities/AvMergeUtilities.h"
 
 constexpr uint16_t evtColors[6] = { 0x18C6, 0x294A, 0x108C, 0x4210, 0x3084, 0x1184 };
 
@@ -28,6 +29,7 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 	_dmaController = dmaController;
 	_vram = vram;
 	_oam = oam;
+	_settings = _emu->GetSettings();
 
 	_outputBuffers[0] = new uint16_t[GbConstants::PixelCount];
 	_outputBuffers[1] = new uint16_t[GbConstants::PixelCount];
@@ -48,6 +50,10 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 
 	_gameboy->InitializeRam(_state.CgbBgPalettes, 4 * 8 * sizeof(uint16_t));
 	_gameboy->InitializeRam(_state.CgbObjPalettes, 4 * 8 * sizeof(uint16_t));
+	if(_state.CgbEnabled) {
+		_emu->RegisterMemory(MemoryType::GbBgPaletteRam, _state.CgbBgPalettes, 4 * 8 * sizeof(uint16_t));
+		_emu->RegisterMemory(MemoryType::GbObjPaletteRam, _state.CgbObjPalettes, 4 * 8 * sizeof(uint16_t));
+	}
 
 	UpdatePalette();
 
@@ -807,7 +813,9 @@ void GbPpu::SendFrame()
 
 	UpdatePalette();
 
-	_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::PpuFrameDone);
+	if(_gameboy->IsPrimaryConsole()) {
+		_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::PpuFrameDone);
+	}
 
 	if(_forceBlankFrame) {
 		//Send blank frame on the first frame after enabling LCD
@@ -820,13 +828,47 @@ void GbPpu::SendFrame()
 	_isFirstFrame = false;
 
 	RenderedFrame frame(_currentBuffer, GbConstants::ScreenWidth, GbConstants::ScreenHeight, 1.0, _state.FrameCount, _gameboy->GetControlManager()->GetPortStates());
-	bool rewinding = _emu->GetRewindManager()->IsRewinding();
-	_emu->GetVideoDecoder()->UpdateFrame(frame, rewinding, rewinding);
+	if(_gameboy->GetLinkedConsole()) {
+		SendLinkedFrame(frame);
+		if(_gameboy->IsPrimaryConsole()) {
+			_emu->ProcessEndOfFrame();
+		}
+	} else {
+		bool rewinding = _emu->GetRewindManager()->IsRewinding();
+		_emu->GetVideoDecoder()->UpdateFrame(frame, rewinding, rewinding);
+		_emu->ProcessEndOfFrame();
+	}
 
-	_emu->ProcessEndOfFrame();
 	_gameboy->ProcessEndOfFrame();
 
 	_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
+}
+
+void GbPpu::SendLinkedFrame(RenderedFrame& frame)
+{
+	GameboyConfig& cfg = _settings->GetGameboyConfig();
+	bool forRewind = _emu->GetRewindManager()->IsRewinding();
+
+	if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::MainSystemOnly && _gameboy->IsPrimaryConsole()) {
+		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
+	} else if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::SubSystemOnly && !_gameboy->IsPrimaryConsole()) {
+		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
+	} else if(cfg.LocalLinkCableVideoOutput == GbLocalLinkOutputOption::Both) {
+		if(_gameboy->IsPrimaryConsole()) {
+			GbPpu* otherPpu = _gameboy->GetLinkedConsole()->GetPpu();
+			uint16_t* otherFrame;
+			if(otherPpu->GetScanline() >= GetScanline() || (otherPpu->GetMode() == PpuMode::HBlank && otherPpu->GetScanline() == GetScanline() - 1)) {
+				//When both PPUs are in vblank (or at least, done drawing the current frame), use the latest frame
+				otherFrame = otherPpu->GetOutputBuffer();
+			} else {
+				//When the other PPU is not in vblank, use the previous frame's output to avoid screen tearing
+				otherFrame = otherPpu->_currentBuffer == otherPpu->_outputBuffers[0] ? otherPpu->_outputBuffers[1] : otherPpu->_outputBuffers[0];
+			}
+
+			VideoMergeResult merged = AvMergeUtilities::MergeFrames(frame, otherFrame);
+			_emu->GetVideoDecoder()->UpdateFrame(merged.Frame, true, forRewind);
+		}
+	}
 }
 
 void GbPpu::DebugSendFrame()
@@ -1247,7 +1289,9 @@ void GbPpu::WriteCgbRegister(uint16_t addr, uint8_t value)
 uint8_t GbPpu::ReadCgbPalette(uint8_t& pos, uint16_t* pal)
 {
 	if(_state.Mode <= PpuMode::OamEvaluation) {
-		return (pal[pos >> 1] >> ((pos & 0x01) ? 8 : 0)) & 0xFF;
+		uint8_t value = (pal[pos >> 1] >> ((pos & 0x01) ? 8 : 0)) & 0xFF;
+		_emu->ProcessPpuRead<CpuType::Gameboy>(pos, value, (pal == _state.CgbBgPalettes) ? MemoryType::GbBgPaletteRam : MemoryType::GbObjPaletteRam);
+		return value;
 	}
 	return 0xFF;
 }
@@ -1255,6 +1299,7 @@ uint8_t GbPpu::ReadCgbPalette(uint8_t& pos, uint16_t* pal)
 void GbPpu::WriteCgbPalette(uint8_t& pos, uint16_t* pal, bool autoInc, uint8_t value)
 {
 	if(_state.Mode <= PpuMode::OamEvaluation) {
+		_emu->ProcessPpuWrite<CpuType::Gameboy>(pos, value, (pal == _state.CgbBgPalettes) ? MemoryType::GbBgPaletteRam : MemoryType::GbObjPaletteRam);
 		if(pos & 0x01) {
 			pal[pos >> 1] = (pal[pos >> 1] & 0xFF) | (value << 8);
 		} else {

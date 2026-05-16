@@ -47,6 +47,7 @@ namespace Mesen.ViewModels
 			ControllerType.PowerPadSideB,
 			ControllerType.SnesController,
 			ControllerType.SnesMouse,
+			ControllerType.SnesNttDataKeypad,
 			ControllerType.SuborMouse,
 			ControllerType.VbController
 		};
@@ -62,6 +63,7 @@ namespace Mesen.ViewModels
 			ControllerType.PowerPadSideB,
 			ControllerType.SnesController,
 			ControllerType.SnesMouse,
+			ControllerType.SnesNttDataKeypad,
 			ControllerType.SuborMouse,
 			ControllerType.VbController
 		};
@@ -77,6 +79,7 @@ namespace Mesen.ViewModels
 			ControllerType.Pachinko,
 			ControllerType.SnesController,
 			ControllerType.SnesMouse,
+			ControllerType.SnesNttDataKeypad,
 			ControllerType.SuborMouse,
 			ControllerType.VbController,
 		};

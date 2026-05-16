@@ -17,13 +17,13 @@
 #include "NES/HdPacks/HdNesPpu.h"
 #include "NES/HdPacks/HdBuilderPpu.h"
 
-#include "Debugger/Debugger.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/Video/VideoDecoder.h"
 #include "Shared/RewindManager.h"
 #include "Shared/NotificationManager.h"
 #include "Shared/RenderedFrame.h"
 #include "Shared/MemoryOperationType.h"
+#include "Shared/Utilities/AvMergeUtilities.h"
 
 #include "Shared/EventType.h"
 
@@ -1209,7 +1209,7 @@ template<class T> void NesPpu<T>::SendFrame()
 	frame.Data = frameData; //HD packs
 
 	if(_console->GetVsMainConsole() || _console->GetVsSubConsole()) {
-		SendFrameVsDualSystem();
+		SendFrameVsDualSystem(frame);
 		if(_console->IsVsMainConsole()) {
 			_emu->ProcessEndOfFrame();
 		}
@@ -1222,12 +1222,10 @@ template<class T> void NesPpu<T>::SendFrame()
 	_enableOamDecay = _settings->GetNesConfig().EnableOamDecay;
 }
 
-template<class T> void NesPpu<T>::SendFrameVsDualSystem()
+template<class T> void NesPpu<T>::SendFrameVsDualSystem(RenderedFrame& frame)
 {
 	NesConfig& cfg = _settings->GetNesConfig();
 	bool forRewind = _emu->GetRewindManager()->IsRewinding();
-
-	RenderedFrame frame(_currentOutputBuffer, NesConstants::ScreenWidth, NesConstants::ScreenHeight, 1.0, _frameCount, _console->GetControlManager()->GetPortStates());
 
 	if(cfg.VsDualVideoOutput == VsDualOutputOption::MainSystemOnly && _console->IsVsMainConsole()) {
 		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
@@ -1235,23 +1233,8 @@ template<class T> void NesPpu<T>::SendFrameVsDualSystem()
 		_emu->GetVideoDecoder()->UpdateFrame(frame, forRewind, forRewind);
 	} else if(cfg.VsDualVideoOutput == VsDualOutputOption::Both) {
 		if(_console->IsVsMainConsole()) {
-			uint16_t* mergedBuffer = new uint16_t[NesConstants::ScreenWidth * NesConstants::ScreenHeight * 2];
-
-			uint16_t* in1 = _currentOutputBuffer;
-			uint16_t* in2 = ((NesPpu<T>*)_console->GetVsSubConsole()->GetPpu())->_currentOutputBuffer;
-			uint16_t* out = mergedBuffer;
-			for(int i = 0; i < NesConstants::ScreenHeight; i++) {
-				memcpy(out, in1, NesConstants::ScreenWidth * sizeof(uint16_t));
-				out += NesConstants::ScreenWidth;
-				in1 += NesConstants::ScreenWidth;
-				memcpy(out, in2, NesConstants::ScreenWidth * sizeof(uint16_t));
-				out += NesConstants::ScreenWidth;
-				in2 += NesConstants::ScreenWidth;
-			}
-
-			RenderedFrame mergedFrame(mergedBuffer, NesConstants::ScreenWidth * 2, NesConstants::ScreenHeight, 1.0, _frameCount, _console->GetControlManager()->GetPortStates());
-			_emu->GetVideoDecoder()->UpdateFrame(mergedFrame, true, forRewind);
-			delete[] mergedBuffer;
+			VideoMergeResult merged = AvMergeUtilities::MergeFrames(frame, ((NesPpu<T>*)_console->GetVsSubConsole()->GetPpu())->_currentOutputBuffer);
+			_emu->GetVideoDecoder()->UpdateFrame(merged.Frame, true, forRewind);
 		}
 	}
 }
@@ -1271,16 +1254,17 @@ template<class T> void NesPpu<T>::TriggerNmi()
 template<class T> void NesPpu<T>::UpdateApuStatus()
 {
 	NesApu* apu = _console->GetApu();
-	apu->SetApuStatus(true);
+	bool enabled = true;
 	if(_scanline > 240) {
 		if(_scanline > _standardVblankEnd) {
 			//Disable APU for extra lines after NMI
-			apu->SetApuStatus(false);
+			enabled = false;
 		} else if(_scanline >= _standardNmiScanline && _scanline < _nmiScanline) {
 			//Disable APU for extra lines before NMI
-			apu->SetApuStatus(false);
+			enabled = false;
 		}
 	}
+	apu->SetApuStatus(enabled);
 }
 
 template<class T> void NesPpu<T>::DebugUpdateFrameBuffer(bool toGrayscale)

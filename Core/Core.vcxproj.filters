@@ -2982,6 +2982,18 @@
     <ClInclude Include="SNES\Input\SnesRumbleController.h">
       <Filter>SNES\Input</Filter>
     </ClInclude>
+    <ClInclude Include="Shared\Utilities\AvMergeUtilities.h">
+      <Filter>Shared\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="SNES\Input\SnesNttDataKeypad.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinStf.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinTf2.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
     <ClInclude Include="WS\Input\WsController.h">
       <Filter>WS\Input</Filter>
     </ClInclude>
@@ -3351,6 +3363,9 @@
       <Filter>SNES\Debugger</Filter>
     </ClCompile>
     <ClCompile Include="SNES\Input\SnesRumbleController.cpp">
+      <Filter>SNES\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="SNES\Input\SnesNttDataKeypad.cpp">
       <Filter>SNES\Input</Filter>
     </ClCompile>
   </ItemGroup>

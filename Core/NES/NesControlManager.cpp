@@ -8,13 +8,13 @@
 #include "Shared/Interfaces/IInputProvider.h"
 #include "Shared/Interfaces/IInputRecorder.h"
 #include "Shared/MessageManager.h"
-#include "Shared/BatteryManager.h"
 #include "Shared/Emulator.h"
 #include "Shared/KeyManager.h"
 #include "Shared/SystemActionManager.h"
 #include "NES/Input/NesController.h"
 #include "SNES/Input/SnesController.h"
 #include "SNES/Input/SnesMouse.h"
+#include "SNES/Input/SnesNttDataKeypad.h"
 #include "NES/Input/Zapper.h"
 #include "NES/Input/ArkanoidController.h"
 #include "NES/Input/OekaKidsTablet.h"
@@ -88,6 +88,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 
 		case ControllerType::NesArkanoidController: device.reset(new ArkanoidController(_emu, type, port, keys)); break;
 		case ControllerType::SnesController: device.reset(new SnesController(_emu, port, keys)); break;
+		case ControllerType::SnesNttDataKeypad: device.reset(new SnesNttDataKeypad(_emu, port, keys)); break;
 
 		case ControllerType::PowerPadSideA:
 		case ControllerType::PowerPadSideB:
@@ -223,16 +224,6 @@ void NesControlManager::UpdateInputState()
 
 	//Used by VS System games
 	RemapControllerButtons();
-}
-
-void NesControlManager::SaveBattery()
-{
-	for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
-		shared_ptr<IBattery> batteryDevice = std::dynamic_pointer_cast<IBattery>(device);
-		if(batteryDevice) {
-			batteryDevice->SaveBattery();
-		}
-	}
 }
 
 uint8_t NesControlManager::ReadRam(uint16_t addr)
