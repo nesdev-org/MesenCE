@@ -4,14 +4,16 @@
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/MessageManager.h"
+#include "Shared/Video/VideoDecoder.h"
 #include "Shared/NotificationManager.h"
 #include "Shared/Movies/MovieManager.h"
 #include "Utilities/VirtualFile.h"
 #include "Utilities/FolderUtilities.h"
-#include "Utilities/md5.h"
+#include "Utilities/sha1.h"
 #include "Utilities/ZipWriter.h"
 #include "Utilities/ZipReader.h"
 #include "Utilities/ArchiveReader.h"
+#include "Utilities/StringUtilities.h"
 
 RecordedRomTest::RecordedRomTest(Emulator* emu, bool inBackground)
 {
@@ -29,21 +31,17 @@ void RecordedRomTest::SaveFrame()
 {
 	PpuFrameInfo frame = _emu->GetPpuFrame();
 
-	uint8_t md5Hash[16];
-	GetMd5Sum(md5Hash, frame.FrameBuffer, frame.FrameBufferSize);
+	string hash = SHA1::GetHash(frame.FrameBuffer, frame.FrameBufferSize);
 
-	if(memcmp(_previousHash, md5Hash, 16) == 0 && _currentCount < 255) {
+	if(_previousHash == hash && _currentCount < 255) {
 		_currentCount++;
 	} else {
-		uint8_t* hash = new uint8_t[16];
-		memcpy(hash, md5Hash, 16);
 		_screenshotHashes.push_back(hash);
 		if(_currentCount > 0) {
 			_repetitionCount.push_back(_currentCount);
 		}
 		_currentCount = 1;
-
-		memcpy(_previousHash, md5Hash, 16);
+		_previousHash = hash;
 
 		_signal.Signal();
 	}
@@ -53,8 +51,8 @@ void RecordedRomTest::ValidateFrame()
 {
 	PpuFrameInfo frame = _emu->GetPpuFrame();
 
-	uint8_t md5Hash[16];
-	GetMd5Sum(md5Hash, frame.FrameBuffer, frame.FrameBufferSize);
+	string hash = SHA1::GetHash(frame.FrameBuffer, frame.FrameBufferSize);
+	_previousHash = hash;
 
 	if(_currentCount == 0) {
 		_currentCount = _repetitionCount.front();
@@ -63,7 +61,7 @@ void RecordedRomTest::ValidateFrame()
 	}
 	_currentCount--;
 
-	if(memcmp(_screenshotHashes.front(), md5Hash, 16) != 0) {
+	if(_screenshotHashes.front() != hash) {
 		_badFrameCount++;
 		_isLastFrameGood = false;
 		//_console->BreakIfDebugging();
@@ -96,14 +94,11 @@ void RecordedRomTest::ProcessNotification(ConsoleNotificationType type, void* pa
 
 void RecordedRomTest::Reset()
 {
-	memset(_previousHash, 0xFF, 16);
+	_previousHash = "";
 
 	_currentCount = 0;
 	_repetitionCount.clear();
 
-	for(uint8_t* hash : _screenshotHashes) {
-		delete[] hash;
-	}
 	_screenshotHashes.clear();
 
 	_runningTest = false;
@@ -186,7 +181,7 @@ RomTestResult RecordedRomTest::Run(string filename)
 	if(testData && testMovie.IsValid() && testRom.IsValid()) {
 		char header[3];
 		testData.read((char*)&header, 3);
-		if(memcmp((char*)&header, "MRT", 3) != 0) {
+		if(memcmp((char*)&header, "MT2", 3) != 0) {
 			//Invalid test file
 			result.ErrorCode = -3;
 			return result;
@@ -202,8 +197,8 @@ RomTestResult RecordedRomTest::Run(string filename)
 			testData.read((char*)&repeatCount, sizeof(uint8_t));
 			_repetitionCount.push_back(repeatCount);
 
-			uint8_t* screenshotHash = new uint8_t[16];
-			testData.read((char*)screenshotHash, 16);
+			string screenshotHash(40, '0');
+			testData.read((char*)screenshotHash.data(), 40);
 			_screenshotHashes.push_back(screenshotHash);
 		}
 
@@ -244,6 +239,9 @@ RomTestResult RecordedRomTest::Run(string filename)
 			_emu->Unlock();
 			_emu->Resume();
 			_signal.Wait();
+			if(!_isLastFrameGood) {
+				_emu->GetVideoDecoder()->TakeScreenshot();
+			}
 			_emu->Stop(!_inBackground);
 			_runningTest = false;
 		} else {
@@ -257,6 +255,7 @@ RomTestResult RecordedRomTest::Run(string filename)
 
 		result.ErrorCode = _badFrameCount;
 		result.State = _badFrameCount == 0 ? RomTestState::Passed : (_isLastFrameGood ? RomTestState::PassedWithWarnings : RomTestState::Failed);
+		StringUtilities::CopyToBuffer(_previousHash, result.LastFrameHash, sizeof(result.LastFrameHash));
 
 		return result;
 	}
@@ -283,14 +282,14 @@ void RecordedRomTest::Save()
 	//Stop playing/recording the movie
 	_emu->GetMovieManager()->Stop();
 
-	_file.write("MRT", 3);
+	_file.write("MT2", 3);
 
 	uint32_t hashCount = (uint32_t)_screenshotHashes.size();
 	_file.write((char*)&hashCount, sizeof(uint32_t));
 
 	for(uint32_t i = 0; i < hashCount; i++) {
 		_file.write((char*)&_repetitionCount[i], sizeof(uint8_t));
-		_file.write((char*)&_screenshotHashes[i][0], 16);
+		_file.write((char*)_screenshotHashes[i].data(), 40);
 	}
 
 	_file.close();
@@ -307,6 +306,11 @@ void RecordedRomTest::Save()
 	std::remove(mmoFilename.c_str());
 
 	writer.AddFile(_emu->GetRomInfo().RomFile.GetFilePath(), "TestRom" + _emu->GetRomInfo().RomFile.GetFileExtension());
+
+	//Add a screenshot of the last frame to the zip file (with the sha1 hash in the filename)
+	stringstream screenshot;
+	_emu->GetVideoDecoder()->TakeScreenshot(screenshot);
+	writer.AddFile(screenshot, "LastFrame." + _screenshotHashes[_screenshotHashes.size() - 1] + ".png");
 
 	writer.Save();
 

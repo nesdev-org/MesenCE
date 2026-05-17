@@ -5,7 +5,6 @@
 #include "NES/GameDatabase.h"
 #include "Shared/MessageManager.h"
 #include "Utilities/CRC32.h"
-#include "Utilities/md5.h"
 #include "Utilities/HexUtilities.h"
 
 void UnifLoader::Read(uint8_t*& data, uint8_t& dest)

@@ -221,7 +221,6 @@
     <ClInclude Include="ISerializable.h" />
     <ClInclude Include="KreedSaiEagle\SaiEagle.h" />
     <ClInclude Include="magic_enum.hpp" />
-    <ClInclude Include="md5.h" />
     <ClInclude Include="miniz.h" />
     <ClInclude Include="AutoResetEvent.h" />
     <ClInclude Include="NTSC\nes_ntsc.h" />
@@ -352,7 +351,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PGO Optimize|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="md5.cpp" />
     <ClCompile Include="miniz.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
