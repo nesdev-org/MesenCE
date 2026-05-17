@@ -22,7 +22,7 @@ jobs:
           {netversion: 8.x, targetframework: net8.0, aot: true, singleFile: false, aotString: " - AoT"}
         ]
       fail-fast: false
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
 
     steps:
       - name: Checkout repo
