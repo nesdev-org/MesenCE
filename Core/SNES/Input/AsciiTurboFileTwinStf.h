@@ -84,12 +84,6 @@ public:
 		uint8_t output = 0;
 
 		if(addr == 0x4017) {
-			StrobeProcessRead();
-
-			// Get one bit from the status
-			output = _stateBuffer & 0x01;
-			_stateBuffer >>= 1;
-			_stateBuffer |= 1 << 31; // All bits after the first 32 are 1s in STF mode
 			if(_strobe) {
 				// Write mode is exited by turning the strobe and off without doing any $4017 reads
 				_didReadWithStrobe = true;
@@ -99,6 +93,11 @@ public:
 				if(_firstAccess) {
 					_writeMode = false;
 				}
+			} else {
+				// Get one bit from the status
+				output = _stateBuffer & 0x01;
+				_stateBuffer >>= 1;
+				_stateBuffer |= 1 << 31; // All bits after the first 32 are 1s in STF mode
 			}
 
 			uint8_t ioBit = (_console->GetInternalRegisters()->GetIoPortOutput() & 0x80) ? 0x01 : 0x00;
@@ -125,10 +124,10 @@ public:
 
 		if(!prevStrobe && _strobe) {
 			_didReadWithStrobe = false;
+			RefreshStateBuffer();
 		}
 
 		if(prevStrobe && !_strobe) {
-			RefreshStateBuffer();
 			if(!_writeMode && !_readMode) {
 				// Potentially start a new command
 				_position = _newCommand >> 8;
