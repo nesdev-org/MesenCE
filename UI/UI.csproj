@@ -27,7 +27,7 @@
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(RuntimeIdentifier)'!='net6.0'">
+	<PropertyGroup Condition="'$(TargetFramework)'!='net6.0'">
 		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='osx-x64' Or '$(RuntimeIdentifier)'=='osx-arm64' Or '$(RuntimeIdentifier)'=='linux-x64' Or '$(RuntimeIdentifier)'=='linux-arm64'">
