@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'master'
+      - 'SourTestUpdate'
   pull_request:
     branches:
       - '*'

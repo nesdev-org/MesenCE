@@ -10,7 +10,7 @@
     <StartupObject>Mesen.Program</StartupObject>
     <Version>2.1.1</Version>
     <FileVersion>2.1.1</FileVersion>
-    <Copyright>(C) 2014-2025 Sour</Copyright>
+    <Copyright>(C) 2014-2026 Sour</Copyright>
   </PropertyGroup>
 	<PropertyGroup>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -20,12 +20,15 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<IsAotCompatible>true</IsAotCompatible>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
 		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 		<AvaloniaNameGeneratorIsEnabled>false</AvaloniaNameGeneratorIsEnabled>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(RuntimeIdentifier)'!='net6.0'">
+		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='osx-x64' Or '$(RuntimeIdentifier)'=='osx-arm64' Or '$(RuntimeIdentifier)'=='linux-x64' Or '$(RuntimeIdentifier)'=='linux-arm64'">
 		<SolutionDir>..</SolutionDir>
