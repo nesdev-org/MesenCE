@@ -3,4 +3,5 @@ runs:
   using: "composite"
   steps:
       - name: Write commit SHA1 to file
+        shell: bash
         run: echo "${{ github.sha }}" > UI/Dependencies/Internal/BuildSha.txt
