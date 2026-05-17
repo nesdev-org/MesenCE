@@ -26,6 +26,7 @@
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+		<SelfContained>false</SelfContained>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)'!='net6.0'">
 		<IsAotCompatible>true</IsAotCompatible>
