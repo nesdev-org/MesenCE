@@ -1,13 +1,6 @@
 name: Build Mesen
 
-on:
-  push:
-    branches:
-      - 'master'
-      - 'SourTestUpdate'
-  pull_request:
-    branches:
-      - '*'
+on: [push, pull_request]
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -15,6 +8,7 @@ env:
 
 jobs:
   windows:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         platform: [
@@ -63,6 +57,7 @@ jobs:
 
 
   linux:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         compiler: [gcc, clang, clang_aot]
@@ -116,6 +111,7 @@ jobs:
           path: bin/linux-${{ matrix.platform.path }}/Release/linux-${{ matrix.platform.path }}/publish/Mesen
 
   appimage:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         compiler: [clang_appimage]
@@ -160,6 +156,7 @@ jobs:
 
 
   macos:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         compiler: [clang, clang_aot]
