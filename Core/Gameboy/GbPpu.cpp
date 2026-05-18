@@ -643,9 +643,15 @@ void GbPpu::ClockTileFetcher()
 			bool vMirror = (attributes & 0x40) != 0;
 			uint16_t tileBank = (attributes & 0x08) ? 0x2000 : 0x0000;
 
-			uint16_t baseTile = _state.BgTileSelect ? 0 : 0x1000;
 			uint8_t tileY = vMirror ? (7 - (yOffset & 0x07)) : (yOffset & 0x07);
-			uint16_t tileRowAddr = baseTile + (baseTile ? (int8_t)_tileIndex * 16 : _tileIndex * 16) + tileY * 2;
+
+			uint16_t tileRowAddr = tileY * 2;
+			if(_state.BgTileSelect) {
+				tileRowAddr += _tileIndex * 16;
+			} else {
+				tileRowAddr += 0x1000 + (int8_t)_tileIndex * 16;
+			}
+
 			tileRowAddr |= tileBank;
 			_bgFetcher.Addr = tileRowAddr;
 			_bgFetcher.Attributes = (attributes & 0xBF);

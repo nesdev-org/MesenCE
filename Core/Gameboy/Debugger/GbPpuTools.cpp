@@ -16,8 +16,6 @@ DebugTilemapInfo GbPpuTools::GetTilemap(GetTilemapOptions options, BaseState& ba
 	uint32_t offset = options.Layer == 1 ? 0x1C00 : 0x1800;
 	bool isCgb = state.CgbEnabled;
 
-	uint16_t baseTile = state.BgTileSelect ? 0 : 0x1000;
-
 	std::fill(outBuffer, outBuffer + 256 * 256, 0xFFFFFFFF);
 
 	uint16_t vramMask = isCgb ? 0x3FFF : 0x1FFF;
@@ -43,16 +41,12 @@ DebugTilemapInfo GbPpuTools::GetTilemap(GetTilemapOptions options, BaseState& ba
 			bool vMirror = (attributes & 0x40) != 0;
 			//bool bgPriority = (attributes & 0x80) != 0;
 
-			uint16_t tileStart = baseTile;
-			if(baseTile) {
-				//This is done manually to avoid a bug where MSVC calculates the tileStart value wrong.
-				//The issue doesn't seem to be caused by the technically undefined behavior of casting uint8_t to int8_t.
-				//Calculating the negative value manually works, so use that for now.
-				tileStart += (tileIndex >= 0x80 ? -(0x80 - (tileIndex & 0x7F)) : tileIndex) * 16;
+			uint16_t tileStart;
+			if(state.BgTileSelect) {
+				tileStart = tileIndex * 16;
 			} else {
-				tileStart += tileIndex * 16;
+				tileStart = 0x1000 + (int8_t)tileIndex * 16;
 			}
-
 			tileStart |= tileBank;
 
 			for(int y = 0; y < 8; y++) {
@@ -75,7 +69,7 @@ DebugTilemapInfo GbPpuTools::GetTilemap(GetTilemapOptions options, BaseState& ba
 	result.ColumnCount = 32;
 	result.RowCount = 32;
 	result.TilemapAddress = offset;
-	result.TilesetAddress = baseTile;
+	result.TilesetAddress = state.BgTileSelect ? 0 : 0x1000;
 	result.ScrollX = state.ScrollX;
 	result.ScrollY = state.ScrollY;
 	result.ScrollWidth = GbConstants::ScreenWidth;
