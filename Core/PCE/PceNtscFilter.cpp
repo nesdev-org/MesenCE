@@ -99,10 +99,11 @@ void PceNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 		}
 	}
 
+	int phase = _ntscSetup.merge_fields ? 0 : (IsOddFrame() ? 0 : 1);
 	if(_frameDivider) {
-		snes_ntsc_blit(&_ntscData, _rgb555Buffer, frameWidth, IsOddFrame() ? 0 : 1, frameWidth, rowCount, GetOutputBuffer(), frameInfo.Width * sizeof(uint32_t));
+		snes_ntsc_blit(&_ntscData, _rgb555Buffer, frameWidth, phase, frameWidth, rowCount, GetOutputBuffer(), frameInfo.Width * sizeof(uint32_t));
 	} else {
-		snes_ntsc_blit_hires(&_ntscData, _rgb555Buffer, frameWidth, IsOddFrame() ? 0 : 1, frameWidth, rowCount, _ntscBuffer, frameInfo.Width * sizeof(uint32_t));
+		snes_ntsc_blit_hires(&_ntscData, _rgb555Buffer, frameWidth, phase, frameWidth, rowCount, _ntscBuffer, frameInfo.Width * sizeof(uint32_t));
 
 		for(uint32_t i = 0; i < rowCount; i++) {
 			uint32_t* src = _ntscBuffer + i * frameInfo.Width;

@@ -167,7 +167,7 @@
 			<Control ID="trkGamma">Gamma</Control>
 			<Control ID="trkResolution">Resolution</Control>
 			<Control ID="trkSharpness">Sharpness</Control>
-			<Control ID="chkMergeFields">Merge Fields</Control>
+			<Control ID="chkMergeFields">Remove artifact jitter</Control>
 			<Control ID="chkVerticalBlend">Apply Vertical Blending</Control>
 
 			<Control ID="lblNtscBisqwitSettings">NTSC settings (Bisqwit)</Control>

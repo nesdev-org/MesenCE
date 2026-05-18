@@ -101,6 +101,9 @@ public:
 			_inputBuffer[i] = ColorUtilities::Rgb888To555(inOut[i]);
 		}
 
+		if(_ntscSetup.merge_fields) {
+			phase = 0;
+		}
 		snes_ntsc_blit(&_ntscData, _inputBuffer, inWidth, phase, inWidth, inHeight, inOut, outWidth * sizeof(uint32_t));
 	}
 };

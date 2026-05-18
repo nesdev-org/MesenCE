@@ -121,6 +121,6 @@ void WsDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	}
 
 	if(_applyNtscFilter) {
-		_ntscFilter.ApplyFilter(out, size.Width, size.Height, 0);
+		_ntscFilter.ApplyFilter(out, size.Width, size.Height, IsOddFrame());
 	}
 }
