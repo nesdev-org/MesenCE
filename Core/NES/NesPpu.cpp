@@ -934,6 +934,8 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			if(_cycle == 320) {
 				LoadExtraSprites();
 			}
+			//Increment OAM2ADDR during the first 4 dots of each set of 8. There is special behavior where the first set of 8 skips the
+			//first increment, and an extra increment is done after the last set of 8.
 			_secondaryOamAddr += !((_cycle - 1) & 4);
 		}
 		if(_cycle == 257) {
@@ -952,8 +954,8 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 
 		if(_cycle == 321) {
 			if(_prevRenderingEnabled) {
+				//Do the final increment, which follows the last set of 8 sprite fetch dots.
 				_secondaryOamAddr++;
-				_oamCopybuffer = _secondarySpriteRam[0];
 			}
 		} else if(_prevRenderingEnabled && (_cycle == 328 || _cycle == 336)) {
 			_lowBitShift <<= 8;
