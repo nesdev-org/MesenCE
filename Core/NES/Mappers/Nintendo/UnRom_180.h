@@ -17,6 +17,6 @@ protected:
 
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
-		SelectPrgPage(1, value & 0x07);
+		SelectPrgPage(1, value);
 	}
 };
