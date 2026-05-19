@@ -85,7 +85,7 @@ protected:
 	uint32_t GetWorkRamPageSize() override { return 0x8000; }
 	uint32_t GetWorkRamSize() override { return 0x8000; }
 	uint16_t RegisterStartAddress() override { return 0x4020; }
-	uint16_t RegisterEndAddress() override { return 0x4092; }
+	uint16_t RegisterEndAddress() override { return 0x4097; }
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
 
@@ -106,6 +106,7 @@ protected:
 	void ProcessCpuClock() override;
 	void UpdateCrc(uint8_t value);
 
+	void SetFdsControlReg(uint8_t value);
 	void WriteRegister(uint16_t addr, uint8_t value) override;
 	uint8_t ReadRegister(uint16_t addr) override;
 

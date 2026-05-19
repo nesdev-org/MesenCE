@@ -70,7 +70,7 @@ void NsfMapper::InitMapper(RomData& romData)
 	}
 
 	if(_nsfHeader.SoundChips & NsfSoundChips::FDS) {
-		AddRegisterRange(0x4040, 0x4092, MemoryOperation::Any);
+		AddRegisterRange(0x4040, 0x4097, MemoryOperation::Any);
 	}
 
 	//Reset/IRQ vector
@@ -227,7 +227,7 @@ void NsfMapper::ProcessCpuClock()
 
 uint8_t NsfMapper::ReadRegister(uint16_t addr)
 {
-	if((_nsfHeader.SoundChips & NsfSoundChips::FDS) && addr >= 0x4040 && addr <= 0x4092) {
+	if((_nsfHeader.SoundChips & NsfSoundChips::FDS) && addr >= 0x4040 && addr <= 0x4097) {
 		return _fdsAudio->ReadRegister(addr);
 	} else if((_nsfHeader.SoundChips & NsfSoundChips::Namco) && addr >= 0x4800 && addr <= 0x4FFF) {
 		return _namcoAudio->ReadRegister(addr);

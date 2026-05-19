@@ -20,15 +20,17 @@ void FdsAudio::Serialize(Serializer& s)
 	SV(_disableEnvelopes);
 	SV(_haltWaveform);
 	SV(_masterVolume);
-	SV(_waveOverflowCounter);
+	SV(_waveAccumulator);
+	SV(_waveM2Counter);
 	SV(_wavePitch);
 	SV(_wavePosition);
 	SV(_lastOutput);
+	SV(_lastGain);
 }
 
 void FdsAudio::ClockAudio()
 {
-	int frequency = _volume.GetFrequency();
+	uint16_t frequency = _volume.GetFrequency();
 	if(!_haltWaveform && !_disableEnvelopes) {
 		_volume.TickEnvelope();
 		if(_mod.TickEnvelope()) {
@@ -36,28 +38,46 @@ void FdsAudio::ClockAudio()
 		}
 	}
 
-	if(_mod.TickModulator()) {
+	//TODO Check if modulator and wave units are ticked on the same M2 cycle
+	//(the FDS stuff is probably ticked by the RAM adapter's crystal - we can't really simulate that here)
+	if(_mod.TickModulator(_haltWaveform)) {
 		//Modulator was ticked, update wave pitch
 		_mod.UpdateOutput(frequency);
 	}
 
-	UpdateOutput();
+	if(++_waveM2Counter == 16) {
+		if(_haltWaveform) {
+			_waveAccumulator = 0;
+		} else {
+			if(!_waveWriteEnabled) {
+				_waveAccumulator += (frequency * _mod.GetOutput()) & 0xFFFFF;
+				if(_waveAccumulator > 0xFFFFFF) {
+					_waveAccumulator -= 0x1000000;
+				}
 
-	if(!_haltWaveform && frequency + _mod.GetOutput() > 0) {
-		_waveOverflowCounter += frequency + _mod.GetOutput();
-		if(_waveOverflowCounter < frequency + _mod.GetOutput()) {
-			_wavePosition = (_wavePosition + 1) & 0x3F;
+				_wavePosition = (_waveAccumulator >> 18) & 0x3F;
+			}
 		}
+		_waveM2Counter = 0;
 	}
+	UpdateOutput();
 }
 
 void FdsAudio::UpdateOutput()
 {
+	//The wave unit continues to run, but the output is held at its previous value
 	if(_waveWriteEnabled) {
 		return;
 	}
 
-	uint32_t level = std::min((int)_volume.GetGain(), 32) * WaveVolumeTable[_masterVolume];
+	//"Changes to the volume envelope only take effect while the wavetable
+	// pointer (top 6 bits of wave accumulator) is 0."
+	if(_wavePosition == 0) {
+		_lastGain = _volume.GetGain();
+	}
+	uint32_t level = std::min(_lastGain, uint8_t(32)) * WaveVolumeTable[_masterVolume];
+	//TODO Volume ramp is actually nonlinear, masked by PWM + 2KHz lowpass
+	//(would likely kill performance for a miniscule audio accuracy improvement)
 	uint8_t outputLevel = (_waveTable[_wavePosition] * level) / 1152;
 
 	if(_lastOutput != outputLevel) {
@@ -81,12 +101,55 @@ uint8_t FdsAudio::ReadRegister(uint16_t addr)
 			//"When writing is disabled ($4089.7), reading anywhere in 4040-407F returns the value at the current wave position"
 			value |= _waveTable[_wavePosition];
 		}
-	} else if(addr == 0x4090) {
-		value &= 0xC0;
-		value |= _volume.GetGain();
-	} else if(addr == 0x4092) {
-		value &= 0xC0;
-		value |= _mod.GetGain();
+	} else if(addr >= 0x4090) {
+		switch(addr) {
+			case 0x4090:
+				value &= 0xC0;
+				value |= _volume.GetGain();
+				break;
+
+			case 0x4091:
+				//Wave accumulator
+				//value &= 0xC0;
+				value = (_waveAccumulator >> 12) & 0xFF;
+				break;
+
+			case 0x4092:
+				value &= 0xC0;
+				value |= _mod.GetGain();
+				break;
+
+			case 0x4093:
+				//Mod accumulator
+				value &= 0x80;
+				value |= (_mod.GetModAccumulator() >> 5) & 0x7F;
+				break;
+
+			case 0x4094:
+				//Wave pitch intermediate result
+				//value &= 0xC0;
+				value = (_mod.GetOutput() >> 4) & 0xFF;
+				break;
+
+			case 0x4095:
+				//Mod counter increment (lower nybble)
+				//TODO Determine upper nybble
+				value &= 0xC0;
+				value |= _mod.GetModIncrement();
+				break;
+
+			case 0x4096:
+				//Wavetable value
+				//TODO PWM masking
+				value &= 0xC0;
+				value |= _waveTable[_wavePosition] & 0x3F;
+				break;
+
+			case 0x4097:
+				value &= 0x80;
+				value |= _mod.GetCounter() & 0x7F;
+				break;
+		}
 	}
 
 	return value;
@@ -174,14 +237,13 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4084.7", "Envelope Disabled", _mod.IsEnvelopeDisabled(), MapperStateValueType::Bool));
 
 	int8_t modCounter = _mod.GetCounter();
-	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), modCounter < 0 ? (modCounter + 128) : modCounter));
+	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), (modCounter & 0x7F)));
 
 	entries.push_back(MapperStateEntry("$4086/7.0-11", "Frequency", _mod.GetFrequency(), MapperStateValueType::Number16));
 
-	//todo emulation logic + this based on new info
-	//entries.push_back(MapperStateEntry("$4087.6", "???", false, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4087.6", "Force Tick Modulator", _mod.GetForceCarryOut(), MapperStateValueType::Bool));
 
-	entries.push_back(MapperStateEntry("$4087.7", "Disabled", _mod.IsModulationDisabled(), MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4087.7", "Counter Disabled", _mod.IsModCounterDisabled(), MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("", "Gain", _mod.GetGain(), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("", "Mod Output", std::to_string(_mod.GetOutput())));
 
@@ -190,4 +252,14 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4089.7", "Wave Write Enabled", _waveWriteEnabled, MapperStateValueType::Bool));
 
 	entries.push_back(MapperStateEntry("$408A", "Envelope Speed Multiplier", _volume.GetMasterSpeed(), MapperStateValueType::Number8));
+
+	entries.push_back(MapperStateEntry("$4090-$4097", "Audio Debug"));
+	entries.push_back(MapperStateEntry("$4090.0-5", "Volume Gain", _volume.GetGain(), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4091", "Wave Accumulator", ((_waveAccumulator >> 12) & 0xFF), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4092.0-5", "Mod Gain", _mod.GetGain(), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4093.0-6", "Mod Accumulator", ((_mod.GetModAccumulator() >> 5) & 0x7F), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4094", "Mod Counter * Gain", ((_mod.GetOutput() >> 4) & 0xFF), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4095.0-3", "Mod Counter Increment", _mod.GetModIncrement(), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4096.0-5", "Wavetable Value", (_waveTable[_wavePosition] & 0x3F), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4097.0-6", "Mod Counter Value", std::to_string(modCounter), (modCounter & 0x7F)));
 }
