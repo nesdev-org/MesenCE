@@ -89,7 +89,6 @@ public:
 	ConsoleType GetConsoleType() override;
 	vector<CpuType> GetCpuTypes() override;
 	uint64_t GetCartridgeClock();
-	uint32_t GetCartridgeClockRate();
 	uint64_t GetMasterClock() override;
 	uint32_t GetMasterClockRate() override;
 	double GetFps() override;

@@ -1,9 +1,8 @@
-#include "Shared/Utilities/S3511ARtc.h"
-#include "WS/WsConsole.h"
 #include "pch.h"
+#include "WS/WsConsole.h"
 #include "WS/Carts/WsRtc.h"
 #include "Utilities/Serializer.h"
-#include "Shared/Emulator.h"
+#include "Shared/Utilities/S3511ARtc.h"
 
 // TODOWS clock-accurate behavior, needs tests
 // TODOWS edge case: changing commands mid-transfer, needs tests

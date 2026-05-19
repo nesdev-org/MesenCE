@@ -392,11 +392,6 @@ uint64_t WsConsole::GetCartridgeClock()
 	return _cpu->GetCycleCount() / 8;
 }
 
-uint32_t WsConsole::GetCartridgeClockRate()
-{
-	return 12288000 / 32;
-}
-
 uint64_t WsConsole::GetMasterClock()
 {
 	return _cpu->GetCycleCount();

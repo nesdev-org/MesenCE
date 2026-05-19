@@ -5,6 +5,7 @@
 #include "Shared/Utilities/S3511ARtc.h"
 
 class Emulator;
+class WsConsole;
 
 class WsRtc final : public S3511ARtc
 {
