@@ -2,9 +2,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mesen.ViewModels
 {
+	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 	public class ViewModelBase : ReactiveObject
 	{
 	}
