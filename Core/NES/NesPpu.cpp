@@ -986,7 +986,7 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluationStart()
 	//Sprite evaluation does not necessarily start on the first byte of OAM
 	//it can start on any byte (based on the OAM address in 2003), and interprets
 	//that byte as the "sprite 0" Y coordinate.
-	_firstVisibleSpriteAddr = ((_spriteRamAddr >> 2) & 0x3F) * 4;
+	_firstVisibleSpriteAddr = _spriteRamAddr & 0xFC;
 	_lastVisibleSpriteAddr = _firstVisibleSpriteAddr;
 }
 
