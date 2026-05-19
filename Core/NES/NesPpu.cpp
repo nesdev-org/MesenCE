@@ -121,8 +121,6 @@ template<class T> void NesPpu<T>::Reset(bool softReset)
 	_oamCopybuffer = 0;
 	_spriteInRange = false;
 	_sprite0Added = false;
-	_spriteAddrH = 0;
-	_spriteAddrL = 0;
 	_oamCopyDone = false;
 
 	memset(_hasSprite, 0, sizeof(_hasSprite));
@@ -988,10 +986,7 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluationStart()
 	//Sprite evaluation does not necessarily start on the first byte of OAM
 	//it can start on any byte (based on the OAM address in 2003), and interprets
 	//that byte as the "sprite 0" Y coordinate.
-	_spriteAddrH = (_spriteRamAddr >> 2) & 0x3F;
-	_spriteAddrL = _spriteRamAddr & 0x03;
-
-	_firstVisibleSpriteAddr = _spriteAddrH * 4;
+	_firstVisibleSpriteAddr = ((_spriteRamAddr >> 2) & 0x3F) * 4;
 	_lastVisibleSpriteAddr = _firstVisibleSpriteAddr;
 }
 
@@ -1038,12 +1033,11 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 				//Read a byte from the primary OAM on odd cycles
 				_oamCopybuffer = ReadSpriteRam(_spriteRamAddr);
 			} else {
-				//TODO These really should be local variables, because they're just a convenient way of handling the two parts of OAM1ADDR.
-				_spriteAddrH = _spriteRamAddr >> 2;
-				_spriteAddrL = _spriteRamAddr & 3;
+				uint8_t spriteAddrH = _spriteRamAddr >> 2;
+				uint8_t spriteAddrL = _spriteRamAddr & 3;
 
 				if(_oamCopyDone && !_settings->GetNesConfig().EnablePpuSpriteEvalBug) {
-					_spriteAddrH = (_spriteAddrH + 1) & 0x3F;
+					spriteAddrH = (spriteAddrH + 1) & 0x3F;
 					//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
 					_oamCopybuffer = _secondarySpriteRam[_secondaryOamAddr & 0x1F];
 				} else {
@@ -1063,28 +1057,28 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 								_sprite0Added = true;
 							}
 
-							_spriteAddrL++;
+							spriteAddrL++;
 							_secondaryOamAddr++;
 
-							if(_spriteAddrL >= 4) {
-								_spriteAddrH = (_spriteAddrH + 1) & 0x3F;
-								_spriteAddrL = 0;
+							if(spriteAddrL >= 4) {
+								spriteAddrH = (spriteAddrH + 1) & 0x3F;
+								spriteAddrL = 0;
 
-								if(_spriteAddrH == 0) {
+								if(spriteAddrH == 0) {
 									_oamCopyDone = true;
 								}
 							}
 
-							//Note: Using "(_secondaryOamAddr & 0x03) == 0" instead of "_spriteAddrL == 0" is required
+							//Note: Using "(_secondaryOamAddr & 0x03) == 0" instead of "spriteAddrL == 0" is required
 							//to replicate a hardware bug noticed in oam_flicker_test_reenable when disabling & re-enabling
 							//rendering on a single scanline
 							//TODO This should actually be using a timer (which runs even with rendering off) rather than the OAM2 address.
 							if((_secondaryOamAddr & 0x03) == 0) {
 								//Done copying all 4 bytes
 								_spriteInRange = false;
-								_lastVisibleSpriteAddr = (_spriteAddrH - 1) * 4;
+								_lastVisibleSpriteAddr = (spriteAddrH - 1) * 4;
 
-								if(_spriteAddrL != 0) {
+								if(spriteAddrL != 0) {
 									//Normally, if the sprite eval started on a non-multiple-of-4 address, it would
 									//resync here and start reading the first byte of next entry as the Y value.
 									//But if the last byte read/copied, interpreted as a Y coordinate, has a value
@@ -1092,15 +1086,15 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 									//of the address aren't reset, which means the next sprite will also be interpreted incorrectly
 									bool inRange = (_scanline >= _oamCopybuffer && _scanline < _oamCopybuffer + (_control.LargeSprites ? 16 : 8));
 									if(!inRange) {
-										_spriteAddrL = 0;
+										spriteAddrL = 0;
 									}
 								}
 							}
 						} else {
 							//Nothing to copy, skip to next sprite
-							_spriteAddrH = (_spriteAddrH + 1) & 0x3F;
-							_spriteAddrL = 0;
-							if(_spriteAddrH == 0) {
+							spriteAddrH = (spriteAddrH + 1) & 0x3F;
+							spriteAddrL = 0;
+							if(spriteAddrH == 0) {
 								_oamCopyDone = true;
 							}
 						}
@@ -1111,15 +1105,15 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 						//8 sprites have been found, check next sprite for overflow + emulate PPU bug
 						if(_oamCopyDone) {
 							//Skip to next sprite (this scenario only happens when the X=255 sprite bug emulation is enabled)
-							_spriteAddrH = (_spriteAddrH + 1) & 0x3F;
-							_spriteAddrL = 0;
+							spriteAddrH = (spriteAddrH + 1) & 0x3F;
+							spriteAddrL = 0;
 						} else if(_spriteInRange) {
 							//Sprite is visible, consider this to be an overflow
 							_statusFlags.SpriteOverflow = true;
-							_spriteAddrL = (_spriteAddrL + 1);
-							if(_spriteAddrL == 4) {
-								_spriteAddrH = (_spriteAddrH + 1) & 0x3F;
-								_spriteAddrL = 0;
+							spriteAddrL = (spriteAddrL + 1);
+							if(spriteAddrL == 4) {
+								spriteAddrH = (spriteAddrH + 1) & 0x3F;
+								spriteAddrL = 0;
 							}
 
 							if(_overflowBugCounter == 0) {
@@ -1129,21 +1123,21 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 								if(_overflowBugCounter == 0) {
 									//"After it finishes "fetching" this sprite(and setting the overflow flag), it realigns back at the beginning of this line and then continues here on the next sprite"
 									_oamCopyDone = true;
-									_spriteAddrL = 0;
+									spriteAddrL = 0;
 								}
 							}
 						} else {
 							//Sprite isn't on this scanline, trigger sprite evaluation bug - increment both H & L at the same time
-							_spriteAddrH = (_spriteAddrH + 1) & 0x3F;
-							_spriteAddrL = (_spriteAddrL + 1) & 0x03;
+							spriteAddrH = (spriteAddrH + 1) & 0x3F;
+							spriteAddrL = (spriteAddrL + 1) & 0x03;
 
-							if(_spriteAddrH == 0) {
+							if(spriteAddrH == 0) {
 								_oamCopyDone = true;
 							}
 						}
 					}
 				}
-				_spriteRamAddr = (_spriteAddrL & 0x03) | (_spriteAddrH << 2);
+				_spriteRamAddr = (spriteAddrL & 0x03) | (spriteAddrH << 2);
 				if(_cycle == 256) {
 					ProcessSpriteEvaluationEnd();
 				}
@@ -1582,8 +1576,6 @@ template<class T> void NesPpu<T>::Serialize(Serializer& s)
 
 		SV(_spriteIndex);
 		SV(_spriteCount);
-		SV(_spriteAddrH);
-		SV(_spriteAddrL);
 		SV(_sprite0Added);
 		SV(_sprite0Visible);
 		SV(_oamCopybuffer);
