@@ -182,6 +182,9 @@ enum class ControllerType
 	SuperScope,
 	Multitap,
 	SnesRumbleController,
+	SnesNttDataKeypad,
+	AsciiTurboFileTwinTf2,
+	AsciiTurboFileTwinStf,
 
 	//NES controllers
 	NesController,
@@ -239,7 +242,8 @@ enum class ControllerType
 
 	//WS
 	WsController,
-	WsControllerVertical
+	WsControllerVertical,
+	Pcv2Controller
 };
 
 struct KeyMapping
@@ -402,12 +406,24 @@ struct GameConfig
 	OverscanDimensions Overscan = {};
 };
 
+enum class GbLocalLinkOutputOption
+{
+	Both = 0,
+	MainSystemOnly = 1,
+	SubSystemOnly = 2
+};
+
 struct GameboyConfig
 {
 	ControllerConfig Controller;
+	ControllerConfig LinkedController;
 
 	GameboyModel Model = GameboyModel::AutoFavorGbc;
 	bool UseSgb2 = true;
+
+	bool UseLocalLinkCable = false;
+	GbLocalLinkOutputOption LocalLinkCableVideoOutput = GbLocalLinkOutputOption::Both;
+	GbLocalLinkOutputOption LocalLinkCableAudioOutput = GbLocalLinkOutputOption::Both;
 
 	bool BlendFrames = true;
 	bool GbcAdjustColors = true;
@@ -747,7 +763,8 @@ enum class WsModel : uint8_t
 	Auto,
 	Monochrome,
 	Color,
-	SwanCrystal
+	SwanCrystal,
+	PocketChallenge
 };
 
 enum class WsAudioMode : uint8_t
@@ -760,6 +777,7 @@ struct WsConfig
 {
 	ControllerConfig ControllerHorizontal;
 	ControllerConfig ControllerVertical;
+	ControllerConfig ControllerPcv2;
 
 	WsModel Model = WsModel::Auto;
 	bool UseBootRom = false;

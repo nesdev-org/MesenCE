@@ -196,7 +196,7 @@ namespace Mesen.Windows
 
 		private void OnDrop(object? sender, DragEventArgs e)
 		{
-			string? filename = e.Data.GetFiles()?.FirstOrDefault()?.Path.LocalPath;
+			string? filename = e.DataTransfer.TryGetFiles()?.FirstOrDefault()?.Path.LocalPath;
 			if(filename != null) {
 				if(File.Exists(filename)) {
 					LoadRomHelper.LoadFile(filename);
@@ -432,6 +432,13 @@ namespace Mesen.Windows
 				case ConsoleNotificationType.RefreshSoftwareRenderer:
 					SoftwareRendererFrame frame = Marshal.PtrToStructure<SoftwareRendererFrame>(e.Parameter);
 					_softwareRenderer.UpdateSoftwareRenderer(frame);
+					break;
+
+				case ConsoleNotificationType.NetplayStopped:
+					Dispatcher.UIThread.Post(() => {
+						//Re-apply user config (netplay might temporarily modify options to match host server's options)
+						ConfigManager.Config.ApplyConfig();
+					});
 					break;
 			}
 		}

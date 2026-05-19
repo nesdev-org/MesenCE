@@ -6,6 +6,7 @@
 #include "Shared/BatteryManager.h"
 #include "Shared/Interfaces/IBattery.h"
 #include "Utilities/Serializer.h"
+#include "Utilities/BitUtilities.h"
 
 class AsciiTurboFile : public BaseControlDevice, public IBattery
 {
@@ -46,7 +47,7 @@ public:
 	uint8_t ReadRam(uint16_t addr) override
 	{
 		if(addr == 0x4017) {
-			return ((_data[_position / 8] >> (_position % 8)) & 0x01) << 2;
+			return BitUtilities::GetBitInArray(_data, FileSize, _position) << 2;
 		}
 		return 0;
 	}
@@ -59,8 +60,7 @@ public:
 
 		if(!(value & 0x04) && (_lastWrite & 0x04)) {
 			//Clock, perform write, increase position
-			_data[_position / 8] &= ~(1 << (_position % 8));
-			_data[_position / 8] |= (value & 0x01) << (_position % 8);
+			BitUtilities::SetBitInArray(_data, FileSize, _position, (value & 0x01) == 0x01);
 			_position = (_position + 1) & (AsciiTurboFile::BitCount - 1);
 		}
 

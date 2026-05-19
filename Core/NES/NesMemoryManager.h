@@ -61,4 +61,10 @@ public:
 
 	uint8_t GetOpenBus(uint8_t mask = 0xFF);
 	uint8_t GetInternalOpenBus(uint8_t mask = 0xFF);
+
+	template<NesCpuBusType busType = NesCpuBusType::Both>
+	void SetOpenBus(uint8_t value)
+	{
+		_openBusHandler.SetOpenBus<busType>(value);
+	}
 };

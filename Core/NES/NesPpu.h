@@ -1,11 +1,8 @@
 #pragma once
 
 #include "pch.h"
-#include "Utilities/ISerializable.h"
 #include "NES/NesTypes.h"
 #include "NES/BaseNesPpu.h"
-#include "NES/BaseMapper.h"
-#include "NES/NesTypes.h"
 #include "NES/INesMemoryHandler.h"
 #include "Shared/MemoryOperationType.h"
 
@@ -15,6 +12,7 @@ class Emulator;
 class SnesControlManager;
 class NesConsole;
 class EmuSettings;
+struct RenderedFrame;
 
 enum PpuRegisters
 {
@@ -33,7 +31,7 @@ template<class T>
 class NesPpu : public BaseNesPpu
 {
 private:
-	static constexpr int32_t OamDecayCycleCount = 3000;
+	static constexpr int32_t OamDecayCycleCount = 4500; //About 40 scanlines.
 
 protected:
 	void UpdateStatusFlag();
@@ -72,14 +70,13 @@ protected:
 	__forceinline uint8_t ReadSpriteRam(uint8_t addr);
 	__forceinline void WriteSpriteRam(uint8_t addr, uint8_t value);
 
-	void SetOamCorruptionFlags();
-	void ProcessOamCorruption();
+	__forceinline void CorruptOamRow(uint8_t sourceRow, uint8_t destRow);
 
 	__forceinline uint8_t GetPixelColor();
 
 	void SendFrame();
 
-	void SendFrameVsDualSystem();
+	void SendFrameVsDualSystem(RenderedFrame& frame);
 
 	void UpdateState();
 

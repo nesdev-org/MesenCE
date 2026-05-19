@@ -32,7 +32,7 @@ WsPpu::WsPpu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager, 
 	_screenHeight = WsConstants::ScreenHeight;
 	if(console->GetModel() == WsModel::Monochrome) {
 		_screenHeight += 13;
-	} else {
+	} else if(console->IsColorModel()) {
 		_screenWidth += 13;
 	}
 
@@ -201,7 +201,7 @@ void WsPpu::DrawBackground()
 	}
 
 	uint16_t scanline = _state.Scanline;
-	uint16_t layerAddr = (uint16_t)(layer.MapAddressLatch & (_console->GetModel() == WsModel::Monochrome ? 0x3FFF : 0x7FFF));
+	uint16_t layerAddr = (uint16_t)(layer.MapAddressLatch & (_console->IsColorModel() ? 0x7FFF : 0x3FFF));
 
 	for(int cycle = 0; cycle < WsConstants::ScreenWidth; cycle++) {
 		int y = (scanline + layer.ScrollYLatch) & 0xFF;
@@ -299,7 +299,7 @@ void WsPpu::ProcessSpriteCopy()
 		_state.SpriteCountLatch = _state.SpriteCount;
 	}
 
-	uint16_t baseAddr = _state.SpriteTableAddress & (_console->GetModel() == WsModel::Monochrome ? 0x3FFF : 0x7FFF);
+	uint16_t baseAddr = _state.SpriteTableAddress & (_console->IsColorModel() ? 0x7FFF : 0x3FFF);
 
 	int i = _state.Cycle << 1;
 	_spriteRam[i] = _vram[baseAddr + (((_state.FirstSpriteIndex * 4) + i) & 0x1FF)];
@@ -327,7 +327,7 @@ void WsPpu::DrawIcons()
 	static constexpr uint16_t aux2[11] = { 0, 0, 0x70, 0xF8, 0x1FC, 0x1FC, 0x1FC, 0xF8, 0x70, 0, 0 };
 	static constexpr uint16_t aux1[11] = { 0, 0, 0, 0, 0x70, 0x70, 0x70, 0, 0, 0, 0 };
 
-	if(_console->GetModel() == WsModel::Monochrome) {
+	if(!_console->IsColorModel()) {
 		uint16_t* start = _currentBuffer + (WsConstants::ScreenWidth * WsConstants::ScreenHeight);
 		std::fill(start, start + WsConstants::ScreenWidth * 13, 0xFFF);
 	} else {
@@ -343,10 +343,10 @@ void WsPpu::DrawIcons()
 	//DrawIcon(true, lowBattery, 39, 144);
 	if(_state.ShowVolumeIconFrame <= _state.FrameCount && _state.FrameCount - _state.ShowVolumeIconFrame < 128) {
 		//Show speaker/headphone icons if sound button was pressed within the last 128 frames
-		if(_emu->GetSettings()->GetWsConfig().AudioMode == WsAudioMode::Headphones) {
+		if(_console->GetAudioMode() == WsAudioMode::Headphones) {
 			DrawIcon(true, headphones, 65);
 		} else {
-			if(_console->GetModel() == WsModel::Monochrome) {
+			if(!_console->IsColorModel()) {
 				switch(_console->GetApu()->GetMasterVolume()) {
 					default:
 					case 0: DrawIcon(true, volumeWsOff, 52); break;
@@ -374,7 +374,7 @@ void WsPpu::DrawIcons()
 
 void WsPpu::DrawIcon(bool visible, const uint16_t icon[11], uint8_t position)
 {
-	if(!visible) {
+	if(!visible || _console->GetModel() == WsModel::PocketChallenge) {
 		return;
 	}
 
@@ -441,7 +441,7 @@ uint8_t WsPpu::GetLcdStatus()
 	uint8_t masterVolume = _console->GetApu()->GetMasterVolume();
 	uint8_t volumeLevel;
 
-	if(_console->GetModel() == WsModel::Monochrome) {
+	if(!_console->IsColorModel()) {
 		switch(masterVolume) {
 			default:
 			case 0: volumeLevel = 0; break;
@@ -462,7 +462,7 @@ uint8_t WsPpu::GetLcdStatus()
 	bool speaker = false;
 	if(_state.ShowVolumeIconFrame <= _state.FrameCount && _state.FrameCount - _state.ShowVolumeIconFrame < 128) {
 		//Show speaker/headphone icons if sound button was pressed within the last 128 frames
-		if(_emu->GetSettings()->GetWsConfig().AudioMode == WsAudioMode::Headphones) {
+		if(_console->GetAudioMode() == WsAudioMode::Headphones) {
 			headphone = true;
 		} else {
 			speaker = true;
@@ -570,15 +570,15 @@ void WsPpu::WritePort(uint16_t port, uint8_t value)
 			_state.BgWindow.Enabled = value & 0x20;
 			break;
 
-		case 0x01: _state.BgColor = value & (_console->GetModel() == WsModel::Monochrome ? 0x07 : 0xFF); break;
+		case 0x01: _state.BgColor = value & (_console->IsColorModel() ? 0xFF : 0x07); break;
 		case 0x03: _state.IrqScanline = value; break;
-		case 0x04: _state.SpriteTableAddress = (value & (_console->GetModel() == WsModel::Monochrome ? 0x1F : 0x3F)) << 9; break;
+		case 0x04: _state.SpriteTableAddress = (value & (_console->IsColorModel() ? 0x3F : 0x1F)) << 9; break;
 
 		case 0x05: _state.FirstSpriteIndex = value & 0x7F; break;
 		case 0x06: _state.SpriteCount = value; break;
 
 		case 0x07:
-			_state.ScreenAddress = value & (_console->GetModel() == WsModel::Monochrome ? 0x77 : 0xFF);
+			_state.ScreenAddress = value & (_console->IsColorModel() ? 0xFF : 0x77);
 			_state.BgLayers[0].MapAddress = (_state.ScreenAddress & 0x0F) << 11;
 			_state.BgLayers[1].MapAddress = (_state.ScreenAddress & 0xF0) << 7;
 			break;

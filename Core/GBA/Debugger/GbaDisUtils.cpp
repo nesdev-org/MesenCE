@@ -192,8 +192,8 @@ void GbaDisUtils::ThumbDisassemble(DisassemblyInfo& info, string& out, uint32_t 
 
 			switch(op) {
 				case 0: str.Write("STRH"); break;
-				case 1: str.Write("LDRH"); break;
-				case 2: str.Write("LDSB"); break;
+				case 1: str.Write("LDSB"); break;
+				case 2: str.Write("LDRH"); break;
 				case 3: str.Write("LDSH"); break;
 			}
 

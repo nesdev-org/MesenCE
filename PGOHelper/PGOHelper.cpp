@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 		romFolder = argv[1];
 	}
 
-	vector<string> testRoms = GetFilesInFolder(romFolder, { ".sfc", ".gb", ".gbc", ".gbx", ".nes", ".pce", ".cue", ".sms", ".gg", ".sg", ".gba", ".col", ".ws", ".wsc" });
+	vector<string> testRoms = GetFilesInFolder(romFolder, { ".sfc", ".gb", ".gbc", ".gbx", ".nes", ".pce", ".cue", ".sms", ".gg", ".sg", ".gba", ".col", ".ws", ".wsc", ".pc2" });
 	PgoRunTest(testRoms, true);
 	return 0;
 }

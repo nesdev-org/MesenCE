@@ -66,8 +66,12 @@ bool MovieRecorder::Record(RecordMovieOptions options)
 		if(needSaveState) {
 			_emu->GetSaveStateManager()->SaveState(_saveStateData);
 			_hasSaveState = true;
+
+			//Get rid of any inputs recorded while the game was reloaded
+			_inputData = stringstream();
 		}
 
+		_emu->GetBatteryManager()->SetBatteryProvider(nullptr);
 		_emu->GetBatteryManager()->SetBatteryRecorder(nullptr);
 		_emu->Unlock();
 
@@ -189,7 +193,7 @@ vector<uint8_t> MovieRecorder::LoadBattery(string extension)
 
 void MovieRecorder::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
-	if(type == ConsoleNotificationType::GameLoaded) {
+	if(type == ConsoleNotificationType::AfterInitConsole) {
 		_emu->RegisterInputRecorder(this);
 	}
 }
@@ -216,9 +220,24 @@ bool MovieRecorder::CreateMovie(string movieFile, deque<RewindData>& data, uint3
 
 		_inputData = stringstream();
 
+		//When a save state is part of the data and the startPosition is 0, skip the first input
+		//This is a workaround to deal with the fact that the rewindmanager's first save state after loading
+		//the ROM is taken at a different time (before vs after the inputs for the first frame are polled) compared
+		//to regular movie save states. Ignoring the first frame's input allows us to get the correct result
+		//in the vast majority of scenarios
+		bool skipFirstInput = _hasSaveState && startPosition == 0;
+
 		for(uint32_t i = startPosition; i < endPosition; i++) {
 			RewindData rewindData = data[i];
-			for(uint32_t j = 0; j < RewindManager::BufferSize; j++) {
+			uint32_t len = 0;
+
+			//Some blocks (like the first block after power cycle) can contain an extra set of inputs
+			//Check the max number of inputs to be able to export them all
+			for(int j = 0; j < BaseControlDevice::PortCount; j++) {
+				len = std::max(len, (uint32_t)rewindData.InputLogs[j].size());
+			}
+
+			for(uint32_t j = skipFirstInput ? 1 : 0; j < len; j++) {
 				for(shared_ptr<BaseControlDevice>& device : devices) {
 					uint8_t port = device->GetPort();
 					if(j < rewindData.InputLogs[port].size()) {
@@ -228,6 +247,8 @@ bool MovieRecorder::CreateMovie(string movieFile, deque<RewindData>& data, uint3
 				}
 				_inputData << "\n";
 			}
+
+			skipFirstInput = false;
 		}
 
 		//Write the movie file

@@ -58,14 +58,15 @@ void SnesNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	uint32_t xOffset = overscan.Left;
 	uint32_t yOffset = overscan.Top / 2 * baseWidth;
 
+	int phase = _ntscSetup.merge_fields ? 0 : (IsOddFrame() ? 0 : 1);
 	if(useHighResOutput) {
-		snes_ntsc_blit_hires(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, IsOddFrame() ? 0 : 1, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, baseWidth * 4);
+		snes_ntsc_blit_hires(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, phase, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, baseWidth * 4);
 
 		for(uint32_t i = 0; i < frameInfo.Height; i++) {
 			memcpy(GetOutputBuffer() + i * frameInfo.Width, _ntscBuffer + yOffset * 2 + xOffset + i * baseWidth, frameInfo.Width * sizeof(uint32_t));
 		}
 	} else {
-		snes_ntsc_blit(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, IsOddFrame() ? 0 : 1, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, baseWidth * 4);
+		snes_ntsc_blit(&_ntscData, ppuOutputBuffer, _baseFrameInfo.Width, phase, _baseFrameInfo.Width, _baseFrameInfo.Height, _ntscBuffer, baseWidth * 4);
 
 		for(uint32_t i = 0; i < frameInfo.Height; i += 2) {
 			memcpy(GetOutputBuffer() + i * frameInfo.Width, _ntscBuffer + yOffset + xOffset + i / 2 * baseWidth, frameInfo.Width * sizeof(uint32_t));

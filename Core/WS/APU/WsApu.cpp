@@ -23,7 +23,7 @@ WsApu::WsApu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager, 
 	_dmaController = dmaController;
 	_soundMixer = emu->GetSoundMixer();
 
-	_state.MasterVolume = _console->GetModel() == WsModel::Monochrome ? 2 : 3;
+	_state.MasterVolume = _console->IsColorModel() ? 3 : 2;
 	_state.InternalMasterVolume = _state.MasterVolume;
 
 	_ch1.reset(new WsApuCh1(this, _state.Ch1));
@@ -46,9 +46,9 @@ WsApu::~WsApu()
 
 void WsApu::ChangeMasterVolume()
 {
-	if(_emu->GetSettings()->GetWsConfig().AudioMode == WsAudioMode::Speakers) {
+	if(_console->GetAudioMode() == WsAudioMode::Speakers) {
 		if(_state.InternalMasterVolume == 0) {
-			_state.InternalMasterVolume = _console->GetModel() == WsModel::Monochrome ? 2 : 3;
+			_state.InternalMasterVolume = _console->IsColorModel() ? 3 : 2;
 		} else {
 			_state.InternalMasterVolume--;
 		}
@@ -113,7 +113,7 @@ void WsApu::UpdateOutput()
 		rightOutput = leftOutput;
 	}
 
-	if(cfg.AudioMode == WsAudioMode::Headphones) {
+	if(_console->GetAudioMode() == WsAudioMode::Headphones) {
 		if(_state.HeadphoneEnabled) {
 			leftOutput <<= 5;
 			rightOutput <<= 5;
@@ -132,7 +132,7 @@ void WsApu::UpdateOutput()
 			leftOutput = out;
 			rightOutput = out;
 
-			if(_console->GetModel() == WsModel::Monochrome) {
+			if(!_console->IsColorModel()) {
 				switch(_state.InternalMasterVolume) {
 					case 0:
 						leftOutput = 0;
@@ -253,7 +253,7 @@ uint8_t WsApu::Read(uint16_t port)
 				(uint8_t)_state.SpeakerEnabled |
 				(_state.SpeakerVolume << 1) |
 				((uint8_t)_state.HeadphoneEnabled << 3) |
-				(_emu->GetSettings()->GetWsConfig().AudioMode == WsAudioMode::Headphones ? 0x80 : 0));
+				(_console->GetAudioMode() == WsAudioMode::Headphones ? 0x80 : 0));
 
 		case 0x92: return BitUtilities::GetBits<0>(_state.Ch4.Lfsr);
 		case 0x93: return BitUtilities::GetBits<8>(_state.Ch4.Lfsr);
@@ -275,7 +275,7 @@ uint8_t WsApu::Read(uint16_t port)
 		case 0x9B: return (GetApuOutput(false) + GetApuOutput(true)) >> 8;
 
 		case 0x9E:
-			if(_console->GetModel() != WsModel::Monochrome) {
+			if(_console->IsColorModel()) {
 				return _state.MasterVolume;
 			}
 			break;
@@ -366,7 +366,7 @@ void WsApu::Write(uint16_t port, uint8_t value)
 			break;
 
 		case 0x9E:
-			if(_console->GetModel() != WsModel::Monochrome) {
+			if(_console->IsColorModel()) {
 				_state.InternalMasterVolume = value & 0x03;
 				_state.MasterVolume = value & 0x03;
 			}

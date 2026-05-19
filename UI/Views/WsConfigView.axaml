@@ -69,7 +69,7 @@
 		<TabItem Header="{l:Translate tpgInput}">
 			<ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Auto" Padding="0 0 2 0">
 				<c:OptionSection Header="{l:Translate grpControllers}" Margin="0">
-					<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,5,Auto">
+					<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,5,Auto,5,Auto">
 						<TextBlock Text="{l:Translate lblPlayer1Horizontal}" />
 						<Button
 							Grid.Column="1"
@@ -85,6 +85,16 @@
 							Grid.Row="2"
 							Grid.Column="1"
 							Command="{Binding SetupPlayerVertical}"
+							CommandParameter="{Binding $self}"
+							Content="{l:Translate btnSetup}"
+						/>
+
+						<TextBlock Text="{l:Translate lblPlayer1Pcv2}" Grid.Row="4" />
+						<Button
+							Margin="10 0 0 0"
+							Grid.Row="4"
+							Grid.Column="1"
+							Command="{Binding SetupPlayerPcv2}"
 							CommandParameter="{Binding $self}"
 							Content="{l:Translate btnSetup}"
 						/>

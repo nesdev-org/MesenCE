@@ -4,6 +4,7 @@
 #include "Utilities/StringUtilities.h"
 #include "Utilities/FolderUtilities.h"
 #include "Utilities/magic_enum.hpp"
+#include "Utilities/Audio/WavReader.h"
 
 struct CueIndexEntry
 {
@@ -25,9 +26,16 @@ struct CueTrackEntry
 	vector<CueIndexEntry> Indexes;
 };
 
+enum class CueFileFormat
+{
+	Binary,
+	Wave
+};
+
 struct CueFileEntry
 {
 	string Filename;
+	CueFileFormat Format;
 	vector<CueTrackEntry> Tracks;
 };
 
@@ -68,7 +76,24 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 				if(cueFile.IsArchive()) {
 					dataFile = VirtualFile(cueFile.GetFilePath(), filename);
 				}
-				files.push_back({ dataFile });
+
+				vector<string> fileEntry = StringUtilities::Split(StringUtilities::ToUpper(line), ' ');
+				string fileFormat;
+				if(fileEntry.size() > 0) {
+					fileFormat = fileEntry[fileEntry.size() - 1];
+				}
+
+				CueFileEntry entry = { dataFile };
+
+				if(fileFormat == "BINARY") {
+					entry.Format = CueFileFormat::Binary;
+				} else if(fileFormat == "WAVE") {
+					entry.Format = CueFileFormat::Wave;
+				} else {
+					MessageManager::Log("[CUE] Unsupported file format: " + fileFormat);
+					return false;
+				}
+				files.push_back(entry);
 			} else {
 				MessageManager::Log("[CUE] Invalid FILE entry");
 				return false;
@@ -157,7 +182,6 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 		}
 	}
 
-	uint32_t totalPregapLbaLength = 0;
 	for(size_t i = 0; i < files.size(); i++) {
 		VirtualFile physicalFile = files[i].Filename;
 		if(!physicalFile.IsValid()) {
@@ -165,27 +189,37 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 			return false;
 		}
 
-		disc.Files.push_back(files[i].Filename);
+		uint32_t fileOffset = 0;
+		if(files[i].Format == CueFileFormat::Wave) {
+			vector<uint8_t> headerData;
+			physicalFile.ReadChunk(headerData, 0, 100);
+			WavHeader header = WavReader::GetHeader(headerData.data(), (uint32_t)headerData.size(), (uint32_t)physicalFile.GetSize());
+			if(!header.Valid || header.BitsPerSample != 16 || header.ChannelCount != 2 || header.SampleRate != 44100) {
+				MessageManager::Log("[CUE] Unsupported WAVE file (must be 16-bit, stereo and 44,100 Hz): " + files[i].Filename);
+				return false;
+			}
+			fileOffset = header.HeaderSize;
+		}
+
+		disc.Files.push_back({ files[i].Filename });
 		int startSector = i == 0 ? 0 : (disc.Tracks[disc.Tracks.size() - 1].LastSector + 1);
 		for(size_t j = 0; j < files[i].Tracks.size(); j++) {
 			CueTrackEntry entry = files[i].Tracks[j];
 			TrackInfo trk = {};
 
-			if(entry.PreGap.HasGap) {
-				totalPregapLbaLength += entry.PreGap.Length.ToLba();
-			}
+			uint32_t pregapLength = entry.PreGap.HasGap ? entry.PreGap.Length.ToLba() : 0;
 
 			DiscPosition startPos;
 			for(CueIndexEntry& idx : entry.Indexes) {
 				if(idx.Number == 0) {
 					trk.HasLeadIn = true;
-					trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + startSector);
+					trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + pregapLength + startSector);
 				} else if(idx.Number == 1) {
 					if(entry.PreGap.HasGap) {
 						trk.HasLeadIn = true;
-						trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + totalPregapLbaLength - entry.PreGap.Length.ToLba() + startSector);
+						trk.LeadInPosition = DiscPosition::FromLba(idx.Position.ToLba() + startSector);
 					}
-					trk.StartPosition = DiscPosition::FromLba(idx.Position.ToLba() + totalPregapLbaLength + startSector);
+					trk.StartPosition = DiscPosition::FromLba(idx.Position.ToLba() + pregapLength + startSector);
 					startPos = idx.Position;
 				} else {
 					MessageManager::Log("[CUE] Unsupported index number: " + std::to_string(idx.Number));
@@ -223,8 +257,10 @@ bool CdReader::LoadCue(VirtualFile& cueFile, DiscInfo& disc)
 			}
 
 			if(trk.HasLeadIn && !entry.PreGap.HasGap) {
+				//Index 0 is part of the file on the disc, but PREGAPs aren't.
 				trk.FileOffset += (trk.StartPosition.ToLba() - trk.LeadInPosition.ToLba()) * trk.GetSectorSize();
 			}
+			trk.FileOffset += fileOffset;
 			trk.FileIndex = (uint32_t)disc.Files.size() - 1;
 
 			disc.Tracks.push_back(trk);

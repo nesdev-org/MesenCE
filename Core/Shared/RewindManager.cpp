@@ -253,6 +253,12 @@ void RewindManager::Stop()
 {
 	if(_rewindState >= RewindState::Starting) {
 		auto lock = _emu->AcquireLock();
+		if(_rewindState < RewindState::Starting) {
+			//Rewind state was changed while waiting for the lock, stop processing
+			//Fixes crash when a power cycle occurs at the same time as rewind attempts to stop
+			return;
+		}
+
 		if(_rewindState == RewindState::Started) {
 			//Move back to the save state containing the frame currently shown on the screen
 			if(_historyBackup.size() > 1) {

@@ -64,7 +64,7 @@ NetMessage* GameConnection::ReadMessage()
 				case MessageType::SaveState: return new SaveStateMessage(_messageBuffer, messageLength);
 				case MessageType::InputData: return new InputDataMessage(_messageBuffer, messageLength);
 				case MessageType::MovieData: return new MovieDataMessage(_messageBuffer, messageLength);
-				case MessageType::GameInformation: return new GameInformationMessage(_messageBuffer, messageLength);
+				case MessageType::GameInformation: return new GameInformationMessage(_emu->GetSettings(), _messageBuffer, messageLength);
 				case MessageType::PlayerList: return new PlayerListMessage(_messageBuffer, messageLength);
 				case MessageType::SelectController: return new SelectControllerMessage(_messageBuffer, messageLength);
 				case MessageType::ForceDisconnect: return new ForceDisconnectMessage(_messageBuffer, messageLength);
@@ -95,6 +95,9 @@ bool GameConnection::ConnectionError()
 void GameConnection::ProcessMessages()
 {
 	NetMessage* message;
+
+	ProcessPendingEvents();
+
 	while((message = ReadMessage()) != nullptr) {
 		//Loop until all messages have been processed
 		message->Initialize();

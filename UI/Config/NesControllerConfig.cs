@@ -40,6 +40,7 @@ namespace Mesen.Config
 		public UInt16[]? MouseButtons { get; set; } = null;
 		public UInt16[]? OekakidsButtons { get; set; } = null;
 		public UInt16[]? BandaiHypershotButtons { get; set; } = null;
+		public UInt16[]? NttDataKeypadButtons { get; set; } = null;
 
 		protected override UInt16[]? GetCustomButtons(ControllerType type)
 		{
@@ -65,6 +66,7 @@ namespace Mesen.Config
 				ControllerType.OekaKidsTablet => OekakidsButtons,
 				ControllerType.BandaiHyperShot => BandaiHypershotButtons,
 				ControllerType.BandaiMicrophone => BandaiMicrophoneButtons,
+				ControllerType.SnesNttDataKeypad => NttDataKeypadButtons,
 				_ => null
 			};
 		}
@@ -107,6 +109,7 @@ namespace Mesen.Config
 				ControllerType.OekaKidsTablet => Enum.GetValues<NesOekakidsButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
 				ControllerType.BandaiHyperShot => Enum.GetValues<NesZapperButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
 				ControllerType.BandaiMicrophone => Enum.GetValues<NesBandaiMicrophoneButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
+				ControllerType.SnesNttDataKeypad => Enum.GetValues<SnesNttDataKeypadButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
 				_ => new()
 			};
 
@@ -183,6 +186,11 @@ namespace Mesen.Config
 
 				case ControllerType.OekaKidsTablet:
 					OekakidsButtons = new UInt16[1];
+					break;
+
+				case ControllerType.SnesNttDataKeypad:
+					NttDataKeypadButtons = new UInt16[15];
+					base.ClearKeys(type);
 					break;
 
 				case ControllerType.SnesController:
@@ -399,6 +407,25 @@ namespace Mesen.Config
 						InputApi.GetKeyCode("Mouse Left")
 					};
 
+				case ControllerType.SnesNttDataKeypad:
+					return new UInt16[15] {
+						InputApi.GetKeyCode("Numpad 0"),
+						InputApi.GetKeyCode("Numpad 1"),
+						InputApi.GetKeyCode("Numpad 2"),
+						InputApi.GetKeyCode("Numpad 3"),
+						InputApi.GetKeyCode("Numpad 4"),
+						InputApi.GetKeyCode("Numpad 5"),
+						InputApi.GetKeyCode("Numpad 6"),
+						InputApi.GetKeyCode("Numpad 7"),
+						InputApi.GetKeyCode("Numpad 8"),
+						InputApi.GetKeyCode("Numpad 9"),
+						InputApi.GetKeyCode("Numpad *"),
+						InputApi.GetKeyCode("Numpad +"),
+						InputApi.GetKeyCode("Numpad ."),
+						InputApi.GetKeyCode("Numpad -"),
+						InputApi.GetKeyCode("Numpad /"),
+					};
+
 				default:
 					return null;
 			}
@@ -440,6 +467,11 @@ namespace Mesen.Config
 				case ControllerType.FamilyTrainerMatSideA:
 				case ControllerType.FamilyTrainerMatSideB:
 					PowerPadButtons = GetDefaultCustomKeys(type, preset);
+					break;
+
+				case ControllerType.SnesNttDataKeypad:
+					base.SetDefaultKeys(type, preset);
+					NttDataKeypadButtons = GetDefaultCustomKeys(type, preset);
 					break;
 
 				default:

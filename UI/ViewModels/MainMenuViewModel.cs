@@ -431,6 +431,7 @@ namespace Mesen.ViewModels
 						GetWsModelMenuItem(WsModel.Monochrome),
 						GetWsModelMenuItem(WsModel.Color),
 						GetWsModelMenuItem(WsModel.SwanCrystal),
+						GetWsModelMenuItem(WsModel.PocketChallenge),
 					}
 				},
 
@@ -439,6 +440,7 @@ namespace Mesen.ViewModels
 					DynamicText = () => ResourceHelper.GetEnumText(ActionType.Region) + (MainWindow.RomInfo.ConsoleType != ConsoleType.Gameboy ? " (GB)" : ""),
 					IsVisible = () => IsGameRunning && MainWindow.RomInfo.CpuTypes.Contains(CpuType.Gameboy),
 					SubActions = new List<object>() {
+						GetGameboyModelMenuItem(GameboyModel.AutoFavorBest),
 						GetGameboyModelMenuItem(GameboyModel.AutoFavorGbc),
 						GetGameboyModelMenuItem(GameboyModel.AutoFavorSgb),
 						GetGameboyModelMenuItem(GameboyModel.AutoFavorGb),
@@ -793,6 +795,14 @@ namespace Mesen.ViewModels
 
 				new MainMenuAction(EmulatorShortcut.TakeScreenshot) {
 					ActionType = ActionType.TakeScreenshot,
+				},
+
+				new MainMenuAction() {
+					ActionType = ActionType.SaveSpcFile,
+					IsVisible = () => MainWindow.RomInfo.CpuTypes.Contains(CpuType.Spc),
+					OnClick = () => {
+						ApplicationHelper.GetOrCreateUniqueWindow(wnd, () => new SaveSpcFileWindow());
+					}
 				},
 			};
 		}

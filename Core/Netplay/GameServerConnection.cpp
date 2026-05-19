@@ -6,9 +6,7 @@
 #include "Netplay/MovieDataMessage.h"
 #include "Netplay/GameInformationMessage.h"
 #include "Netplay/SaveStateMessage.h"
-#include "Netplay/ClientConnectionData.h"
 #include "Netplay/SelectControllerMessage.h"
-#include "Netplay/PlayerListMessage.h"
 #include "Netplay/GameServer.h"
 #include "Netplay/ForceDisconnectMessage.h"
 #include "Netplay/ServerInformationMessage.h"
@@ -16,7 +14,6 @@
 #include "Shared/MessageManager.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
-#include "Shared/BaseControlDevice.h"
 
 GameServerConnection::GameServerConnection(GameServer* gameServer, Emulator* emu, unique_ptr<Socket> socket, string serverPassword) : GameConnection(emu, std::move(socket))
 {
@@ -50,14 +47,15 @@ void GameServerConnection::SendServerInformation()
 	SendNetMessage(message);
 }
 
-void GameServerConnection::SendGameInformation()
+void GameServerConnection::SendGameInformation(bool forceReload)
 {
 	auto lock = _emu->AcquireLock();
 	RomInfo romInfo = _emu->GetRomInfo();
-	GameInformationMessage gameInfo(romInfo.RomFile.GetFileName(), _emu->GetCrc32(), _controllerPort, _emu->IsPaused());
+	GameInformationMessage gameInfo(_emu->GetSettings(), romInfo.RomFile.GetFileName(), _emu->GetCrc32(), _controllerPort, _emu->IsPaused());
 	SendNetMessage(gameInfo);
-	SaveStateMessage saveState(_emu);
+	SaveStateMessage saveState(_emu, forceReload);
 	SendNetMessage(saveState);
+	_previousConfig = GetSerializedConfig();
 }
 
 void GameServerConnection::SendMovieData(uint8_t port, ControlDeviceState state)
@@ -103,7 +101,7 @@ void GameServerConnection::ProcessHandshakeResponse(HandShakeMessage* message)
 			MessageManager::DisplayMessage("NetPlay", "Player connected.");
 
 			if(_emu->IsRunning()) {
-				SendGameInformation();
+				SendGameInformation(true);
 			}
 
 			_handshakeCompleted = true;
@@ -146,6 +144,14 @@ void GameServerConnection::ProcessMessage(NetMessage* message)
 	}
 }
 
+void GameServerConnection::ProcessPendingEvents()
+{
+	if(_needSendGameInfo) {
+		SendGameInformation(false);
+		_needSendGameInfo = false;
+	}
+}
+
 void GameServerConnection::SelectControllerPort(NetplayControllerInfo controller)
 {
 	auto lock = _emu->AcquireLock();
@@ -166,42 +172,38 @@ void GameServerConnection::SelectControllerPort(NetplayControllerInfo controller
 			//Another player is using this port, we can't use it
 		}
 	}
-	SendGameInformation();
+	SendGameInformation(false);
 	_server->SendPlayerList();
 }
 
 void GameServerConnection::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
 	switch(type) {
-		case ConsoleNotificationType::GamePaused:
 		case ConsoleNotificationType::GameLoaded:
+			SendGameInformation(true);
+			break;
+
+		case ConsoleNotificationType::GamePaused:
 		case ConsoleNotificationType::GameResumed:
 		case ConsoleNotificationType::GameReset:
 		case ConsoleNotificationType::StateLoaded:
 		case ConsoleNotificationType::CheatsChanged:
-		case ConsoleNotificationType::ConfigChanged:
-			SendGameInformation();
+			SendGameInformation(false);
 			break;
 
 		case ConsoleNotificationType::PpuFrameDone: {
 			//Detect any configuration change that impacts emulation
 			//Send a save state to clients if any change is done
-			Serializer s(0, true);
-			EmuSettings* settings = _emu->GetSettings();
-			s.Stream(*settings, "", -1);
-			stringstream currentConfig;
-			s.SaveTo(currentConfig, 0);
-
-			if(_previousConfig != currentConfig.str()) {
-				SendGameInformation();
+			string cfg = GetSerializedConfig();
+			if(_previousConfig != cfg) {
+				_needSendGameInfo = true;
 			}
-			_previousConfig = currentConfig.str();
 			break;
 		}
 
 		case ConsoleNotificationType::BeforeEmulationStop: {
 			//Make clients unload the current game
-			GameInformationMessage gameInfo("", 0, _controllerPort, true);
+			GameInformationMessage gameInfo(nullptr, "", 0, _controllerPort, true);
 			SendNetMessage(gameInfo);
 			break;
 		}
@@ -214,4 +216,14 @@ void GameServerConnection::ProcessNotification(ConsoleNotificationType type, voi
 NetplayControllerInfo GameServerConnection::GetControllerPort()
 {
 	return _controllerPort;
+}
+
+string GameServerConnection::GetSerializedConfig()
+{
+	Serializer s(0, true);
+	EmuSettings* settings = _emu->GetSettings();
+	s.Stream(*settings, "", -1);
+	stringstream cfg;
+	s.SaveTo(cfg, 0);
+	return cfg.str();
 }

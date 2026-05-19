@@ -58,7 +58,8 @@ public class NesRegisterViewer
 			new RegEntry("$2002.6", "Sprite 0 hit", ppu.StatusFlags.Sprite0Hit),
 			new RegEntry("$2002.7", "Vertical blank", ppu.StatusFlags.VerticalBlank),
 
-			new RegEntry("$2003", "OAM address", ppu.SpriteRamAddr, Format.X8),
+			new RegEntry("$2003", "OAM1 address", ppu.SpriteRamAddr, Format.X8),
+			new RegEntry("", "OAM2 address", ppu.SecondaryOamAddr & 0x1F, Format.X8),
 
 			new RegEntry("$2005-2006", "VRAM Address / Scrolling"),
 			new RegEntry("", "VRAM Address", ppu.VideoRamAddr, Format.X16),

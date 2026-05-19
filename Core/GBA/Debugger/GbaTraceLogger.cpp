@@ -5,7 +5,7 @@
 #include "Debugger/DisassemblyInfo.h"
 #include "Debugger/Debugger.h"
 #include "Debugger/DebugTypes.h"
-#include "Utilities/HexUtilities.h"
+#include "Utilities/FastString.h"
 
 GbaTraceLogger::GbaTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, GbaPpu* ppu) : BaseTraceLogger(debugger, cpuDebugger, CpuType::Gba)
 {

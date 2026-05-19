@@ -22,6 +22,14 @@ namespace Mesen.Interop
 	{
 		public RomTestState State;
 		public Int32 ErrorCode;
+
+		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)]
+		public byte[] LastFrameHash;
+
+		public string GetLastFrameHash()
+		{
+			return Encoding.UTF8.GetString(LastFrameHash, 0, 40);
+		}
 	}
 
 	public enum RomTestState

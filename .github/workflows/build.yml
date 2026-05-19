@@ -1,6 +1,6 @@
 name: Build Mesen
 
-on: [push]
+on: [push, pull_request]
 
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -8,6 +8,7 @@ env:
 
 jobs:
   windows:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         platform: [
@@ -16,21 +17,21 @@ jobs:
           {netversion: 8.x, targetframework: net8.0, aot: true, singleFile: false, aotString: " - AoT"}
         ]
       fail-fast: false
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Install .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ matrix.platform.netversion }}
 
       - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: x64
 
@@ -47,7 +48,8 @@ jobs:
         run: dotnet publish --no-restore -c Release -p:PublishAot="${{ matrix.platform.aot }}" -p:SelfContained="${{ matrix.platform.aot }}" -p:PublishSingleFile="${{ matrix.platform.singleFile }}" -p:OptimizeUi="true" -p:Platform="Any CPU" -p:TargetFramework="${{ matrix.platform.targetframework }}" -r win-x64 Mesen.sln /p:PublishProfile=UI\Properties\PublishProfiles\Release.pubxml
 
       - name: Upload Mesen
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (Windows - ${{ matrix.platform.targetframework }}${{ matrix.platform.aotString }})
           path: |
@@ -55,6 +57,7 @@ jobs:
 
 
   linux:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         compiler: [gcc, clang, clang_aot]
@@ -74,12 +77,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Install .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.x
 
@@ -101,12 +104,14 @@ jobs:
           make -j$(nproc) -O ${{ matrix.make_flags }} LTO=true STATICLINK=true SYSTEM_LIBEVDEV=false
 
       - name: Upload Mesen
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (Linux - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
           path: bin/linux-${{ matrix.platform.path }}/Release/linux-${{ matrix.platform.path }}/publish/Mesen
 
   appimage:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         compiler: [clang_appimage]
@@ -118,12 +123,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Install .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.x
 
@@ -141,14 +146,17 @@ jobs:
       - name: Build Mesen (AppImage)
         run: |
           ${{ matrix.platform.script }}
+
       - name: Upload Mesen (AppImage)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (Linux ${{ matrix.platform.name }} - AppImage)
           path: Mesen.AppImage
 
 
   macos:
+    if: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository) }}
     strategy:
       matrix:
         compiler: [clang, clang_aot]
@@ -166,12 +174,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Install .NET Core
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.x
 
@@ -198,6 +206,7 @@ jobs:
           ${{ matrix.make_flags }} make -j$(sysctl -n hw.logicalcpu)
 
       - name: Sign binary
+        if: github.event_name != 'pull_request'
         env:
           APP_NAME: bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Mesen.app
           CERT_DATA: ${{ secrets.MACOS_CERTIFICATE }}
@@ -223,11 +232,13 @@ jobs:
           codesign --force --deep --timestamp --keychain macos-build.keychain --options=runtime --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_NAME"
 
       - name: Zip Mesen.app
+        if: github.event_name != 'pull_request'
         run: |
           ditto -c -k --sequesterRsrc --keepParent bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Mesen.app bin/osx-${{ matrix.platform.arch }}/Release/Mesen.app.zip
 
       - name: Upload Mesen
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
+        if: github.event_name != 'pull_request'
         with:
           name: Mesen (macOS - ${{ matrix.platform.os }} - ${{ matrix.compiler }})
           path: bin/osx-${{ matrix.platform.arch }}/Release/Mesen.app.zip

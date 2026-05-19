@@ -168,8 +168,8 @@ public:
 			case 0x4800:
 				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Write>(_ramPosition + _ramOffset, value);
 				_internalRam[_ramPosition] = value;
-				if(_autoIncrement) {
-					_ramPosition = (_ramPosition + 1) & 0x7F;
+				if(_autoIncrement && _ramPosition != 0x7F) {
+					_ramPosition++;
 				}
 				break;
 			case 0xE000:
@@ -189,8 +189,8 @@ public:
 			case 0x4800: {
 				value = _internalRam[_ramPosition];
 				_console->GetEmulator()->ProcessMemoryAccess<CpuType::Nes, MemoryType::NesMapperRam, MemoryOperationType::Read>(_ramPosition + _ramOffset, value);
-				if(_autoIncrement) {
-					_ramPosition = (_ramPosition + 1) & 0x7F;
+				if(_autoIncrement && _ramPosition != 0x7F) {
+					_ramPosition++;
 				}
 				break;
 			}

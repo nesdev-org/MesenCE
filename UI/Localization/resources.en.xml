@@ -167,7 +167,7 @@
 			<Control ID="trkGamma">Gamma</Control>
 			<Control ID="trkResolution">Resolution</Control>
 			<Control ID="trkSharpness">Sharpness</Control>
-			<Control ID="chkMergeFields">Merge Fields</Control>
+			<Control ID="chkMergeFields">Remove artifact jitter</Control>
 			<Control ID="chkVerticalBlend">Apply Vertical Blending</Control>
 
 			<Control ID="lblNtscBisqwitSettings">NTSC settings (Bisqwit)</Control>
@@ -342,13 +342,13 @@
 			<Control ID="chkMapperRandomPowerOnState">Randomize power-on state for mappers</Control>
 			<Control ID="chkRandomizeCpuPpuAlignment">Randomize power-on/reset CPU/PPU alignment</Control>
 			<Control ID="chkEnableOamDecay">Enable PPU OAM decay</Control>
-			<Control ID="chkEnablePpuOamRowCorruption">Enable PPU OAM row corruption emulation</Control>
+			<Control ID="chkEnablePpuOamRowCorruption">Enable PPU $2003/rendering-toggle OAM corruption</Control>
 			<Control ID="chkEnablePpu2006ScrollGlitch">Enable PPU $2006 scroll glitch emulation</Control>
 			<Control ID="chkEnablePpu2000ScrollGlitch">Enable PPU $2000/$2005/$2006 first-write scroll glitch emulation</Control>
 			<Control ID="chkRestrictPpuAccessOnFirstFrame">Clear PPU $2000/1/5/6/7 throughout first frame after reset/power on</Control>
 
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
-			<Control ID="chkDisableOamAddrBug">Disable PPU OAMADDR bug emulation</Control>
+			<Control ID="chkDisableOamAddrBug">Disable PPU frame-start OAM corruption (2C02D and earlier)</Control>
 			<Control ID="chkDisablePaletteRead">Disable PPU palette reads</Control>
 			<Control ID="chkDisablePpu2004Reads">Disable PPU $2004 reads</Control>
 			<Control ID="chkEnablePpuSpriteEvalBug">Enable erroneous sprite pixels at X=255 (2C02B and earlier)</Control>
@@ -402,7 +402,14 @@
 			<Control ID="tpgInput">Input</Control>
 			<Control ID="grpControllers">Controllers</Control>
 			<Control ID="lblPlayer1">Player 1</Control>
+			<Control ID="lblPlayer2">Player 2</Control>
+			<Control ID="lblPlayer2UsedForLink">(Used for link cable emulation)</Control>
 			<Control ID="btnSetup">Setup</Control>
+
+			<Control ID="chkLocalLinkCable">Emulate two linked Game Boy consoles</Control>
+			<Control ID="lblLocalLinkCable">Link cable emulation</Control>
+			<Control ID="lblLocalLinkCablePlayAudio">Play audio for:</Control>
+			<Control ID="lblLocalLinkCableShowVideo">Show video for:</Control>
 		</Form>
 		
 		<Form ID="GbaConfigView">
@@ -644,6 +651,7 @@
 			<Control ID="grpControllers">Controllers</Control>
 			<Control ID="lblPlayer1Horizontal">Controller (Horizontal)</Control>
 			<Control ID="lblPlayer1Vertical">Controller (Vertical)</Control>
+			<Control ID="lblPlayer1Pcv2">Controller (Pocket Challenge V2)</Control>
 			<Control ID="btnSetup">Setup</Control>
 		</Form>
 		
@@ -727,7 +735,7 @@
 			<Control ID="chkGameGearRomFiles">Game Gear roms: .gg</Control>
 			<Control ID="chkSgRomFiles">SG-1000 roms: .sg</Control>
 			<Control ID="chkCvRomFiles">ColecoVision roms: .col</Control>
-			<Control ID="chkWsRomFiles">WonderSwan roms: .ws, .wsc</Control>
+			<Control ID="chkWsRomFiles">WonderSwan roms: .ws, .wsc, .pc2</Control>
 
 			<Control ID="grpDataStorageLocation">Data Storage Folder</Control>
 			<Control ID="btnChangeStorageFolder">Change folder...</Control>
@@ -1013,6 +1021,18 @@
 			<Control ID="mnuPs4Layout2AltB">Controller #2 - X+Square layout</Control>
 
 			<Control ID="btnOK">OK</Control>
+			<Control ID="btnCancel">Cancel</Control>
+		</Form>
+		
+		<Form ID="SaveSpcFileWindow">
+			<Control ID="wndTitle">Save a .SPC file</Control>
+
+			<Control ID="grpTags">ID666 tags</Control>
+			<Control ID="lblSongTitle">Song title</Control>
+			<Control ID="lblGameTitle">Game title</Control>
+			<Control ID="lblSongArtist">Artist</Control>
+
+			<Control ID="btnOK">Save file</Control>
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		
@@ -2006,6 +2026,9 @@ E
 			<Value ID="SnesMouse">SNES Mouse</Value>
 			<Value ID="SuperScope">Super Scope</Value>
 			<Value ID="Multitap">Super Multitap</Value>
+			<Value ID="SnesNttDataKeypad">SNES NTT Data Keypad</Value>
+			<Value ID="AsciiTurboFileTwinTf2">Turbo File Twin (TFII mode)</Value>
+			<Value ID="AsciiTurboFileTwinStf">Turbo File Twin (STF mode)</Value>
 
 			<Value ID="NesController">NES Controller</Value>
 			<Value ID="FamicomController">Famicom Controller</Value>
@@ -2373,6 +2396,23 @@ E
 			<Value ID="R">Button - Right</Value>
 			<Value ID="L">Button - Left</Value>
 		</Enum>
+		<Enum ID="SnesNttDataKeypadButtons">
+			<Value ID="Num0">Number 0</Value>
+			<Value ID="Num1">Number 1</Value>
+			<Value ID="Num2">Number 2</Value>
+			<Value ID="Num3">Number 3</Value>
+			<Value ID="Num4">Number 4</Value>
+			<Value ID="Num5">Number 5</Value>
+			<Value ID="Num6">Number 6</Value>
+			<Value ID="Num7">Number 7</Value>
+			<Value ID="Num8">Number 8</Value>
+			<Value ID="Num9">Number 9</Value>
+			<Value ID="Star">Star (*)</Value>
+			<Value ID="Pound">Pound (#)</Value>
+			<Value ID="Period">Period (.)</Value>
+			<Value ID="C">C</Value>
+			<Value ID="EndComunication">End communication</Value>
+		</Enum>
 		<Enum ID="NesConsoleType">
 			<Value ID="Nes001">NES - Front loader (NES-001)</Value>
 			<Value ID="Nes101">NES - Top loader (NES-101)</Value>
@@ -2521,6 +2561,11 @@ E
 			<Value ID="Delay">Delay</Value>
 			<Value ID="Panning">Panning</Value>
 			<Value ID="CombFilter">Comb filter</Value>
+		</Enum>
+		<Enum ID="GbLocalLinkOutputOption">
+			<Value ID="Both">Both</Value>
+			<Value ID="MainSystemOnly">Player 1 only</Value>
+			<Value ID="SubSystemOnly">Player 2 only</Value>
 		</Enum>
 		<Enum ID="VsDualOutputOption">
 			<Value ID="Both">Both</Value>
@@ -2803,6 +2848,8 @@ E
 			<Value ID="GbBootRom">GB - Boot ROM</Value>
 			<Value ID="GbVideoRam">GB - Video RAM</Value>
 			<Value ID="GbSpriteRam">GB - Sprite RAM</Value>
+			<Value ID="GbBgPaletteRam">GB - Background Palette RAM</Value>
+			<Value ID="GbObjPaletteRam">GB - Sprite Palette RAM</Value>
 
 			<Value ID="NesMemory">CPU Memory</Value>
 			<Value ID="NesPpuMemory">PPU Memory</Value>
@@ -2873,6 +2920,7 @@ E
 		</Enum>
 		<Enum ID="WsModel">
 			<Value ID="Auto">Auto</Value>
+			<Value ID="PocketChallenge">Pocket Challenge V2</Value>
 			<Value ID="Monochrome">WonderSwan</Value>
 			<Value ID="Color">WonderSwan Color</Value>
 			<Value ID="SwanCrystal">SwanCrystal</Value>
@@ -3546,6 +3594,7 @@ E
 			<Value ID="InstallHdPack">Install HD Pack</Value>
 			<Value ID="HdPackBuilder">HD Pack Builder</Value>
 			<Value ID="TakeScreenshot">Take Screenshot</Value>
+			<Value ID="SaveSpcFile">Save .SPC File</Value>
 
 			<Value ID="OnlineHelp">Online Help</Value>
 			<Value ID="CommandLineHelp">Command-line options</Value>

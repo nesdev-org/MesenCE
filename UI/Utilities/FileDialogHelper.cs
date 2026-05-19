@@ -36,6 +36,7 @@ namespace Mesen.Utilities
 		public const string BinExt = "bin";
 		public const string NesExt = "nes";
 		public const string SufamiTurboExt = "st";
+		public const string SpcExt = "spc";
 
 		public static async Task<string?> OpenFile(string? initialFolder, IRenderRoot? parent, params string[] extensions)
 		{
@@ -55,7 +56,7 @@ namespace Mesen.Utilities
 								"*.pce", "*.sgx", "*.cue", "*.hes",
 								"*.sms", "*.gg", "*.sg", "*.col",
 								"*.gba",
-								"*.ws", "*.wsc",
+								"*.ws", "*.wsc", "*.pc2",
 								"*.zip", "*.7z",
 								"*.ips", "*.bps"
 							}
@@ -68,7 +69,7 @@ namespace Mesen.Utilities
 						filter.Add(new FilePickerFileType("SMS / GG ROM files") { Patterns = new List<string>() { "*.sms", "*.gg" } });
 						filter.Add(new FilePickerFileType("SG-1000 ROM files") { Patterns = new List<string>() { "*.sg" } });
 						filter.Add(new FilePickerFileType("ColecoVision ROM files") { Patterns = new List<string>() { "*.col" } });
-						filter.Add(new FilePickerFileType("WonderSwan ROM files") { Patterns = new List<string>() { "*.ws", "*.wsc" } });
+						filter.Add(new FilePickerFileType("WonderSwan ROM files") { Patterns = new List<string>() { "*.ws", "*.wsc", "*.pc2" } });
 						filter.Add(new FilePickerFileType("Patch files (IPS/BPS)") { Patterns = new List<string>() { "*.ips", "*.bps" } });
 					} else if(ext == FileDialogHelper.FirmwareExt) {
 						filter.Add(new FilePickerFileType("All firmware files") { Patterns = new List<string>() { "*.sfc", "*.pce", "*.nes", "*.bin", "*.rom", "*.col", "*.sms", "*.gg", "*.gba", "*.ws", "*.wsc" } });

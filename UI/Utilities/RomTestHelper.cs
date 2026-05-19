@@ -30,7 +30,7 @@ namespace Mesen.Utilities
 					Dispatcher.UIThread.Post(async () => {
 						string msg = "[Test] " + result.State.ToString();
 						if(result.State != RomTestState.Passed) {
-							msg += ": (" + result.ErrorCode.ToString() + ")";
+							msg += "(incorrect frames: " + result.ErrorCode + ", hash: " + result.GetLastFrameHash() + ")";
 						}
 
 						await MessageBox.Show(null, msg, "", MessageBoxButtons.OK, result.State == RomTestState.Failed ? MessageBoxIcon.Error : MessageBoxIcon.Info);
@@ -67,7 +67,7 @@ namespace Mesen.Utilities
 					RomTestResult result = results[entry];
 					string msg = "[Test] " + result.State.ToString() + ": " + entry;
 					if(result.State != RomTestState.Passed) {
-						msg += " (" + result.ErrorCode.ToString() + ")";
+						msg += "(incorrect frames: " + result.ErrorCode + ", hash: " + result.GetLastFrameHash() + ")";
 					}
 					EmuApi.WriteLogEntry(msg);
 

@@ -53,8 +53,12 @@ WsEepromCommand WsEeprom::GetCommand()
 
 WsEepromSize WsEeprom::GetSize()
 {
+	if(_state.Size == WsEepromSize::Size0) {
+		//Process commands as if the eeprom was the monochrome model's 128-byte eeprom on PCv2
+		return WsEepromSize::Size128;
+	}
 	if(_isInternal && _state.Size == WsEepromSize::Size2kb && !_console->IsColorMode()) {
-		//Process commands as is the eeprom was the monochrome model's 128-byte eeprom when color mode is disabled
+		//Process commands as if the eeprom was the monochrome model's 128-byte eeprom when color mode is disabled
 		return WsEepromSize::Size128;
 	}
 	return _state.Size;
@@ -73,7 +77,7 @@ uint16_t WsEeprom::GetCommandAddress()
 
 void WsEeprom::WriteValue(uint16_t addr, uint16_t value)
 {
-	if(!_state.WriteDisabled && (!_state.InternalEepromWriteProtected || addr < 0x30)) {
+	if((uint32_t)_state.Size && !_state.WriteDisabled && (!_state.InternalEepromWriteProtected || addr < 0x30)) {
 		if(_isInternal) {
 			_emu->ProcessMemoryAccess<CpuType::Ws, MemoryType::WsInternalEeprom, MemoryOperationType::Write>(addr << 1, value);
 		} else {
@@ -94,6 +98,10 @@ string WsEeprom::ConvertToEepromString(string in)
 
 void WsEeprom::InitInternalEepromData()
 {
+	if(!(uint32_t)_state.Size) {
+		return;
+	}
+
 	memset(_data, 0, (uint32_t)_state.Size);
 
 	string name;
@@ -132,7 +140,11 @@ void WsEeprom::Run()
 
 			switch(cmd) {
 				case WsEepromCommand::Read:
-					_state.ReadBuffer = _data[addr << 1] | (_data[(addr << 1) + 1] << 8);
+					if(!(uint32_t)_state.Size) {
+						_state.ReadBuffer = 0xFFFF;
+					} else {
+						_state.ReadBuffer = _data[addr << 1] | (_data[(addr << 1) + 1] << 8);
+					}
 					_state.ReadDone = true;
 					break;
 
@@ -207,10 +219,12 @@ void WsEeprom::WritePort(uint8_t port, uint8_t value)
 					}
 					_state.Idle = false;
 
-					if(_isInternal) {
-						_emu->ProcessMemoryAccess<CpuType::Ws, MemoryType::WsInternalEeprom, MemoryOperationType::Read>(addr << 1, _state.ReadBuffer);
-					} else {
-						_emu->ProcessMemoryAccess<CpuType::Ws, MemoryType::WsCartEeprom, MemoryOperationType::Read>(addr << 1, _state.ReadBuffer);
+					if((uint32_t)_state.Size) {
+						if(_isInternal) {
+							_emu->ProcessMemoryAccess<CpuType::Ws, MemoryType::WsInternalEeprom, MemoryOperationType::Read>(addr << 1, _state.ReadBuffer);
+						} else {
+							_emu->ProcessMemoryAccess<CpuType::Ws, MemoryType::WsCartEeprom, MemoryOperationType::Read>(addr << 1, _state.ReadBuffer);
+						}
 					}
 				}
 			} else if(write) {
@@ -263,12 +277,16 @@ uint8_t WsEeprom::ReadPort(uint8_t port)
 
 void WsEeprom::LoadBattery()
 {
-	_emu->GetBatteryManager()->LoadBattery(_isInternal ? ".ieeprom" : ".eeprom", _data, (uint32_t)_state.Size);
+	if((uint32_t)_state.Size) {
+		_emu->GetBatteryManager()->LoadBattery(_isInternal ? ".ieeprom" : ".eeprom", _data, (uint32_t)_state.Size);
+	}
 }
 
 void WsEeprom::SaveBattery()
 {
-	_emu->GetBatteryManager()->SaveBattery(_isInternal ? ".ieeprom" : ".eeprom", _data, (uint32_t)_state.Size);
+	if((uint32_t)_state.Size) {
+		_emu->GetBatteryManager()->SaveBattery(_isInternal ? ".ieeprom" : ".eeprom", _data, (uint32_t)_state.Size);
+	}
 }
 
 void WsEeprom::Serialize(Serializer& s)

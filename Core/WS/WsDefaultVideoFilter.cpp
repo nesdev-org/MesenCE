@@ -37,7 +37,7 @@ void WsDefaultVideoFilter::InitLookupTable()
 		uint8_t b = rgb444 & 0xF;
 
 		if(_adjustColors) {
-			if(_console->GetModel() == WsModel::Monochrome) {
+			if(!_console->IsColorModel()) {
 				//Same formula as what asie recently implemented for ares
 				auto applyGamma = [](uint32_t color, uint32_t min, uint32_t max) {
 					return min + (uint32_t)(pow(color / 15.0, 1 / 2.2) * (max - min));
@@ -121,6 +121,6 @@ void WsDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	}
 
 	if(_applyNtscFilter) {
-		_ntscFilter.ApplyFilter(out, size.Width, size.Height, 0);
+		_ntscFilter.ApplyFilter(out, size.Width, size.Height, IsOddFrame());
 	}
 }

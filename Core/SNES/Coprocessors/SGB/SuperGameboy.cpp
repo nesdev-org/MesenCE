@@ -294,7 +294,7 @@ void SuperGameboy::Run()
 		return;
 	}
 
-	_gameboy->Run(_clockOffset + (uint64_t)((_memoryManager->GetMasterClock() - _resetClock) * _clockRatio));
+	_gameboy->RunSgb(_clockOffset + (uint64_t)((_memoryManager->GetMasterClock() - _resetClock) * _clockRatio));
 }
 
 void SuperGameboy::UpdateClockRatio()

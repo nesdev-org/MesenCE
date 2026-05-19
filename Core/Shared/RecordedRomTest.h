@@ -19,6 +19,7 @@ struct RomTestResult
 {
 	RomTestState State;
 	int32_t ErrorCode;
+	char LastFrameHash[40];
 };
 
 class RecordedRomTest : public INotificationListener, public std::enable_shared_from_this<RecordedRomTest>
@@ -32,8 +33,8 @@ private:
 	int _badFrameCount = 0;
 	bool _isLastFrameGood = false;
 
-	uint8_t _previousHash[16] = {};
-	std::deque<uint8_t*> _screenshotHashes;
+	string _previousHash = "";
+	std::deque<string> _screenshotHashes;
 	std::deque<uint8_t> _repetitionCount;
 	uint8_t _currentCount = 0;
 

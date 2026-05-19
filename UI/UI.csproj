@@ -10,7 +10,7 @@
     <StartupObject>Mesen.Program</StartupObject>
     <Version>2.1.1</Version>
     <FileVersion>2.1.1</FileVersion>
-    <Copyright>(C) 2014-2025 Sour</Copyright>
+    <Copyright>(C) 2014-2026 Sour</Copyright>
   </PropertyGroup>
 	<PropertyGroup>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -20,12 +20,16 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<IsAotCompatible>true</IsAotCompatible>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
 		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 		<AvaloniaNameGeneratorIsEnabled>false</AvaloniaNameGeneratorIsEnabled>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+		<SelfContained>false</SelfContained>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'!='net6.0'">
+		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='osx-x64' Or '$(RuntimeIdentifier)'=='osx-arm64' Or '$(RuntimeIdentifier)'=='linux-x64' Or '$(RuntimeIdentifier)'=='linux-arm64'">
 		<SolutionDir>..</SolutionDir>
@@ -108,13 +112,13 @@
 		<TrimmerRootAssembly Include="Dock.Settings" />
 	</ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.1" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.3.1" />
-    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.1" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.1" Condition="'$(OptimizeUi)'!='true'" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.1" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.1" />
+    <PackageReference Include="Avalonia" Version="11.3.14" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.4.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.14" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.14" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.14" Condition="'$(OptimizeUi)'!='true'" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.14" />
     <PackageReference Include="Dock.Avalonia" Version="11.3.0.2" />
     <PackageReference Include="Dock.Model.Mvvm" Version="11.3.0.2" />
     <PackageReference Include="Dotnet.Bundle" Version="*" />
@@ -281,6 +285,9 @@
     </Compile>
     <Compile Update="Views\WsControllerVerticalView.axaml.cs">
       <DependentUpon>WsControllerVerticalView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\WsPcv2ControllerView.axaml.cs">
+      <DependentUpon>WsPcv2ControllerView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\WsControllerView.axaml.cs">
       <DependentUpon>WsControllerView.axaml</DependentUpon>

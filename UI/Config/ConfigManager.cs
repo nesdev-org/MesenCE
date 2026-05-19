@@ -249,6 +249,7 @@ namespace Mesen.Config
 		public static string TestFolder { get { return GetFolder(Path.Combine(ConfigManager.HomeFolder, "Tests"), null, false); } }
 		public static string HdPackFolder { get { return GetFolder(Path.Combine(ConfigManager.HomeFolder, "HdPacks"), null, false); } }
 		public static string RecentGamesFolder { get { return GetFolder(Path.Combine(ConfigManager.HomeFolder, "RecentGames"), null, false); } }
+		public static string DumpsFolder { get { return GetFolder(Path.Combine(ConfigManager.HomeFolder, "Dumps"), null, false); } }
 
 		public static string ConfigFile
 		{

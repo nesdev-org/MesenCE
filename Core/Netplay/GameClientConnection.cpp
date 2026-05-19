@@ -41,6 +41,7 @@ void GameClientConnection::Shutdown()
 
 		_emu->UnregisterInputProvider(this);
 
+		_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::NetplayStopped);
 		MessageManager::DisplayMessage("NetPlay", "ConnectionLost");
 		_emu->GetSettings()->ClearFlag(EmulationFlags::MaximumSpeed);
 	}
@@ -225,9 +226,7 @@ void GameClientConnection::InitControlDevice()
 
 void GameClientConnection::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
-	if(type == ConsoleNotificationType::ConfigChanged) {
-		InitControlDevice();
-	} else if(type == ConsoleNotificationType::GameLoaded) {
+	if(type == ConsoleNotificationType::GameLoaded) {
 		_emu->RegisterInputProvider(this);
 	}
 }

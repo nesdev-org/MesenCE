@@ -30,6 +30,9 @@ private:
 	SuperGameboy* _superGameboy = nullptr;
 	bool _allowSgb = false;
 
+	unique_ptr<Gameboy> _secondaryConsole;
+	Gameboy* _mainConsole = nullptr;
+
 	unique_ptr<GbMemoryManager> _memoryManager;
 	unique_ptr<GbCpu> _cpu;
 	unique_ptr<GbPpu> _ppu;
@@ -65,6 +68,8 @@ private:
 	GameboyModel GetEffectiveModel(GameboyHeader& header);
 	static GameboyHeader GetHeader(uint8_t* romData, uint32_t romSize);
 
+	template<bool hasLink> void InternalRunFrame();
+
 public:
 	static constexpr int HeaderOffset = 0x134;
 
@@ -76,13 +81,14 @@ public:
 
 	void PowerOn(SuperGameboy* sgb);
 
-	void Run(uint64_t runUntilClock);
+	void RunSgb(uint64_t runUntilClock);
 
 	void LoadBattery();
 	void SaveBattery() override;
 
 	Emulator* GetEmulator();
 
+	GbApu* GetApu();
 	GbPpu* GetPpu();
 	GbCpu* GetCpu();
 	GbTimer* GetTimer();
@@ -101,6 +107,7 @@ public:
 	bool IsCgb();
 	bool IsSgb();
 	SuperGameboy* GetSgb();
+	Gameboy* GetLinkedConsole();
 
 	uint64_t GetCycleCount();
 	uint64_t GetApuCycleCount();
@@ -109,8 +116,11 @@ public:
 
 	void RunApu();
 
+	void RunLinkedConsole();
+	bool IsPrimaryConsole();
+
 	void Serialize(Serializer& s) override;
-	SaveStateCompatInfo ValidateSaveStateCompatibility(ConsoleType stateConsoleType) override;
+	optional<SaveStateCompatInfo> ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType) override;
 
 	// Inherited via IConsole
 	void Reset() override;

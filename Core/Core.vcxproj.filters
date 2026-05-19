@@ -2880,9 +2880,6 @@
     <ClInclude Include="WS\WsPpu.h">
       <Filter>WS</Filter>
     </ClInclude>
-    <ClInclude Include="WS\WsController.h">
-      <Filter>WS</Filter>
-    </ClInclude>
     <ClInclude Include="WS\Carts\WsCart.h">
       <Filter>WS\Carts</Filter>
     </ClInclude>
@@ -2984,6 +2981,24 @@
     </ClInclude>
     <ClInclude Include="SNES\Input\SnesRumbleController.h">
       <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\Utilities\AvMergeUtilities.h">
+      <Filter>Shared\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="SNES\Input\SnesNttDataKeypad.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinStf.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinTf2.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WS\Input\WsController.h">
+      <Filter>WS\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WS\Input\Pcv2Controller.h">
+      <Filter>WS\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3350,6 +3365,9 @@
     <ClCompile Include="SNES\Input\SnesRumbleController.cpp">
       <Filter>SNES\Input</Filter>
     </ClCompile>
+    <ClCompile Include="SNES\Input\SnesNttDataKeypad.cpp">
+      <Filter>SNES\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="PCE">
@@ -3477,6 +3495,9 @@
     </Filter>
     <Filter Include="SNES\Coprocessors\SufamiTurbo">
       <UniqueIdentifier>{bfdd4bb9-41c2-4255-a8c3-0176c990cbf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WS\Input">
+      <UniqueIdentifier>{5077d508-bbdf-4bab-9d03-9b3d2b05edfb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -3,9 +3,7 @@
 #include "WS/WsConsole.h"
 #include "Shared/BaseControlDevice.h"
 #include "Shared/Emulator.h"
-#include "Shared/EmuSettings.h"
 #include "Shared/InputHud.h"
-#include "Utilities/Serializer.h"
 
 class WsController : public BaseControlDevice
 {

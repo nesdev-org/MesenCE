@@ -6,6 +6,7 @@
 #include "Shared/Emulator.h"
 #include "Shared/SettingTypes.h"
 #include "Shared/Audio/SoundMixer.h"
+#include "Shared/Utilities/AvMergeUtilities.h"
 #include "Utilities/Serializer.h"
 #include "Utilities/Audio/blip_buf.h"
 
@@ -118,17 +119,7 @@ void NesSoundMixer::ProcessVsDualSystemAudio()
 
 	NesSoundMixer* subMixer = _console->GetVsSubConsole()->GetSoundMixer();
 	if(cfg.VsDualAudioOutput != VsDualOutputOption::MainSystemOnly) {
-		size_t i;
-		for(i = 0; i < _sampleCount && subMixer->_sampleCount; i++) {
-			_outputBuffer[i * 2] += subMixer->_outputBuffer[i * 2];
-			_outputBuffer[i * 2 + 1] += subMixer->_outputBuffer[i * 2 + 1];
-		}
-
-		if(i < subMixer->_sampleCount) {
-			size_t samplesToCopy = subMixer->_sampleCount - i;
-			memmove(subMixer->_outputBuffer, subMixer->_outputBuffer + i * 2, samplesToCopy * 2 * sizeof(int16_t));
-			subMixer->_sampleCount = samplesToCopy;
-		}
+		AvMergeUtilities::MergeAudio(_outputBuffer, _sampleCount, subMixer->_outputBuffer, subMixer->_sampleCount);
 	} else {
 		subMixer->_sampleCount = 0;
 	}
@@ -184,7 +175,7 @@ int16_t NesSoundMixer::GetOutputVolume(bool forRightChannel)
 
 	return (int16_t)(squareVolume + tndVolume +
 		GetChannelOutput(AudioChannel::FDS, forRightChannel) * 20 +
-		GetChannelOutput(AudioChannel::MMC5, forRightChannel) * 43 +
+		GetChannelOutput(AudioChannel::MMC5, forRightChannel) * 14 +
 		GetChannelOutput(AudioChannel::Namco163, forRightChannel) * 20 +
 		GetChannelOutput(AudioChannel::Sunsoft5B, forRightChannel) * 15 +
 		GetChannelOutput(AudioChannel::VRC6, forRightChannel) * 5 +

@@ -2,8 +2,9 @@
 #include "WS/WsConsole.h"
 #include "WS/WsControlManager.h"
 #include "WS/WsMemoryManager.h"
-#include "WS/WsController.h"
-#include "Shared/KeyManager.h"
+#include "WS/Input/WsController.h"
+#include "WS/Input/Pcv2Controller.h"
+#include "Shared/EmuSettings.h"
 
 WsControlManager::WsControlManager(Emulator* emu, WsConsole* console) : BaseControlManager(emu, CpuType::Ws)
 {
@@ -24,6 +25,10 @@ shared_ptr<BaseControlDevice> WsControlManager::CreateControllerDevice(Controlle
 		case ControllerType::WsControllerVertical:
 			device.reset(new WsController(_emu, _console, port, cfg.ControllerHorizontal.Keys, cfg.ControllerVertical.Keys));
 			break;
+
+		case ControllerType::Pcv2Controller:
+			device.reset(new Pcv2Controller(_emu, port, cfg.ControllerPcv2.Keys));
+			break;
 	}
 
 	return device;
@@ -41,7 +46,7 @@ void WsControlManager::UpdateControlDevices()
 
 	ClearDevices();
 
-	shared_ptr<BaseControlDevice> device(CreateControllerDevice(ControllerType::WsController, 0));
+	shared_ptr<BaseControlDevice> device(CreateControllerDevice(_console->GetModel() == WsModel::PocketChallenge ? ControllerType::Pcv2Controller : ControllerType::WsController, 0));
 	if(device) {
 		RegisterControlDevice(device);
 	}
@@ -52,7 +57,11 @@ uint8_t WsControlManager::Read()
 	uint8_t result = _state.InputSelect;
 
 	for(shared_ptr<BaseControlDevice>& controller : _controlDevices) {
-		if(controller->GetPort() == 0 && controller->GetControllerType() == ControllerType::WsController) {
+		if(controller->GetPort() != 0) {
+			continue;
+		}
+
+		if(controller->GetControllerType() == ControllerType::WsController) {
 			if(_state.InputSelect & 0x10) {
 				result |= controller->IsPressed(WsController::Up2) ? 0x01 : 0;
 				result |= controller->IsPressed(WsController::Right2) ? 0x02 : 0;
@@ -69,6 +78,23 @@ uint8_t WsControlManager::Read()
 				result |= controller->IsPressed(WsController::Start) ? 0x02 : 0;
 				result |= controller->IsPressed(WsController::A) ? 0x04 : 0;
 				result |= controller->IsPressed(WsController::B) ? 0x08 : 0;
+			}
+		} else if(controller->GetControllerType() == ControllerType::Pcv2Controller) {
+			result |= 0x02;
+			if(_state.InputSelect & 0x10) {
+				result |= controller->IsPressed(Pcv2Controller::Clear) ? 0x01 : 0;
+				result |= controller->IsPressed(Pcv2Controller::Circle) ? 0x04 : 0;
+				result |= controller->IsPressed(Pcv2Controller::Pass) ? 0x08 : 0;
+			}
+			if(_state.InputSelect & 0x20) {
+				result |= controller->IsPressed(Pcv2Controller::View) ? 0x01 : 0;
+				result |= controller->IsPressed(Pcv2Controller::Esc) ? 0x04 : 0;
+				result |= controller->IsPressed(Pcv2Controller::Right) ? 0x08 : 0;
+			}
+			if(_state.InputSelect & 0x40) {
+				result |= controller->IsPressed(Pcv2Controller::Left) ? 0x01 : 0;
+				result |= controller->IsPressed(Pcv2Controller::Down) ? 0x04 : 0;
+				result |= controller->IsPressed(Pcv2Controller::Up) ? 0x08 : 0;
 			}
 		}
 	}

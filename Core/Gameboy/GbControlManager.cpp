@@ -14,6 +14,15 @@ GbControlManager::GbControlManager(Emulator* emu, Gameboy* console) : BaseContro
 {
 	_emu = emu;
 	_console = console;
+
+	if(!console->IsPrimaryConsole()) {
+		RegisterInputProvider(this);
+	}
+}
+
+GbControlManager::~GbControlManager()
+{
+	UnregisterInputProvider(this);
 }
 
 GbControlManagerState GbControlManager::GetState()
@@ -35,7 +44,7 @@ shared_ptr<BaseControlDevice> GbControlManager::CreateControllerDevice(Controlle
 		default:
 		case ControllerType::None: break;
 
-		case ControllerType::GameboyController: device.reset(new GbController(_emu, port, cfg.Controller.Keys)); break;
+		case ControllerType::GameboyController: device.reset(new GbController(_emu, port, port == 0 ? cfg.Controller.Keys : cfg.LinkedController.Keys)); break;
 	}
 
 	return device;
@@ -56,6 +65,14 @@ void GbControlManager::UpdateControlDevices()
 	shared_ptr<BaseControlDevice> device(CreateControllerDevice(ControllerType::GameboyController, 0));
 	if(device) {
 		RegisterControlDevice(device);
+	}
+
+	if(_console->IsPrimaryConsole() && _console->GetLinkedConsole()) {
+		shared_ptr<BaseControlDevice> linkedDevice = CreateControllerDevice(ControllerType::GameboyController, 1);
+		if(linkedDevice) {
+			RegisterControlDevice(linkedDevice);
+			linkedDevice->Disconnect();
+		}
 	}
 }
 
@@ -130,6 +147,22 @@ void GbControlManager::ProcessInputChange(std::function<void()> inputUpdateCallb
 void GbControlManager::UpdateInputState()
 {
 	ProcessInputChange([this]() { BaseControlManager::UpdateInputState(); });
+}
+
+bool GbControlManager::SetInput(BaseControlDevice* device)
+{
+	//Copy port P2 (port 1) from the main console to the subconsole.
+	//This allows input to be recorded properly for rewind, movies, etc.
+	uint8_t port = device->GetPort();
+	GbControlManager* mainControlManager = (GbControlManager*)_console->GetLinkedConsole()->GetControlManager();
+	if(mainControlManager && port == 0) {
+		shared_ptr<BaseControlDevice> controlDevice = mainControlManager->GetControlDevice(1);
+		if(controlDevice) {
+			ControlDeviceState state = controlDevice->GetRawState();
+			device->SetRawState(state);
+		}
+	}
+	return true;
 }
 
 void GbControlManager::Serialize(Serializer& s)
