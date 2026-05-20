@@ -128,17 +128,17 @@ namespace Mesen.Utilities
 			Array.Sort(result);
 			return result;
 		}
-		
+
 		/// <summary>
 		/// Returns the lowest refresh rate that is equal to or a multiple of <paramref name="targetRate"/>.
 		/// Falls back to the highest available rate if no compatible rate is found, or if <paramref name="targetRate"/> is 0.
 		/// </summary>
 		public static UInt32 GetCompatibleRefreshRate(UInt32[] availableRates, UInt32 targetRate)
 		{
-			if (targetRate == 0) return availableRates.LastOrDefault();
-			
+			if(targetRate == 0) return availableRates.LastOrDefault();
+
 			var compatibleRate = availableRates.FirstOrDefault(rate => rate % targetRate == 0);
-			
+
 			return compatibleRate == 0 ? availableRates.LastOrDefault() : compatibleRate;
 		}
 	}
