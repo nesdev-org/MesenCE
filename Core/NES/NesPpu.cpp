@@ -933,7 +933,7 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				LoadExtraSprites();
 			}
 			//Increment OAM2ADDR during the first 4 dots of each set of 8. There is special behavior where the first set of 8 skips the
-			//first increment, and an extra increment is done after the last set of 8.
+			//first increment (because OAM2ADDR is being cleared), and an extra increment is done after the last set of 8.
 			_secondaryOamAddr += !((_cycle - 1) & 4);
 		}
 		if(_cycle == 257) {
@@ -943,8 +943,8 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				//copy horizontal scrolling value from t
 				_videoRamAddr = (_videoRamAddr & ~0x041F) | (_tmpVideoRamAddr & 0x041F);
 
-				//Fix up OAM2ADDR, which got incremented an extra time earlier. By doing this here, we avoid an extra if every dot.
-				_secondaryOamAddr--;
+				//This is reset during dots 256.5-257.0, overriding the increment that would happen in 257.
+				_secondaryOamAddr = 0;
 			}
 		}
 	} else if(_cycle >= 321 && _cycle <= 336) {
