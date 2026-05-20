@@ -21,7 +21,7 @@ namespace Mesen.Views
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void nudGsuSpeed_LostFocus(object? sender, RoutedEventArgs e)
+		private void NudGsuSpeed_LostFocus(object? sender, RoutedEventArgs e)
 		{
 			if(DataContext is SnesConfigViewModel model) {
 				//Clock speed must be a multiple of 100

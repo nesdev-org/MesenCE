@@ -144,7 +144,7 @@
 								Minimum="100"
 								Maximum="1000"
 								Increment="100"
-								LostFocus="nudGsuSpeed_LostFocus"
+								LostFocus="NudGsuSpeed_LostFocus"
 							/>
 						</Grid>
 					</c:OptionSection>

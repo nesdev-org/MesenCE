@@ -12,7 +12,7 @@ namespace Mesen.Debugger.Windows
 {
 	public class BreakOnWindow : MesenWindow
 	{
-		public static int _lastValue { get; set; } = 0;
+		private static int _lastValue = 0;
 
 		public static readonly StyledProperty<int> ValueProperty = AvaloniaProperty.Register<BreakInWindow, int>(nameof(Value));
 		public static readonly StyledProperty<int?> MinProperty = AvaloniaProperty.Register<BreakInWindow, int?>(nameof(Min));

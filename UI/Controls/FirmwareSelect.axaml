@@ -20,7 +20,7 @@
 			IsVisible="{Binding WarningMessage.Length}"
 			Margin="3 0"
 		/>
-		<Button Content="{l:Translate btnSelect}" Click="btnBrowse_OnClick" Grid.Column="2" />
+		<Button Content="{l:Translate btnSelect}" Click="BtnBrowse_OnClick" Grid.Column="2" />
 		<c:IconButton
 			Grid.Column="3"
 			ToolTip.Tip="{l:Translate btnDelete}"

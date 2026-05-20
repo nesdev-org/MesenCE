@@ -2666,7 +2666,7 @@ E
 			<Value ID="iNes">iNes</Value>
 			<Value ID="Nes2_0">NES 2.0</Value>
 		</Enum>
-		<Enum ID="iNesMirroringType">
+		<Enum ID="MirroringType">
 			<Value ID="Horizontal">Horizontal</Value>
 			<Value ID="Vertical">Vertical</Value>
 			<Value ID="FourScreens">Four Screens</Value>

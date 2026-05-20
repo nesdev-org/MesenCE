@@ -54,7 +54,7 @@ namespace Mesen.Debugger.Windows
 		{
 			base.OnOpened(e);
 			ListBox list = this.GetControl<ListBox>("lstResults");
-			list.DoubleTapped += lstResults_DoubleTapped;
+			list.DoubleTapped += LstResults_DoubleTapped;
 			list.PointerReleased += List_PointerReleased;
 
 			Dispatcher.UIThread.Post(() => {
@@ -73,7 +73,7 @@ namespace Mesen.Debugger.Windows
 			}
 		}
 
-		private void lstResults_DoubleTapped(object? sender, RoutedEventArgs e)
+		private void LstResults_DoubleTapped(object? sender, RoutedEventArgs e)
 		{
 			_isDoubleTap = true;
 		}

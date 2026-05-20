@@ -6,7 +6,7 @@ public static class EventViewerColors
 {
 	public static Color[] Colors => _colors;
 
-	private static readonly Color[] _colors = new Color[] {
+	private static Color[] _colors = new Color[] {
 		//Pairs
 		Color.FromRgb(0x00, 0x6E, 0x8E),
 		Color.FromRgb(0x78, 0xA5, 0xB2),

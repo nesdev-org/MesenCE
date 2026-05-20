@@ -43,7 +43,7 @@
 			<Button 
 				Name="PresetButton"
 				Content="{l:Translate btnSelectPreset}"
-				Click="btnPreset_OnClick" 
+				Click="BtnPreset_OnClick" 
 				VerticalAlignment="Top"
 				Margin="12"
 				IsVisible="{Binding ShowPresets}"
@@ -51,29 +51,29 @@
 				<Button.ContextMenu>
 					<ContextMenu Name="Preset" Placement="BottomEdgeAlignedLeft">
 						<MenuItem Header="{l:Translate mnuKeyboard}">
-							<MenuItem Header="{l:Translate mnuWasdLayout}" Click="mnuWasdLayout_OnClick" />
-							<MenuItem Header="{l:Translate mnuArrowLayout}" Click="mnuArrowLayout_OnClick" />
+							<MenuItem Header="{l:Translate mnuWasdLayout}" Click="MnuWasdLayout_OnClick" />
+							<MenuItem Header="{l:Translate mnuArrowLayout}" Click="MnuArrowLayout_OnClick" />
 						</MenuItem>
 						<Separator />
 						<MenuItem Header="{l:Translate mnuXboxController}">
-							<MenuItem Header="{l:Translate mnuXboxLayout1}" Click="mnuXboxLayout1_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuXboxLayout2}" Click="mnuXboxLayout2_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuXboxLayout1}" Click="MnuXboxLayout1_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuXboxLayout2}" Click="MnuXboxLayout2_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
 
-							<MenuItem Header="{l:Translate mnuXboxLayout1AltA}" Click="mnuXboxLayout1_OnClick" IsVisible="{Binding IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuXboxLayout1AltB}" Click="mnuXboxLayout1Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuXboxLayout1AltA}" Click="MnuXboxLayout1_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuXboxLayout1AltB}" Click="MnuXboxLayout1Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
 							<Separator IsVisible="{Binding IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuXboxLayout2AltA}" Click="mnuXboxLayout2_OnClick" IsVisible="{Binding IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuXboxLayout2AltB}" Click="mnuXboxLayout2Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuXboxLayout2AltA}" Click="MnuXboxLayout2_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuXboxLayout2AltB}" Click="MnuXboxLayout2Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
 						</MenuItem>
 						<MenuItem Header="{l:Translate mnuPs4Controller}">
-							<MenuItem Header="{l:Translate mnuPs4Layout1}" Click="mnuPs4Layout1_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuPs4Layout2}" Click="mnuPs4Layout2_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuPs4Layout1}" Click="MnuPs4Layout1_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuPs4Layout2}" Click="MnuPs4Layout2_OnClick" IsVisible="{Binding !IsTwoButtonController}" />
 
-							<MenuItem Header="{l:Translate mnuPs4Layout1AltA}" Click="mnuPs4Layout1_OnClick" IsVisible="{Binding IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuPs4Layout1AltB}" Click="mnuPs4Layout1Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuPs4Layout1AltA}" Click="MnuPs4Layout1_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuPs4Layout1AltB}" Click="MnuPs4Layout1Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
 							<Separator IsVisible="{Binding IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuPs4Layout2AltA}" Click="mnuPs4Layout2_OnClick" IsVisible="{Binding IsTwoButtonController}" />
-							<MenuItem Header="{l:Translate mnuPs4Layout2AltB}" Click="mnuPs4Layout2Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuPs4Layout2AltA}" Click="MnuPs4Layout2_OnClick" IsVisible="{Binding IsTwoButtonController}" />
+							<MenuItem Header="{l:Translate mnuPs4Layout2AltB}" Click="MnuPs4Layout2Alt_OnClick" IsVisible="{Binding IsTwoButtonController}" />
 						</MenuItem>
 					</ContextMenu>
 				</Button.ContextMenu>
@@ -83,7 +83,7 @@
 				Margin="12 10 0 3"
 				Grid.Column="0"
 				Grid.Row="0"
-				Click="btnSetDefaultBindings_OnClick"
+				Click="BtnSetDefaultBindings_OnClick"
 				Content="{l:Translate btnSetDefaultBindings}"
 				IsVisible="{Binding !ShowPresets}"
 			/>
@@ -92,7 +92,7 @@
 				Margin="12 10 0 3"
 				Grid.Column="0"
 				Grid.Row="1"
-				Click="btnClearBindings_OnClick"
+				Click="BtnClearBindings_OnClick"
 				Content="{l:Translate btnClear}"
 			/>
 
@@ -106,8 +106,8 @@
 			</StackPanel>
 
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5 10 5 3" Grid.Column="2" Grid.Row="1">
-				<Button MinWidth="70" HorizontalContentAlignment="Center" Click="btnOk_OnClick" Content="{l:Translate btnOK}" />
-				<Button MinWidth="70" HorizontalContentAlignment="Center" Click="btnCancel_OnClick" Content="{l:Translate btnCancel}" />
+				<Button MinWidth="70" HorizontalContentAlignment="Center" Click="BtnOk_OnClick" Content="{l:Translate btnOK}" />
+				<Button MinWidth="70" HorizontalContentAlignment="Center" Click="BtnCancel_OnClick" Content="{l:Translate btnCancel}" />
 			</StackPanel>
 		</Grid>
 

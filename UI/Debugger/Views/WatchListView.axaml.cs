@@ -20,6 +20,7 @@ namespace Mesen.Debugger.Views
 		public WatchListViewModel Model => (WatchListViewModel)DataContext!;
 
 		private DataBox _grid;
+		bool _inSelectionChanged = false;
 
 		public WatchListView()
 		{
@@ -43,14 +44,13 @@ namespace Mesen.Debugger.Views
 			base.OnDataContextChanged(e);
 		}
 
-		bool inSelectionChanged = false;
 		private void Selection_SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs<WatchValueInfo> e)
 		{
-			if(inSelectionChanged || Model == null || !IsKeyboardFocusWithin) {
+			if(_inSelectionChanged || Model == null || !IsKeyboardFocusWithin) {
 				return;
 			}
 
-			inSelectionChanged = true;
+			_inSelectionChanged = true;
 			if(Model.Selection.Count == 1) {
 				Dispatcher.UIThread.Post(() => {
 					int index = Model.Selection.SelectedIndex;
@@ -64,7 +64,7 @@ namespace Mesen.Debugger.Views
 					Model.Selection.Select(0);
 				});
 			}
-			inSelectionChanged = false;
+			_inSelectionChanged = false;
 		}
 
 		private void OnEntryContextRequested(object? sender, ContextRequestedEventArgs e)

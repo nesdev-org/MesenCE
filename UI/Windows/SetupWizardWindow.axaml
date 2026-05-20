@@ -44,13 +44,13 @@
 					Cursor="Hand"
 					DockPanel.Dock="Left"
 					VerticalAlignment="Center"
-					Tapped="lblCancel_Tapped"
+					Tapped="LblCancel_Tapped"
 				/>
 				<Button
 					MinWidth="70"
 					HorizontalAlignment="Right"
 					HorizontalContentAlignment="Center"
-					Click="btnOk_OnClick"
+					Click="BtnOk_OnClick"
 					Content="{l:Translate btnOk}"
 				/>
 			</DockPanel>

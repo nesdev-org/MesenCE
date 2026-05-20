@@ -198,7 +198,7 @@ namespace Mesen.Debugger.ViewModels
 
 	public class RegEntry : INotifyPropertyChanged
 	{
-		private static ISolidColorBrush HeaderBgBrush = new SolidColorBrush(0x40B0B0B0);
+		private readonly static ISolidColorBrush HeaderBgBrush = new SolidColorBrush(0x40B0B0B0);
 
 		public string Address { get; private set; }
 		public string Name { get; private set; }

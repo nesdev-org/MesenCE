@@ -141,9 +141,9 @@ namespace Mesen.Debugger.ViewModels
 	public class FunctionViewModel : INotifyPropertyChanged
 	{
 		private string _format;
+		private CpuType _cpuType;
 
 		public AddressInfo FuncAddr { get; private set; }
-		public CpuType _cpuType;
 
 		public string AbsAddressDisplay { get; }
 		public int AbsAddress => FuncAddr.Address;

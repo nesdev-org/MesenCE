@@ -253,7 +253,7 @@ public abstract class SdccSymbolImporter : ISymbolProvider
 		}
 	}
 
-	private record MemAddress(int addr, MemoryType type);
+	private record MemAddress(int Addr, MemoryType Type);
 
 	private void LoadSymFile(string path, Dictionary<string, CodeLabel> labels)
 	{

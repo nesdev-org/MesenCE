@@ -46,7 +46,7 @@ namespace Mesen.Utilities
 			_usesSoftwareRenderer = usesSoftwareRenderer;
 
 			_timer.Interval = TimeSpan.FromMilliseconds(15);
-			_timer.Tick += tmrProcessMouse;
+			_timer.Tick += TmrProcessMouse;
 			_timer.Start();
 		}
 
@@ -55,7 +55,7 @@ namespace Mesen.Utilities
 			return _mainMenu.IsPointerOver || MenuHelper.IsPointerInMenu(_mainMenu.MainMenu);
 		}
 
-		private void tmrProcessMouse(object? sender, EventArgs e)
+		private void TmrProcessMouse(object? sender, EventArgs e)
 		{
 			UpdateMainMenuVisibility();
 
@@ -278,7 +278,7 @@ namespace Mesen.Utilities
 		public void Dispose()
 		{
 			if(_timer is DispatcherTimer timer) {
-				timer.Tick -= tmrProcessMouse;
+				timer.Tick -= TmrProcessMouse;
 				timer.Stop();
 			}
 		}

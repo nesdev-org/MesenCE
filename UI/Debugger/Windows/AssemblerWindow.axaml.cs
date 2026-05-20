@@ -57,8 +57,8 @@ namespace Mesen.Debugger.Windows
 				return;
 			}
 
-			_textEditor.TemplateApplied += textEditor_TemplateApplied;
-			_hexView.TemplateApplied += hexView_TemplateApplied;
+			_textEditor.TemplateApplied += TextEditor_TemplateApplied;
+			_hexView.TemplateApplied += HexView_TemplateApplied;
 
 			_textEditor.SyntaxHighlighting = _highlighting;
 
@@ -96,22 +96,22 @@ namespace Mesen.Debugger.Windows
 			_model.Config.SaveWindowSettings(this);
 		}
 
-		private void hexView_TemplateApplied(object? sender, Avalonia.Controls.Primitives.TemplateAppliedEventArgs e)
+		private void HexView_TemplateApplied(object? sender, Avalonia.Controls.Primitives.TemplateAppliedEventArgs e)
 		{
-			_hexView.ScrollChanged += hexView_ScrollChanged;
+			_hexView.ScrollChanged += HexView_ScrollChanged;
 		}
 
-		private void textEditor_TemplateApplied(object? sender, Avalonia.Controls.Primitives.TemplateAppliedEventArgs e)
+		private void TextEditor_TemplateApplied(object? sender, Avalonia.Controls.Primitives.TemplateAppliedEventArgs e)
 		{
-			_textEditor.ScrollChanged += textEditor_ScrollChanged;
+			_textEditor.ScrollChanged += TextEditor_ScrollChanged;
 		}
 
-		private void hexView_ScrollChanged(object? sender, ScrollChangedEventArgs e)
+		private void HexView_ScrollChanged(object? sender, ScrollChangedEventArgs e)
 		{
 			_textEditor.VerticalScrollBarValue = _hexView.VerticalScrollBarValue;
 		}
 
-		private void textEditor_ScrollChanged(object? sender, ScrollChangedEventArgs e)
+		private void TextEditor_ScrollChanged(object? sender, ScrollChangedEventArgs e)
 		{
 			_hexView.VerticalScrollBarValue = _textEditor.VerticalScrollBarValue;
 		}

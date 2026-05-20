@@ -64,7 +64,7 @@ namespace Mesen.ViewModels
 			}
 
 			_listener = AddDisposable(new NotificationListener());
-			_listener.OnNotification += listener_OnNotification;
+			_listener.OnNotification += Listener_OnNotification;
 
 			AddDisposable(Input);
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
@@ -73,7 +73,7 @@ namespace Mesen.ViewModels
 			AddDisposable(this.WhenAnyValue(x => x.Config.StereoFilter).Select(x => x == StereoFilter.CombFilter).ToPropertyEx(this, x => x.IsCombStereoEffect));
 		}
 
-		private void listener_OnNotification(NotificationEventArgs e)
+		private void Listener_OnNotification(NotificationEventArgs e)
 		{
 			if(e.NotificationType == ConsoleNotificationType.RequestConfigChange) {
 				//Update configuration when game is loaded

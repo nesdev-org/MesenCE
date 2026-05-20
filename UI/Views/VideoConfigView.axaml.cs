@@ -19,7 +19,7 @@ namespace Mesen.Views
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void btnPreset_OnClick(object sender, RoutedEventArgs e)
+		private void BtnPreset_OnClick(object sender, RoutedEventArgs e)
 		{
 			((Button)sender).ContextMenu?.Open();
 		}

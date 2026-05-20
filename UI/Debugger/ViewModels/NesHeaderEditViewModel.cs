@@ -189,7 +189,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		[Reactive] public UInt64 ChrRom { get; set; }
 		[Reactive] public RomSizeUnit ChrRomUnit { get; set; }
 
-		[Reactive] public iNesMirroringType Mirroring { get; set; }
+		[Reactive] public MirroringType Mirroring { get; set; }
 
 		[Reactive] public FrameTiming Timing { get; set; }
 		[Reactive] public TvSystem System { get; set; }
@@ -382,14 +382,14 @@ public class NesHeaderEditViewModel : DisposableViewModel
 	private class BinaryHeader
 	{
 		private byte[] _bytes;
-		private byte PrgCount;
-		private byte ChrCount;
+		private byte _prgCount;
+		private byte _chrCount;
 
 		public BinaryHeader(byte[] bytes)
 		{
 			_bytes = bytes;
-			PrgCount = bytes[4];
-			ChrCount = bytes[5];
+			_prgCount = bytes[4];
+			_chrCount = bytes[5];
 		}
 
 		public RomHeaderVersion GetRomHeaderVersion()
@@ -465,15 +465,15 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		{
 			if(GetRomHeaderVersion() == RomHeaderVersion.Nes2_0) {
 				if((_bytes[9] & 0x0F) == 0x0F) {
-					return GetSizeValue(PrgCount >> 2, PrgCount & 0x03);
+					return GetSizeValue(_prgCount >> 2, _prgCount & 0x03);
 				} else {
-					return (UInt64)(((_bytes[9] & 0x0F) << 8) | PrgCount) * 16 * 1024;
+					return (UInt64)(((_bytes[9] & 0x0F) << 8) | _prgCount) * 16 * 1024;
 				}
 			} else {
-				if(PrgCount == 0) {
+				if(_prgCount == 0) {
 					return 256 * 16 * 1024; //0 is a special value and means 256
 				} else {
-					return (UInt64)PrgCount * 16 * 1024;
+					return (UInt64)_prgCount * 16 * 1024;
 				}
 			}
 		}
@@ -482,12 +482,12 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		{
 			if(GetRomHeaderVersion() == RomHeaderVersion.Nes2_0) {
 				if((_bytes[9] & 0xF0) == 0xF0) {
-					return GetSizeValue(ChrCount >> 2, ChrCount & 0x03);
+					return GetSizeValue(_chrCount >> 2, _chrCount & 0x03);
 				} else {
-					return (UInt64)(((_bytes[9] & 0xF0) << 4) | ChrCount) * 8 * 1024;
+					return (UInt64)(((_bytes[9] & 0xF0) << 4) | _chrCount) * 8 * 1024;
 				}
 			} else {
-				return (UInt64)ChrCount * 8 * 1024;
+				return (UInt64)_chrCount * 8 * 1024;
 			}
 		}
 
@@ -536,12 +536,12 @@ public class NesHeaderEditViewModel : DisposableViewModel
 			}
 		}
 
-		public iNesMirroringType GetMirroringType()
+		public MirroringType GetMirroringType()
 		{
 			if((_bytes[6] & 0x08) != 0) {
-				return iNesMirroringType.FourScreens;
+				return MirroringType.FourScreens;
 			} else {
-				return (_bytes[6] & 0x01) != 0 ? iNesMirroringType.Vertical : iNesMirroringType.Horizontal;
+				return (_bytes[6] & 0x01) != 0 ? MirroringType.Vertical : MirroringType.Horizontal;
 			}
 		}
 
@@ -581,7 +581,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		Nes2_0 = 1
 	}
 
-	public enum iNesMirroringType
+	public enum MirroringType
 	{
 		Horizontal = 0,
 		Vertical = 1,

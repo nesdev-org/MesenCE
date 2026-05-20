@@ -49,7 +49,7 @@ namespace Mesen.Debugger.Integration
 		private Dictionary<int, LineInfo?[]> _linesByFile = new Dictionary<int, LineInfo?[]>();
 		private Dictionary<string, int> _prgAddressByLine = new Dictionary<string, int>();
 		private Dictionary<string, int> _prgAddressEndByLine = new Dictionary<string, int>();
-		protected HashSet<int> _scopeSpans = new HashSet<int>();
+		private HashSet<int> _scopeSpans = new HashSet<int>();
 
 		private Dictionary<int, ScopeInfo> _scopesBySymbol = new Dictionary<int, ScopeInfo>();
 

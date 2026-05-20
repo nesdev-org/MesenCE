@@ -27,12 +27,12 @@ namespace Mesen.Views
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void btnResetLagCounter_OnClick(object sender, RoutedEventArgs e)
+		private void BtnResetLagCounter_OnClick(object sender, RoutedEventArgs e)
 		{
 			InputApi.ResetLagCounter();
 		}
 
-		private void btnChangeStorageFolder_OnClick(object sender, RoutedEventArgs e)
+		private void BtnChangeStorageFolder_OnClick(object sender, RoutedEventArgs e)
 		{
 			ShowSelectFolderWindow();
 		}

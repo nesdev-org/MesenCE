@@ -38,8 +38,6 @@ namespace Mesen.ViewModels
 		[Reactive] public List<object> DebugMenuItems { get; set; } = new();
 		[Reactive] public List<object> HelpMenuItems { get; set; } = new();
 
-		[Reactive] private List<object> _netPlayControllers { get; set; } = new();
-
 		private RomInfo RomInfo => MainWindow.RomInfo;
 		private bool IsGameRunning => RomInfo.Format != RomFormat.Unknown;
 		private bool IsFdsGame => RomInfo.Format == RomFormat.Fds;
@@ -62,7 +60,7 @@ namespace Mesen.ViewModels
 		{
 			if(_cfgWindow == null) {
 				_cfgWindow = new ConfigWindow(tab);
-				_cfgWindow.Closed += cfgWindow_Closed;
+				_cfgWindow.Closed += CfgWindow_Closed;
 				_cfgWindow.ShowCentered((Control)wnd);
 			} else {
 				(_cfgWindow.DataContext as ConfigViewModel)!.SelectTab(tab);
@@ -70,7 +68,7 @@ namespace Mesen.ViewModels
 			}
 		}
 
-		private void cfgWindow_Closed(object? sender, EventArgs e)
+		private void CfgWindow_Closed(object? sender, EventArgs e)
 		{
 			_cfgWindow = null;
 			if(ConfigManager.Config.Preferences.GameSelectionScreenMode == GameSelectionMode.Disabled && MainWindow.RecentGames.Visible) {
@@ -863,7 +861,7 @@ namespace Mesen.ViewModels
 			_selectControllerAction = new MainMenuAction() {
 				ActionType = ActionType.SelectController,
 				IsEnabled = () => NetplayApi.IsConnected() || NetplayApi.IsServerRunning(),
-				SubActions = _netPlayControllers
+				SubActions = new()
 			};
 
 			return new MainMenuAction() {

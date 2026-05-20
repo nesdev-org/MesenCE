@@ -46,8 +46,8 @@ namespace Mesen.Debugger.Windows
 			}
 
 			_model.Config.LoadWindowSettings(this);
-			_editor.ByteUpdated += editor_ByteUpdated;
-			_editor.PointerMoved += editor_PointerMoved;
+			_editor.ByteUpdated += Editor_ByteUpdated;
+			_editor.PointerMoved += Editor_PointerMoved;
 		}
 
 		public static void ShowInMemoryTools(MemoryType memType, int address)
@@ -98,7 +98,7 @@ namespace Mesen.Debugger.Windows
 			_model.Config.ShowOptionPanel = !_model.Config.ShowOptionPanel;
 		}
 
-		private void editor_PointerMoved(object? sender, PointerEventArgs e)
+		private void Editor_PointerMoved(object? sender, PointerEventArgs e)
 		{
 			Point point = e.GetPosition(_editor);
 			if(point == _prevMousePos) {
@@ -143,7 +143,7 @@ namespace Mesen.Debugger.Windows
 			_prevByteOffset = byteOffset;
 		}
 
-		private void editor_ByteUpdated(object? sender, ByteUpdatedEventArgs e)
+		private void Editor_ByteUpdated(object? sender, ByteUpdatedEventArgs e)
 		{
 			if(e.Values != null) {
 				DebugApi.SetMemoryValues(_model.Config.MemoryType, (uint)e.ByteOffset, e.Values, e.Values.Length);

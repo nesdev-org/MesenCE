@@ -130,11 +130,11 @@ namespace Mesen.Debugger.Controls
 		{
 			base.OnAttachedToVisualTree(e);
 			_timer.Interval = TimeSpan.FromMilliseconds(100);
-			_timer.Tick += timer_Tick;
+			_timer.Tick += Timer_Tick;
 			_timer.Start();
 		}
 
-		private void timer_Tick(object? sender, EventArgs e)
+		private void Timer_Tick(object? sender, EventArgs e)
 		{
 			if(SelectionMode != PaletteSelectionMode.None) {
 				InvalidateVisual();

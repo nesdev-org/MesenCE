@@ -218,12 +218,12 @@ namespace Mesen.Debugger.Controls
 		{
 			base.OnAttachedToVisualTree(e);
 			_timer.Interval = TimeSpan.FromMilliseconds(250);
-			_timer.Tick += timer_Tick;
+			_timer.Tick += Timer_Tick;
 			_timer.Start();
 			UpdateSize();
 		}
 
-		private void timer_Tick(object? sender, EventArgs e)
+		private void Timer_Tick(object? sender, EventArgs e)
 		{
 			if(SelectionRect != default) {
 				InvalidateVisual();

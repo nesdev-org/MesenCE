@@ -68,7 +68,7 @@ namespace Mesen.Controls
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private async void btnSetup_Click(object sender, RoutedEventArgs e)
+		private async void BtnSetup_Click(object sender, RoutedEventArgs e)
 		{
 			Button btn = (Button)sender;
 

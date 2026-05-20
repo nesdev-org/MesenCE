@@ -94,7 +94,7 @@ namespace Mesen.Windows
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void btnOk_OnClick(object? sender, RoutedEventArgs e)
+		private void BtnOk_OnClick(object? sender, RoutedEventArgs e)
 		{
 			Close();
 		}

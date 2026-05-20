@@ -23,7 +23,7 @@ namespace Mesen.Windows
 		private DispatcherTimer _timer;
 
 		private List<UInt16> _prevScanCodes = new List<UInt16>();
-		private TextBlock lblCurrentKey;
+		private TextBlock _lblCurrentKey;
 		private bool _allowKeyboardOnly;
 
 		private Stopwatch _stopWatch = Stopwatch.StartNew();
@@ -48,7 +48,7 @@ namespace Mesen.Windows
 
 			InitializeComponent();
 
-			lblCurrentKey = this.GetControl<TextBlock>("lblCurrentKey");
+			_lblCurrentKey = this.GetControl<TextBlock>("lblCurrentKey");
 
 			_timer = new DispatcherTimer(TimeSpan.FromMilliseconds(25), DispatcherPriority.Normal, (s, e) => UpdateKeyDisplay());
 			_timer.Start();
@@ -104,8 +104,8 @@ namespace Mesen.Windows
 		{
 			base.OnOpened(e);
 
-			lblCurrentKey.IsVisible = !this.SingleKeyMode;
-			lblCurrentKey.Height = this.SingleKeyMode ? 0 : 40;
+			_lblCurrentKey.IsVisible = !this.SingleKeyMode;
+			_lblCurrentKey.Height = this.SingleKeyMode ? 0 : 40;
 
 			ShortcutKey = new KeyCombination();
 			InputApi.UpdateInputDevices();

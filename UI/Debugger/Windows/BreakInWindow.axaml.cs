@@ -12,8 +12,8 @@ namespace Mesen.Debugger.Windows
 {
 	public class BreakInWindow : MesenWindow
 	{
-		public static int _lastValue { get; set; } = 0;
-		public static StepType _lastStepType { get; set; } = StepType.Step;
+		private static int _lastValue = 0;
+		private static StepType _lastStepType = StepType.Step;
 
 		public static readonly StyledProperty<int> ValueProperty = AvaloniaProperty.Register<BreakInWindow, int>(nameof(Value), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 		public static readonly StyledProperty<StepType> StepTypeProperty = AvaloniaProperty.Register<BreakInWindow, StepType>(nameof(StepType));

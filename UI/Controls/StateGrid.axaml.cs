@@ -113,7 +113,7 @@ namespace Mesen.Controls
 			InitializeComponent();
 			Focusable = true;
 			_timerInput.Interval = TimeSpan.FromMilliseconds(50);
-			_timerInput.Tick += timerInput_Tick;
+			_timerInput.Tick += TimerInput_Tick;
 		}
 
 		private void InitializeComponent()
@@ -246,7 +246,7 @@ namespace Mesen.Controls
 		private bool _loadRequested = false;
 		private HashSet<ushort> _pressedKeyCodes = new();
 
-		private void timerInput_Tick(object? sender, EventArgs e)
+		private void TimerInput_Tick(object? sender, EventArgs e)
 		{
 			if(!IsEffectivelyVisible || !IsKeyboardFocusWithin || Entries == null || Entries.Count == 0) {
 				_loadRequested = false;

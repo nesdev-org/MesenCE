@@ -38,7 +38,7 @@ namespace Mesen.Views
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void mnuTools_Opened(object sender, RoutedEventArgs e)
+		private void MnuTools_Opened(object sender, RoutedEventArgs e)
 		{
 			if(DataContext is MainMenuViewModel model) {
 				if(model.UpdateNetplayMenu() && e.Source is MenuItem item) {

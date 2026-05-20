@@ -222,7 +222,7 @@ namespace Mesen.Windows
 			ConfigManager.Config.Debug.Fonts.ApplyConfig();
 
 			_timerBackgroundFlag.Interval = TimeSpan.FromMilliseconds(100);
-			_timerBackgroundFlag.Tick += timerUpdateBackgroundFlag;
+			_timerBackgroundFlag.Tick += TimerUpdateBackgroundFlag;
 			_timerBackgroundFlag.Start();
 
 			//Give focus to panel to avoid menu being given focus by default
@@ -729,7 +729,7 @@ namespace Mesen.Windows
 			}
 		}
 
-		private void timerUpdateBackgroundFlag(object? sender, EventArgs e)
+		private void TimerUpdateBackgroundFlag(object? sender, EventArgs e)
 		{
 			Window? activeWindow = ApplicationHelper.GetActiveWindow();
 

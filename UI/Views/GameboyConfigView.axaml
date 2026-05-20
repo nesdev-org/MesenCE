@@ -144,14 +144,14 @@
 							<Button
 								Grid.Column="2"
 								Content="{l:Translate btnSelectPreset}"
-								Click="btnSelectPreset_OnClick"
+								Click="BtnSelectPreset_OnClick"
 							>
 								<Button.ContextMenu>
 									<ContextMenu Placement="BottomEdgeAlignedLeft">
-										<MenuItem Header="{l:Translate lblGrayscale}" Click="mnuGrayscalePreset_Click" />
-										<MenuItem Header="{l:Translate lblGrayscaleHighContrast}" Click="mnuGrayscaleHighContrastPreset_Click" />
-										<MenuItem Header="{l:Translate lblGreen}" Click="mnuGreenPreset_Click" />
-										<MenuItem Header="{l:Translate lblBrown}" Click="mnuBrownPreset_Click" />
+										<MenuItem Header="{l:Translate lblGrayscale}" Click="MnuGrayscalePreset_Click" />
+										<MenuItem Header="{l:Translate lblGrayscaleHighContrast}" Click="MnuGrayscaleHighContrastPreset_Click" />
+										<MenuItem Header="{l:Translate lblGreen}" Click="MnuGreenPreset_Click" />
+										<MenuItem Header="{l:Translate lblBrown}" Click="MnuBrownPreset_Click" />
 									</ContextMenu>
 								</Button.ContextMenu>
 							</Button>

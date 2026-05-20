@@ -18,7 +18,7 @@ namespace Mesen.Debugger.Views
 			InitializeComponent();
 
 			_txtSearch = this.GetControl<TextBox>("txtSearch");
-			_txtSearch.KeyDown += txtSearch_KeyDown;
+			_txtSearch.KeyDown += TxtSearch_KeyDown;
 		}
 
 		private void InitializeComponent()
@@ -50,7 +50,7 @@ namespace Mesen.Debugger.Views
 			}
 		}
 
-		private void txtSearch_KeyDown(object? sender, KeyEventArgs e)
+		private void TxtSearch_KeyDown(object? sender, KeyEventArgs e)
 		{
 			if(e.Key == Key.Enter) {
 				_model?.FindNext();

@@ -13,7 +13,7 @@ namespace Mesen.Windows
 {
 	public class InputBarcodeWindow : MesenWindow
 	{
-		private static string _lastBarcode { get; set; } = "";
+		private static string _lastBarcode = "";
 
 		public static readonly StyledProperty<string> BarcodeProperty = AvaloniaProperty.Register<InputBarcodeWindow, string>(nameof(Barcode), "");
 

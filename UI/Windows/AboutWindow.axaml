@@ -86,7 +86,7 @@
 				MinWidth="70"
 				HorizontalContentAlignment="Center"
 				IsCancel="True"
-				Click="btnOk_OnClick"
+				Click="BtnOk_OnClick"
 				Content="{l:Translate btnOk}"
 			/>
 		</StackPanel>
