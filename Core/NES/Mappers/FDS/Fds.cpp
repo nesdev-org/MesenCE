@@ -256,7 +256,7 @@ void Fds::ProcessAutoDiskInsert()
 
 /**TODO:
  - Proper byte transfer flag handling (set every 1792 master cycles, or 149+1/3 CPU cycles, under normal conditions)
-   - Should allow for accurate handling of level 2->3 load bug in Ai Senshi Nicol
+	- Should allow for accurate handling of level 2->3 load bug in Ai Senshi Nicol
  - Proper CRC handling using $4025 bits 4 and 6
  - Verify End of Head handling (may affect Kosodate Gokko and FMC Disk Card Checker)
  - DRAM refresh watchdog implementation (must track PRG-RAM vs external access cycles...)
@@ -405,10 +405,10 @@ void Fds::SetFdsControlReg(uint8_t value)
 	SetMirroringType(value & 0x08 ? MirroringType::Horizontal : MirroringType::Vertical);
 	_crcControl = (value & 0x10) == 0x10;
 	//TODO $4025 bit 5 is unknown, all known software sets it to 1
-	
+
 	_diskReady = (value & 0x40) == 0x40; //TODO $4025 bit 6 is CRC enable, not disk ready flag
 	_diskIrqEnabled = (value & 0x80) == 0x80;
-	
+
 	//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
 	//Fixes issues in some unlicensed games (error $20 at power on)
 	//TODO This probably depends on the bits set?
@@ -420,7 +420,7 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 	if(!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) {
 		return;
 	}
-	
+
 	/**Only $4080 (volume envelope) seems to consistently deny writes during audio reset
 	TODO:
 	 - $4085 (mod counter) denies writes too, but there is an unknown delay before being forced to 0
@@ -464,7 +464,7 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			}
-			
+
 			/**TODO Determine/implement audio reset behaviour, should probably go in FdsAudio:
 			 - Proper method of resetting modulation state ($4085 write below doesn't always work)
 			 - Reset wave accumulator to 0
@@ -677,7 +677,7 @@ bool Fds::IsAutoInsertDiskEnabled()
 vector<MapperStateEntry> Fds::GetMapperStateEntries()
 {
 	vector<MapperStateEntry> entries;
-	
+
 	entries.push_back(MapperStateEntry("", "IRQ"));
 	entries.push_back(MapperStateEntry("$4020-$4022", "Timer IRQ"));
 	entries.push_back(MapperStateEntry("$4020/1", "IRQ Reload Value", _irqReloadValue, MapperStateValueType::Number16));
@@ -698,7 +698,7 @@ vector<MapperStateEntry> Fds::GetMapperStateEntries()
 	entries.push_back(MapperStateEntry("$4025.4", "Transfer CRC", _crcControl, MapperStateValueType::Bool));
 	//entries.push_back(MapperStateEntry("$4025.6", "CRC Enabled", _crcEnabled, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4025.7", "Disk IRQ Enabled", _diskIrqEnabled, MapperStateValueType::Bool));
-	
+
 	entries.push_back(MapperStateEntry("$4030", "Drive/IRQ Status"));
 	entries.push_back(MapperStateEntry("$4030.0", "Timer IRQ", _cpu->HasIrqSource(IRQSource::External), MapperStateValueType::Bool));
 	//entries.push_back(MapperStateEntry("$4030.1", "DRAM Refresh Watchdog IRQ", false, MapperStateValueType::Bool));
@@ -706,7 +706,7 @@ vector<MapperStateEntry> Fds::GetMapperStateEntries()
 	entries.push_back(MapperStateEntry("$4030.5", "CRC Error", (_useQdFormat && _badCrc), MapperStateValueType::Bool));
 	//entries.push_back(MapperStateEntry("$4030.6", "End of Head", _endOfHead, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4030.7", "Byte Transferred", _transferComplete, MapperStateValueType::Bool));
-	
+
 	entries.push_back(MapperStateEntry("$4024/$4031", "Disk Data"));
 	entries.push_back(MapperStateEntry("$4024", "Disk Data Output", _writeDataReg, MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4031", "Disk Data Input", _readDataReg, MapperStateValueType::Number8));

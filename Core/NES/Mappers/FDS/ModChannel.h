@@ -142,12 +142,12 @@ public:
 	{
 		return _modulationDisabled;
 	}
-	
+
 	uint32_t GetModAccumulator()
 	{
 		return (_modTablePosition << 12) | _overflowCounter;
 	}
-	
+
 	int8_t GetModIncrement()
 	{
 		int16_t offset = _modLut[_modTable[_modTablePosition]];

@@ -239,8 +239,8 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4089.7", "Wave Write Enabled", _waveWriteEnabled, MapperStateValueType::Bool));
 
 	entries.push_back(MapperStateEntry("$408A", "Envelope Speed Multiplier", _volume.GetMasterSpeed(), MapperStateValueType::Number8));
-	
-entries.push_back(MapperStateEntry("$4090-$4097", "Audio Debug"));
+
+	entries.push_back(MapperStateEntry("$4090-$4097", "Audio Debug"));
 	entries.push_back(MapperStateEntry("$4090.0-5", "Volume Gain", _volume.GetGain(), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4091", "Wave Accumulator", ((GetWaveAccumulator() >> 12) & 0xFF), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4092.0-5", "Mod Gain", _mod.GetGain(), MapperStateValueType::Number8));
