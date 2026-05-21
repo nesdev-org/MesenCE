@@ -678,14 +678,13 @@ vector<MapperStateEntry> Fds::GetMapperStateEntries()
 {
 	vector<MapperStateEntry> entries;
 
-	entries.push_back(MapperStateEntry("", "IRQ"));
-	entries.push_back(MapperStateEntry("$4020-$4022", "Timer IRQ"));
+	entries.push_back(MapperStateEntry("", "Timer IRQ"));
 	entries.push_back(MapperStateEntry("$4020/1", "IRQ Reload Value", _irqReloadValue, MapperStateValueType::Number16));
 	entries.push_back(MapperStateEntry("$4022.0", "IRQ Repeat", _irqRepeatEnabled, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4022.1", "IRQ Enabled", _irqEnabled, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("", "IRQ Counter", _irqCounter, MapperStateValueType::Number16));
 
-	entries.push_back(MapperStateEntry("$4023", "I/O Control"));
+	entries.push_back(MapperStateEntry("", "I/O Control"));
 	entries.push_back(MapperStateEntry("$4023.0", "Disk Registers Enabled", _diskRegEnabled, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4023.1", "Audio Enabled", _soundRegEnabled, MapperStateValueType::Bool));
 
