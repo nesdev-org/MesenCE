@@ -111,6 +111,6 @@ public:
 
 	void ResetTimer()
 	{
-		_timer = 8 * (_speed + 1) * _masterSpeed;
+		_timer = 8 * (_speed + 1) * (_masterSpeed + 1);
 	}
 };
