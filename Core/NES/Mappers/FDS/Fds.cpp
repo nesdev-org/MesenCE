@@ -415,7 +415,16 @@ void Fds::SetFdsControlReg(uint8_t value)
 
 void Fds::WriteRegister(uint16_t addr, uint8_t value)
 {
-	if((!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) || (!_soundRegEnabled && addr >= 0x4040)) {
+	if(!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) {
+		return;
+	}
+	
+	/**Only $4080 (volume envelope) seems to consistently deny writes during audio reset
+	TODO:
+	 - $4085 (mod counter) denies writes too, but there is an unknown delay before being forced to 0
+	 - Determine $4088 (mod table write) behaviour while in audio reset state
+	**/
+	if(!_soundRegEnabled && (addr == 0x4080 || addr == 0x4085 || addr == 0x4088)) {
 		return;
 	}
 
@@ -441,7 +450,7 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 
 		case 0x4023:
 			_diskRegEnabled = (value & 0x01) == 0x01;
-			//TODO Disabling sound registers should pause audio output?
+			//TODO This is actually an audio reset, rename this variable in Fds.h
 			_soundRegEnabled = (value & 0x02) == 0x02;
 
 			if(!_diskRegEnabled) {
@@ -452,6 +461,18 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 				_extConWriteReg = 0x7F;
 				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
+			}
+			
+			/**TODO Determine/implement audio reset behaviour, should probably go in FdsAudio:
+			 - Proper method of resetting modulation state ($4085 write below doesn't always work)
+			 - Reset wave accumulator to 0
+			 - Mod table appears to init with (or decay to) all 0s?
+			 - There seems to be some kind of analogue "resume" window?
+			(Ongoing research, please consult TakuikaNinja for further details)
+			**/
+			if(!_soundRegEnabled) {
+				_audio->WriteRegister(0x4080, 0x80); //Based on instant muting
+				_audio->WriteRegister(0x4085, 0x00); //Based on $4097 state
 			}
 			break;
 
