@@ -406,6 +406,11 @@ void Fds::SetFdsControlReg(uint8_t value)
 	//TODO $4025 bit 5 is unknown, all known software sets it to 1
 	_diskReady = (value & 0x40) == 0x40;
 	_diskIrqEnabled = (value & 0x80) == 0x80;
+	
+	//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
+	//Fixes issues in some unlicensed games (error $20 at power on)
+	//TODO This probably depends on the bits set?
+	_cpu->ClearIrqSource(IRQSource::FdsDisk);
 }
 
 void Fds::WriteRegister(uint16_t addr, uint8_t value)
@@ -454,20 +459,17 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			_writeDataReg = value;
 			_transferComplete = false;
 
-			//Unsure about clearing irq here: FCEUX/Nintendulator don't do this, puNES does.
+			//Needed by some Super Magic Card games, which use this IRQ for raster effects
 			_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			break;
 
 		case 0x4025:
 			SetFdsControlReg(value);
-
-			//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
-			//Fixes issues in some unlicensed games (error $20 at power on)
-			_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			break;
 
 		case 0x4026:
-			_extConWriteReg = value;
+			//External connector only wires 7 bits
+			_extConWriteReg = value & 0x7F;
 			break;
 
 		default:
@@ -499,9 +501,11 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				//value |= _endOfHead ? 0x40 : 0x00;
 				value |= _transferComplete ? 0x80 : 0x00;
 
-				_transferComplete = false;
 				_cpu->ClearIrqSource(IRQSource::External);
-				_cpu->ClearIrqSource(IRQSource::FdsDisk);
+
+				//Byte transfer flag is NOT cleared by this register!
+				//_transferComplete = false;
+				//_cpu->ClearIrqSource(IRQSource::FdsDisk);
 				return value;
 
 			case 0x4031:
