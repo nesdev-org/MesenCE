@@ -112,9 +112,9 @@ uint8_t FdsAudio::ReadRegister(uint16_t addr)
 				break;
 
 			case 0x4094:
-				//Mod counter*gain intermediate result
+				//Mod counter*gain intermediate result (bits 4-11)
 				//value &= 0xC0;
-				value = (_mod.GetOutput() >> 4) & 0xFF;
+				value = (_mod.GetCounter() * _mod.GetGain() >> 4) & 0xFF;
 				break;
 
 			case 0x4095:
@@ -245,7 +245,7 @@ entries.push_back(MapperStateEntry("$4090-$4097", "Audio Debug"));
 	entries.push_back(MapperStateEntry("$4091", "Wave Accumulator", ((GetWaveAccumulator() >> 12) & 0xFF), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4092.0-5", "Mod Gain", _mod.GetGain(), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4093.0-6", "Mod Accumulator", ((_mod.GetModAccumulator() >> 5) & 0x7F), MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4094", "Mod Counter * Gain", ((_mod.GetOutput() >> 4) & 0xFF), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4094", "Mod Counter * Gain", (((_mod.GetCounter() * _mod.GetGain()) >> 4) & 0xFF), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4095.0-3", "Mod Counter Increment", _mod.GetModIncrement(), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4096.0-5", "Wavetable Value", (_waveTable[_wavePosition] & 0x3F), MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4097.0-6", "Mod Counter Value", std::to_string(modCounter), (modCounter & 0x7F)));
