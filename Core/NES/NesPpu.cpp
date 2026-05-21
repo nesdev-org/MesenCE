@@ -1026,6 +1026,7 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				for(int i = 0; i < 8; i++) {
 					_spriteShifterList[i] += 1 << 4;
 				}
+				_nextSpriteShifterCycle++;
 			}
 		} else {
 			//If rendering is off, the sprites aren't put into counting mode, so make sure they're output+shift in case they got pattern data.
@@ -1060,10 +1061,13 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluationStart()
 template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 {
 	//Handle sprite shifter counting.
-	while((uint32_t)(_spriteShifterList[_nextSpriteShifter] >> 4) == _cycle) {
-		_activeSpriteShifters |= (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
-		_spriteShifterList[_nextSpriteShifter] = SpriteShifterDone;
-		_nextSpriteShifter++;
+	if(_nextSpriteShifterCycle == _cycle) {
+		while((uint32_t)(_spriteShifterList[_nextSpriteShifter] >> 4) == _cycle) {
+			_activeSpriteShifters |= (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
+			_spriteShifterList[_nextSpriteShifter] = SpriteShifterDone;
+			_nextSpriteShifter++;
+		}
+		_nextSpriteShifterCycle = _spriteShifterList[_nextSpriteShifter] >> 4;
 	}
 
 	if(_prevRenderingEnabled) {
@@ -1402,8 +1406,9 @@ template<class T> void NesPpu<T>::ProcessScanlineFirstCycle()
 
 	//Cycle = 0
 	if(_scanline < 240) {
-		_nextSpriteShifter = 0;
 		std::sort(_spriteShifterList, _spriteShifterList + 8);
+		_nextSpriteShifter = 0;
+		_nextSpriteShifterCycle = (_spriteShifterList[0] >> 4);
 
 		if(_scanline == -1) {
 			_statusFlags.SpriteOverflow = false;
@@ -1651,8 +1656,10 @@ template<class T> void NesPpu<T>::Serialize(Serializer& s)
 
 		SVArray(_spriteShifterList, 8);
 		SV(_nextSpriteShifter);
+		SV(_nextSpriteShifterCycle);
 		SV(_activeSpriteShifters);
 		SV(_dotSkipped);
+		SV(_processSprites);
 
 		SV(_oamCopyDone);
 		SV(_needStateUpdate);
