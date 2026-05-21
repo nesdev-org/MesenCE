@@ -39,6 +39,8 @@ protected:
 	void ClockAudio() override;
 	void UpdateOutput();
 
+	uint32_t GetWaveAccumulator();
+
 public:
 	FdsAudio(NesConsole* console);
 

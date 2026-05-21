@@ -66,6 +66,11 @@ void FdsAudio::UpdateOutput()
 	}
 }
 
+uint32_t FdsAudio::GetWaveAccumulator()
+{
+	return (_wavePosition << 18) | _waveOverflowCounter;
+}
+
 FdsAudio::FdsAudio(NesConsole* console) : BaseExpansionAudio(console)
 {
 }
@@ -82,12 +87,55 @@ uint8_t FdsAudio::ReadRegister(uint16_t addr)
 			//"When writing is disabled ($4089.7), reading anywhere in 4040-407F returns the value at the current wave position"
 			value |= _waveTable[_wavePosition];
 		}
-	} else if(addr == 0x4090) {
-		value &= 0xC0;
-		value |= _volume.GetGain();
-	} else if(addr == 0x4092) {
-		value &= 0xC0;
-		value |= _mod.GetGain();
+	} else if(addr >= 0x4090) {
+		switch(addr) {
+			case 0x4090:
+				value &= 0xC0;
+				value |= _volume.GetGain() & 0x3F;
+				break;
+
+			case 0x4091:
+				//Wave accumulator (bits 12-19)
+				//value &= 0xC0;
+				value = (GetWaveAccumulator() >> 12) & 0xFF;
+				break;
+
+			case 0x4092:
+				value &= 0xC0;
+				value |= _mod.GetGain() & 0x3F;
+				break;
+
+			case 0x4093:
+				//Mod accumulator (bits 5-11)
+				value &= 0x80;
+				value |= (_mod.GetModAccumulator() >> 5) & 0x7F;
+				break;
+
+			case 0x4094:
+				//Mod counter*gain intermediate result
+				//value &= 0xC0;
+				value = (_mod.GetOutput() >> 4) & 0xFF;
+				break;
+
+			case 0x4095:
+				//Mod counter increment (lower nybble)
+				//TODO Determine upper nybble
+				value &= 0xC0;
+				value |= _mod.GetModIncrement();
+				break;
+
+			case 0x4096:
+				//Wavetable value
+				//TODO PWM masking
+				value &= 0xC0;
+				value |= _waveTable[_wavePosition] & 0x3F;
+				break;
+
+			case 0x4097:
+				value &= 0x80;
+				value |= _mod.GetCounter() & 0x7F;
+				break;
+		}
 	}
 
 	return value;
@@ -175,7 +223,7 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4084.7", "Envelope Disabled", _mod.IsEnvelopeDisabled(), MapperStateValueType::Bool));
 
 	int8_t modCounter = _mod.GetCounter();
-	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), modCounter < 0 ? (modCounter + 128) : modCounter));
+	entries.push_back(MapperStateEntry("$4085.0-6", "Counter", std::to_string(modCounter), (modCounter & 0x7F)));
 
 	entries.push_back(MapperStateEntry("$4086/7.0-11", "Frequency", _mod.GetFrequency(), MapperStateValueType::Number16));
 
@@ -191,4 +239,14 @@ void FdsAudio::GetMapperStateEntries(vector<MapperStateEntry>& entries)
 	entries.push_back(MapperStateEntry("$4089.7", "Wave Write Enabled", _waveWriteEnabled, MapperStateValueType::Bool));
 
 	entries.push_back(MapperStateEntry("$408A", "Envelope Speed Multiplier", _volume.GetMasterSpeed(), MapperStateValueType::Number8));
+	
+entries.push_back(MapperStateEntry("$4090-$4097", "Audio Debug"));
+	entries.push_back(MapperStateEntry("$4090.0-5", "Volume Gain", _volume.GetGain(), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4091", "Wave Accumulator", ((GetWaveAccumulator() >> 12) & 0xFF), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4092.0-5", "Mod Gain", _mod.GetGain(), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4093.0-6", "Mod Accumulator", ((_mod.GetModAccumulator() >> 5) & 0x7F), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4094", "Mod Counter * Gain", ((_mod.GetOutput() >> 4) & 0xFF), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4095.0-3", "Mod Counter Increment", _mod.GetModIncrement(), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4096.0-5", "Wavetable Value", (_waveTable[_wavePosition] & 0x3F), MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4097.0-6", "Mod Counter Value", std::to_string(modCounter), (modCounter & 0x7F)));
 }
