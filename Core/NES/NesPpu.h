@@ -54,6 +54,7 @@ protected:
 
 	void ProcessScanlineFirstCycle();
 	__forceinline void ProcessScanlineImpl();
+	__forceinline void UpdateProcessSpritesFlag();
 	__forceinline void ProcessSpriteEvaluation();
 	__noinline void ProcessSpriteEvaluationStart();
 

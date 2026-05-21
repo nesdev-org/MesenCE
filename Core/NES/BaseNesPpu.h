@@ -91,7 +91,8 @@ protected:
 	uint16_t _spriteShifterList[9] = { SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone }; //Ordered by X coordinate.
 	uint8_t _nextSpriteShifter = 0;
 	uint8_t _activeSpriteShifters = 0;
-	uint8_t _dotSkipped = 0;
+	uint8_t _dotSkipped = false;
+	bool _processSprites = false;
 
 	Emulator* _emu = nullptr;
 	EmuSettings* _settings = nullptr;

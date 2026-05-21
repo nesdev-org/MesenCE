@@ -768,6 +768,7 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 		}
 
 		_spriteCount++;
+		_processSprites = true;
 	} else if(!extraSprite) {
 		info.LowByte = 0;
 		info.HighByte = 0;
@@ -849,67 +850,73 @@ template<class T> uint8_t NesPpu<T>::GetPixelColor()
 	int8_t spriteIndex = -1;
 	uint8_t spriteColor = 0;
 	//If the dot is skipped, all sprite shifters are active on the first dot of the scanline.
-	if((_spriteCount | _activeSpriteShifters | _dotSkipped) && _prevRenderingEnabled) {
-		uint8_t remainingShifters = _dotSkipped ? 0xff : _activeSpriteShifters;
-		_lastSprite = &_spriteTiles[BitUtilities::GetHighestBitIndex(_activeSpriteShifters)];
-
-		//Output and shift from all active sprite shifters.
-		while(remainingShifters) {
-			uint8_t i = BitUtilities::GetHighestBitIndex(remainingShifters);
-			remainingShifters &= ~(1 << i);
-
-			NesSpriteInfo& sprite = _spriteTiles[i];
-
-			//Get the color. We start with the lowest priority shifter first so the higher priority ones override it.
-			uint8_t currColor = ((sprite.HighByte >> 6) & 0x2) | (sprite.LowByte >> 7);
-			if(currColor != 0) {
-				spriteIndex = i;
-				spriteColor = currColor;
-				_lastSprite = &sprite;
-			}
-			sprite.HighByte <<= 1;
-			sprite.LowByte <<= 1;
-
-			//If the shifter is empty, deactivate it.
-			if(!(sprite.HighByte | sprite.LowByte)) {
-				_activeSpriteShifters &= ~(1 << i);
-			}
+	if(_processSprites) {
+		uint8_t remainingShifters = _activeSpriteShifters;
+		if(_dotSkipped) {
+			remainingShifters = 0xFF;
 		}
 
-		if(_cycle > _minimumDrawSpriteCycle && _mask.SpritesEnabled) {
-			if(_spriteCount > 8 && spriteColor == 0) {
-				for(spriteIndex = 8; spriteIndex < _spriteCount; spriteIndex++) {
-					NesSpriteInfo& sprite = _spriteTiles[spriteIndex];
-					uint32_t shift = (int32_t)_cycle - sprite.SpriteX - 1;
-					if(shift < 8) {
-						_lastSprite = &sprite;
-						spriteColor = ((sprite.LowByte << shift) & 0x80) >> 7 | ((sprite.HighByte << shift) & 0x80) >> 6;
-						if(spriteColor) {
-							break;
+		if(_prevRenderingEnabled) {
+			_lastSprite = &_spriteTiles[BitUtilities::GetHighestBitIndex(_activeSpriteShifters)];
+
+			//Output and shift from all active sprite shifters.
+			while(remainingShifters) {
+				uint8_t i = BitUtilities::GetHighestBitIndex(remainingShifters);
+				remainingShifters &= ~(1 << i);
+
+				NesSpriteInfo& sprite = _spriteTiles[i];
+
+				//Get the color. We start with the lowest priority shifter first so the higher priority ones override it.
+				uint8_t currColor = ((sprite.HighByte >> 6) & 0x2) | (sprite.LowByte >> 7);
+				if(currColor != 0) {
+					spriteIndex = i;
+					spriteColor = currColor;
+					_lastSprite = &sprite;
+				}
+				sprite.HighByte <<= 1;
+				sprite.LowByte <<= 1;
+
+				//If the shifter is empty, deactivate it.
+				if(!(sprite.HighByte | sprite.LowByte)) {
+					_activeSpriteShifters &= ~(1 << i);
+					UpdateProcessSpritesFlag();
+				}
+			}
+
+			if(_cycle > _minimumDrawSpriteCycle && _mask.SpritesEnabled) {
+				if(_spriteCount > 8 && spriteColor == 0) {
+					for(spriteIndex = 8; spriteIndex < _spriteCount; spriteIndex++) {
+						NesSpriteInfo& sprite = _spriteTiles[spriteIndex];
+						uint32_t shift = (int32_t)_cycle - sprite.SpriteX - 1;
+						if(shift < 8) {
+							_lastSprite = &sprite;
+							spriteColor = ((sprite.LowByte << shift) & 0x80) >> 7 | ((sprite.HighByte << shift) & 0x80) >> 6;
+							if(spriteColor) {
+								break;
+							}
 						}
 					}
 				}
-			}
 
-			if(spriteColor != 0) {
-				if(_sprite0Visible && spriteIndex == 0 && spriteColor != 0 && spriteBgColor != 0 && _cycle != 256 && _mask.BackgroundEnabled && !_statusFlags.Sprite0Hit && _cycle > _minimumDrawSpriteStandardCycle) {
-					//"The hit condition is basically sprite zero is in range AND the first sprite output unit is outputting a non-zero pixel AND the background drawing unit is outputting a non-zero pixel."
-					//"Sprite zero hits do not register at x=255" (cycle 256)
-					//"... provided that background and sprite rendering are both enabled"
-					//"Should always miss when Y >= 239"
-					_statusFlags.Sprite0Hit = true;
+				if(spriteColor != 0) {
+					if(_sprite0Visible && spriteIndex == 0 && spriteColor != 0 && spriteBgColor != 0 && _cycle != 256 && _mask.BackgroundEnabled && !_statusFlags.Sprite0Hit && _cycle > _minimumDrawSpriteStandardCycle) {
+						//"The hit condition is basically sprite zero is in range AND the first sprite output unit is outputting a non-zero pixel AND the background drawing unit is outputting a non-zero pixel."
+						//"Sprite zero hits do not register at x=255" (cycle 256)
+						//"... provided that background and sprite rendering are both enabled"
+						//"Should always miss when Y >= 239"
+						_statusFlags.Sprite0Hit = true;
 
-					_emu->AddDebugEvent<CpuType::Nes>(DebugEventType::SpriteZeroHit);
-				}
+						_emu->AddDebugEvent<CpuType::Nes>(DebugEventType::SpriteZeroHit);
+					}
 
-				if(_emulatorSpritesEnabled && (backgroundColor == 0 || !_spriteTiles[spriteIndex].BackgroundPriority)) {
-					//Check sprite priority
-					return _spriteTiles[spriteIndex].PaletteOffset + spriteColor;
+					if(_emulatorSpritesEnabled && (backgroundColor == 0 || !_spriteTiles[spriteIndex].BackgroundPriority)) {
+						//Check sprite priority
+						return _spriteTiles[spriteIndex].PaletteOffset + spriteColor;
+					}
 				}
 			}
 		}
 	}
-
 	return ((offset + ((_cycle - 1) & 0x07) < 8) ? _previousTilePalette : _currentTilePalette) + backgroundColor;
 }
 
@@ -1022,9 +1029,15 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			}
 		} else {
 			//If rendering is off, the sprites aren't put into counting mode, so make sure they're output+shift in case they got pattern data.
-			_activeSpriteShifters = 0xff;
+			_activeSpriteShifters = 0xFF;
 		}
+		UpdateProcessSpritesFlag();
 	}
+}
+
+template<class T> void NesPpu<T>::UpdateProcessSpritesFlag()
+{
+	_processSprites = _spriteCount || _activeSpriteShifters || _dotSkipped;
 }
 
 template<class T> void NesPpu<T>::ProcessSpriteEvaluationStart()
@@ -1047,7 +1060,7 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluationStart()
 template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 {
 	//Handle sprite shifter counting.
-	while(static_cast<uint32_t>(_spriteShifterList[_nextSpriteShifter] >> 4) == _cycle) {
+	while((uint32_t)(_spriteShifterList[_nextSpriteShifter] >> 4) == _cycle) {
 		_activeSpriteShifters |= (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
 		_spriteShifterList[_nextSpriteShifter] = SpriteShifterDone;
 		_nextSpriteShifter++;
