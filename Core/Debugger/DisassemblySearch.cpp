@@ -77,6 +77,9 @@ uint32_t DisassemblySearch::SearchDisassembly(CpuType cpuType, const char* searc
 			prevAddress = rows[i].CpuAddress;
 
 			_disassembler->GetLineData(rows[i], cpuType, memType, lineData);
+			if(lineData.Flags & LineFlags::BlockStart) {
+				continue;
+			}
 
 			if(TextContains(searchStr, lineData.Text, 1000, options)) {
 				searchResults[resultCount] = lineData;

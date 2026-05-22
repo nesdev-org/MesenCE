@@ -162,5 +162,13 @@ public class FindResultViewModel
 		if(line.EffectiveAddress >= 0) {
 			Text += " " + line.GetEffectiveAddressString(format, out _);
 		}
+
+		if(line.Comment.Length > 0) {
+			if(string.IsNullOrWhiteSpace(Text)) {
+				Text = line.Comment;
+			} else {
+				Text += " " + line.Comment;
+			}
+		}
 	}
 }

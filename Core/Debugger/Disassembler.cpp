@@ -314,10 +314,13 @@ void Disassembler::GetLineData(DisassemblyResult& row, CpuType type, MemoryType 
 {
 	data.Address = row.CpuAddress;
 	data.AbsoluteAddress = row.Address;
+	data.OpSize = 0;
+	data.Flags = row.Flags;
 	data.EffectiveAddress = {};
 	data.Value = 0;
-	data.Flags = row.Flags;
 	data.LineCpuType = type;
+	data.Text[0] = 0;
+	data.Comment[0] = 0;
 
 	//TODO move color logic to UI and complete missing data?
 
