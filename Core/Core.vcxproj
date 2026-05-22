@@ -29,6 +29,7 @@
     <ClInclude Include="NES\Mappers\Nintendo\CnromProtect.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper487.h" />
     <ClInclude Include="NES\OpnInterface.h" />
+    <ClInclude Include="Shared\Utilities\S3511ARtc.h" />
     <ClInclude Include="SNES\Input\AsciiTurboFileTwinStf.h" />
     <ClInclude Include="SNES\Input\AsciiTurboFileTwinTf2.h" />
     <ClInclude Include="Shared\Utilities\AvMergeUtilities.h" />
@@ -785,6 +786,7 @@
     <ClInclude Include="WS\APU\WsApuCh4.h" />
     <ClInclude Include="WS\APU\WsHyperVoice.h" />
     <ClInclude Include="WS\Carts\WsCart.h" />
+    <ClInclude Include="WS\Carts\WsRtc.h" />
     <ClInclude Include="WS\Debugger\DummyWsCpu.h" />
     <ClInclude Include="WS\Debugger\WsAssembler.h" />
     <ClInclude Include="WS\Debugger\WsDebugger.h" />

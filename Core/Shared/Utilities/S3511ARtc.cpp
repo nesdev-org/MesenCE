@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "S3511ARtc.h"
-#include "Utilities/Serializer.h"
-#include "Utilities/TimeUtilities.h"
+#include "Shared/Utilities/S3511ARtc.h"
 #include "Shared/Emulator.h"
 #include "Shared/BatteryManager.h"
+#include "Utilities/Serializer.h"
+#include "Utilities/TimeUtilities.h"
 
 S3511ARtc::S3511ARtc(Emulator* emu)
 {
