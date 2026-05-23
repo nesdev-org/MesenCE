@@ -454,17 +454,20 @@ template<class T> void NesPpu<T>::WriteRam(uint16_t addr, uint8_t value)
 			break;
 
 		case PpuRegisters::SpriteData:
-			if((_scanline >= 240 && (_region != ConsoleRegion::Pal || _scanline < _palSpriteEvalScanline)) || !IsRenderingEnabled()) {
+			//TODO: The $2003 increment can be eaten if it happens at the same time as another increment (from sprite processing or PAL's forced refresh).
+			//The increment appears to happen 1.5-2.5 dots after the write ends.
+			if(_scanline >= 240 || !IsRenderingEnabled()) {
 				if((_spriteRamAddr & 0x03) == 0x02) {
 					//"The three unimplemented bits of each sprite's byte 2 do not exist in the PPU and always read back as 0 on PPU revisions that allow reading PPU OAM through OAMDATA ($2004)"
 					value &= 0xE3;
 				}
 				WriteSpriteRam(_spriteRamAddr, value);
 				_emu->ProcessPpuWrite<CpuType::Nes>(_spriteRamAddr, value, MemoryType::NesSpriteRam);
-				_spriteRamAddr = (_spriteRamAddr + 1) & 0xFF;
+				_spriteRamAddr++;
 			} else {
 				//"Writes to OAMDATA during rendering (on the pre-render line and the visible lines 0-239, provided either sprite or background rendering is enabled) do not modify values in OAM,
 				//but do perform a glitchy increment of OAMADDR, bumping only the high 6 bits"
+				//TODO: This should actually write the contents of the OAM buffer to the current OAM1 or OAM2 byte, 1.0-2.0 dots after the write ends.
 				_spriteRamAddr = (_spriteRamAddr + 4) & 0xFC;
 				_emu->BreakIfDebugging(CpuType::Nes, BreakSource::NesInvalidOamWrite);
 			}
@@ -1017,7 +1020,7 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluationEnd()
 
 template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 {
-	if(_prevRenderingEnabled || (_region == ConsoleRegion::Pal && _scanline >= _palSpriteEvalScanline)) {
+	if(_prevRenderingEnabled) {
 		if(_cycle < 65) {
 			//Clear secondary OAM at between cycle 1 and 64
 			_oamCopybuffer = 0xFF;
@@ -1301,14 +1304,14 @@ template<class T> void NesPpu<T>::Exec()
 			}
 			_preventVblFlag = false;
 		} else if(_region == ConsoleRegion::Pal && _scanline >= _palSpriteEvalScanline) {
-			//"On a PAL machine, because of its extended vertical blank, the PPU begins refreshing OAM roughly 21 scanlines after NMI[2], to prevent it
-			//from decaying during the longer hiatus of rendering. Additionally, it will continue to refresh during the visible portion of the screen
-			//even if rendering is disabled. Because of this, OAM DMA must be done near the beginning of vertical blank on PAL, and everywhere else
-			//it is liable to conflict with the refresh. Since the refresh can't be disabled like on the NTSC hardware, OAM decay does not occur at all on the PAL NES."
-			if(_cycle <= 256) {
-				ProcessSpriteEvaluation();
-			} else if(_cycle >= 257 && _cycle < 320) {
-				_spriteRamAddr = 0;
+			//"During scanlines 265-310, the PAL PPU does not perform sprite evaluation at all - instead, it simply increments the OAM address register
+			//every 2 pixels (at x=2, x=4, x=6, x=8, ..., x=334, x=336, x=338, and x=340, but not at x=0)."
+			if(((_cycle & 1) == 0) && (_cycle != 0)) {
+				_spriteRamAddr++;
+
+				if(_enableOamDecay) {
+					_oamDecayCycles[_spriteRamAddr >> 3] = _console->GetCpu()->GetCycleCount();
+				}
 			}
 		}
 	} else {
@@ -1390,9 +1393,9 @@ template<class T> void NesPpu<T>::ProcessScanlineFirstCycle()
 
 template<class T> void NesPpu<T>::CorruptOamRow(uint8_t sourceRow, uint8_t destRow)
 {
-	if(sourceRow != destRow) {
-		uint8_t sourceByte = (sourceRow << 3) & 0xFF;
-		uint8_t destByte = (destRow << 3) & 0xFF;
+	if(sourceRow != destRow && _region == ConsoleRegion::Ntsc) {
+		uint8_t sourceByte = sourceRow << 3;
+		uint8_t destByte = destRow << 3;
 
 		memcpy(_spriteRam + destByte, _spriteRam + sourceByte, 8);
 		_secondarySpriteRam[destRow] = _secondarySpriteRam[sourceRow];
