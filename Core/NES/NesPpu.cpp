@@ -1396,7 +1396,7 @@ template<class T> void NesPpu<T>::ProcessScanlineFirstCycle()
 
 template<class T> void NesPpu<T>::CorruptOamRow(uint8_t sourceRow, uint8_t destRow)
 {
-	if(sourceRow != destRow && _region == ConsoleRegion::Ntsc) {
+	if(sourceRow != destRow && _region != ConsoleRegion::Pal) {
 		uint8_t sourceByte = sourceRow << 3;
 		uint8_t destByte = destRow << 3;
 
