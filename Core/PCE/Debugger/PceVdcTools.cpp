@@ -241,7 +241,7 @@ void PceVdcTools::InternalGetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* sprit
 	sprite.TileCount = 0;
 	for(int i = 0, rowCount = height / 16; i < rowCount; i++) {
 		for(int j = 0, columnCount = width / 16; j < columnCount; j++) {
-			sprite.TileAddresses[sprite.TileCount] = sprite.TileAddress + (i * columnCount + j) * 128;
+			sprite.TileAddresses[sprite.TileCount] = sprite.TileAddress + (i * 2 + j) * 128;
 			sprite.TileCount++;
 		}
 	}
