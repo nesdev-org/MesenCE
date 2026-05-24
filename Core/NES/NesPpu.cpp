@@ -463,7 +463,7 @@ template<class T> void NesPpu<T>::WriteRam(uint16_t addr, uint8_t value)
 				}
 				WriteSpriteRam(_spriteRamAddr, value);
 				_emu->ProcessPpuWrite<CpuType::Nes>(_spriteRamAddr, value, MemoryType::NesSpriteRam);
-				if(_region == ConsoleRegion::Ntsc || _scanline < _palSpriteEvalScanline || (((_cycle & 1) == 1) && (_cycle != 339))) {
+				if(_region == ConsoleRegion::Ntsc || _scanline < _palSpriteEvalScanline || ((_cycle & 1) && (_cycle != 339))) {
 					_spriteRamAddr++;
 				}
 			} else {
@@ -1309,7 +1309,7 @@ template<class T> void NesPpu<T>::Exec()
 			//"During scanlines 265-310, the PAL PPU does not perform sprite evaluation at all - instead, it simply increments the OAM address register
 			//every 2 pixels (at x=2, x=4, x=6, x=8, ..., x=334, x=336, x=338, and x=340, but not at x=0)."
 			//This code only runs for dots 1-340, so we don't need to check dot 0 explicitly.
-			if((_cycle & 1) == 0) {
+			if(!(_cycle & 1)) {
 				_spriteRamAddr++;
 
 				if(_enableOamDecay) {
