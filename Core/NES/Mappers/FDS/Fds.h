@@ -32,6 +32,8 @@ private:
 
 	uint8_t _writeDataReg = 0;
 
+	//TODO Change $4025.D0-D1 namings/meanings so we don't have to invert the read/write logic
+	// (_resetTransfer (bit 0) -> _scanMedia, _motorOn (bit 1) -> _stopMotor)
 	bool _motorOn = false;
 	bool _resetTransfer = false;
 	bool _readMode = false;
@@ -106,7 +108,6 @@ protected:
 	void ProcessCpuClock() override;
 	void UpdateCrc(uint8_t value);
 
-	void SetFdsControlReg(uint8_t value);
 	void WriteRegister(uint16_t addr, uint8_t value) override;
 	uint8_t ReadRegister(uint16_t addr) override;
 

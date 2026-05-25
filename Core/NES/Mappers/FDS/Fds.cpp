@@ -397,24 +397,6 @@ void Fds::UpdateCrc(uint8_t value)
 	}
 }
 
-void Fds::SetFdsControlReg(uint8_t value)
-{
-	_motorOn = (value & 0x01) == 0x01;
-	_resetTransfer = (value & 0x02) == 0x02;
-	_readMode = (value & 0x04) == 0x04;
-	SetMirroringType(value & 0x08 ? MirroringType::Horizontal : MirroringType::Vertical);
-	_crcControl = (value & 0x10) == 0x10;
-	//TODO $4025 bit 5 is unknown, all known software sets it to 1
-
-	_diskReady = (value & 0x40) == 0x40; //TODO $4025 bit 6 is CRC enable, not disk ready flag
-	_diskIrqEnabled = (value & 0x80) == 0x80;
-
-	//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
-	//Fixes issues in some unlicensed games (error $20 at power on)
-	//TODO This probably depends on the bits set?
-	_cpu->ClearIrqSource(IRQSource::FdsDisk);
-}
-
 void Fds::WriteRegister(uint16_t addr, uint8_t value)
 {
 	if(!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) {
@@ -457,10 +439,21 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 
 			if(!_diskRegEnabled) {
 				_irqEnabled = false;
+
 				//Disabling disk registers forces $4025 = $06 (bit 3 reflected in $4030 reads)
-				SetFdsControlReg(0x06);
+				_resetTransfer = true;
+				_motorOn = false;
+				_readMode = true;
+				SetMirroringType(MirroringType::Vertical);
+				_crcControl = false;
+				//TODO Set $4025 bit 5 = 0 here once implemented
+
+				_diskReady = false; //TODO $4025 bit 6 is CRC enable, not disk ready flag
+				_diskIrqEnabled = false;
+
 				//Disabling disk registers forces $4026 (external connector) = 0x7F
 				_extConWriteReg = 0x7F;
+
 				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			}
@@ -487,7 +480,20 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x4025:
-			SetFdsControlReg(value);
+			_resetTransfer = !(value & 0x01); // 0 = reset transfer
+			_motorOn = !(value & 0x02); // 0 = start motor
+			_readMode = value & 0x04;
+			SetMirroringType(value & 0x08 ? MirroringType::Horizontal : MirroringType::Vertical);
+			_crcControl = value & 0x10;
+			//TODO $4025 bit 5 is unknown, all known software sets it to 1
+
+			_diskReady = value & 0x40; //TODO $4025 bit 6 is CRC enable, not disk ready flag
+			_diskIrqEnabled = value & 0x80;
+
+			//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
+			//Fixes issues in some unlicensed games (error $20 at power on)
+			//TODO This probably depends on the bits set?
+			_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			break;
 
 		case 0x4026:
@@ -525,10 +531,6 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				value |= _transferComplete ? 0x80 : 0x00;
 
 				_cpu->ClearIrqSource(IRQSource::External);
-
-				//Byte transfer flag is NOT cleared by this register!
-				//_transferComplete = false;
-				//_cpu->ClearIrqSource(IRQSource::FdsDisk);
 				return value;
 
 			case 0x4031:
@@ -567,7 +569,7 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				return value;
 
 			case 0x4033:
-				//Always return good battery
+				//Always return good battery status in bit 7
 				return _extConWriteReg | 0x80;
 		}
 	}
@@ -690,8 +692,8 @@ vector<MapperStateEntry> Fds::GetMapperStateEntries()
 
 	entries.push_back(MapperStateEntry("", "Disk Drive"));
 	entries.push_back(MapperStateEntry("$4025", "Drive Control"));
-	entries.push_back(MapperStateEntry("$4025.0", "Motor Enabled", _motorOn, MapperStateValueType::Bool));
-	entries.push_back(MapperStateEntry("$4025.1", "Reset Transfer", _resetTransfer, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4025.0", "Scan Disk", !_resetTransfer, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4025.1", "Stop Motor", !_motorOn, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4025.2", "Read Mode", _readMode, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4025.3", "Mirroring", GetMirroringType() == MirroringType::Horizontal ? "Horizontal" : "Vertical", GetMirroringType() == MirroringType::Horizontal ? 1 : 0));
 	entries.push_back(MapperStateEntry("$4025.4", "Transfer CRC", _crcControl, MapperStateValueType::Bool));
