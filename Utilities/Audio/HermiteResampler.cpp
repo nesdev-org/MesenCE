@@ -69,15 +69,18 @@ template<bool addMode>
 uint32_t HermiteResampler::Resample(int16_t* in, uint32_t inSampleCount, int16_t* out, size_t maxOutSampleCount, bool fillToMax)
 {
 	maxOutSampleCount *= 2;
-	if(_pendingSamples.size() >= maxOutSampleCount) {
-		_pendingSamples.clear();
-	}
 
 	uint32_t outPos = (uint32_t)_pendingSamples.size();
-	for(uint32_t i = 0; i < outPos; i += 2) {
+	for(uint32_t i = 0; i < outPos && i < maxOutSampleCount; i += 2) {
 		WriteSample<addMode>(out, i, _pendingSamples[i], _pendingSamples[i + 1]);
 	}
-	_pendingSamples.clear();
+
+	if(_pendingSamples.size() > maxOutSampleCount) {
+		_pendingSamples.erase(_pendingSamples.begin(), _pendingSamples.begin() + maxOutSampleCount);
+		return (uint32_t)(maxOutSampleCount / 2);
+	} else {
+		_pendingSamples.clear();
+	}
 
 	if(_rateRatio == 1.0) {
 		if(inSampleCount > 0) {
