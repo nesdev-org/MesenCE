@@ -152,7 +152,7 @@ void Fds::ClockIrq()
 
 uint8_t Fds::ReadRam(uint16_t addr)
 {
-	if(addr == 0xE18C && !_gameStarted && (_memoryManager->DebugRead(0x100) & 0xC0) != 0) {
+	if(addr == 0xE18C && !_gameStarted && (_memoryManager->DebugRead(0x100) & 0xC0)) {
 		//$E18B is the NMI entry point (using $E18C due to dummy reads)
 		//When NMI occurs while $100 & $C0 != 0, it typically means that the game is starting.
 		_gameStarted = true;
@@ -190,6 +190,7 @@ uint8_t Fds::ReadRam(uint16_t addr)
 		if(matchCount > 1) {
 			//More than 1 disk matches, can happen in unlicensed games - disable auto insert logic
 			_disableAutoInsertDisk = true;
+			MessageManager::Log("[FDS] Multiple disks match, auto-insert disabled.");
 		}
 
 		if(matchIndex >= 0) {
@@ -281,6 +282,13 @@ void Fds::ProcessCpuClock()
 		//Disk has been ejected
 		_endOfHead = true;
 		_scanningDisk = false;
+
+		//It appears the BIOS disk I/O routines can stop the motor well before the end of the disk
+		//(File transfer loop normally runs until accessed files == value in file amount block)
+		//Wait a bit before ejecting the disk (eject in ~77 frames)
+		if(_autoDiskEjectCounter < 0) {
+			_autoDiskEjectCounter = 77;
+		}
 		return;
 	}
 
@@ -422,8 +430,8 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x4022:
-			_irqRepeatEnabled = (value & 0x01) == 0x01;
-			_irqEnabled = (value & 0x02) == 0x02 && _diskRegEnabled;
+			_irqRepeatEnabled = value & 0x01;
+			_irqEnabled = (value & 0x02) && _diskRegEnabled;
 
 			if(_irqEnabled) {
 				_irqCounter = _irqReloadValue;
@@ -433,9 +441,9 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x4023:
-			_diskRegEnabled = (value & 0x01) == 0x01;
+			_diskRegEnabled = value & 0x01;
 			//TODO This is actually an audio reset, rename this variable in Fds.h
-			_soundRegEnabled = (value & 0x02) == 0x02;
+			_soundRegEnabled = value & 0x02;
 
 			if(!_diskRegEnabled) {
 				_irqEnabled = false;
@@ -525,7 +533,7 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				**/
 				value |= _cpu->HasIrqSource(IRQSource::External) ? 0x01 : 0x00;
 				//value |= _transferComplete ? 0x02 : 0x00;
-				value |= GetMirroringType() == MirroringType::Horizontal ? 0x08 : 0;
+				value |= GetMirroringType() == MirroringType::Horizontal ? 0x08 : 0x00;
 				value |= _useQdFormat && _badCrc ? 0x10 : 0x00;
 				//value |= _endOfHead ? 0x40 : 0x00;
 				value |= _transferComplete ? 0x80 : 0x00;
@@ -543,8 +551,9 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				value &= 0xF8;
 
 				value |= !IsDiskInserted() ? 0x01 : 0x00; //Disk not in drive
+				//TODO This should use _diskReady instead
 				value |= (!IsDiskInserted() || !_scanningDisk) ? 0x02 : 0x00; //Disk not ready
-				value |= !IsDiskInserted() ? 0x04 : 0x00; //Disk not writable
+				value |= !IsDiskInserted() ? 0x04 : 0x00; //Simulate inserted disks as always being writable
 
 				if(IsAutoInsertDiskEnabled()) {
 					if(_emu->GetFrameCount() - _lastDiskCheckFrame < 100) {

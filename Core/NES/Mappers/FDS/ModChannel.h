@@ -42,7 +42,7 @@ public:
 				break;
 			case 0x4087:
 				BaseFdsChannel::WriteReg(addr, value);
-				_modulationDisabled = (value & 0x80) == 0x80;
+				_modulationDisabled = value & 0x80;
 				if(_modulationDisabled) {
 					_overflowCounter = 0;
 				}

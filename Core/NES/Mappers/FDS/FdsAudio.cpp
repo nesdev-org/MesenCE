@@ -158,8 +158,8 @@ void FdsAudio::WriteRegister(uint16_t addr, uint8_t value)
 				break;
 
 			case 0x4083:
-				_disableEnvelopes = (value & 0x40) != 0;
-				_haltWaveform = (value & 0x80) != 0;
+				_disableEnvelopes = value & 0x40;
+				_haltWaveform = value & 0x80;
 				if(_haltWaveform) {
 					_wavePosition = 0;
 				}
@@ -192,7 +192,7 @@ void FdsAudio::WriteRegister(uint16_t addr, uint8_t value)
 
 			case 0x4089:
 				_masterVolume = value & 0x03;
-				_waveWriteEnabled = (value & 0x80) == 0x80;
+				_waveWriteEnabled = value & 0x80;
 				break;
 
 			case 0x408A:

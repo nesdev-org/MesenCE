@@ -39,8 +39,8 @@ public:
 		switch(addr & 0x03) {
 			case 0:
 				_speed = value & 0x3F;
-				_volumeIncrease = (value & 0x40) == 0x40;
-				_envelopeOff = (value & 0x80) == 0x80;
+				_volumeIncrease = value & 0x40;
+				_envelopeOff = value & 0x80;
 
 				//"Writing to this register immediately resets the clock timer that ticks the volume envelope (delaying the next tick slightly)."
 				ResetTimer();
