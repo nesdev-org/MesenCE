@@ -176,6 +176,7 @@ namespace Mesen.Interop
 		{
 			switch(cpuType) {
 				case CpuType.Snes:
+				case CpuType.Sa1:
 				case CpuType.Gameboy:
 				case CpuType.Nes:
 				case CpuType.Pce:
@@ -248,6 +249,7 @@ namespace Mesen.Interop
 		{
 			return cpuType switch {
 				CpuType.Snes => 0xEA,
+				CpuType.Sa1 => 0xEA,
 				CpuType.Gameboy => 0x00,
 				CpuType.Nes => 0xEA,
 				CpuType.Pce => 0xEA,
