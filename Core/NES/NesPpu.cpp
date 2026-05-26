@@ -850,7 +850,7 @@ template<class T> uint8_t NesPpu<T>::GetPixelColor()
 	int8_t spriteIndex = -1;
 	uint8_t spriteColor = 0;
 	//If the dot is skipped, all sprite shifters are active on the first dot of the scanline.
-	if((_spriteCount | _activeSpriteShifters | (uint8_t)_dotSkipped) && (_mask.BackgroundEnabled | _mask.SpritesEnabled)) {
+	if((_spriteCount | _activeSpriteShifters | _dotSkipped) && (_mask.BackgroundEnabled | _mask.SpritesEnabled)) {
 		uint8_t remainingShifters = _dotSkipped ? 0xff : _activeSpriteShifters;
 		_lastSprite = &_spriteTiles[BitUtilities::GetHighestBitIndex(_activeSpriteShifters)];
 
@@ -1012,7 +1012,8 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				//This behavior is NTSC-specific - PAL frames are always the same number of cycles
 				//"With rendering enabled, each odd PPU frame is one PPU clock shorter than normal" (skip from 339 to 0, going over 340)
 				_cycle = 340;
-				_dotSkipped = true;
+				_dotSkipped = 3;
+				_needStateUpdate = true;
 				// Delay all sprites by 1 pixel.
 				for(int i = 0; i < 8; i++) {
 					_spriteShifterList[i] += 1 << 4;
@@ -1555,6 +1556,11 @@ template<class T> void NesPpu<T>::UpdateState()
 			}
 			_needVideoRamIncrement = true;
 		}
+		_needStateUpdate = true;
+	}
+
+	if(_dotSkipped > 0) {
+		_dotSkipped--;
 		_needStateUpdate = true;
 	}
 }
