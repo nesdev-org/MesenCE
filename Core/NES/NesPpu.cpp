@@ -725,13 +725,12 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 	bool verticalMirror = (attributes & 0x80) == 0x80;
 
 	uint16_t tileAddr;
-	uint16_t rangeResult;
 	const uint8_t spriteSizeMask = _control.LargeSprites ? 15 : 7;
+
 	//This function is only called on rendering scanlines (0-239) or pre-render (-1). We need to handle the pre-render scanline numbers manually.
 	//These are deliberately truncated to 8 bits to match hardware behavior.
 	const uint8_t scanline8Bit = _scanline >= 0 ? _scanline : (_region == ConsoleRegion::Ntsc ? 261 : 311);
-
-	rangeResult = scanline8Bit - spriteY;
+	uint16_t rangeResult = scanline8Bit - spriteY;
 	if(verticalMirror) {
 		rangeResult ^= spriteSizeMask;
 	}
@@ -753,27 +752,27 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 		info.LowByte = ReadVram(tileAddr);
 		info.HighByte = ReadVram(tileAddr + 8);
 	}
-	if(horizontalMirror) {
-		info.LowByte = BitUtilities::ReverseByte(info.LowByte);
-		info.HighByte = BitUtilities::ReverseByte(info.HighByte);
-	}
 	info.SpriteX = spriteX;
 
 	bool inRange = rangeResult <= spriteSizeMask;
 	if(inRange) {
-		((T*)this)->StoreSpriteInformation(horizontalMirror, verticalMirror, tileAddr, rangeResult, info); //Used by HD packs
-		_spriteCount++;
-	}
-
-	if(!extraSprite) {
-		if(inRange) {
-			_spriteShifterList[_spriteIndex] = (((uint16_t)spriteX + 1) << 4) | _spriteIndex;
-		} else {
-			info.LowByte = 0;
-			info.HighByte = 0;
-
-			_spriteShifterList[_spriteIndex] = SpriteShifterDone;
+		if(horizontalMirror) {
+			info.LowByte = BitUtilities::ReverseByte(info.LowByte);
+			info.HighByte = BitUtilities::ReverseByte(info.HighByte);
 		}
+
+		((T*)this)->StoreSpriteInformation(horizontalMirror, verticalMirror, tileAddr, rangeResult, info); //Used by HD packs
+
+		if(!extraSprite) {
+			_spriteShifterList[_spriteIndex] = (((uint16_t)spriteX + 1) << 4) | _spriteIndex;
+		}
+
+		_spriteCount++;
+	} else if(!extraSprite) {
+		info.LowByte = 0;
+		info.HighByte = 0;
+
+		_spriteShifterList[_spriteIndex] = SpriteShifterDone;
 	}
 
 	_spriteIndex++;
@@ -781,7 +780,7 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 
 template<class T> void NesPpu<T>::LoadExtraSprites()
 {
-	if(_spriteCount == 8 && ((T*)this)->RemoveSpriteLimit()) {
+	if(_spriteCount == 8 && ((T*)this)->RemoveSpriteLimit() && _scanline >= 0) {
 		bool loadExtraSprites = true;
 
 		if(((T*)this)->UseAdaptiveSpriteLimit()) {
@@ -854,6 +853,7 @@ template<class T> uint8_t NesPpu<T>::GetPixelColor()
 		uint8_t remainingShifters = _dotSkipped ? 0xff : _activeSpriteShifters;
 		_lastSprite = &_spriteTiles[BitUtilities::GetHighestBitIndex(_activeSpriteShifters)];
 
+		//Output and shift from all active sprite shifters.
 		while(remainingShifters) {
 			uint8_t i = BitUtilities::GetHighestBitIndex(remainingShifters);
 			remainingShifters &= ~(1 << i);
@@ -1011,6 +1011,8 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				//This behavior is NTSC-specific - PAL frames are always the same number of cycles
 				//"With rendering enabled, each odd PPU frame is one PPU clock shorter than normal" (skip from 339 to 0, going over 340)
 				_cycle = 340;
+
+				//Set a counter for this so it'll be nonzero for GetPixelColor on dot 1, forcing sprite shifter output.
 				_dotSkipped = 3;
 				_needStateUpdate = true;
 				// Delay all sprites by 1 pixel.
@@ -1019,6 +1021,7 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				}
 			}
 		} else {
+			//If rendering is off, the sprites aren't put into counting mode, so make sure they're output+shift in case they got pattern data.
 			_activeSpriteShifters = 0xff;
 		}
 	}
