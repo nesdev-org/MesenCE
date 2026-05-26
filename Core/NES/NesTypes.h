@@ -230,7 +230,6 @@ struct TileInfo
 
 struct NesSpriteInfo
 {
-	bool HorizontalMirror;
 	bool BackgroundPriority;
 	uint8_t SpriteX;
 	uint8_t LowByte;

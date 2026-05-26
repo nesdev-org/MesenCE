@@ -26,13 +26,16 @@ public:
 	__forceinline bool UseAdaptiveSpriteLimit() { return _console->GetNesConfig().AdaptiveSpriteLimit; }
 	void* OnBeforeSendFrame() { return nullptr; }
 
-	__forceinline void StoreSpriteInformation(bool verticalMirror, uint16_t tileAddr, uint8_t lineOffset)
+	__forceinline void StoreSpriteInformation(bool horizontalMirror, bool verticalMirror, uint16_t tileAddr, uint8_t lineOffset, NesSpriteInfo& sprite)
 	{
 		NesSpriteInfoEx& info = _exSpriteInfo[_spriteIndex];
 		info.TileAddr = tileAddr;
 		info.AbsoluteTileAddr = _mapper->GetPpuAbsoluteAddress(info.TileAddr).Address;
+		info.HorizontalMirror = horizontalMirror;
 		info.VerticalMirror = verticalMirror;
 		info.OffsetY = lineOffset;
+		info.LowByte = sprite.LowByte;
+		info.HighByte = sprite.HighByte;
 	}
 
 	__forceinline void StoreTileInformation()
@@ -40,7 +43,7 @@ public:
 		_previousTileEx = _currentTileEx;
 		_currentTileEx = _nextTileEx;
 
-		uint8_t tileIndex = ReadVram(GetNameTableAddr());
+		uint8_t tileIndex = _mapper->DebugReadVram(GetNameTableAddr());
 		uint16_t tileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
 
 		_nextTileEx.OffsetY = _videoRamAddr >> 12;

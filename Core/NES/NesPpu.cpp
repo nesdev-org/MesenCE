@@ -744,7 +744,6 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 
 	NesSpriteInfo& info = _spriteTiles[_spriteIndex];
 	info.BackgroundPriority = backgroundPriority;
-	info.HorizontalMirror = horizontalMirror;
 	info.PaletteOffset = ((attributes & 0x03) << 2) | 0x10;
 	if(extraSprite) {
 		//Use DebugReadVram for extra sprites to prevent side-effects.
@@ -762,7 +761,7 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 
 	bool inRange = rangeResult <= spriteSizeMask;
 	if(inRange) {
-		((T*)this)->StoreSpriteInformation(verticalMirror, tileAddr, rangeResult); //Used by HD packs
+		((T*)this)->StoreSpriteInformation(horizontalMirror, verticalMirror, tileAddr, rangeResult, info); //Used by HD packs
 		_spriteCount++;
 	}
 
@@ -1653,7 +1652,6 @@ template<class T> void NesPpu<T>::Serialize(Serializer& s)
 			SVI(_spriteTiles[i].LowByte);
 			SVI(_spriteTiles[i].HighByte);
 			SVI(_spriteTiles[i].PaletteOffset);
-			SVI(_spriteTiles[i].HorizontalMirror);
 			SVI(_spriteTiles[i].BackgroundPriority);
 		}
 	}
