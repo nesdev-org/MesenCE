@@ -850,7 +850,7 @@ template<class T> uint8_t NesPpu<T>::GetPixelColor()
 	int8_t spriteIndex = -1;
 	uint8_t spriteColor = 0;
 	//If the dot is skipped, all sprite shifters are active on the first dot of the scanline.
-	if((_spriteCount | _activeSpriteShifters | _dotSkipped) && (_mask.BackgroundEnabled | _mask.SpritesEnabled)) {
+	if((_spriteCount | _activeSpriteShifters | _dotSkipped) && _prevRenderingEnabled) {
 		uint8_t remainingShifters = _dotSkipped ? 0xff : _activeSpriteShifters;
 		_lastSprite = &_spriteTiles[BitUtilities::GetHighestBitIndex(_activeSpriteShifters)];
 
