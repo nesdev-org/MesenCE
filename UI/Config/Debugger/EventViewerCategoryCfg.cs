@@ -1,15 +1,15 @@
 ﻿using Avalonia.Media;
 using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Config
 {
-	public class EventViewerCategoryCfg : ViewModelBase
+	public partial class EventViewerCategoryCfg : ViewModelBase
 	{
-		[Reactive] public bool Visible { get; set; } = true;
-		[Reactive] public UInt32 Color { get; set; }
+		[ObservableProperty] public partial bool Visible { get; set; } = true;
+		[ObservableProperty] public partial UInt32 Color { get; set; }
 
 		public EventViewerCategoryCfg() { }
 

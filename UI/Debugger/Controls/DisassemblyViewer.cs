@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Disposables;
 
 namespace Mesen.Debugger.Controls
 {
@@ -116,7 +115,7 @@ namespace Mesen.Debugger.Controls
 		private Dictionary<CodeLineData, List<TextFragment>> _textFragments = new();
 		private Point _previousPointerPos;
 		private CodeSegmentInfo? _prevPointerOverSegment = null;
-		private CompositeDisposable _disposables = new();
+		private List<IDisposable> _disposables = new();
 
 		static DisassemblyViewer()
 		{
@@ -138,14 +137,19 @@ namespace Mesen.Debugger.Controls
 		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
 		{
 			base.OnAttachedToVisualTree(e);
-			_disposables.Add(FontSizeProperty.Changed.Subscribe(_ => InitFontAndLetterSize()));
-			_disposables.Add(FontFamilyProperty.Changed.Subscribe(_ => InitFontAndLetterSize()));
-			_disposables.Add(BoundsProperty.Changed.Subscribe(_ => InitFontAndLetterSize()));
+			this.ObserveProp(FontSizeProperty, _ => InitFontAndLetterSize());
+			this.ObserveProp(FontFamilyProperty, _ => InitFontAndLetterSize());
+			this.ObserveProp(BoundsProperty, _ => InitFontAndLetterSize());
+
+			InitFontAndLetterSize();
 		}
 
 		protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
 		{
-			_disposables.Dispose();
+			foreach(IDisposable disposable in _disposables) {
+				disposable.Dispose();
+			}
+			_disposables.Clear();
 			base.OnDetachedFromVisualTree(e);
 		}
 

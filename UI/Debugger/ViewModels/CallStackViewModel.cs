@@ -10,20 +10,20 @@ using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class CallStackViewModel : DisposableViewModel
+	public partial class CallStackViewModel : DisposableViewModel
 	{
 		public CpuType CpuType { get; }
 		public DebuggerWindowViewModel Debugger { get; }
 
-		[Reactive] public MesenList<StackInfo> CallStackContent { get; private set; } = new();
-		[Reactive] public SelectionModel<StackInfo?> Selection { get; set; } = new();
+		[ObservableProperty] public partial MesenList<StackInfo> CallStackContent { get; private set; } = new();
+		[ObservableProperty] public partial SelectionModel<StackInfo?> Selection { get; set; } = new();
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.CallStackColumnWidths;
 
 		private StackFrameInfo[] _stackFrames = Array.Empty<StackFrameInfo>();

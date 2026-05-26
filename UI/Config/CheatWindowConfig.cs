@@ -1,5 +1,5 @@
 ﻿using Avalonia;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class CheatWindowConfig : BaseWindowConfig<CheatWindowConfig>
+	public partial class CheatWindowConfig : BaseWindowConfig<CheatWindowConfig>
 	{
 		public bool DisableAllCheats { get; set; } = false;
 		public List<int> ColumnWidths { get; set; } = new();

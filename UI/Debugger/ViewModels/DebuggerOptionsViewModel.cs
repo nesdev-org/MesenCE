@@ -4,7 +4,7 @@ using Mesen.ViewModels;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class DebuggerOptionsViewModel : ViewModelBase
+	public partial class DebuggerOptionsViewModel : ViewModelBase
 	{
 		public DebuggerConfig Config { get; }
 

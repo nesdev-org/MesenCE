@@ -1,7 +1,7 @@
 ﻿using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -70,12 +70,12 @@ namespace Mesen.Config
 		}
 	}
 
-	public class CheatCode : ViewModelBase
+	public partial class CheatCode : ViewModelBase
 	{
-		[Reactive] public string Description { get; set; } = "";
-		[Reactive] public CheatType Type { get; set; }
-		[Reactive] public bool Enabled { get; set; } = true;
-		[Reactive] public string Codes { get; set; } = "";
+		[ObservableProperty] public partial string Description { get; set; } = "";
+		[ObservableProperty] public partial CheatType Type { get; set; }
+		[ObservableProperty] public partial bool Enabled { get; set; } = true;
+		[ObservableProperty] public partial string Codes { get; set; } = "";
 
 		public List<InteropCheatCode> ToInteropCheats()
 		{

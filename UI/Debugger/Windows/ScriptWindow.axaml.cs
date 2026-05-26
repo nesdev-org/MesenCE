@@ -52,9 +52,6 @@ namespace Mesen.Debugger.Windows
 		public ScriptWindow(ScriptWindowViewModel model)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			UpdateSyntaxDef();
 			_highlighting = HighlightingLoader.Load(_syntaxDef, HighlightingManager.Instance);

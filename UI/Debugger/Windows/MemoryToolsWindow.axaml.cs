@@ -33,9 +33,6 @@ namespace Mesen.Debugger.Windows
 		public MemoryToolsWindow()
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_editor = this.GetControl<HexEditor>("Hex");
 			_model = new MemoryToolsViewModel(_editor);
@@ -79,7 +76,7 @@ namespace Mesen.Debugger.Windows
 			_editor.Focus();
 		}
 
-		protected override void OnGotFocus(GotFocusEventArgs e)
+		protected override void OnGotFocus(FocusChangedEventArgs e)
 		{
 			base.OnGotFocus(e);
 			if(FocusManager?.GetFocusedElement() == this) {

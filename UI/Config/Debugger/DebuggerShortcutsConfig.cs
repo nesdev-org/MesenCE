@@ -1,6 +1,6 @@
 ﻿using Avalonia.Input;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Mesen.Config
 {
-	public class DebuggerShortcutsConfig : BaseConfig<DebuggerShortcutsConfig>, IJsonOnDeserialized
+	public partial class DebuggerShortcutsConfig : BaseConfig<DebuggerShortcutsConfig>, IJsonOnDeserialized
 	{
 		private List<DebuggerShortcutInfo> _shortcuts = new();
 		private Dictionary<DebuggerShortcut, DebuggerShortcutInfo> _lookup = new();
@@ -473,10 +473,10 @@ namespace Mesen.Config
 		TileEditor_TranslateDown,
 	}
 
-	public class DebuggerShortcutInfo : ViewModelBase
+	public partial class DebuggerShortcutInfo : ViewModelBase
 	{
-		[Reactive] public DebuggerShortcut Shortcut { get; set; }
-		[Reactive] public DbgShortKeys KeyBinding { get; set; } = new();
+		[ObservableProperty] public partial DebuggerShortcut Shortcut { get; set; }
+		[ObservableProperty] public partial DbgShortKeys KeyBinding { get; set; } = new();
 	}
 
 	public class DbgShortKeys

@@ -10,12 +10,10 @@ using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reflection;
 
 namespace Mesen.Controls
@@ -92,7 +90,7 @@ namespace Mesen.Controls
 			ColorPickerViewModel model = new ColorPickerViewModel() { Color = e.Color };
 			ColorPickerWindow wnd = new ColorPickerWindow() { DataContext = model };
 
-			bool success = await wnd.ShowCenteredDialog<bool>(this.GetVisualRoot() as Visual);
+			bool success = await wnd.ShowCenteredDialog<bool>(this.GetWindow());
 			if(success) {
 				UInt32[] colors = (UInt32[])Palette.Clone();
 				colors[e.ColorIndex] = model.Color.ToUInt32();
@@ -102,7 +100,7 @@ namespace Mesen.Controls
 
 		private async void BtnLoadPalFile_OnClick(object sender, RoutedEventArgs e)
 		{
-			string? filename = await FileDialogHelper.OpenFile(null, this.GetVisualRoot(), FileDialogHelper.PaletteExt);
+			string? filename = await FileDialogHelper.OpenFile(null, this.GetWindow(), FileDialogHelper.PaletteExt);
 			if(filename != null) {
 				LoadPaletteFile(filename);
 			}
@@ -110,7 +108,7 @@ namespace Mesen.Controls
 
 		private async void BtnExportPalette_OnClick(object sender, RoutedEventArgs e)
 		{
-			string? filename = await FileDialogHelper.SaveFile(null, null, this.GetVisualRoot(), FileDialogHelper.PaletteExt);
+			string? filename = await FileDialogHelper.SaveFile(null, null, this.GetWindow(), FileDialogHelper.PaletteExt);
 			if(filename != null) {
 				ExportPalette(filename);
 			}
@@ -137,7 +135,7 @@ namespace Mesen.Controls
 				}
 				Palette = paletteData;
 			} else {
-				MesenMsgBox.Show(VisualRoot, "InvalidPaletteFile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MesenMsgBox.Show(this.GetWindow(), "InvalidPaletteFile", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 			paletteFile.Close();
 		}

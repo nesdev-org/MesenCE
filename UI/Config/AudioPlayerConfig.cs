@@ -1,6 +1,5 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class AudioPlayerConfig : BaseConfig<AudioPlayerConfig>
+	public partial class AudioPlayerConfig : BaseConfig<AudioPlayerConfig>
 	{
-		[Reactive] public UInt32 Volume { get; set; } = 100;
-		[Reactive] public bool Repeat { get; set; } = false;
-		[Reactive] public bool Shuffle { get; set; } = false;
+		[ObservableProperty] public partial UInt32 Volume { get; set; } = 100;
+		[ObservableProperty] public partial bool Repeat { get; set; } = false;
+		[ObservableProperty] public partial bool Shuffle { get; set; } = false;
 
 		public void ApplyConfig()
 		{

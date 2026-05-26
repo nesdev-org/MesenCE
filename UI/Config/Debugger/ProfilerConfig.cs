@@ -1,12 +1,12 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 
 namespace Mesen.Config
 {
-	public class ProfilerConfig : BaseWindowConfig<ProfilerConfig>
+	public partial class ProfilerConfig : BaseWindowConfig<ProfilerConfig>
 	{
-		[Reactive] public List<int> ColumnWidths { get; set; } = new();
-		[Reactive] public bool AutoRefresh { get; set; } = true;
-		[Reactive] public bool RefreshOnBreakPause { get; set; } = true;
+		[ObservableProperty] public partial List<int> ColumnWidths { get; set; } = new();
+		[ObservableProperty] public partial bool AutoRefresh { get; set; } = true;
+		[ObservableProperty] public partial bool RefreshOnBreakPause { get; set; } = true;
 	}
 }

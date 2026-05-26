@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Input.Platform;
 using Mesen.Interop;
 using Mesen.Utilities;
 using System;

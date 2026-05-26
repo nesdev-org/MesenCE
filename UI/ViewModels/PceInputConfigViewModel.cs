@@ -1,16 +1,15 @@
 ﻿using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using Mesen.Utilities;
 using System;
-using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
-	public class PceInputConfigViewModel : DisposableViewModel
+	public partial class PceInputConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public PcEngineConfig Config { get; set; }
-		[Reactive] public bool HasTurboTap { get; private set; }
+		[ObservableProperty] public partial PcEngineConfig Config { get; set; }
+		[ObservableProperty] public partial bool HasTurboTap { get; private set; }
 
 		public Enum[] AvailableControllerTypesP1 => new Enum[] {
 			ControllerType.None,
@@ -32,10 +31,8 @@ namespace Mesen.ViewModels
 		{
 			Config = config;
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type).Subscribe(t => {
-				Dispatcher.UIThread.Post(() => {
-					HasTurboTap = Config.Port1.Type == ControllerType.PceTurboTap;
-				});
+			AddDisposable(Config.Port1.ObserveProp(nameof(ControllerConfig.Type), () => {
+				HasTurboTap = Config.Port1.Type == ControllerType.PceTurboTap;
 			}));
 		}
 	}

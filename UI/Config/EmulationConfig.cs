@@ -1,6 +1,5 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class EmulationConfig : BaseConfig<EmulationConfig>
+	public partial class EmulationConfig : BaseConfig<EmulationConfig>
 	{
-		[Reactive][MinMax(0, 5000)] public UInt32 EmulationSpeed { get; set; } = 100;
-		[Reactive][MinMax(0, 5000)] public UInt32 TurboSpeed { get; set; } = 300;
-		[Reactive][MinMax(0, 5000)] public UInt32 RewindSpeed { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 5000)] public partial UInt32 EmulationSpeed { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 5000)] public partial UInt32 TurboSpeed { get; set; } = 300;
+		[ObservableProperty][MinMax(0, 5000)] public partial UInt32 RewindSpeed { get; set; } = 100;
 
-		[Reactive][MinMax(0, 10)] public UInt32 RunAheadFrames { get; set; } = 0;
+		[ObservableProperty][MinMax(0, 10)] public partial UInt32 RunAheadFrames { get; set; } = 0;
 
 		public void ApplyConfig()
 		{

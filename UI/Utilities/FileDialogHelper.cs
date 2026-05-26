@@ -38,7 +38,7 @@ namespace Mesen.Utilities
 		public const string SufamiTurboExt = "st";
 		public const string SpcExt = "spc";
 
-		public static async Task<string?> OpenFile(string? initialFolder, IRenderRoot? parent, params string[] extensions)
+		public static async Task<string?> OpenFile(string? initialFolder, Window? parent, params string[] extensions)
 		{
 			if(!((parent ?? ApplicationHelper.GetMainWindow()) is Window wnd)) {
 				throw new Exception("Invalid parent window");
@@ -96,7 +96,7 @@ namespace Mesen.Utilities
 			return null;
 		}
 
-		public static async Task<string?> SaveFile(string? initialFolder, string? initialFile, IRenderRoot? parent, params string[] extensions)
+		public static async Task<string?> SaveFile(string? initialFolder, string? initialFile, Window? parent, params string[] extensions)
 		{
 			if(!((parent ?? ApplicationHelper.GetMainWindow()) is Window wnd)) {
 				throw new Exception("Invalid parent window");
@@ -132,7 +132,7 @@ namespace Mesen.Utilities
 			return null;
 		}
 
-		public static async Task<string?> OpenFolder(IRenderRoot? parent)
+		public static async Task<string?> OpenFolder(Window? parent)
 		{
 			if(!((parent ?? ApplicationHelper.GetMainWindow()) is Window wnd)) {
 				throw new Exception("Invalid parent window");

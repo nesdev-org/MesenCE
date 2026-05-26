@@ -1,5 +1,7 @@
 ﻿using Avalonia;
+using Avalonia.Input.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Disassembly;
@@ -8,8 +10,6 @@ using Mesen.Debugger.Utilities;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class SourceViewViewModel : DisposableViewModel, ISelectableModel
+public partial class SourceViewViewModel : DisposableViewModel, ISelectableModel
 {
 	public ISymbolProvider SymbolProvider { get; set; }
 	public DebugConfig Config { get; }
@@ -29,18 +29,18 @@ public class SourceViewViewModel : DisposableViewModel, ISelectableModel
 
 	public QuickSearchViewModel QuickSearch { get; } = new();
 
-	[Reactive] public SourceFileInfo? SelectedFile { get; set; }
-	[Reactive] public int MaxScrollPosition { get; private set; }
-	[Reactive] public int ScrollPosition { get; set; }
-	[Reactive] public CodeLineData[] Lines { get; private set; } = Array.Empty<CodeLineData>();
+	[ObservableProperty] public partial SourceFileInfo? SelectedFile { get; set; }
+	[ObservableProperty] public partial int MaxScrollPosition { get; private set; }
+	[ObservableProperty] public partial int ScrollPosition { get; set; }
+	[ObservableProperty] public partial CodeLineData[] Lines { get; private set; } = Array.Empty<CodeLineData>();
 
-	[Reactive] public int? ActiveAddress { get; set; }
-	[Reactive] public int SelectedRow { get; set; }
-	[Reactive] public int SelectionAnchor { get; set; }
-	[Reactive] public int SelectionStart { get; set; }
-	[Reactive] public int SelectionEnd { get; set; }
+	[ObservableProperty] public partial int? ActiveAddress { get; set; }
+	[ObservableProperty] public partial int SelectedRow { get; set; }
+	[ObservableProperty] public partial int SelectionAnchor { get; set; }
+	[ObservableProperty] public partial int SelectionStart { get; set; }
+	[ObservableProperty] public partial int SelectionEnd { get; set; }
 
-	[Reactive] public int VisibleRowCount { get; set; } = 100;
+	[ObservableProperty] public partial int VisibleRowCount { get; set; } = 100;
 	public DebuggerWindowViewModel Debugger { get; }
 
 	public NavigationHistory<SourceCodeLocation> History { get; } = new();
@@ -72,21 +72,21 @@ public class SourceViewViewModel : DisposableViewModel, ISelectableModel
 
 		QuickSearch.OnFind += QuickSearch_OnFind;
 
-		AddDisposable(this.WhenAnyValue(x => x.QuickSearch.IsSearchBoxVisible).Subscribe(x => {
+		AddDisposable(QuickSearch.ObserveProp(nameof(QuickSearch.IsSearchBoxVisible), () => {
 			if(!QuickSearch.IsSearchBoxVisible) {
 				_viewer?.Focus();
 			}
 		}));
 
-		AddDisposable(this.WhenAnyValue(x => x.SelectedFile).Subscribe(x => {
-			MaxScrollPosition = (x?.Data.Length ?? 1) - 1;
+		AddDisposable(this.ObserveProp(nameof(SelectedFile), () => {
+			MaxScrollPosition = (SelectedFile?.Data.Length ?? 1) - 1;
 			ScrollPosition = 0;
 			UpdateCodeLines();
 		}));
 
 		int lastValue = ScrollPosition;
-		AddDisposable(this.WhenAnyValue(x => x.ScrollPosition).Subscribe(x => {
-			if(_viewer == null && x == 0) {
+		AddDisposable(this.ObserveProp(nameof(ScrollPosition), () => {
+			if(_viewer == null && ScrollPosition == 0) {
 				ScrollPosition = lastValue;
 				return;
 			}

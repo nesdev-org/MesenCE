@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Controls;
 using Mesen.Debugger.Utilities;
@@ -8,8 +9,6 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,25 +18,25 @@ using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class HistoryViewerViewModel : DisposableViewModel
+	public partial class HistoryViewerViewModel : DisposableViewModel
 	{
 		public HistoryViewerConfig Config { get; init; }
 
-		[Reactive] public bool IsPaused { get; set; }
+		[ObservableProperty] public partial bool IsPaused { get; set; }
 
-		[Reactive] public string TotalTimeText { get; set; } = "00:00";
-		[Reactive] public string CurrentTimeText { get; set; } = "00:00";
+		[ObservableProperty] public partial string TotalTimeText { get; set; } = "00:00";
+		[ObservableProperty] public partial string CurrentTimeText { get; set; } = "00:00";
 
-		[Reactive] public uint MaxPosition { get; set; }
-		[Reactive] public uint CurrentPosition { get; set; }
+		[ObservableProperty] public partial uint MaxPosition { get; set; }
+		[ObservableProperty] public partial uint CurrentPosition { get; set; }
 
-		[Reactive] public Size RendererSize { get; set; }
+		[ObservableProperty] public partial Size RendererSize { get; set; }
 
-		[Reactive] public List<ContextMenuAction> FileMenuItems { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> OptionsMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> FileMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> OptionsMenuItems { get; private set; } = new();
 
 		public SoftwareRendererViewModel SoftwareRenderer { get; } = new();
-		[Reactive] public bool IsSoftwareRendererVisible { get; set; } = false;
+		[ObservableProperty] public partial bool IsSoftwareRendererVisible { get; set; } = false;
 
 		private bool _blockCoreUpdates = false;
 		private uint[] _segments = Array.Empty<uint>();
@@ -48,27 +47,38 @@ namespace Mesen.ViewModels
 			Config = ConfigManager.Config.HistoryViewer;
 
 			_blockCoreUpdates = true;
-			AddDisposable(this.WhenAnyValue(x => x.CurrentPosition).Subscribe(x => {
-				if(!_blockCoreUpdates) {
-					HistoryApi.HistoryViewerSetPosition((uint)CurrentPosition);
-				}
-			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Volume, x => x.IsPaused, x => x.RendererSize).Subscribe(x => {
-				if(!_blockCoreUpdates) {
-					SetCoreOptions();
-				}
-			}));
-
-			AddDisposable(this.WhenAnyValue(x => x.SoftwareRenderer.FrameSurface).Subscribe(x => {
+			AddDisposable(Config.ObserveProp(nameof(HistoryViewerConfig.Volume), () => SetCoreOptions()));
+			AddDisposable(SoftwareRenderer.ObserveProp(nameof(SoftwareRendererViewModel.FrameSurface), () => {
 				IsSoftwareRendererVisible = SoftwareRenderer.FrameSurface != null;
 			}));
 
 			_blockCoreUpdates = false;
 		}
 
+		partial void OnCurrentPositionChanged(uint value)
+		{
+			if(!_blockCoreUpdates) {
+				HistoryApi.HistoryViewerSetPosition((uint)CurrentPosition);
+			}
+		}
+
+		partial void OnIsPausedChanged(bool value)
+		{
+			SetCoreOptions();
+		}
+
+		partial void OnRendererSizeChanged(Size value)
+		{
+			SetCoreOptions();
+		}
+
 		public void SetCoreOptions()
 		{
+			if(_blockCoreUpdates) {
+				return;
+			}
+
 			HistoryApi.HistoryViewerSetOptions(new HistoryViewerOptions() {
 				IsPaused = IsPaused,
 				Volume = (uint)Config.Volume,

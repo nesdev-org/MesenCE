@@ -28,17 +28,14 @@ namespace Mesen.Debugger.Windows
 		public DebuggerConfigWindow(DebuggerConfigWindowViewModel model)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_model = model;
 			DataContext = model;
 		}
 
-		public static void Open(DebugConfigWindowTab tab, IRenderRoot? parent)
+		public static void Open(DebugConfigWindowTab tab, Window? parent)
 		{
-			new DebuggerConfigWindow(new DebuggerConfigWindowViewModel(tab)).ShowCenteredDialog(parent as Visual);
+			new DebuggerConfigWindow(new DebuggerConfigWindowViewModel(tab)).ShowCenteredDialog(parent);
 		}
 
 		private void InitializeComponent()

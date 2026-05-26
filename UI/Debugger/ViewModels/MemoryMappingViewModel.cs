@@ -3,18 +3,18 @@ using Avalonia.Media;
 using Mesen.Debugger.Controls;
 using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class MemoryMappingViewModel : ViewModelBase
+	public partial class MemoryMappingViewModel : ViewModelBase
 	{
 		private CpuType _cpuType;
 
-		[Reactive] public List<MemoryMappingBlock> CpuMappings { get; private set; } = new();
-		[Reactive] public List<MemoryMappingBlock>? PpuMappings { get; private set; } = null;
+		[ObservableProperty] public partial List<MemoryMappingBlock> CpuMappings { get; private set; } = new();
+		[ObservableProperty] public partial List<MemoryMappingBlock>? PpuMappings { get; private set; } = null;
 		public MemoryType CpuMemType { get; }
 		public MemoryType PpuMemType { get; }
 

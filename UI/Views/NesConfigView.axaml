@@ -117,15 +117,15 @@
 								SelectedItem="{Binding Config.StereoFilter}"
 								Width="100"
 							/>
-							<StackPanel Orientation="Horizontal" IsVisible="{Binding IsDelayStereoEffect}">
+							<StackPanel Orientation="Horizontal" IsVisible="{Binding Config.StereoFilter, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:StereoFilter.Delay}}">
 								<c:MesenNumericUpDown Minimum="0" Maximum="100" Value="{Binding Config.StereoDelay}" />
 								<TextBlock Text="{l:Translate lblMs}" Margin="5 0 0 0" />
 							</StackPanel>
-							<StackPanel Orientation="Horizontal" IsVisible="{Binding IsPanningStereoEffect}">
+							<StackPanel Orientation="Horizontal" IsVisible="{Binding Config.StereoFilter, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:StereoFilter.Panning}}">
 								<c:MesenNumericUpDown Minimum="0" Maximum="180" Value="{Binding Config.StereoPanningAngle}" />
 								<TextBlock Text="{l:Translate lblAngle}" Margin="5 0 0 0" />
 							</StackPanel>
-							<StackPanel Orientation="Horizontal" IsVisible="{Binding IsCombStereoEffect}" Margin="10 0">
+							<StackPanel Orientation="Horizontal" Margin="10 0" IsVisible="{Binding Config.StereoFilter, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:StereoFilter.CombFilter}}">
 								<TextBlock Text="{l:Translate lblDelay}" />
 								<c:MesenNumericUpDown Minimum="0" Maximum="100" Value="{Binding Config.StereoCombFilterDelay}" />
 								<TextBlock Text="{l:Translate lblMs}" Margin="5 0" />

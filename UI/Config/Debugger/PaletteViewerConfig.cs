@@ -1,15 +1,15 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.Config
 {
-	public class PaletteViewerConfig : BaseWindowConfig<PaletteViewerConfig>
+	public partial class PaletteViewerConfig : BaseWindowConfig<PaletteViewerConfig>
 	{
-		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
-		[Reactive] public bool ShowPaletteIndexes { get; set; } = false;
-		[Reactive] public int Zoom { get; set; } = 3;
+		[ObservableProperty] public partial bool ShowSettingsPanel { get; set; } = true;
+		[ObservableProperty] public partial bool ShowPaletteIndexes { get; set; } = false;
+		[ObservableProperty] public partial int Zoom { get; set; } = 3;
 
-		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
+		[ObservableProperty] public partial RefreshTimingConfig RefreshTiming { get; set; } = new();
 
 		public PaletteViewerConfig()
 		{

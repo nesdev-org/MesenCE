@@ -42,7 +42,7 @@ namespace Mesen.Views
 			ColorPickerViewModel model = new ColorPickerViewModel() { Color = color };
 			ColorPickerWindow wnd = new ColorPickerWindow() { DataContext = model };
 
-			bool success = await wnd.ShowCenteredDialog<bool>(this.GetVisualRoot() as Visual);
+			bool success = await wnd.ShowCenteredDialog<bool>(this.GetWindow());
 			if(success) {
 				return model.Color;
 			}

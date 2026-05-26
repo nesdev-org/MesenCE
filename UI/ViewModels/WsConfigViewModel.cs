@@ -1,37 +1,33 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mesen.Config;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
-using System.Reactive;
 
 namespace Mesen.ViewModels
 {
-	public class WsConfigViewModel : DisposableViewModel
+	public partial class WsConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public WsConfig Config { get; set; }
-		[Reactive] public WsConfig OriginalConfig { get; set; }
-		[Reactive] public WsConfigTab SelectedTab { get; set; } = 0;
+		[ObservableProperty] public partial WsConfig Config { get; set; }
+		[ObservableProperty] public partial WsConfig OriginalConfig { get; set; }
+		[ObservableProperty] public partial WsConfigTab SelectedTab { get; set; } = 0;
 
-		public ReactiveCommand<Button, Unit> SetupPlayerHorizontal { get; }
-		public ReactiveCommand<Button, Unit> SetupPlayerVertical { get; }
-		public ReactiveCommand<Button, Unit> SetupPlayerPcv2 { get; }
+		public IRelayCommand SetupPlayerHorizontal { get; }
+		public IRelayCommand SetupPlayerVertical { get; }
+		public IRelayCommand SetupPlayerPcv2 { get; }
 
 		public WsConfigViewModel()
 		{
 			Config = ConfigManager.Config.Ws;
 			OriginalConfig = Config.Clone();
 
-			IObservable<bool> button1Enabled = this.WhenAnyValue(x => x.Config.ControllerHorizontal.Type, x => x.CanConfigure());
-			IObservable<bool> button2Enabled = this.WhenAnyValue(x => x.Config.ControllerVertical.Type, x => x.CanConfigure());
-			IObservable<bool> button3Enabled = this.WhenAnyValue(x => x.Config.ControllerPcv2.Type, x => x.CanConfigure());
-			SetupPlayerHorizontal = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, ControllerType.WsController), button1Enabled);
-			SetupPlayerVertical = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, ControllerType.WsControllerVertical), button2Enabled);
-			SetupPlayerPcv2 = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, ControllerType.Pcv2Controller), button3Enabled);
+			SetupPlayerHorizontal = new RelayCommand<Button>(btn => this.OpenSetup(btn!, ControllerType.WsController));
+			SetupPlayerVertical = new RelayCommand<Button>(btn => this.OpenSetup(btn!, ControllerType.WsControllerVertical));
+			SetupPlayerPcv2 = new RelayCommand<Button>(btn => this.OpenSetup(btn!, ControllerType.Pcv2Controller));
 
 			if(Design.IsDesignMode) {
 				return;
@@ -55,7 +51,7 @@ namespace Mesen.ViewModels
 
 			wnd.DataContext = new ControllerConfigViewModel(type, cfg, orgCfg, 0);
 
-			if(await wnd.ShowDialogAtPosition<bool>(btn.GetVisualRoot() as Visual, startPosition)) {
+			if(await wnd.ShowDialogAtPosition<bool>(btn.GetWindow(), startPosition)) {
 				switch(type) {
 					case ControllerType.WsController: Config.ControllerHorizontal = cfg; break;
 					case ControllerType.WsControllerVertical: Config.ControllerVertical = cfg; break;

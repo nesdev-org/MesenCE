@@ -11,7 +11,7 @@ using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,11 +20,11 @@ using System.Linq;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class LabelListViewModel : DisposableViewModel
+	public partial class LabelListViewModel : DisposableViewModel
 	{
-		[Reactive] public MesenList<LabelViewModel> Labels { get; private set; } = new();
-		[Reactive] public SelectionModel<LabelViewModel?> Selection { get; set; } = new() { SingleSelect = false };
-		[Reactive] public SortState SortState { get; set; } = new();
+		[ObservableProperty] public partial MesenList<LabelViewModel> Labels { get; private set; } = new();
+		[ObservableProperty] public partial SelectionModel<LabelViewModel?> Selection { get; set; } = new() { SingleSelect = false };
+		[ObservableProperty] public partial SortState SortState { get; set; } = new();
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.LabelListColumnWidths;
 
 		public CpuType CpuType { get; }

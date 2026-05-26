@@ -3,29 +3,29 @@ using Avalonia.Controls;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class ControllerInputViewModel : ViewModelBase
+	public partial class ControllerInputViewModel : ViewModelBase
 	{
-		[Reactive] public int ViewHeight { get; set; }
+		[ObservableProperty] public partial int ViewHeight { get; set; }
 
-		[Reactive] public bool ButtonA { get; set; }
-		[Reactive] public bool ButtonB { get; set; }
-		[Reactive] public bool ButtonX { get; set; }
-		[Reactive] public bool ButtonY { get; set; }
-		[Reactive] public bool ButtonL { get; set; }
-		[Reactive] public bool ButtonR { get; set; }
-		[Reactive] public bool ButtonU { get; set; }
-		[Reactive] public bool ButtonD { get; set; }
-		[Reactive] public bool ButtonUp { get; set; }
-		[Reactive] public bool ButtonDown { get; set; }
-		[Reactive] public bool ButtonLeft { get; set; }
-		[Reactive] public bool ButtonRight { get; set; }
-		[Reactive] public bool ButtonSelect { get; set; }
-		[Reactive] public bool ButtonStart { get; set; }
+		[ObservableProperty] public partial bool ButtonA { get; set; }
+		[ObservableProperty] public partial bool ButtonB { get; set; }
+		[ObservableProperty] public partial bool ButtonX { get; set; }
+		[ObservableProperty] public partial bool ButtonY { get; set; }
+		[ObservableProperty] public partial bool ButtonL { get; set; }
+		[ObservableProperty] public partial bool ButtonR { get; set; }
+		[ObservableProperty] public partial bool ButtonU { get; set; }
+		[ObservableProperty] public partial bool ButtonD { get; set; }
+		[ObservableProperty] public partial bool ButtonUp { get; set; }
+		[ObservableProperty] public partial bool ButtonDown { get; set; }
+		[ObservableProperty] public partial bool ButtonLeft { get; set; }
+		[ObservableProperty] public partial bool ButtonRight { get; set; }
+		[ObservableProperty] public partial bool ButtonSelect { get; set; }
+		[ObservableProperty] public partial bool ButtonStart { get; set; }
 
 		public int ControllerIndex { get; }
 		public bool IsSnes { get; }

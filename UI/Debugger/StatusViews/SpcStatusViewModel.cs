@@ -1,46 +1,52 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
+using Mesen.Utilities;
 using System;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class SpcStatusViewModel : BaseConsoleStatusViewModel
+	public partial class SpcStatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public byte RegA { get; set; }
-		[Reactive] public byte RegX { get; set; }
-		[Reactive] public byte RegY { get; set; }
-		[Reactive] public byte RegSP { get; set; }
-		[Reactive] public UInt16 RegPC { get; set; }
-		[Reactive] public byte RegPS { get; set; }
+		[ObservableProperty] public partial byte RegA { get; set; }
+		[ObservableProperty] public partial byte RegX { get; set; }
+		[ObservableProperty] public partial byte RegY { get; set; }
+		[ObservableProperty] public partial byte RegSP { get; set; }
+		[ObservableProperty] public partial UInt16 RegPC { get; set; }
+		[ObservableProperty] public partial byte RegPS { get; set; }
 
-		[Reactive] public bool FlagN { get; set; }
-		[Reactive] public bool FlagV { get; set; }
-		[Reactive] public bool FlagP { get; set; }
-		[Reactive] public bool FlagB { get; set; }
-		[Reactive] public bool FlagH { get; set; }
-		[Reactive] public bool FlagI { get; set; }
-		[Reactive] public bool FlagZ { get; set; }
-		[Reactive] public bool FlagC { get; set; }
+		[ObservableProperty] public partial bool FlagN { get; set; }
+		[ObservableProperty] public partial bool FlagV { get; set; }
+		[ObservableProperty] public partial bool FlagP { get; set; }
+		[ObservableProperty] public partial bool FlagB { get; set; }
+		[ObservableProperty] public partial bool FlagH { get; set; }
+		[ObservableProperty] public partial bool FlagI { get; set; }
+		[ObservableProperty] public partial bool FlagZ { get; set; }
+		[ObservableProperty] public partial bool FlagC { get; set; }
 
-		[Reactive] public string StackPreview { get; private set; } = "";
+		[ObservableProperty] public partial string StackPreview { get; private set; } = "";
 
 		public SpcStatusViewModel()
 		{
-			this.WhenAnyValue(x => x.FlagC, x => x.FlagP, x => x.FlagB, x => x.FlagH).Subscribe(x => UpdatePsValue());
-			this.WhenAnyValue(x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ).Subscribe(x => UpdatePsValue());
+			bool preventUpdate = false;
 
-			this.WhenAnyValue(x => x.RegPS).Subscribe(x => {
-				using var delayNotifs = DelayChangeNotifications(); //don't reupdate PS while updating the flags
-				FlagN = (x & (byte)SpcFlags.Negative) != 0;
-				FlagV = (x & (byte)SpcFlags.Overflow) != 0;
-				FlagP = (x & (byte)SpcFlags.DirectPage) != 0;
-				FlagB = (x & (byte)SpcFlags.Break) != 0;
-				FlagH = (x & (byte)SpcFlags.HalfCarry) != 0;
-				FlagI = (x & (byte)SpcFlags.IrqEnable) != 0;
-				FlagZ = (x & (byte)SpcFlags.Zero) != 0;
-				FlagC = (x & (byte)SpcFlags.Carry) != 0;
+			this.ObserveProp([nameof(FlagC), nameof(FlagP), nameof(FlagB), nameof(FlagH), nameof(FlagI), nameof(FlagN), nameof(FlagV), nameof(FlagZ)], () => {
+				if(!preventUpdate) {
+					UpdatePsValue();
+				}
+			});
+
+			this.ObserveProp(nameof(RegPS), () => {
+				preventUpdate = true;
+				FlagN = (RegPS & (byte)SpcFlags.Negative) != 0;
+				FlagV = (RegPS & (byte)SpcFlags.Overflow) != 0;
+				FlagP = (RegPS & (byte)SpcFlags.DirectPage) != 0;
+				FlagB = (RegPS & (byte)SpcFlags.Break) != 0;
+				FlagH = (RegPS & (byte)SpcFlags.HalfCarry) != 0;
+				FlagI = (RegPS & (byte)SpcFlags.IrqEnable) != 0;
+				FlagZ = (RegPS & (byte)SpcFlags.Zero) != 0;
+				FlagC = (RegPS & (byte)SpcFlags.Carry) != 0;
+				preventUpdate = false;
 			});
 		}
 

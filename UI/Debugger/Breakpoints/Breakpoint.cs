@@ -1,33 +1,31 @@
 ﻿using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
 using Mesen.Interop;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
-using System.Reactive.Linq;
 using System.Text;
 
 namespace Mesen.Debugger
 {
-	public class Breakpoint : ReactiveObject
+	public partial class Breakpoint : ObservableObject
 	{
-		[Reactive] public bool BreakOnRead { get; set; }
-		[Reactive] public bool BreakOnWrite { get; set; }
-		[Reactive] public bool BreakOnExec { get; set; }
-		[Reactive] public bool Forbid { get; set; }
+		[ObservableProperty] public partial bool BreakOnRead { get; set; }
+		[ObservableProperty] public partial bool BreakOnWrite { get; set; }
+		[ObservableProperty] public partial bool BreakOnExec { get; set; }
+		[ObservableProperty] public partial bool Forbid { get; set; }
 
-		[Reactive] public bool Enabled { get; set; } = true;
-		[Reactive] public bool MarkEvent { get; set; }
-		[Reactive] public bool IgnoreDummyOperations { get; set; } = true;
-		[Reactive] public MemoryType MemoryType { get; set; }
-		[Reactive] public UInt32 StartAddress { get; set; }
-		[Reactive] public UInt32 EndAddress { get; set; }
-		[Reactive] public CpuType CpuType { get; set; }
-		[Reactive] public bool AnyAddress { get; set; } = false;
-		[Reactive] public bool IsAssert { get; set; } = false;
-		[Reactive] public string Condition { get; set; } = "";
+		[ObservableProperty] public partial bool Enabled { get; set; } = true;
+		[ObservableProperty] public partial bool MarkEvent { get; set; }
+		[ObservableProperty] public partial bool IgnoreDummyOperations { get; set; } = true;
+		[ObservableProperty] public partial MemoryType MemoryType { get; set; }
+		[ObservableProperty] public partial UInt32 StartAddress { get; set; }
+		[ObservableProperty] public partial UInt32 EndAddress { get; set; }
+		[ObservableProperty] public partial CpuType CpuType { get; set; }
+		[ObservableProperty] public partial bool AnyAddress { get; set; } = false;
+		[ObservableProperty] public partial bool IsAssert { get; set; } = false;
+		[ObservableProperty] public partial string Condition { get; set; } = "";
 
 		public Breakpoint()
 		{
