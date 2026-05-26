@@ -931,7 +931,6 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			ProcessSpriteEvaluation();
 
 			((T*)this)->DrawPixel();
-			_dotSkipped = false;
 
 			if(_prevRenderingEnabled) {
 				ShiftTileRegisters();
