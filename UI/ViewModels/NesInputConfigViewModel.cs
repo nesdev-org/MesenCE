@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Config.Shortcuts;
 using Mesen.Interop;
@@ -8,33 +9,30 @@ using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.Views;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class NesInputConfigViewModel : DisposableViewModel
+	public partial class NesInputConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public NesConfig Config { get; set; }
+		[ObservableProperty] public partial NesConfig Config { get; set; }
 
 		public List<ShortcutKeyInfo> ShortcutKeys { get; set; }
 
 		private MainWindowViewModel MainWindow { get; }
 
-		[Reactive] public bool ShowMapperInput { get; private set; }
-		[Reactive] public bool HasFourScore { get; private set; }
-		[ObservableAsProperty] public bool HasFourPlayerAdapter { get; }
-		[ObservableAsProperty] public bool HasExpansionHub { get; }
-		[ObservableAsProperty] public string ExpConfigLabel { get; } = "";
-		[ObservableAsProperty] public Enum[] AvailableControllerTypesExpansionHub { get; } = Array.Empty<Enum>();
+		[ObservableProperty] public partial bool ShowMapperInput { get; private set; }
+		[ObservableProperty] public partial bool HasFourScore { get; private set; }
+
+		[ObservableProperty] public partial bool HasFourPlayerAdapter { get; private set; }
+		[ObservableProperty] public partial bool HasExpansionHub { get; private set; }
+		[ObservableProperty] public partial string ExpConfigLabel { get; private set; } = "";
+		[ObservableProperty] public partial Enum[] AvailableControllerTypesExpansionHub { get; private set; } = Array.Empty<Enum>();
 
 		public Enum[] AvailableControllerTypesP1 => new Enum[] {
 			ControllerType.None,
@@ -121,37 +119,23 @@ namespace Mesen.ViewModels
 			Config = config;
 			MainWindow = MainWindowViewModel.Instance;
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Port1.Type, x => x.Config.Port2.Type).Subscribe(t => {
-				Dispatcher.UIThread.Post(() => {
-					HasFourScore = Config.Port1.Type == ControllerType.FourScore || Config.Port2.Type == ControllerType.FourScore;
-					if(HasFourScore) {
-						Config.Port1.Type = ControllerType.FourScore;
-						Config.Port2.Type = ControllerType.None;
-					}
-				});
+			AddDisposable(ReactiveHelper.RegisterObserver([Config.Port1, Config.Port2], nameof(ControllerConfig.Type), () => {
+				HasFourScore = Config.Port1.Type == ControllerType.FourScore || Config.Port2.Type == ControllerType.FourScore;
+				if(HasFourScore) {
+					Config.Port1.Type = ControllerType.FourScore;
+					Config.Port2.Type = ControllerType.None;
+				}
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.ExpPort.Type).Select(t => t == ControllerType.FourPlayerAdapter).ToPropertyEx(this, x => x.HasFourPlayerAdapter));
+			AddDisposable(Config.ExpPort.ObserveProp(nameof(ControllerConfig.Type), () => {
+				ControllerType t = Config.ExpPort.Type;
+				HasFourPlayerAdapter = t == ControllerType.FourPlayerAdapter;
+				HasExpansionHub = t == ControllerType.TwoPlayerAdapter || t == ControllerType.FourPlayerAdapter;
+				ExpConfigLabel = ResourceHelper.GetViewLabel(nameof(NesInputConfigView), t == ControllerType.TwoPlayerAdapter ? "lblTwoPlayerAdapterConfig" : "lblFourPlayerAdapterConfig");
+				AvailableControllerTypesExpansionHub = t == ControllerType.TwoPlayerAdapter ? AvailableControllerTypesTwoPlayer : AvailableControllerTypesFourPlayer;
+			}));
 
-			AddDisposable(
-				this.WhenAnyValue(x => x.Config.ExpPort.Type)
-					.Select(t => t == ControllerType.TwoPlayerAdapter || t == ControllerType.FourPlayerAdapter)
-					.ToPropertyEx(this, x => x.HasExpansionHub)
-			);
-
-			AddDisposable(
-				this.WhenAnyValue(x => x.Config.ExpPort.Type)
-					.Select(t => ResourceHelper.GetViewLabel(nameof(NesInputConfigView), t == ControllerType.TwoPlayerAdapter ? "lblTwoPlayerAdapterConfig" : "lblFourPlayerAdapterConfig"))
-					.ToPropertyEx(this, x => x.ExpConfigLabel)
-			);
-
-			AddDisposable(
-				this.WhenAnyValue(x => x.Config.ExpPort.Type)
-					.Select(t => t == ControllerType.TwoPlayerAdapter ? AvailableControllerTypesTwoPlayer : AvailableControllerTypesFourPlayer)
-					.ToPropertyEx(this, x => x.AvailableControllerTypesExpansionHub)
-			);
-
-			AddDisposable(this.WhenAnyValue(x => x.MainWindow.RomInfo).Subscribe(x => {
+			AddDisposable(MainWindow.ObserveProp(nameof(MainWindowViewModel.RomInfo), () => {
 				ShowMapperInput = InputApi.HasControlDevice(ControllerType.BandaiMicrophone);
 			}));
 

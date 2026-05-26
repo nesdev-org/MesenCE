@@ -7,7 +7,7 @@ using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Interop;
 using Mesen.Utilities;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Debugger.Windows
@@ -61,9 +61,6 @@ namespace Mesen.Debugger.Windows
 			}
 
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private static UInt32[] GenerateWsPalette()

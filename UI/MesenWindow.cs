@@ -30,16 +30,16 @@ public class MesenWindow : Window
 	{
 		switch(ConfigManager.Config.Preferences.FontAntialiasing) {
 			case FontAntialiasing.Disabled:
-				RenderOptions.SetTextRenderingMode(v, TextRenderingMode.Alias);
+				TextOptions.SetTextRenderingMode(v, TextRenderingMode.Alias);
 				break;
 
 			case FontAntialiasing.Antialias:
-				RenderOptions.SetTextRenderingMode(v, TextRenderingMode.Antialias);
+				TextOptions.SetTextRenderingMode(v, TextRenderingMode.Antialias);
 				break;
 
 			default:
 			case FontAntialiasing.SubPixelAntialias:
-				RenderOptions.SetTextRenderingMode(v, TextRenderingMode.SubpixelAntialias);
+				TextOptions.SetTextRenderingMode(v, TextRenderingMode.SubpixelAntialias);
 				break;
 		}
 	}

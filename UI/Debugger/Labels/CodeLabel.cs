@@ -1,7 +1,6 @@
-﻿using Mesen.Interop;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Globalization;
 using System.Text;

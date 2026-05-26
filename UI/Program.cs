@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
-using Avalonia.ReactiveUI;
 using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Utilities;
@@ -113,7 +112,6 @@ namespace Mesen
 		// Avalonia configuration, don't remove; also used by visual designer.
 		public static AppBuilder BuildAvaloniaApp()
 			 => AppBuilder.Configure<App>()
-					.UseReactiveUI()
 					.UsePlatformDetect()
 					.With(new Win32PlatformOptions { })
 					.With(new X11PlatformOptions {

@@ -18,10 +18,6 @@
 		<cfg:ConsoleOverrideConfig />
 	</Design.DataContext>
 
-	<UserControl.Resources>
-		<u:EnumMatchConverter x:Key="EnumMatchConverter" />
-	</UserControl.Resources>
-
 	<c:OptionSection Header="{Binding Header, ElementName=root}" Margin="0">
 		<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto,Auto">
 			<CheckBox

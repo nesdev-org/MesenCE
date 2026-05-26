@@ -1,26 +1,26 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.Config
 {
-	public class TilemapViewerConfig : BaseWindowConfig<TilemapViewerConfig>
+	public partial class TilemapViewerConfig : BaseWindowConfig<TilemapViewerConfig>
 	{
-		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
+		[ObservableProperty] public partial bool ShowSettingsPanel { get; set; } = true;
 
-		[Reactive] public double ImageScale { get; set; } = 1;
+		[ObservableProperty] public partial double ImageScale { get; set; } = 1;
 
-		[Reactive] public bool ShowGrid { get; set; }
-		[Reactive] public bool ShowScrollOverlay { get; set; }
+		[ObservableProperty] public partial bool ShowGrid { get; set; }
+		[ObservableProperty] public partial bool ShowScrollOverlay { get; set; }
 
-		[Reactive] public bool NesShowAttributeGrid { get; set; }
-		[Reactive] public bool NesShowAttributeByteGrid { get; set; }
-		[Reactive] public bool NesShowTilemapGrid { get; set; }
+		[ObservableProperty] public partial bool NesShowAttributeGrid { get; set; }
+		[ObservableProperty] public partial bool NesShowAttributeByteGrid { get; set; }
+		[ObservableProperty] public partial bool NesShowTilemapGrid { get; set; }
 
-		[Reactive] public TilemapHighlightMode TileHighlightMode { get; set; } = TilemapHighlightMode.None;
-		[Reactive] public TilemapHighlightMode AttributeHighlightMode { get; set; } = TilemapHighlightMode.None;
-		[Reactive] public TilemapDisplayMode DisplayMode { get; set; } = TilemapDisplayMode.Default;
+		[ObservableProperty] public partial TilemapHighlightMode TileHighlightMode { get; set; } = TilemapHighlightMode.None;
+		[ObservableProperty] public partial TilemapHighlightMode AttributeHighlightMode { get; set; } = TilemapHighlightMode.None;
+		[ObservableProperty] public partial TilemapDisplayMode DisplayMode { get; set; } = TilemapDisplayMode.Default;
 
-		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
+		[ObservableProperty] public partial RefreshTimingConfig RefreshTiming { get; set; } = new();
 
 		public TilemapViewerConfig()
 		{

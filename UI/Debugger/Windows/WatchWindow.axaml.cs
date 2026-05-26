@@ -24,9 +24,6 @@ namespace Mesen.Debugger.Windows
 		public WatchWindow(WatchWindowViewModel model)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_model = model;
 			DataContext = model;

@@ -159,7 +159,9 @@ namespace Mesen.Config
 				object? cfg = ConfigManager.Config;
 				PropertyInfo? property;
 				for(int i = 0; i < switchPath.Length; i++) {
+#pragma warning disable IL2075 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
 					property = cfg.GetType().GetProperty(switchPath[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+#pragma warning restore IL2075 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
 					if(property == null) {
 						//Invalid switch name
 						return false;

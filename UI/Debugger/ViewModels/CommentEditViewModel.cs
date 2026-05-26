@@ -5,7 +5,7 @@ using static Mesen.Debugger.ViewModels.LabelEditViewModel;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class CommentEditViewModel : ViewModelBase
+	public partial class CommentEditViewModel : ViewModelBase
 	{
 		public ReactiveCodeLabel Label { get; set; }
 

@@ -1,27 +1,25 @@
-﻿using Mesen.Config;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class RecentGamesViewModel : ViewModelBase
+	public partial class RecentGamesViewModel : ViewModelBase
 	{
-		[Reactive] public bool Visible { get; set; }
-		[Reactive] public bool NeedResume { get; private set; }
-		[Reactive] public string Title { get; private set; } = "";
-		[Reactive] public GameScreenMode Mode { get; private set; }
-		[Reactive] public List<RecentGameInfo> GameEntries { get; private set; } = new List<RecentGameInfo>();
+		[ObservableProperty] public partial bool Visible { get; set; }
+		[ObservableProperty] public partial bool NeedResume { get; private set; }
+		[ObservableProperty] public partial string Title { get; private set; } = "";
+		[ObservableProperty] public partial GameScreenMode Mode { get; private set; }
+		[ObservableProperty] public partial List<RecentGameInfo> GameEntries { get; private set; } = new List<RecentGameInfo>();
 
 		public RecentGamesViewModel()
 		{

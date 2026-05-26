@@ -5,7 +5,7 @@ using Avalonia.Markup.Xaml;
 using Mesen.Controls;
 using Mesen.Interop;
 using Mesen.Utilities;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Debugger.Windows
@@ -51,9 +51,6 @@ namespace Mesen.Debugger.Windows
 			}
 
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()

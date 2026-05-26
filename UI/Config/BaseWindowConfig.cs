@@ -5,7 +5,7 @@ using System;
 
 namespace Mesen.Config
 {
-	public class BaseWindowConfig<T> : BaseConfig<T> where T : class
+	public partial class BaseWindowConfig<T> : BaseConfig<T> where T : class
 	{
 		public MesenSize WindowSize { get; set; } = new PixelSize(0, 0);
 		public MesenPoint WindowLocation { get; set; } = new PixelPoint(0, 0);
@@ -30,7 +30,7 @@ namespace Mesen.Config
 		public void LoadWindowSettings(Window wnd)
 		{
 			//Update _restoreBounds when size/position changes
-			wnd.GetPropertyChangedObservable(Window.ClientSizeProperty).Subscribe(x => UpdateRestoreBounds(wnd));
+			wnd.SizeChanged += (s, e) => UpdateRestoreBounds(wnd);
 			wnd.PositionChanged += (s, e) => UpdateRestoreBounds(wnd);
 
 			if(WindowSize.Width != 0 && WindowSize.Height != 0) {

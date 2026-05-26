@@ -24,9 +24,6 @@ namespace Mesen.Debugger.Windows
 			DataContext = _model;
 
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			if(Design.IsDesignMode) {
 				return;

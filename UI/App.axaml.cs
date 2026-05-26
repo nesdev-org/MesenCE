@@ -34,6 +34,9 @@ namespace Mesen
 				e.Handled = true;
 			};
 
+#if DEBUG
+			this.AttachDeveloperTools();
+#endif
 			AvaloniaXamlLoader.Load(this);
 			ResourceHelper.LoadResources();
 		}

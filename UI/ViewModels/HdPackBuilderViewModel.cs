@@ -1,33 +1,31 @@
 ﻿using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Config.Shortcuts;
 using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class HdPackBuilderViewModel : DisposableViewModel
+	public partial class HdPackBuilderViewModel : DisposableViewModel
 	{
-		[Reactive] public string SaveFolder { get; set; }
-		[Reactive] public bool IsRecording { get; set; }
-		[Reactive] public bool IsBankSizeVisible { get; set; }
-		[Reactive] public bool IsOpenFolderEnabled { get; set; }
-		[Reactive] public HdPackBuilderConfig Config { get; set; }
-		[Reactive] public FilterInfo? SelectedFilter { get; set; }
-		[Reactive] public BankSizeInfo SelectedBankSize { get; set; }
+		[ObservableProperty] public partial string SaveFolder { get; set; }
+		[ObservableProperty] public partial bool IsRecording { get; set; }
+		[ObservableProperty] public partial bool IsBankSizeVisible { get; set; }
+		[ObservableProperty] public partial bool IsOpenFolderEnabled { get; set; }
+		[ObservableProperty] public partial HdPackBuilderConfig Config { get; set; }
+		[ObservableProperty] public partial FilterInfo? SelectedFilter { get; set; }
+		[ObservableProperty] public partial BankSizeInfo SelectedBankSize { get; set; }
 
-		[Reactive] public FilterInfo[] Filters { get; private set; } = Array.Empty<FilterInfo>();
+		[ObservableProperty] public partial FilterInfo[] Filters { get; private set; } = Array.Empty<FilterInfo>();
 
 		public BankSizeInfo[] BankSizes { get; } = {
 			new BankSizeInfo() { Name = "1 KB", BankSize = 0x400 },
@@ -46,18 +44,18 @@ namespace Mesen.ViewModels
 			SelectedBankSize = BankSizes.Where(x => x.BankSize == Config.ChrRamBankSize).FirstOrDefault() ?? BankSizes[0];
 			IsBankSizeVisible = EmuApi.GetGameMemorySize(MemoryType.NesChrRam) > 0;
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedFilter).Subscribe(x => {
-				if(x != null) {
-					Config.FilterType = x.FilterType;
-					Config.Scale = x.Scale;
+			AddDisposable(this.ObserveProp(nameof(SelectedFilter), () => {
+				if(SelectedFilter != null) {
+					Config.FilterType = SelectedFilter.FilterType;
+					Config.Scale = SelectedFilter.Scale;
 				}
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedBankSize).Subscribe(x => {
-				Config.ChrRamBankSize = x.BankSize;
+			AddDisposable(this.ObserveProp(nameof(SelectedBankSize), () => {
+				Config.ChrRamBankSize = SelectedBankSize.BankSize;
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.SaveFolder).Subscribe(x => {
+			AddDisposable(this.ObserveProp(nameof(SaveFolder), () => {
 				IsOpenFolderEnabled = File.Exists(SaveFolder);
 				UpdateFilterDropdown();
 			}));

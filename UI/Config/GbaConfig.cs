@@ -1,5 +1,5 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,36 +9,36 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class GbaConfig : BaseConfig<GbaConfig>
+	public partial class GbaConfig : BaseConfig<GbaConfig>
 	{
-		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
+		[ObservableProperty] public partial ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
-		[Reactive] public ControllerConfig Controller { get; set; } = new();
+		[ObservableProperty] public partial ControllerConfig Controller { get; set; } = new();
 
-		[Reactive] public bool SkipBootScreen { get; set; } = false;
-		[Reactive] public bool DisableFrameSkipping { get; set; } = false;
-		[Reactive] public bool BlendFrames { get; set; } = true;
-		[Reactive] public bool GbaAdjustColors { get; set; } = true;
+		[ObservableProperty] public partial bool SkipBootScreen { get; set; } = false;
+		[ObservableProperty] public partial bool DisableFrameSkipping { get; set; } = false;
+		[ObservableProperty] public partial bool BlendFrames { get; set; } = true;
+		[ObservableProperty] public partial bool GbaAdjustColors { get; set; } = true;
 
-		[Reactive] public bool HideBgLayer1 { get; set; } = false;
-		[Reactive] public bool HideBgLayer2 { get; set; } = false;
-		[Reactive] public bool HideBgLayer3 { get; set; } = false;
-		[Reactive] public bool HideBgLayer4 { get; set; } = false;
-		[Reactive] public bool DisableSprites { get; set; } = false;
+		[ObservableProperty] public partial bool HideBgLayer1 { get; set; } = false;
+		[ObservableProperty] public partial bool HideBgLayer2 { get; set; } = false;
+		[ObservableProperty] public partial bool HideBgLayer3 { get; set; } = false;
+		[ObservableProperty] public partial bool HideBgLayer4 { get; set; } = false;
+		[ObservableProperty] public partial bool DisableSprites { get; set; } = false;
 
-		[Reactive][MinMax(0, 1000)] public UInt32 OverclockScanlineCount { get; set; } = 0;
-		[Reactive] public RamState RamPowerOnState { get; set; } = RamState.AllZeros;
-		[Reactive] public GbaSaveType SaveType { get; set; } = GbaSaveType.AutoDetect;
-		[Reactive] public GbaRtcType RtcType { get; set; } = GbaRtcType.AutoDetect;
-		[Reactive] public bool AllowInvalidInput { get; set; } = false;
-		[Reactive] public bool EnableMgbaLogApi { get; set; } = false;
+		[ObservableProperty][MinMax(0, 1000)] public partial UInt32 OverclockScanlineCount { get; set; } = 0;
+		[ObservableProperty] public partial RamState RamPowerOnState { get; set; } = RamState.AllZeros;
+		[ObservableProperty] public partial GbaSaveType SaveType { get; set; } = GbaSaveType.AutoDetect;
+		[ObservableProperty] public partial GbaRtcType RtcType { get; set; } = GbaRtcType.AutoDetect;
+		[ObservableProperty] public partial bool AllowInvalidInput { get; set; } = false;
+		[ObservableProperty] public partial bool EnableMgbaLogApi { get; set; } = false;
 
-		[Reactive][MinMax(0, 100)] public UInt32 Square1Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Square2Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 NoiseVol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 WaveVol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 ChannelAVol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 ChannelBVol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Square1Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Square2Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 NoiseVol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 WaveVol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 ChannelAVol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 ChannelBVol { get; set; } = 100;
 
 		public void ApplyConfig()
 		{

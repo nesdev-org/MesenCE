@@ -1,11 +1,11 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 
 namespace Mesen.Config
 {
-	public class MemorySearchConfig : BaseWindowConfig<MemorySearchConfig>
+	public partial class MemorySearchConfig : BaseWindowConfig<MemorySearchConfig>
 	{
-		[Reactive] public List<int> ColumnWidths { get; set; } = new();
+		[ObservableProperty] public partial List<int> ColumnWidths { get; set; } = new();
 	}
 }

@@ -1,23 +1,21 @@
-﻿using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
-using System.Reactive;
-using System.Reactive.Linq;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.ViewModels;
 
 namespace Mesen.Config
 {
-	public class NesDebuggerConfig : ViewModelBase
+	public partial class NesDebuggerConfig : ViewModelBase
 	{
-		[Reactive] public bool BreakOnBrk { get; set; } = false;
-		[Reactive] public bool BreakOnUnofficialOpCode { get; set; } = false;
-		[Reactive] public bool BreakOnUnstableOpCode { get; set; } = true;
-		[Reactive] public bool BreakOnCpuCrash { get; set; } = true;
+		[ObservableProperty] public partial bool BreakOnBrk { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnUnofficialOpCode { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnUnstableOpCode { get; set; } = true;
+		[ObservableProperty] public partial bool BreakOnCpuCrash { get; set; } = true;
 
-		[Reactive] public bool BreakOnBusConflict { get; set; } = false;
-		[Reactive] public bool BreakOnDecayedOamRead { get; set; } = false;
-		[Reactive] public bool BreakOnPpuScrollGlitch { get; set; } = false;
-		[Reactive] public bool BreakOnExtOutputMode { get; set; } = true;
-		[Reactive] public bool BreakOnInvalidVramAccess { get; set; } = false;
-		[Reactive] public bool BreakOnInvalidOamWrite { get; set; } = false;
-		[Reactive] public bool BreakOnDmaInputRead { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnBusConflict { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnDecayedOamRead { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnPpuScrollGlitch { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnExtOutputMode { get; set; } = true;
+		[ObservableProperty] public partial bool BreakOnInvalidVramAccess { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnInvalidOamWrite { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnDmaInputRead { get; set; } = false;
 	}
 }

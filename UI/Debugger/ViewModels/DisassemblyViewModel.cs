@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Disassembly;
@@ -9,31 +11,29 @@ using Mesen.Debugger.Views;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Linq;
 using System.Text;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class DisassemblyViewModel : DisposableViewModel, ISelectableModel
+	public partial class DisassemblyViewModel : DisposableViewModel, ISelectableModel
 	{
 		public ICodeDataProvider DataProvider { get; }
 		public CpuType CpuType { get; }
 		public DebuggerWindowViewModel Debugger { get; }
 		public DisassemblyViewStyleProvider StyleProvider { get; }
 
-		[Reactive] public int ScrollPosition { get; set; } = 0;
-		[Reactive] public int MaxScrollPosition { get; private set; } = 1000000000;
-		[Reactive] public int TopAddress { get; private set; } = 0;
-		[Reactive] public CodeLineData[] Lines { get; private set; } = Array.Empty<CodeLineData>();
+		[ObservableProperty] public partial int ScrollPosition { get; set; } = 0;
+		[ObservableProperty] public partial int MaxScrollPosition { get; private set; } = 1000000000;
+		[ObservableProperty] public partial int TopAddress { get; private set; } = 0;
+		[ObservableProperty] public partial CodeLineData[] Lines { get; private set; } = Array.Empty<CodeLineData>();
 
-		[Reactive] public int? ActiveAddress { get; set; }
-		[Reactive] public int SelectedRowAddress { get; set; }
-		[Reactive] public int SelectionAnchor { get; set; }
-		[Reactive] public int SelectionStart { get; set; }
-		[Reactive] public int SelectionEnd { get; set; }
+		[ObservableProperty] public partial int? ActiveAddress { get; set; }
+		[ObservableProperty] public partial int SelectedRowAddress { get; set; }
+		[ObservableProperty] public partial int SelectionAnchor { get; set; }
+		[ObservableProperty] public partial int SelectionStart { get; set; }
+		[ObservableProperty] public partial int SelectionEnd { get; set; }
 
 		public QuickSearchViewModel QuickSearch { get; } = new QuickSearchViewModel();
 		public NavigationHistory<int> History { get; } = new();
@@ -65,16 +65,17 @@ namespace Mesen.Debugger.ViewModels
 
 			QuickSearch.OnFind += QuickSearch_OnFind;
 
-			AddDisposable(this.WhenAnyValue(x => x.TopAddress).Subscribe(x => Refresh()));
+			AddDisposable(this.ObserveProp(nameof(TopAddress), Refresh));
 
-			AddDisposable(this.WhenAnyValue(x => x.QuickSearch.IsSearchBoxVisible).Subscribe(x => {
+			AddDisposable(QuickSearch.ObserveProp(nameof(QuickSearch.IsSearchBoxVisible), () => {
 				if(!QuickSearch.IsSearchBoxVisible) {
 					_viewer?.Focus();
 				}
 			}));
 
 			int lastValue = ScrollPosition;
-			AddDisposable(this.WhenAnyValue(x => x.ScrollPosition).Subscribe(scrollPos => {
+			AddDisposable(this.ObserveProp(nameof(ScrollPosition), () => {
+				int scrollPos = ScrollPosition;
 				if(_viewer == null) {
 					ScrollPosition = lastValue;
 					return;

@@ -40,8 +40,8 @@ namespace Mesen.Views
 		private async void ShowSelectFolderWindow()
 		{
 			SelectStorageFolderWindow wnd = new();
-			if(await wnd.ShowCenteredDialog<bool>(this.GetVisualRoot() as Visual)) {
-				(this.GetVisualRoot() as Window)?.Close();
+			if(await wnd.ShowCenteredDialog<bool>(this.GetWindow())) {
+				this.GetWindow()?.Close();
 				ApplicationHelper.GetMainWindow()?.Close();
 				ConfigManager.RestartMesen();
 			}

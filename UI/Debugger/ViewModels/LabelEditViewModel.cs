@@ -1,25 +1,24 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Debugger.Labels;
 using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Linq;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class LabelEditViewModel : DisposableViewModel
+	public partial class LabelEditViewModel : DisposableViewModel
 	{
-		[Reactive] public ReactiveCodeLabel Label { get; set; }
+		[ObservableProperty] public partial ReactiveCodeLabel Label { get; set; }
 
-		[ObservableAsProperty] public bool OkEnabled { get; }
-		[ObservableAsProperty] public string MaxAddress { get; } = "";
-		[Reactive] public string ErrorMessage { get; private set; } = "";
+		[ObservableProperty] public partial bool OkEnabled { get; private set; } = false;
+		[ObservableProperty] public partial string MaxAddress { get; private set; } = "";
+		[ObservableProperty] public partial string ErrorMessage { get; private set; } = "";
 
 		public bool AllowDelete { get; } = false;
 
@@ -48,58 +47,63 @@ namespace Mesen.Debugger.ViewModels
 				Label.MemoryType = (MemoryType)AvailableMemoryTypes[0];
 			}
 
-			AddDisposable(this.WhenAnyValue(x => x.Label.MemoryType, (memoryType) => {
-				int maxAddress = DebugApi.GetMemorySize(memoryType) - 1;
-				if(maxAddress <= 0) {
-					return "(unavailable)";
-				} else {
-					return "(Max: $" + maxAddress.ToString("X4") + ")";
+			Label.PropertyChanged += (s, e) => {
+				int maxAddress = DebugApi.GetMemorySize(Label.MemoryType) - 1;
+
+				if(e.PropertyName == nameof(Label.MemoryType)) {
+					if(maxAddress <= 0) {
+						MaxAddress = "(unavailable)";
+					} else {
+						MaxAddress = "(Max: $" + maxAddress.ToString("X4") + ")";
+					}
 				}
-			}).ToPropertyEx(this, x => x.MaxAddress));
 
-			AddDisposable(this.WhenAnyValue(x => x.Label.Label, x => x.Label.Comment, x => x.Label.Length, x => x.Label.MemoryType, x => x.Label.Address, (label, comment, length, memoryType, address) => {
-				CodeLabel? sameLabel = LabelManager.GetLabel(label);
-				int maxAddress = DebugApi.GetMemorySize(memoryType) - 1;
+				CodeLabel? sameLabel = LabelManager.GetLabel(Label.Label);
 
-				for(UInt32 i = 0; i < length; i++) {
-					CodeLabel? sameAddress = LabelManager.GetLabel(address + i, memoryType);
+				for(UInt32 i = 0; i < Label.Length; i++) {
+					CodeLabel? sameAddress = LabelManager.GetLabel(Label.Address + i, Label.MemoryType);
 					if(sameAddress != null) {
 						if(originalLabel == null || (sameAddress.Label != originalLabel.Label && !sameAddress.Label.StartsWith(originalLabel.Label + "+"))) {
 							//A label already exists, we're trying to edit an existing label, but the existing label
 							//and the label we're editing aren't the same label.  Can't override an existing label with a different one.
 							ErrorMessage = ResourceHelper.GetMessage("AddressHasOtherLabel", sameAddress.Label.Length > 0 ? sameAddress.Label : sameAddress.Comment);
-							return false;
+							OkEnabled = false;
 						}
 					}
 				}
 
-				if(address + (length - 1) > maxAddress) {
+				if(Label.Address + (Label.Length - 1) > maxAddress) {
 					ErrorMessage = ResourceHelper.GetMessage("AddressOutOfRange");
-					return false;
+					OkEnabled = false;
+					return;
 				}
 
-				if(label.Length == 0 && comment.Length == 0) {
+				if(label.Length == 0 && Label.Comment.Length == 0) {
 					ErrorMessage = ResourceHelper.GetMessage("LabelOrCommentRequired");
-					return false;
+					OkEnabled = false;
+					return;
 				}
 
-				if(label.Length > 0 && !LabelManager.LabelRegex.IsMatch(label)) {
+				if(label.Length > 0 && !LabelManager.LabelRegex.IsMatch(Label.Label)) {
 					ErrorMessage = ResourceHelper.GetMessage("InvalidLabel");
-					return false;
+					OkEnabled = false;
+					return;
 				}
 
 				if(sameLabel != null && sameLabel != originalLabel) {
 					ErrorMessage = ResourceHelper.GetMessage("LabelNameInUse");
-					return false;
+					OkEnabled = false;
+					return;
 				}
 
-				if(length >= 1 && length <= 65536 && !comment.Contains('\x1')) {
+				if(Label.Length >= 1 && Label.Length <= 65536 && !Label.Comment.Contains('\x1')) {
 					ErrorMessage = "";
-					return true;
+					OkEnabled = false;
+					return;
 				}
 
-				return false;
-			}).ToPropertyEx(this, x => x.OkEnabled));
+				OkEnabled = true;
+			};
 		}
 
 		public void DeleteLabel()
@@ -114,7 +118,7 @@ namespace Mesen.Debugger.ViewModels
 			Label.Commit();
 		}
 
-		public class ReactiveCodeLabel : ReactiveObject
+		public partial class ReactiveCodeLabel : ObservableObject
 		{
 			private CodeLabel _originalLabel;
 
@@ -140,12 +144,17 @@ namespace Mesen.Debugger.ViewModels
 				_originalLabel.Length = Length;
 			}
 
-			[Reactive] public UInt32 Address { get; set; }
-			[Reactive] public MemoryType MemoryType { get; set; }
-			[Reactive] public string Label { get; set; } = "";
-			[Reactive] public string Comment { get; set; } = "";
-			[Reactive] public CodeLabelFlags Flags { get; set; }
-			[Reactive] public UInt32 Length { get; set; } = 1;
+			[ObservableProperty] public partial UInt32 Address { get; set; }
+			[ObservableProperty] public partial MemoryType MemoryType { get; set; }
+			[ObservableProperty] public partial string Label { get; set; } = "";
+			[ObservableProperty] public partial string Comment { get; set; } = "";
+			[ObservableProperty] public partial CodeLabelFlags Flags { get; set; }
+			[ObservableProperty] public partial UInt32 Length { get; set; } = 1;
+
+			protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+			{
+				base.OnPropertyChanged(e);
+			}
 		}
 	}
 }

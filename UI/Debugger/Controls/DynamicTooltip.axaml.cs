@@ -5,12 +5,11 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -91,11 +90,11 @@ namespace Mesen.Debugger.Controls
 		}
 	}
 
-	public class TooltipEntry : ReactiveObject
+	public partial class TooltipEntry : ObservableObject
 	{
-		[Reactive] public string Name { get; set; } = "";
-		[Reactive] public object Value { get; set; } = "";
-		[Reactive] public bool UseMonoFont { get; set; } = false;
+		[ObservableProperty] public partial string Name { get; set; } = "";
+		[ObservableProperty] public partial object Value { get; set; } = "";
+		[ObservableProperty] public partial bool UseMonoFont { get; set; } = false;
 
 		public virtual VerticalAlignment VerticalAlignment => Value is bool ? VerticalAlignment.Center : VerticalAlignment.Top;
 
@@ -114,9 +113,9 @@ namespace Mesen.Debugger.Controls
 		}
 	}
 
-	public class TooltipSeparator : TooltipEntry
+	public partial class TooltipSeparator : TooltipEntry
 	{
-		[Reactive] public bool Hidden { get; set; } = false;
+		[ObservableProperty] public partial bool Hidden { get; set; } = false;
 
 		public TooltipSeparator(string name) : base(name, false, false)
 		{
@@ -243,11 +242,11 @@ namespace Mesen.Debugger.Controls
 		}
 	}
 
-	public class TooltipPictureEntry : ReactiveObject
+	public partial class TooltipPictureEntry : ObservableObject
 	{
-		[Reactive] public IImage Source { get; set; }
-		[Reactive] public double Zoom { get; set; }
-		[Reactive] public PixelRect? CropRect { get; set; }
+		[ObservableProperty] public partial IImage Source { get; set; }
+		[ObservableProperty] public partial double Zoom { get; set; }
+		[ObservableProperty] public partial PixelRect? CropRect { get; set; }
 		public IImage OriginalSource { get; }
 
 		public TooltipPictureEntry(IImage src, double zoom, PixelRect? cropRect)
@@ -263,9 +262,9 @@ namespace Mesen.Debugger.Controls
 		}
 	}
 
-	public class TooltipColorEntry : ReactiveObject
+	public partial class TooltipColorEntry : ObservableObject
 	{
-		[Reactive] public UInt32[] Color { get; set; }
+		[ObservableProperty] public partial UInt32[] Color { get; set; }
 
 		public TooltipColorEntry(UInt32 color)
 		{
@@ -274,11 +273,11 @@ namespace Mesen.Debugger.Controls
 		}
 	}
 
-	public class TooltipPaletteEntry : ReactiveObject
+	public partial class TooltipPaletteEntry : ObservableObject
 	{
-		[Reactive] public UInt32[] RgbPalette { get; set; }
-		[Reactive] public UInt32[] RawPalette { get; set; }
-		[Reactive] public RawPaletteFormat RawFormat { get; set; }
+		[ObservableProperty] public partial UInt32[] RgbPalette { get; set; }
+		[ObservableProperty] public partial UInt32[] RawPalette { get; set; }
+		[ObservableProperty] public partial RawPaletteFormat RawFormat { get; set; }
 
 		public TooltipPaletteEntry(UInt32[] rgbPalette, UInt32[] rawPalette, RawPaletteFormat rawFormat)
 		{

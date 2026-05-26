@@ -153,7 +153,7 @@ namespace Mesen.Debugger.Controls
 					string rowText = sb.ToString();
 					int count = font.CountGlyphs(rowText);
 					var buffer = builder.AllocateRun(font, count, 0, (float)(row * _rowHeight + drawOffsetY));
-					font.GetGlyphs(rowText, buffer.GetGlyphSpan());
+					font.GetGlyphs(rowText, buffer.Glyphs);
 					row++;
 					sb.Clear();
 				}
@@ -201,9 +201,9 @@ namespace Mesen.Debugger.Controls
 						if(codepoint > 0x024F) {
 							SKRunBuffer measureBuffer = measureText.AllocateRun(altFont, altFont.CountGlyphs(str), 0, 0);
 							byteInfo.UseAltFont = true;
-							altFont.GetGlyphs(str, measureBuffer.GetGlyphSpan());
+							altFont.GetGlyphs(str, measureBuffer.Glyphs);
 							startPositionByByte[index] = (float)xPos;
-							xPos += altFont.MeasureText(measureBuffer.GetGlyphSpan());
+							xPos += altFont.MeasureText(measureBuffer.Glyphs);
 							endPositionByByte[index] = (float)xPos;
 						} else {
 							startPositionByByte[index] = (float)xPos;
@@ -282,7 +282,7 @@ namespace Mesen.Debugger.Controls
 
 							int count = currentFont.CountGlyphs(byteInfo.StringValue);
 							var buffer = builder.AllocateRun(currentFont, count, _he._startPositionByByte[pos + i], (float)(row * _rowHeight + drawOffsetY));
-							currentFont.GetGlyphs(byteInfo.StringValue, buffer.GetGlyphSpan());
+							currentFont.GetGlyphs(byteInfo.StringValue, buffer.Glyphs);
 						}
 
 						i += (byteInfo.StringValueKeyLength - 1);
@@ -498,7 +498,7 @@ namespace Mesen.Debugger.Controls
 						string rowText = headerByte.ToString("X" + _headerCharLength);
 						int count = font.CountGlyphs(rowText);
 						var buffer = builder.AllocateRun(font, count, (float)xOffset, (float)(row * _rowHeight + drawOffsetY));
-						font.GetGlyphs(rowText, buffer.GetGlyphSpan());
+						font.GetGlyphs(rowText, buffer.Glyphs);
 						row++;
 						y += _rowHeight;
 						headerByte += bytesPerRow;

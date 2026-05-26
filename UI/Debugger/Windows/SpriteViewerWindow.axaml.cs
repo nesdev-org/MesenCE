@@ -23,9 +23,6 @@ namespace Mesen.Debugger.Windows
 		public SpriteViewerWindow(CpuType cpuType)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			ScrollPictureViewer scrollViewer = this.GetControl<ScrollPictureViewer>("picViewer");
 			PictureViewer picViewer = scrollViewer.InnerViewer;

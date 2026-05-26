@@ -1,46 +1,46 @@
 ﻿using Avalonia.Media;
 using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.Config
 {
-	public class GbEventViewerConfig : ViewModelBase
+	public partial class GbEventViewerConfig : ViewModelBase
 	{
-		[Reactive] public EventViewerCategoryCfg PpuRegisterCgramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterVramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterOamWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x53, 0xD7, 0x44));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterBgScrollWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x4A, 0x7C, 0xD9));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterWindowWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xE2, 0x51, 0xF7));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterOtherWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xD1, 0xDD, 0x42));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterCgramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x29, 0x29));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterVramWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB4, 0x7A, 0xDA));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterOamWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x53, 0xD7, 0x44));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterBgScrollWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x4A, 0x7C, 0xD9));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterWindowWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xE2, 0x51, 0xF7));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterOtherWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xD1, 0xDD, 0x42));
 
-		[Reactive] public EventViewerCategoryCfg PpuRegisterCgramReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x29, 0xC9, 0x29));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterVramReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xDA, 0xB4, 0x7A));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterOamReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x44, 0x53, 0xD7));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterBgScrollReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xD9, 0x4A, 0x7C));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterWindowReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xF7, 0xE2, 0x51));
-		[Reactive] public EventViewerCategoryCfg PpuRegisterOtherReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x42, 0xD1, 0xDD));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterCgramReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x29, 0xC9, 0x29));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterVramReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xDA, 0xB4, 0x7A));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterOamReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x44, 0x53, 0xD7));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterBgScrollReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xD9, 0x4A, 0x7C));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterWindowReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xF7, 0xE2, 0x51));
+		[ObservableProperty] public partial EventViewerCategoryCfg PpuRegisterOtherReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x42, 0xD1, 0xDD));
 
-		[Reactive] public EventViewerCategoryCfg SerialWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x7A, 0x7C, 0x29));
-		[Reactive] public EventViewerCategoryCfg SerialReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0x29));
+		[ObservableProperty] public partial EventViewerCategoryCfg SerialWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x7A, 0x7C, 0x29));
+		[ObservableProperty] public partial EventViewerCategoryCfg SerialReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0x29));
 
-		[Reactive] public EventViewerCategoryCfg InputWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xFF, 0x42, 0x44));
-		[Reactive] public EventViewerCategoryCfg InputReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x51, 0xE4));
+		[ObservableProperty] public partial EventViewerCategoryCfg InputWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xFF, 0x42, 0x44));
+		[ObservableProperty] public partial EventViewerCategoryCfg InputReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x51, 0xE4));
 
-		[Reactive] public EventViewerCategoryCfg TimerWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x51, 0xFF, 0x44));
-		[Reactive] public EventViewerCategoryCfg TimerReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0xE4));
+		[ObservableProperty] public partial EventViewerCategoryCfg TimerWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x51, 0xFF, 0x44));
+		[ObservableProperty] public partial EventViewerCategoryCfg TimerReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0xE4));
 
-		[Reactive] public EventViewerCategoryCfg OtherRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x98, 0x5E, 0xFF));
-		[Reactive] public EventViewerCategoryCfg OtherRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x98, 0xE4));
+		[ObservableProperty] public partial EventViewerCategoryCfg OtherRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x98, 0x5E, 0xFF));
+		[ObservableProperty] public partial EventViewerCategoryCfg OtherRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC9, 0x98, 0xE4));
 
-		[Reactive] public EventViewerCategoryCfg ApuRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x9F, 0x93, 0xC6));
-		[Reactive] public EventViewerCategoryCfg ApuRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xF9, 0xFE, 0xAC));
+		[ObservableProperty] public partial EventViewerCategoryCfg ApuRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x9F, 0x93, 0xC6));
+		[ObservableProperty] public partial EventViewerCategoryCfg ApuRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xF9, 0xFE, 0xAC));
 
-		[Reactive] public EventViewerCategoryCfg Irq { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC4, 0xF4, 0x7A));
+		[ObservableProperty] public partial EventViewerCategoryCfg Irq { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC4, 0xF4, 0x7A));
 
-		[Reactive] public EventViewerCategoryCfg MarkedBreakpoints { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0xE4));
+		[ObservableProperty] public partial EventViewerCategoryCfg MarkedBreakpoints { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0xE4));
 
-		[Reactive] public bool ShowPreviousFrameEvents { get; set; } = true;
+		[ObservableProperty] public partial bool ShowPreviousFrameEvents { get; set; } = true;
 
 		public InteropGbEventViewerConfig ToInterop()
 		{

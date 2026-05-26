@@ -7,7 +7,7 @@ using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Debugger.Windows
@@ -23,9 +23,6 @@ namespace Mesen.Debugger.Windows
 
 			InitializeComponent();
 
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()
