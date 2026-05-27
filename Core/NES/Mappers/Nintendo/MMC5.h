@@ -301,6 +301,7 @@ protected:
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
 	bool EnableCustomVramRead() override { return true; }
+	bool EnableCustomRamRead() override { return true; }
 
 	uint32_t GetSaveRamSize() override
 	{
@@ -443,7 +444,7 @@ protected:
 
 	uint8_t ReadRam(uint16_t addr) override
 	{
-		uint8_t value = BaseMapper::ReadRam(addr);
+		uint8_t value = BaseMapper::InternalRead(addr);
 		if(_audio->GetPcmReadMode()) {
 			_audio->HandlePcmRead(addr, value);
 		}

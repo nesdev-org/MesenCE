@@ -80,6 +80,7 @@ public:
 	NesConfig& GetNesConfig();
 
 	void ProcessCpuClock();
+	uint8_t GetOpenBus();
 
 	Epsm* GetEpsm();
 

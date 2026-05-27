@@ -2,9 +2,9 @@
 #include "NES/NesMemoryManager.h"
 #include "NES/BaseMapper.h"
 #include "NES/NesConsole.h"
+#include "NES/InternalRamHandler.h"
 #include "Shared/CheatManager.h"
 #include "Shared/Emulator.h"
-#include "Shared/EmuSettings.h"
 #include "Utilities/Serializer.h"
 #include "Shared/MemoryOperationType.h"
 
@@ -120,20 +120,6 @@ uint8_t NesMemoryManager::DebugRead(uint16_t addr)
 uint16_t NesMemoryManager::DebugReadWord(uint16_t addr)
 {
 	return DebugRead(addr) | (DebugRead(addr + 1) << 8);
-}
-
-template<NesCpuBusType busType>
-uint8_t NesMemoryManager::Read(uint16_t addr, MemoryOperationType operationType)
-{
-	uint8_t value = _ramReadHandlers[addr]->ReadRam(addr);
-	if(_cheatManager->HasCheats<CpuType::Nes>()) {
-		_cheatManager->ApplyCheat<CpuType::Nes>(addr, value);
-	}
-	_emu->ProcessMemoryRead<CpuType::Nes>(addr, value, operationType);
-
-	_openBusHandler.SetOpenBus<busType>(value, addr == 0x4015);
-
-	return value;
 }
 
 void NesMemoryManager::Write(uint16_t addr, uint8_t value, MemoryOperationType operationType)

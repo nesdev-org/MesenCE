@@ -670,6 +670,7 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 	_hasCpuClockHook = EnableCpuClockHook();
 	_hasCustomReadVram = EnableCustomVramRead();
 	_hasVramAddressHook = EnableVramAddressHook();
+	_hasCustomReadRam = EnableCustomRamRead();
 
 	memset(_isReadRegisterAddr, 0, sizeof(_isReadRegisterAddr));
 	memset(_isWriteRegisterAddr, 0, sizeof(_isWriteRegisterAddr));
@@ -888,14 +889,7 @@ MirroringType BaseMapper::GetMirroringType()
 
 uint8_t BaseMapper::ReadRam(uint16_t addr)
 {
-	if(_allowRegisterRead && _isReadRegisterAddr[addr]) {
-		return ReadRegister(addr);
-	} else if(_prgMemoryAccess[addr >> 8] & MemoryAccessType::Read) {
-		return _prgPages[addr >> 8][(uint8_t)addr];
-	} else {
-		//assert(false);
-	}
-	return _console->GetMemoryManager()->GetOpenBus();
+	return InternalRead(addr);
 }
 
 uint8_t BaseMapper::PeekRam(uint16_t addr)

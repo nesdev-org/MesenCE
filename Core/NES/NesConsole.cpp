@@ -72,6 +72,11 @@ void NesConsole::ProcessCpuClock()
 	}
 }
 
+uint8_t NesConsole::GetOpenBus()
+{
+	return _memoryManager->GetOpenBus();
+}
+
 Epsm* NesConsole::GetEpsm()
 {
 	return _mapper->GetEpsm();

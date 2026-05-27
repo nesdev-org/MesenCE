@@ -90,11 +90,11 @@ protected:
 	uint16_t RegisterEndAddress() override { return 0x4097; }
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
+	bool EnableCustomRamRead() override { return true; }
 
 	void InitMapper() override;
 	void InitMapper(RomData& romData) override;
 	void LoadDiskData(vector<uint8_t> ipsData = vector<uint8_t>());
-	vector<uint8_t> CreateIpsPatch();
 	void Reset(bool softReset) override;
 
 	uint32_t GetFdsDiskSideSize(uint8_t side);

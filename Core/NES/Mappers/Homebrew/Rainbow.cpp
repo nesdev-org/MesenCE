@@ -113,7 +113,7 @@ uint8_t Rainbow::ReadRam(uint16_t addr)
 		}
 		return (_audio->GetLastOutput() << 1);
 	}
-	return BaseMapper::ReadRam(addr);
+	return BaseMapper::InternalRead(addr);
 }
 
 void Rainbow::GenerateOamClear()

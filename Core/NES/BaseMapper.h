@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "NES/INesMemoryHandler.h"
 #include "NES/NesTypes.h"
+#include "NES/NesConsole.h"
 #include "NES/RomData.h"
 #include "Debugger/DebugTypes.h"
 #include "Shared/Emulator.h"
@@ -38,6 +39,7 @@ private:
 	bool _hasBusConflicts = false;
 	bool _hasDefaultWorkRam = false;
 
+	bool _hasCustomReadRam = false;
 	bool _hasCustomReadVram = false;
 	bool _hasCpuClockHook = false;
 	bool _hasVramAddressHook = false;
@@ -115,6 +117,9 @@ protected:
 	virtual bool EnableCpuClockHook() { return false; }
 	virtual bool EnableCustomVramRead() { return false; }
 	virtual bool EnableVramAddressHook() { return false; }
+
+	//Needed when providing an override to ReadRam for addresses above 0x6000
+	virtual bool EnableCustomRamRead() { return false; }
 
 	virtual uint32_t GetDipSwitchCount() { return 0; }
 	virtual uint32_t GetNametableCount() { return 0; }
@@ -225,6 +230,24 @@ public:
 
 	NesRomInfo GetRomInfo();
 	uint32_t GetMapperDipSwitchCount();
+
+	__forceinline uint8_t Read(uint16_t addr)
+	{
+		if(_hasCustomReadRam) {
+			return ReadRam(addr);
+		}
+		return InternalRead(addr);
+	}
+
+	__forceinline uint8_t InternalRead(uint16_t addr)
+	{
+		if(_allowRegisterRead && _isReadRegisterAddr[addr]) {
+			return ReadRegister(addr);
+		} else if(_prgMemoryAccess[addr >> 8] & MemoryAccessType::Read) {
+			return _prgPages[addr >> 8][(uint8_t)addr];
+		}
+		return _console->GetOpenBus();
+	}
 
 	uint8_t ReadRam(uint16_t addr) override;
 	uint8_t PeekRam(uint16_t addr) override;
