@@ -22,8 +22,9 @@ public:
 		Reset(false);
 	}
 
-	void Serialize(Serializer& s)
+	void Serialize(Serializer& s) override
 	{
+		SquareChannel::Serialize(s);
 		SV(_currentOutput);
 	}
 
@@ -73,7 +74,7 @@ protected:
 	}
 
 public:
-	void Clock()
+	__forceinline void Clock()
 	{
 		if(!_apu->IsApuEnabled()) {
 			return;
