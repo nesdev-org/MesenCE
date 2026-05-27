@@ -85,6 +85,8 @@ public:
 	BaseVideoFilter* GetVideoFilter(bool getDefaultFilter) override;
 
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
+
 	RomFormat GetRomFormat() override;
 
 	void InitHesPlayback(uint8_t selectedTrack);

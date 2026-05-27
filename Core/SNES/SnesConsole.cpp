@@ -4,17 +4,15 @@
 #include "SNES/SnesPpu.h"
 #include "SNES/Spc.h"
 #include "SNES/InternalRegisters.h"
+#include "SNES/RegisterHandlerB.h"
 #include "SNES/SnesControlManager.h"
 #include "SNES/SnesMemoryManager.h"
 #include "SNES/SnesDmaController.h"
 #include "SNES/BaseCartridge.h"
-#include "SNES/RamHandler.h"
-#include "SNES/CartTypes.h"
 #include "SNES/SpcFileData.h"
 #include "SNES/SnesDefaultVideoFilter.h"
 #include "SNES/SnesNtscFilter.h"
 #include "Gameboy/Gameboy.h"
-#include "Gameboy/GbPpu.h"
 #include "Debugger/Debugger.h"
 #include "Debugger/DebugTypes.h"
 #include "SNES/SnesState.h"
@@ -29,11 +27,8 @@
 #include "Shared/EmuSettings.h"
 #include "Shared/BaseControlManager.h"
 #include "Utilities/Serializer.h"
-#include "Utilities/Timer.h"
 #include "Utilities/VirtualFile.h"
-#include "Utilities/PlatformUtilities.h"
 #include "Utilities/FolderUtilities.h"
-#include "Shared/EventType.h"
 #include "SNES/RegisterHandlerA.h"
 #include "SNES/RegisterHandlerB.h"
 #include "Utilities/ArchiveReader.h"
@@ -236,6 +231,11 @@ PpuFrameInfo SnesConsole::GetPpuFrame()
 	frame.ScanlineCount = _ppu->GetVblankEndScanline() + 1;
 	frame.CycleCount = 341;
 	return frame;
+}
+
+uint32_t SnesConsole::GetFrameCount()
+{
+	return _ppu->GetFrameCount();
 }
 
 TimingInfo SnesConsole::GetTimingInfo(CpuType cpuType)

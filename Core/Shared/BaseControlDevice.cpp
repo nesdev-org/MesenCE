@@ -20,6 +20,13 @@ BaseControlDevice::~BaseControlDevice()
 {
 }
 
+bool BaseControlDevice::IsTurboOn(uint8_t turboSpeed)
+{
+	uint8_t turboFreq = 1 << (4 - turboSpeed);
+	bool turboOn = (uint8_t)(_emu->GetFrameCount() % turboFreq) < turboFreq / 2;
+	return turboOn;
+}
+
 uint8_t BaseControlDevice::GetPort()
 {
 	return _port;

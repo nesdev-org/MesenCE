@@ -94,6 +94,7 @@ public:
 	double GetFps() override;
 	BaseVideoFilter* GetVideoFilter(bool getDefaultFilter) override;
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
 	RomFormat GetRomFormat() override;
 	AudioTrackInfo GetAudioTrackInfo() override;
 	void ProcessAudioPlayerAction(AudioPlayerActionParams p) override;

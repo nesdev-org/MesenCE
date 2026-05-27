@@ -699,7 +699,12 @@ uint32_t Emulator::GetMasterClockRate()
 
 uint32_t Emulator::GetFrameCount()
 {
-	return GetPpuFrame().FrameCount;
+	if(IsEmulationThread()) {
+		return _console ? _console->GetFrameCount() : 0;
+	} else {
+		shared_ptr<IConsole> console = GetConsole();
+		return console ? console->GetFrameCount() : 0;
+	}
 }
 
 uint32_t Emulator::GetLagCounter()

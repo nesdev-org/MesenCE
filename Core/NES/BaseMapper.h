@@ -221,6 +221,8 @@ public:
 
 	virtual void SaveBattery();
 
+	virtual void EndFrame() {}
+
 	NesRomInfo GetRomInfo();
 	uint32_t GetMapperDipSwitchCount();
 

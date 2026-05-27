@@ -131,6 +131,8 @@ public:
 	ConsoleType GetConsoleType() override;
 	double GetFps() override;
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
+
 	vector<CpuType> GetCpuTypes() override;
 
 	AddressInfo GetAbsoluteAddress(AddressInfo& relAddress) override;

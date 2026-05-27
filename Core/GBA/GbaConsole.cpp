@@ -388,6 +388,11 @@ PpuFrameInfo GbaConsole::GetPpuFrame()
 	return frame;
 }
 
+uint32_t GbaConsole::GetFrameCount()
+{
+	return _ppu->GetFrameCount();
+}
+
 vector<CpuType> GbaConsole::GetCpuTypes()
 {
 	return { CpuType::Gba };

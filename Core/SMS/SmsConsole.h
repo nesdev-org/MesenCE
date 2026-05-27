@@ -71,6 +71,7 @@ public:
 	RomFormat GetRomFormat() override;
 	double GetFps() override;
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
 	BaseVideoFilter* GetVideoFilter(bool getDefaultFilter) override;
 
 	uint64_t GetMasterClock() override;

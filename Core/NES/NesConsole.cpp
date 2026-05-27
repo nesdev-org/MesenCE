@@ -307,6 +307,7 @@ void NesConsole::InternalRunFrame()
 		}
 	}
 
+	_mapper->EndFrame();
 	_apu->EndFrame();
 
 	if(!_nextFrameOverclockDisabled) {
@@ -351,6 +352,11 @@ double NesConsole::GetFps()
 	} else {
 		return 50.0069789081886;
 	}
+}
+
+uint32_t NesConsole::GetFrameCount()
+{
+	return _ppu->GetFrameCount();
 }
 
 PpuFrameInfo NesConsole::GetPpuFrame()

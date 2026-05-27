@@ -292,6 +292,11 @@ PpuFrameInfo SmsConsole::GetPpuFrame()
 	return frame;
 }
 
+uint32_t SmsConsole::GetFrameCount()
+{
+	return _vdp->GetFrameCount();
+}
+
 RomFormat SmsConsole::GetRomFormat()
 {
 	return _romFormat;

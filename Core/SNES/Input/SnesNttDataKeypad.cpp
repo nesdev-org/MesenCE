@@ -16,6 +16,8 @@ string SnesNttDataKeypad::GetKeyNames()
 
 void SnesNttDataKeypad::InternalSetStateFromInput()
 {
+	bool turboOn = IsTurboOn(_turboSpeed);
+
 	for(KeyMapping& keyMapping : _keyMappings) {
 		SetPressedState(Buttons::A, keyMapping.A);
 		SetPressedState(Buttons::B, keyMapping.B);
@@ -45,8 +47,6 @@ void SnesNttDataKeypad::InternalSetStateFromInput()
 		SetPressedState(Buttons::C, keyMapping.CustomKeys[13]);
 		SetPressedState(Buttons::EndCommunication, keyMapping.CustomKeys[14]);
 
-		uint8_t turboFreq = 1 << (4 - _turboSpeed);
-		bool turboOn = (uint8_t)(_emu->GetFrameCount() % turboFreq) < turboFreq / 2;
 		if(turboOn) {
 			SetPressedState(Buttons::A, keyMapping.TurboA);
 			SetPressedState(Buttons::B, keyMapping.TurboB);

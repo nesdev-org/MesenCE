@@ -120,6 +120,7 @@ public:
 	~Fds();
 
 	void SaveBattery() override;
+	void EndFrame() override;
 
 	uint32_t GetSideCount();
 

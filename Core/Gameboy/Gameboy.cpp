@@ -680,6 +680,11 @@ PpuFrameInfo Gameboy::GetPpuFrame()
 	return frame;
 }
 
+uint32_t Gameboy::GetFrameCount()
+{
+	return _ppu->GetFrameCount();
+}
+
 vector<CpuType> Gameboy::GetCpuTypes()
 {
 	return { CpuType::Gameboy };

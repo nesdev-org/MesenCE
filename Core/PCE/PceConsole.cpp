@@ -281,8 +281,7 @@ BaseVideoFilter* PceConsole::GetVideoFilter(bool getDefaultFilter)
 PpuFrameInfo PceConsole::GetPpuFrame()
 {
 	PpuFrameInfo frame = {};
-	PceVdcState& state = _vdc->GetState();
-	frame.FrameCount = state.FrameCount;
+	frame.FrameCount = _vdc->GetFrameCount();
 	frame.CycleCount = PceConstants::ClockPerScanline;
 
 	frame.FirstScanline = 0;
@@ -294,6 +293,11 @@ PpuFrameInfo PceConsole::GetPpuFrame()
 	frame.Width = PceConstants::InternalOutputWidth;
 	frame.FrameBufferSize = PceConstants::MaxScreenWidth * (PceConstants::ScreenHeight + 1) * sizeof(uint16_t);
 	return frame;
+}
+
+uint32_t PceConsole::GetFrameCount()
+{
+	return _vdc->GetFrameCount();
 }
 
 RomFormat PceConsole::GetRomFormat()

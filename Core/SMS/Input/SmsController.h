@@ -19,6 +19,8 @@ protected:
 
 	void InternalSetStateFromInput() override
 	{
+		bool turboOn = IsTurboOn(_turboSpeed);
+
 		for(KeyMapping& keyMapping : _keyMappings) {
 			SetPressedState(Buttons::A, keyMapping.A);
 			SetPressedState(Buttons::B, keyMapping.B);
@@ -29,8 +31,6 @@ protected:
 
 			SetPressedState(Buttons::Pause, keyMapping.Start);
 
-			uint8_t turboFreq = 1 << (4 - _turboSpeed);
-			bool turboOn = (uint8_t)(_emu->GetFrameCount() % turboFreq) < turboFreq / 2;
 			if(turboOn) {
 				SetPressedState(Buttons::A, keyMapping.TurboA);
 				SetPressedState(Buttons::B, keyMapping.TurboB);

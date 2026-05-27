@@ -3,7 +3,6 @@
 #include "SNES/SnesConsole.h"
 #include "SNES/InternalRegisters.h"
 #include "Shared/Emulator.h"
-#include "Shared/EmuSettings.h"
 #include "Shared/KeyManager.h"
 
 SnesRumbleController::SnesRumbleController(Emulator* emu, SnesConsole* console, uint8_t port, KeyMappingSet keyMappings) : SnesController(emu, port, keyMappings)
@@ -32,7 +31,7 @@ void SnesRumbleController::RefreshStateBuffer()
 	//The LRG rumble controller stops rumbling shortly after the last rumble command.
 	//Not accurate, assumes the game regularly latches the controller.
 	if(_rumbleActive) {
-		if(_emu->GetFrameCount() - _lastRumbleFrame > 2) {
+		if(_console->GetFrameCount() - _lastRumbleFrame > 2) {
 			KeyManager::SetForceFeedback(0, 0);
 			_rumbleActive = false;
 		}
@@ -63,7 +62,7 @@ uint8_t SnesRumbleController::ReadRam(uint16_t addr)
 			KeyManager::SetForceFeedback(rightRumble, leftRumble);
 
 			_rumbleActive = true;
-			_lastRumbleFrame = _emu->GetFrameCount();
+			_lastRumbleFrame = _console->GetFrameCount();
 		}
 	}
 

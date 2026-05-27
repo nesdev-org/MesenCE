@@ -21,6 +21,8 @@ protected:
 
 	void InternalSetStateFromInput() override
 	{
+		bool turboOn = IsTurboOn(_turboSpeed);
+
 		for(KeyMapping& keyMapping : _keyMappings) {
 			SetPressedState(Buttons::I, keyMapping.A);
 			SetPressedState(Buttons::II, keyMapping.B);
@@ -31,8 +33,6 @@ protected:
 			SetPressedState(Buttons::Left, keyMapping.Left);
 			SetPressedState(Buttons::Right, keyMapping.Right);
 
-			uint8_t turboFreq = 1 << (4 - _turboSpeed);
-			bool turboOn = (uint8_t)(_emu->GetFrameCount() % turboFreq) < turboFreq / 2;
 			if(turboOn) {
 				SetPressedState(Buttons::I, keyMapping.TurboA);
 				SetPressedState(Buttons::II, keyMapping.TurboB);
@@ -45,7 +45,7 @@ protected:
 			ClearBit(Buttons::Select);
 		}
 
-		if(!_emu->GetSettings()->GetPcEngineConfig().AllowInvalidInput) {
+		if(!cfg.AllowInvalidInput) {
 			//If both U+D or L+R are pressed at the same time, act as if neither is pressed
 			if(IsPressed(Buttons::Up) && IsPressed(Buttons::Down)) {
 				ClearBit(Buttons::Down);

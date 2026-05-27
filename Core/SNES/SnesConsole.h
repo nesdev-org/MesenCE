@@ -1,12 +1,9 @@
 #pragma once
 #include "pch.h"
-#include "SNES/CartTypes.h"
 #include "Debugger/DebugTypes.h"
 #include "Debugger/Debugger.h"
 #include "Shared/Interfaces/IConsole.h"
-#include "Utilities/Timer.h"
 #include "Utilities/VirtualFile.h"
-#include "Utilities/SimpleLock.h"
 #include "Shared/RomInfo.h"
 
 class SnesCpu;
@@ -118,6 +115,7 @@ public:
 
 	double GetFps() override;
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
 
 	TimingInfo GetTimingInfo(CpuType cpuType) override;
 

@@ -438,6 +438,11 @@ PpuFrameInfo WsConsole::GetPpuFrame()
 	return frame;
 }
 
+uint32_t WsConsole::GetFrameCount()
+{
+	return _ppu->GetFrameCount();
+}
+
 RomFormat WsConsole::GetRomFormat()
 {
 	return RomFormat::Ws;

@@ -51,6 +51,8 @@ protected:
 
 	virtual void InternalSetStateFromInput();
 
+	bool IsTurboOn(uint8_t turboSpeed);
+
 public:
 	static constexpr int DeviceXCoordButtonId = 0xFFFE;
 	static constexpr int DeviceYCoordButtonId = 0xFFFF;

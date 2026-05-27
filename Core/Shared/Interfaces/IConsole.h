@@ -90,6 +90,7 @@ public:
 	virtual BaseVideoFilter* GetVideoFilter(bool getDefaultFilter) = 0;
 	virtual void GetScreenRotationOverride(uint32_t& rotation) {}
 
+	virtual uint32_t GetFrameCount() = 0;
 	virtual PpuFrameInfo GetPpuFrame() = 0;
 
 	virtual string GetHash(HashType hashType) { return {}; }
