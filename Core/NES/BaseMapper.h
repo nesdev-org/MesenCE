@@ -22,11 +22,6 @@ private:
 	MirroringType _mirroringType = {};
 	string _batteryFilename;
 
-	uint16_t InternalGetPrgPageSize();
-	uint16_t InternalGetSaveRamPageSize();
-	uint16_t InternalGetWorkRamPageSize();
-	uint16_t InternalGetChrRomPageSize();
-	uint16_t InternalGetChrRamPageSize();
 	bool ValidateAddressRange(uint16_t startAddr, uint16_t endAddr);
 
 	uint8_t* _nametableRam = nullptr;
@@ -46,17 +41,23 @@ private:
 	bool _isReadRegisterAddr[0x10000] = {};
 	bool _isWriteRegisterAddr[0x10000] = {};
 
+	uint16_t _prgRomPageSize = 0;
+	uint16_t _saveRamPageSize = 0;
+	uint16_t _workRamPageSize = 0;
+	uint16_t _chrRomPageSize = 0;
+	uint16_t _chrRamPageSize = 0;
+
 	MemoryAccessType _prgMemoryAccess[0x100] = {};
 	uint8_t* _prgPages[0x100] = {};
 
-	MemoryAccessType _chrMemoryAccess[0x100] = {};
-	uint8_t* _chrPages[0x100] = {};
+	MemoryAccessType _chrMemoryAccess[0x40] = {};
+	uint8_t* _chrPages[0x40] = {};
 
 	int32_t _prgMemoryOffset[0x100] = {};
 	PrgMemoryType _prgMemoryType[0x100] = {};
 
-	int32_t _chrMemoryOffset[0x100] = {};
-	ChrMemoryType _chrMemoryType[0x100] = {};
+	int32_t _chrMemoryOffset[0x40] = {};
+	ChrMemoryType _chrMemoryType[0x40] = {};
 
 	vector<uint8_t> _originalPrgRom;
 	vector<uint8_t> _originalChrRom;
@@ -134,9 +135,9 @@ protected:
 	void SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint8_t* source, uint32_t sourceOffset, uint32_t sourceSize, int8_t accessType = -1);
 	void RemoveCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr);
 
-	virtual void SelectChrPage8x(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
-	virtual void SelectChrPage4x(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
-	virtual void SelectChrPage2x(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
+	void SelectChrPage8x(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
+	void SelectChrPage4x(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
+	void SelectChrPage2x(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
 	virtual void SelectChrPage(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default);
 	void SetPpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint16_t pageNumber, ChrMemoryType type = ChrMemoryType::Default, int8_t accessType = -1);
 	void SetPpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, ChrMemoryType type, uint32_t sourceOffset, int8_t accessType);
@@ -183,6 +184,8 @@ protected:
 		//Open bus - "When CHR is disabled, the pattern tables are open bus. Theoretically, this should return the LSB of the address read, but real-world behavior varies."
 		return addr;
 	}
+
+	void UpdatePageSizes();
 
 	virtual vector<MapperStateEntry> GetMapperStateEntries() { return {}; }
 

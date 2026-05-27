@@ -69,6 +69,7 @@ protected:
 			memset(_prgRom, 0, _prgSize);
 		}
 		_emu->RegisterMemory(MemoryType::NesPrgRom, _prgRom, _prgSize);
+		UpdatePageSizes();
 
 		SelectPrgPage(1, 0);
 		SelectChrPage(0, 0);

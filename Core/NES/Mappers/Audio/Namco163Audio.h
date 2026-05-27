@@ -2,15 +2,16 @@
 #include "pch.h"
 #include "NES/NesConsole.h"
 #include "NES/APU/NesApu.h"
-#include "NES/APU/BaseExpansionAudio.h"
 #include "Utilities/Serializer.h"
 
-class Namco163Audio : public BaseExpansionAudio
+class Namco163Audio : public ISerializable
 {
 public:
 	static constexpr uint32_t AudioRamSize = 0x80;
 
 private:
+	NesConsole* _console = nullptr;
+	NesApu* _apu = nullptr;
 	uint8_t* _internalRam = nullptr;
 	int16_t _channelOutput[8] = {};
 	uint8_t _ramPosition = 0;
@@ -113,10 +114,8 @@ private:
 	}
 
 protected:
-	void Serialize(Serializer& s) override
+	void Serialize(Serializer& s)
 	{
-		BaseExpansionAudio::Serialize(s);
-
 		SVArray(_internalRam, 0x80);
 		SVArray(_channelOutput, 8);
 		SV(_ramPosition);
@@ -127,25 +126,29 @@ protected:
 		SV(_disableSound);
 	}
 
-	void ClockAudio() override
+public:
+	__forceinline void Clock()
 	{
-		if(!_disableSound) {
-			_updateCounter++;
-			if(_updateCounter == 15) {
-				UpdateChannel(_currentChannel);
+		if(_disableSound || !_apu->IsApuEnabled()) {
+			return;
+		}
 
-				_updateCounter = 0;
-				_currentChannel--;
-				if(_currentChannel < 7 - GetNumberOfChannels()) {
-					_currentChannel = 7;
-				}
+		_updateCounter++;
+		if(_updateCounter == 15) {
+			UpdateChannel(_currentChannel);
+
+			_updateCounter = 0;
+			_currentChannel--;
+			if(_currentChannel < 7 - GetNumberOfChannels()) {
+				_currentChannel = 7;
 			}
 		}
 	}
 
-public:
-	Namco163Audio(NesConsole* console, uint8_t* audioRam, uint32_t ramOffset = 0) : BaseExpansionAudio(console)
+	Namco163Audio(NesConsole* console, uint8_t* audioRam, uint32_t ramOffset = 0)
 	{
+		_console = console;
+		_apu = console->GetApu();
 		_internalRam = audioRam;
 		memset(_channelOutput, 0, sizeof(_channelOutput));
 		_ramPosition = 0;

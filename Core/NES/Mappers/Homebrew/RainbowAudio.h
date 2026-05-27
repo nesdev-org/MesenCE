@@ -1,14 +1,16 @@
 #pragma once
-#include "NES/APU/BaseExpansionAudio.h"
 #include "NES/Mappers/Audio/Vrc6Pulse.h"
 #include "NES/Mappers/Audio/Vrc6Saw.h"
 #include "NES/APU/NesApu.h"
 #include "NES/NesConsole.h"
 #include "Utilities/Serializer.h"
 
-class RainbowAudio : public BaseExpansionAudio
+class RainbowAudio : public ISerializable
 {
 private:
+	NesConsole* _console = nullptr;
+	NesApu* _apu = nullptr;
+
 	Vrc6Pulse _pulse1;
 	Vrc6Pulse _pulse2;
 	Vrc6Saw _saw;
@@ -31,8 +33,13 @@ protected:
 		SV(_lastOutput);
 	}
 
-	void ClockAudio() override
+public:
+	__forceinline void Clock()
 	{
+		if(!_apu->IsApuEnabled()) {
+			return;
+		}
+
 		_pulse1.Clock();
 		_pulse2.Clock();
 		_saw.Clock();
@@ -44,9 +51,10 @@ protected:
 		_lastOutput = outputLevel;
 	}
 
-public:
-	RainbowAudio(NesConsole* console) : BaseExpansionAudio(console)
+	RainbowAudio(NesConsole* console)
 	{
+		_console = console;
+		_apu = console->GetApu();
 		Reset();
 	}
 

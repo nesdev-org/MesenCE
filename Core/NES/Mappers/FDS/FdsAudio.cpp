@@ -6,13 +6,10 @@
 #include "NES/NesTypes.h"
 #include "NES/NesMemoryManager.h"
 #include "NES/APU/NesApu.h"
-#include "NES/APU/BaseExpansionAudio.h"
 #include "Utilities/Serializer.h"
 
 void FdsAudio::Serialize(Serializer& s)
 {
-	BaseExpansionAudio::Serialize(s);
-
 	SVArray(_waveTable, 64);
 	SV(_volume);
 	SV(_mod);
@@ -24,31 +21,6 @@ void FdsAudio::Serialize(Serializer& s)
 	SV(_wavePitch);
 	SV(_wavePosition);
 	SV(_lastOutput);
-}
-
-void FdsAudio::ClockAudio()
-{
-	int frequency = _volume.GetFrequency();
-	if(!_haltWaveform && !_disableEnvelopes) {
-		_volume.TickEnvelope();
-		if(_mod.TickEnvelope()) {
-			_mod.UpdateOutput(frequency);
-		}
-	}
-
-	if(_mod.TickModulator()) {
-		//Modulator was ticked, update wave pitch
-		_mod.UpdateOutput(frequency);
-	}
-
-	UpdateOutput();
-
-	if(!_haltWaveform && frequency + _mod.GetOutput() > 0) {
-		_waveOverflowCounter += frequency + _mod.GetOutput();
-		if(_waveOverflowCounter < frequency + _mod.GetOutput()) {
-			_wavePosition = (_wavePosition + 1) & 0x3F;
-		}
-	}
 }
 
 void FdsAudio::UpdateOutput()
@@ -71,8 +43,10 @@ uint32_t FdsAudio::GetWaveAccumulator()
 	return (_wavePosition << 18) | _waveOverflowCounter;
 }
 
-FdsAudio::FdsAudio(NesConsole* console) : BaseExpansionAudio(console)
+FdsAudio::FdsAudio(NesConsole* console)
 {
+	_console = console;
+	_apu = console->GetApu();
 }
 
 //TODO Update to switch statement and map read-only FDS audio registers at $4090-$4097

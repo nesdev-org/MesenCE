@@ -1,12 +1,14 @@
 #pragma once
 #include "pch.h"
-#include "NES/APU/BaseExpansionAudio.h"
 #include "NES/APU/NesApu.h"
 #include "NES/NesConsole.h"
 
-class UnlDripGameAudio : public BaseExpansionAudio
+class UnlDripGameAudio : public ISerializable
 {
 private:
+	NesConsole* _console = nullptr;
+	NesApu* _apu = nullptr;
+
 	uint8_t _buffer[256] = {};
 	uint8_t _readPos = 0;
 	uint8_t _writePos = 0;
@@ -21,7 +23,6 @@ private:
 protected:
 	void Serialize(Serializer& s) override
 	{
-		BaseExpansionAudio::Serialize(s);
 		SVArray(_buffer, 256);
 		SV(_readPos);
 		SV(_writePos);
@@ -33,9 +34,37 @@ protected:
 		SV(_prevOutput);
 	}
 
-	void ClockAudio() override
+	void SetOutput(int16_t output)
 	{
-		if(_bufferEmpty) {
+		_console->GetApu()->AddExpansionAudioDelta(AudioChannel::VRC7, (output - _prevOutput) * 3);
+		_prevOutput = output;
+	}
+
+	void ResetBuffer()
+	{
+		memset(_buffer, 0, 256);
+		_readPos = 0;
+		_writePos = 0;
+		_bufferFull = false;
+		_bufferEmpty = true;
+	}
+
+public:
+	UnlDripGameAudio(NesConsole* console)
+	{
+		_console = console;
+		_apu = console->GetApu();
+
+		_freq = 0;
+		_timer = 0;
+		_volume = 0;
+		_prevOutput = 0;
+		ResetBuffer();
+	}
+
+	__forceinline void Clock()
+	{
+		if(_bufferEmpty || !_apu->IsApuEnabled()) {
 			return;
 		}
 
@@ -57,31 +86,6 @@ protected:
 				_bufferEmpty = true;
 			}
 		}
-	}
-
-	void SetOutput(int16_t output)
-	{
-		_console->GetApu()->AddExpansionAudioDelta(AudioChannel::VRC7, (output - _prevOutput) * 3);
-		_prevOutput = output;
-	}
-
-	void ResetBuffer()
-	{
-		memset(_buffer, 0, 256);
-		_readPos = 0;
-		_writePos = 0;
-		_bufferFull = false;
-		_bufferEmpty = true;
-	}
-
-public:
-	UnlDripGameAudio(NesConsole* console) : BaseExpansionAudio(console)
-	{
-		_freq = 0;
-		_timer = 0;
-		_volume = 0;
-		_prevOutput = 0;
-		ResetBuffer();
 	}
 
 	uint8_t ReadRegister()

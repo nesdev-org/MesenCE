@@ -733,12 +733,6 @@
     <ClInclude Include="NES\APU\ApuTimer.h">
       <Filter>NES\APU</Filter>
     </ClInclude>
-    <ClCompile Include="NES\APU\BaseExpansionAudio.cpp">
-      <Filter>NES\APU</Filter>
-    </ClCompile>
-    <ClInclude Include="NES\APU\BaseExpansionAudio.h">
-      <Filter>NES\APU</Filter>
-    </ClInclude>
     <ClCompile Include="NES\APU\DeltaModulationChannel.cpp">
       <Filter>NES\APU</Filter>
     </ClCompile>

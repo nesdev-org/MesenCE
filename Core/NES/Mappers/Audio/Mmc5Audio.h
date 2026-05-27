@@ -1,16 +1,14 @@
 #pragma once
 #include "pch.h"
 #include "NES/APU/SquareChannel.h"
-#include "NES/APU/BaseExpansionAudio.h"
 #include "NES/APU/NesApu.h"
 #include "NES/NesConsole.h"
-#include "NES/NesMemoryManager.h"
 
 class Mmc5Square : public SquareChannel
 {
+private:
 	int8_t _currentOutput = 0;
 
-private:
 	virtual void InitializeSweep(uint8_t regValue) override
 	{
 		//"$5001 has no effect. The MMC5 pulse channels will not sweep, as they have no sweep unit."
@@ -24,17 +22,22 @@ public:
 		Reset(false);
 	}
 
+	void Serialize(Serializer& s)
+	{
+		SV(_currentOutput);
+	}
+
 	int8_t GetOutput()
 	{
 		return _currentOutput;
 	}
 
-	void RunChannel()
+	__forceinline void RunChannel()
 	{
 		if(_timer.GetTimer() == 0) {
 			_dutyPos = (_dutyPos - 1) & 0x07;
 			//"Frequency values less than 8 do not silence the MMC5 pulse channels; they can output ultrasonic frequencies."
-			_currentOutput = _dutySequences[_duty][_dutyPos] * _envelope.GetVolume();
+			_currentOutput = _dutySequences[_duty][_dutyPos] * _envelope.GetVolume() * 3;
 			_timer.SetTimer(_timer.GetPeriod());
 		} else {
 			_timer.SetTimer(_timer.GetTimer() - 1);
@@ -42,9 +45,12 @@ public:
 	}
 };
 
-class Mmc5Audio : public BaseExpansionAudio
+class Mmc5Audio : public ISerializable
 {
 private:
+	NesConsole* _console = nullptr;
+	NesApu* _apu = nullptr;
+
 	Mmc5Square _square1;
 	Mmc5Square _square2;
 	int16_t _audioCounter = 0;
@@ -57,8 +63,6 @@ private:
 protected:
 	void Serialize(Serializer& s) override
 	{
-		BaseExpansionAudio::Serialize(s);
-
 		SV(_square1);
 		SV(_square2);
 		SV(_audioCounter);
@@ -68,8 +72,13 @@ protected:
 		SV(_pcmOutput);
 	}
 
-	void ClockAudio() override
+public:
+	void Clock()
 	{
+		if(!_apu->IsApuEnabled()) {
+			return;
+		}
+
 		_audioCounter--;
 		_square1.RunChannel();
 		_square2.RunChannel();
@@ -84,7 +93,7 @@ protected:
 
 		//"The sound output of the square channels are equivalent in volume to the corresponding APU channels"
 		//"The polarity of all MMC5 channels is reversed compared to the APU."
-		int16_t summedOutput = -(_square1.GetOutput() * 3 + _square2.GetOutput() * 3 + _pcmOutput);
+		int16_t summedOutput = -(_square1.GetOutput() + _square2.GetOutput() + _pcmOutput);
 		if(summedOutput != _lastOutput) {
 			_console->GetApu()->AddExpansionAudioDelta(AudioChannel::MMC5, summedOutput - _lastOutput);
 			_lastOutput = summedOutput;
@@ -94,9 +103,11 @@ protected:
 		_square2.ReloadLengthCounter();
 	}
 
-public:
-	Mmc5Audio(NesConsole* console) : BaseExpansionAudio(console), _square1(console), _square2(console)
+	Mmc5Audio(NesConsole* console) : _square1(console), _square2(console)
 	{
+		_console = console;
+		_apu = console->GetApu();
+
 		_audioCounter = 0;
 		_lastOutput = 0;
 		_pcmReadMode = false;
@@ -105,6 +116,7 @@ public:
 	}
 
 	__forceinline bool GetPcmReadMode() { return _pcmReadMode; }
+
 	void HandlePcmRead(uint16_t addr, uint8_t value)
 	{
 		if((addr & 0xC000) == 0x8000 && value) {

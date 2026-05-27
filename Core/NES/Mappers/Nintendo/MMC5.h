@@ -223,13 +223,10 @@ private:
 
 		_audio->Clock();
 
-		if(_ppuIdleCounter) {
-			_ppuIdleCounter--;
-			if(_ppuIdleCounter == 0) {
-				//"The "in-frame" flag is cleared when the PPU is no longer rendering. This is detected when 3 CPU cycles pass without a PPU read having occurred (PPU /RD has not been low during the last 3 M2 rises)."
-				_ppuInFrame = false;
-				UpdateChrBanks(true);
-			}
+		if(_ppuIdleCounter && --_ppuIdleCounter == 0) {
+			//"The "in-frame" flag is cleared when the PPU is no longer rendering. This is detected when 3 CPU cycles pass without a PPU read having occurred (PPU /RD has not been low during the last 3 M2 rises)."
+			_ppuInFrame = false;
+			UpdateChrBanks(true);
 		}
 	}
 

@@ -507,7 +507,6 @@
     <ClInclude Include="NES\Loaders\NsfeLoader.h" />
     <ClInclude Include="NES\Loaders\NsfLoader.h" />
     <ClInclude Include="NES\Loaders\RomLoader.h" />
-    <ClInclude Include="NES\APU\BaseExpansionAudio.h" />
     <ClInclude Include="NES\Mappers\A12Watcher.h" />
     <ClInclude Include="NES\Mappers\Audio\Mmc5Audio.h" />
     <ClInclude Include="NES\Mappers\Audio\Namco163Audio.h" />
@@ -876,7 +875,6 @@
     <ClCompile Include="NES\Loaders\iNesLoader.cpp" />
     <ClCompile Include="NES\Loaders\NsfLoader.cpp" />
     <ClCompile Include="NES\Loaders\RomLoader.cpp" />
-    <ClCompile Include="NES\APU\BaseExpansionAudio.cpp" />
     <ClCompile Include="NES\Loaders\StudyBoxLoader.cpp" />
     <ClCompile Include="NES\Loaders\UnifLoader.cpp" />
     <ClCompile Include="NES\Mappers\Homebrew\Rainbow.cpp" />
