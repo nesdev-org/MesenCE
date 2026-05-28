@@ -109,10 +109,10 @@ protected:
 
 		RemoveRegisterRange(0, 0xFFFF, MemoryOperation::Read);
 		if(!_useHeuristics && _variant <= VRCVariant::VRC2c && _workRamSize == 0 && _saveRamSize == 0) {
-			AddRegisterRange(0x6000, 0x7FFF, MemoryOperation::Any);
+			AddRegisterRange(0x6000, 0x6FFF, MemoryOperation::Any);
 		} else if(_variant == VRCVariant::VRC4_183) {
 			AddRegisterRange(0x6000, 0x7FFF, MemoryOperation::Write);
-			SetCpuMemoryMapping(0x6000, 0x7FFF, 0, PrgMemoryType::PrgRom, MemoryAccessType::Read);
+			SetCpuMemoryMapping(0x6000, 0x7FFF, GetPowerOnByte() & 0xF, PrgMemoryType::PrgRom, MemoryAccessType::Read);
 		}
 	}
 
