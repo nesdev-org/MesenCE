@@ -1923,9 +1923,6 @@
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper170.h">
       <Filter>NES\Mappers\Unlicensed</Filter>
     </ClInclude>
-    <ClInclude Include="NES\Mappers\Unlicensed\Mapper183.h">
-      <Filter>NES\Mappers\Unlicensed</Filter>
-    </ClInclude>
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper200.h">
       <Filter>NES\Mappers\Unlicensed</Filter>
     </ClInclude>
