@@ -505,8 +505,8 @@ void GbaCpu::ArmSingleDataSwap()
 #endif
 	uint32_t src = R(rn);
 	uint32_t val = Read(mode, src);
-	Idle();
 	Write(mode, src, rm == 15 ? (R(rm) + 4) : R(rm));
+	Idle();
 #ifndef DUMMYCPU
 	_memoryManager->UnlockBus();
 #endif
