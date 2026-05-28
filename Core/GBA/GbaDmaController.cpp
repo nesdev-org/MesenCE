@@ -38,13 +38,22 @@ void GbaDmaController::TriggerDmaChannel(GbaDmaTrigger trigger, uint8_t channel,
 			ch.Repeat = false;
 		}
 
+		if(ch.Pending) {
+			//When a channel is already pending (or running) and gets triggered again, ignore the
+			//new trigger and run the channel at the timing determined on the first trigger.
+			//The dma-latch test triggers the DMA channel via a timer on every cycle,
+			//which caused the DMA to never actually start (its start clock was constantly
+			//getting pushed further into the future)
+			return;
+		}
+
 		ch.Pending = true;
 		_dmaPending = true;
 
 		uint8_t delay = 2;
 		if(trigger == GbaDmaTrigger::Special) {
 			if(channel < 3) {
-				//Audio DMA triggers slightly later (4 passes fifo_dma_2 test rom)
+				//Audio DMA triggers slightly later (3 passes fifo_2 test rom)
 				delay = 3;
 			} else {
 				//Video capture DMA
