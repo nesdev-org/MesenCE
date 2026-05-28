@@ -92,7 +92,7 @@ protected:
 	uint8_t _nextSpriteShifter = 0;
 	uint16_t _nextSpriteShifterCycle = 0;
 	uint8_t _activeSpriteShifters = 0;
-	uint8_t _dotSkipped = false;
+	uint8_t _dotSkipped = 0;
 	bool _processSprites = false;
 
 	Emulator* _emu = nullptr;
