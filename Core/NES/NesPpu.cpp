@@ -773,7 +773,7 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 		info.LowByte = 0;
 		info.HighByte = 0;
 
-		_spriteShifterList[_spriteIndex] = SpriteShifterDone;
+		_spriteShifterList[_spriteIndex] = BaseNesPpu::SpriteShifterDone;
 	}
 
 	_spriteIndex++;
@@ -1059,7 +1059,7 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
 	if(_nextSpriteShifterCycle == _cycle) {
 		while((uint32_t)(_spriteShifterList[_nextSpriteShifter] >> 4) == _cycle) {
 			_activeSpriteShifters |= (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
-			_spriteShifterList[_nextSpriteShifter] = SpriteShifterDone;
+			_spriteShifterList[_nextSpriteShifter] = BaseNesPpu::SpriteShifterDone;
 			_nextSpriteShifter++;
 		}
 		_nextSpriteShifterCycle = _spriteShifterList[_nextSpriteShifter] >> 4;
@@ -1690,7 +1690,7 @@ template<class T> void NesPpu<T>::Serialize(Serializer& s)
 			_oamDecayCycles[i] = _console->GetCpu()->GetCycleCount();
 		}
 
-		_spriteShifterList[8] = SpriteShifterDone;
+		_spriteShifterList[8] = BaseNesPpu::SpriteShifterDone;
 
 		_lastUpdatedPixel = -1;
 
