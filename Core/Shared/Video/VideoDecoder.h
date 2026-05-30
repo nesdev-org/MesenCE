@@ -50,7 +50,7 @@ public:
 	void Init();
 
 	void DecodeFrame(bool synchronous = false);
-	void TakeScreenshot();
+	void TakeScreenshot(string romName = "");
 	void TakeScreenshot(std::stringstream& stream);
 
 	void ForceFilterUpdate() { _forceFilterUpdate = true; }

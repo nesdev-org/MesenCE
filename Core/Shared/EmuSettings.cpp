@@ -149,7 +149,8 @@ void EmuSettings::Serialize(Serializer& s)
 			break;
 
 		case ConsoleType::Ws:
-			//TODOWS
+			SV(_ws.Model);
+			SV(_ws.UseBootRom);
 			break;
 
 		default:

@@ -242,10 +242,10 @@ bool VideoDecoder::IsRunning()
 	return _decodeThread != nullptr;
 }
 
-void VideoDecoder::TakeScreenshot()
+void VideoDecoder::TakeScreenshot(string romName)
 {
 	if(_videoFilter) {
-		_videoFilter->TakeScreenshot(_emu->GetRomInfo().RomFile.GetFileName(), _videoFilterType);
+		_videoFilter->TakeScreenshot(romName.empty() ? _emu->GetRomInfo().RomFile.GetFileName() : romName, _videoFilterType);
 	}
 }
 

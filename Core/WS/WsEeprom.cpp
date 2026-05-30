@@ -19,7 +19,7 @@ WsEeprom::WsEeprom(Emulator* emu, WsConsole* console, WsEepromSize size, uint8_t
 	_state.WriteDisabled = true;
 
 	if(_isInternal) {
-		if(!emu->GetSettings()->GetWsConfig().UseBootRom) {
+		if(!_console->HasBootRom()) {
 			//Boot ROM leaves writes enabled
 			_state.WriteDisabled = false;
 		}

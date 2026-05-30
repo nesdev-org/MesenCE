@@ -75,6 +75,7 @@ public:
 	bool IsColorModel();
 	bool IsPowerOff();
 	bool IsVerticalMode();
+	bool HasBootRom() { return _bootRom != nullptr; }
 	WsAudioMode GetAudioMode();
 	WsModel GetModel();
 
