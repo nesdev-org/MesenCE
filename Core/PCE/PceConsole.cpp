@@ -62,6 +62,10 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile)
 			return LoadRomResult::Failure;
 		}
 
+		if(consoleType == PceConsoleType::Auto && IsSuperGrafxCd(disc)) {
+			consoleType = PceConsoleType::SuperGrafx;
+		}
+
 		_cdrom.reset(new PceCdRom(_emu, this, disc));
 		_romFormat = RomFormat::PceCdRom;
 		cdromUnitEnabled = true;
@@ -136,6 +140,9 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile)
 
 	MessageManager::Log("-----------------");
 	MessageManager::Log("Loaded: " + romFile.GetFileName());
+	if(consoleType == PceConsoleType::SuperGrafx && cfg.ConsoleType == PceConsoleType::Auto) {
+		MessageManager::Log("Enabled SuperGrafx mode (auto-detect)");
+	}
 	MessageManager::Log("-----------------");
 
 	return LoadRomResult::Success;
@@ -159,6 +166,25 @@ bool PceConsole::LoadFirmware(DiscInfo& disc, vector<uint8_t>& romData)
 bool PceConsole::IsPopulousCard(uint32_t crc32)
 {
 	return crc32 == 0x083C956A;
+}
+
+bool PceConsole::IsSuperGrafxCd(DiscInfo& disc)
+{
+	int32_t track = disc.GetFirstDataTrack();
+	if(track < 0) {
+		return false;
+	}
+
+	int32_t sector = disc.GetTrackFirstSector(track);
+	if(sector < 0) {
+		return false;
+	}
+
+	//Check for custom homebrew marker to automatically enable SuperGrafx mode for CD games
+	//This should be in the 2nd sector of the first data track, at offset 0x80
+	vector<uint8_t> sectorData;
+	disc.ReadDataSector(sector + 1, sectorData);
+	return memcmp(sectorData.data() + 0x80, "(for SuperGRAFX)", 16) == 0;
 }
 
 bool PceConsole::IsSuperGrafxCard(uint32_t crc32)

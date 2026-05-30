@@ -96,6 +96,16 @@ struct DiscInfo
 		return -1;
 	}
 
+	int32_t GetFirstDataTrack()
+	{
+		for(size_t i = 0; i < Tracks.size(); i++) {
+			if(Tracks[i].Format != TrackFormat::Audio) {
+				return (int32_t)i;
+			}
+		}
+		return -1;
+	}
+
 	int32_t GetTrackFirstSector(int32_t track)
 	{
 		if(track < Tracks.size()) {
@@ -135,6 +145,7 @@ struct DiscInfo
 			uint32_t byteOffset = trk.FileOffset + (sector - trk.FirstSector) * sectorSize;
 			if(!Files[trk.FileIndex].ReadChunk(outData, byteOffset + sectorHeaderSize, 2048)) {
 				LogDebug("Invalid read offsets");
+				outData.insert(outData.end(), 2048, 0);
 			}
 		}
 	}

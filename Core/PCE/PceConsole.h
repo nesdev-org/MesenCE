@@ -38,6 +38,7 @@ private:
 	RomFormat _romFormat = RomFormat::Pce;
 
 	static bool IsPopulousCard(uint32_t crc32);
+	static bool IsSuperGrafxCd(DiscInfo& disc);
 	static bool IsSuperGrafxCard(uint32_t crc32);
 
 	bool LoadHesFile(VirtualFile& hesFile);
