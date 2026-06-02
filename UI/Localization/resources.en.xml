@@ -193,6 +193,7 @@
 			<Control ID="tpgAdvanced">Advanced</Control>
 			<Control ID="lblScreenRotation">Screen Rotation:</Control>
 			<Control ID="chkUseSoftwareRenderer">Use software renderer (requires restart)</Control>
+			<Control ID="chkDisableHighPrecisionFramePacing">Disable high precision frame pacing (may improve battery life)</Control>
 		</Form>
 		<Form ID="EmulationConfigView">
 			<Control ID="tpgGeneral">General</Control>

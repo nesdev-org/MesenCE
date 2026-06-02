@@ -120,6 +120,7 @@ struct VideoConfig
 	uint32_t FullscreenResHeight = 0;
 
 	uint32_t ScreenRotation = 0;
+	bool DisableHighPrecisionFramePacing = false;
 };
 
 struct AudioConfig

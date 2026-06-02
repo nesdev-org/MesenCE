@@ -179,6 +179,7 @@
 			<ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Auto" Padding="0 0 2 0">
 				<StackPanel>
 					<c:CheckBoxWarning IsVisible="{Binding !IsMacOs}" IsChecked="{Binding Config.UseSoftwareRenderer}" Text="{l:Translate chkUseSoftwareRenderer}" />
+					<c:CheckBoxWarning IsChecked="{Binding Config.DisableHighPrecisionFramePacing}" Text="{l:Translate chkDisableHighPrecisionFramePacing}" />
 					<StackPanel Orientation="Horizontal" Margin="0 5 0 0">
 						<TextBlock Text="{l:Translate lblScreenRotation}" VerticalAlignment="Center" />
 						<c:EnumComboBox SelectedItem="{Binding Config.ScreenRotation}" />

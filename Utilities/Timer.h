@@ -12,5 +12,4 @@ public:
 	Timer();
 	void Reset();
 	double GetElapsedMS() const;
-	void WaitUntil(double targetMillisecond) const;
 };

@@ -1,5 +1,7 @@
 #pragma once
 #include "pch.h"
+#include <iomanip>
+#include <sstream>
 
 class StringUtilities
 {
@@ -124,5 +126,12 @@ public:
 			// Size is not a multiple of 1 KiB, so just print the bytes.
 			return std::to_string(size) + " bytes";
 		}
+	}
+
+	static string ToString(double value, uint32_t precision)
+	{
+		std::ostringstream stream;
+		stream << std::fixed << std::setprecision(precision) << value;
+		return stream.str();
 	}
 };
