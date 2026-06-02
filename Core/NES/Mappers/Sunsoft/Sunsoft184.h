@@ -20,6 +20,7 @@ protected:
 		SelectChrPage(0, value & 0x07);
 
 		//"The most significant bit of H is always set in hardware."
-		SelectChrPage(1, 0x80 | ((value >> 4) & 0x07));
+		//H is bits 6-4. This limits the banks to 4-7 instead of 0-7.
+		SelectChrPage(1, 0x04 | ((value >> 4) & 0x03));
 	}
 };
