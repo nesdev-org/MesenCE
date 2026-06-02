@@ -52,8 +52,6 @@ public:
 	{
 		_stateBuffer = 0b111111110111000000000000; // Controller type $E, and then disambiguated with $FF
 		if(_unlocked) {
-			// TODOSNES - When a game increments _unlockCounter without doing a $4017 read without strobe,
-			// this bit can somehow get set. That's not implemented here.
 			_stateBuffer |= 1 << 11;
 		}
 	}
@@ -65,15 +63,12 @@ public:
 		if(addr == 0x4017) {
 			StrobeProcessRead();
 
-			// TODOSNES - The unlock and position reset logic does not match hardware in all cases,
-			// but does seem to match what happens when games read $4017 without strobe after changing _unlockCounter,
-			// which ASCII games do. More research is required to figure out what really happens.
+			_unlocked = _unlockCounter == 0xF;
 			if(_strobe) {
 				_unlockCounter = (_unlockCounter + 1) & 0xF;
+			}
+			if(!_unlocked) {
 				_position = 0;
-				_unlocked = false;
-			} else {
-				_unlocked = _unlockCounter == 0xF;
 			}
 
 			// Return one bit from the status
