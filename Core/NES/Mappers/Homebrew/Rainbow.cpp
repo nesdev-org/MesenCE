@@ -445,7 +445,7 @@ uint8_t Rainbow::MapperReadVram(uint16_t addr, MemoryOperationType memoryOperati
 			uint32_t fetchAddr = (addr & 0xFFF) | ((_extData & 0x3F) << 12) | (_bgExtModeOffset << 18);
 			return ReadChr(fetchAddr, addr);
 		} else if(_spriteExtMode && !isBgFetch) {
-			uint8_t spriteIndex = _oamMappings[_ntFetchCounter - 33];
+			uint8_t spriteIndex = _oamMappings[(_ntFetchCounter - 33) >> 1];
 			uint32_t fetchAddr;
 			if(_largeSprites) {
 				fetchAddr = (_spriteExtBank << 21) | (_spriteExtData[spriteIndex] << 13) | (addr & 0x1FFF);
