@@ -472,9 +472,6 @@ void Rainbow::UpdateIrqStatus()
 void Rainbow::AckCpuIrq()
 {
 	_cpuIrqEnabled = _cpuIrqEnableAfterAck;
-	if(_cpuIrqEnabled) {
-		_cpuIrqCounter = _cpuIrqReloadValue;
-	}
 	_cpuIrqPending = false;
 	UpdateIrqStatus();
 }
