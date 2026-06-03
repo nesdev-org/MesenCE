@@ -454,7 +454,17 @@ namespace Mesen.Debugger.ViewModels
 				BaseState ppuState = DebugApi.GetPpuState(CpuType);
 				_coreData.PpuState = ppuState;
 				_coreData.PpuToolsState = DebugApi.GetPpuToolsState(CpuType);
-				_coreData.PrevVram = _coreData.Vram;
+
+				if(CpuType == CpuType.Nes) {
+					//This is only used for the NES' tilemap viewer, avoid doing this for other consoles
+					if(_coreData.PrevVram.Length != _coreData.Vram.Length) {
+						_coreData.PrevVram = new byte[_coreData.Vram.Length];
+					}
+					Array.Copy(_coreData.Vram, _coreData.PrevVram, _coreData.PrevVram.Length);
+				} else {
+					_coreData.PrevVram = Array.Empty<byte>();
+				}
+
 				DebugApi.GetMemoryState(GetVramMemoryType(), ref _coreData.Vram);
 				DebugApi.GetMemoryAccessCounts(GetVramMemoryType(), ref _coreData.AccessCounters);
 
