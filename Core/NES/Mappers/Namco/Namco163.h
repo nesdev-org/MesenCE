@@ -67,18 +67,7 @@ protected:
 		switch(_romInfo.MapperID) {
 			case 19:
 				_variant = NamcoVariant::Namco163;
-				if(_romInfo.DatabaseInfo.Board == "NAMCOT-163") {
-					_variant = NamcoVariant::Namco163;
-					_autoDetectVariant = false;
-				} else if(_romInfo.DatabaseInfo.Board == "NAMCOT-175") {
-					_variant = NamcoVariant::Namco175;
-					_autoDetectVariant = false;
-				} else if(_romInfo.DatabaseInfo.Board == "NAMCOT-340") {
-					_variant = NamcoVariant::Namco340;
-					_autoDetectVariant = false;
-				} else {
-					_autoDetectVariant = true;
-				}
+				_autoDetectVariant = !_romInfo.IsInDatabase && !_romInfo.IsNes20Header;
 				break;
 			case 210:
 				switch(_romInfo.SubMapperID) {
