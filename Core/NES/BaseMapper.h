@@ -76,6 +76,7 @@ protected:
 	uint32_t _prgSize = 0;
 	uint32_t _chrRomSize = 0;
 	uint32_t _chrRamSize = 0;
+	uint32_t _saveChrRamSize = 0;
 
 	uint8_t* _saveRam = nullptr;
 	uint32_t _saveRamSize = 0;
