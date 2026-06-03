@@ -8,8 +8,8 @@
     <AssemblyName>Mesen</AssemblyName>
     <RootNamespace>Mesen</RootNamespace>
     <StartupObject>Mesen.Program</StartupObject>
-    <Version>2.1.1</Version>
-    <FileVersion>2.1.1</FileVersion>
+    <Version>2.2.0</Version>
+    <FileVersion>2.2.0</FileVersion>
     <Copyright>(C) 2014-2026 Sour</Copyright>
   </PropertyGroup>
 	<PropertyGroup>
