@@ -723,14 +723,18 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 	//TODO This includes a hack to make CHR-NVRAM work for properly-specified headers that have just one
 	//type of CHR-RAM. Most correct would be another memory type for CHR-NVRAM, but that would basically
 	//just matter for RacerMate Challenge II, which uses a bike we don't currently support, anyway.
+	int32_t totalChrRam = -1;
+	if(romData.ChrRamSize >= 0 || romData.SaveChrRamSize >= 0) {
+		totalChrRam = (romData.ChrRamSize > 0 ? romData.ChrRamSize : 0) + (romData.SaveChrRamSize > 0 ? romData.SaveChrRamSize : 0);
+	}
 	if(_chrRomSize == 0) {
 		//Assume there is CHR RAM if no CHR ROM exists
-		InitializeChrRam(romData.ChrRamSize + romData.SaveChrRamSize);
+		InitializeChrRam(totalChrRam);
 
 		//Map CHR RAM to 0x0000-0x1FFF by default when no CHR ROM exists
 		SetPpuMemoryMapping(0x0000, 0x1FFF, 0, ChrMemoryType::ChrRam);
-	} else if(romData.ChrRamSize >= 0 || romData.SaveChrRamSize >= 0) {
-		InitializeChrRam(romData.ChrRamSize + romData.SaveChrRamSize);
+	} else if(totalChrRam >= 0) {
+		InitializeChrRam(totalChrRam);
 	} else if(GetChrRamSize()) {
 		InitializeChrRam();
 	}
