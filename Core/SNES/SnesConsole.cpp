@@ -490,6 +490,7 @@ AddressInfo SnesConsole::GetRelativeAddress(AddressInfo& absAddress, CpuType cpu
 		case MemoryType::SnesPrgRom:
 		case MemoryType::SnesWorkRam:
 		case MemoryType::SnesSaveRam:
+		case MemoryType::GsuWorkRam:
 		case MemoryType::SufamiTurboFirmware: {
 			if(!mappings) {
 				return unmapped;
