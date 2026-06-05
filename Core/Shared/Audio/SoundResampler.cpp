@@ -80,8 +80,9 @@ void SoundResampler::UpdateTargetSampleRate(uint32_t sourceRate, uint32_t sample
 
 	if(_emu->GetSettings()->GetVideoConfig().IntegerFpsMode) {
 		//Adjust input sample rate when using integer fps values
-		double baseFps = _emu->GetConsoleUnsafe()->GetFps();
-		double roundedFps = _emu->GetFps();
+		shared_ptr<IConsole> console = _emu->GetConsole();
+		double baseFps = console->GetFps();
+		double roundedFps = std::round(baseFps);
 		inputRate = sourceRate * (roundedFps / baseFps);
 	}
 
