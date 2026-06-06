@@ -38,9 +38,7 @@ private:
 	uint8_t _inputIndex = 0;
 
 	bool _listeningForPacket = false;
-	bool _waitForHigh = true;
 	bool _packetReady = false;
-	uint64_t _inputWriteClock = 0;
 	uint8_t _inputValue = 0;
 	uint8_t _packetData[16] = {};
 	uint8_t _packetByte = 0;
@@ -57,6 +55,9 @@ private:
 
 	void SetInputIndex(uint8_t index);
 	void SetInputValue(uint8_t index, uint8_t value);
+
+	void EndPacket();
+	void AddPacketBit();
 
 public:
 	SuperGameboy(SnesConsole* console, Gameboy* gameboy);

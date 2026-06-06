@@ -56,9 +56,7 @@ void SuperGameboy::Reset()
 	_inputIndex = 0;
 
 	_listeningForPacket = false;
-	_waitForHigh = true;
 	_packetReady = false;
-	_inputWriteClock = 0;
 	_inputValue = 0;
 	memset(_packetData, 0, sizeof(_packetData));
 	_packetByte = 0;
@@ -144,64 +142,68 @@ void SuperGameboy::ProcessInputPortWrite(uint8_t value)
 		return;
 	}
 
-	if(value == 0x00) {
-		//Reset pulse
-		_waitForHigh = true;
-		_packetByte = 0;
-		_packetBit = 0;
-		_packetBuffer = 0;
-	} else if(_waitForHigh) {
-		if(value == 0x10 || value == 0x20) {
-			//Invalid sequence (should be 0x00 -> 0x30 -> 0x10/0x20 -> 0x30 -> 0x10/0x20, etc.)
-			_waitForHigh = false;
-			_listeningForPacket = false;
-		} else if(value == 0x30) {
-			_waitForHigh = false;
-			_listeningForPacket = true;
-		}
-	} else if(_listeningForPacket) {
-		if(value == 0x20) {
-			//0 bit
-			if(_packetByte >= 16 && _packetBit == 0) {
-				_packetReady = true;
-				_listeningForPacket = false;
-
-				if(_emu->IsDebugging()) {
-					LogPacket();
-				}
-			} else {
-				_packetBuffer &= ~(1 << _packetBit);
-			}
-			_packetBit++;
-			if(_packetBit == 8) {
-				_packetBit = 0;
-				_packetData[_packetByte] = _packetBuffer;
-				_packetBuffer = 0;
-				_packetByte++;
-			}
-		} else if(value == 0x10) {
-			//1 bit
-			if(_packetByte >= 16) {
-				//Invalid bit
-				_listeningForPacket = false;
-			} else {
-				_packetBuffer |= (1 << _packetBit);
-				_packetBit++;
-				if(_packetBit == 8) {
-					_packetBit = 0;
-					_packetData[_packetByte] = _packetBuffer;
-					_packetBuffer = 0;
-					_packetByte++;
-				}
-			}
-		}
-		_waitForHigh = _listeningForPacket;
-	} else if(!(_inputValue & 0x20) && (value & 0x20)) {
+	uint8_t oldValue = _inputValue;
+	if(!(oldValue & 0x20) && (value & 0x20)) {
 		SetInputIndex((_inputIndex + 1) % GetPlayerCount());
 	}
 
 	_inputValue = value;
-	_inputWriteClock = _memoryManager->GetMasterClock();
+
+	if(value == 0x00) {
+		//Reset pulse
+		_packetByte = 0;
+		_packetBit = 0;
+		_packetBuffer = 0;
+		_listeningForPacket = false;
+		return;
+	} else if(value != 0x30) {
+		return;
+	}
+
+	if(oldValue == 0) {
+		_listeningForPacket = true;
+	} else if(_listeningForPacket) {
+		if(oldValue == 0x20) {
+			//0 bit
+			if(_packetByte >= 16) {
+				EndPacket();
+			} else {
+				_packetBuffer &= ~(1 << _packetBit);
+				AddPacketBit();
+			}
+		} else if(oldValue == 0x10) {
+			//1 bit
+			if(_packetByte >= 16) {
+				//Packets should end with a "0" bit, but the sgb-ext-test results
+				//seem to imply that this works.
+				EndPacket();
+			} else {
+				_packetBuffer |= (1 << _packetBit);
+				AddPacketBit();
+			}
+		}
+	}
+}
+
+void SuperGameboy::EndPacket()
+{
+	_listeningForPacket = false;
+	_packetReady = true;
+
+	if(_emu->IsDebugging()) {
+		LogPacket();
+	}
+}
+
+void SuperGameboy::AddPacketBit()
+{
+	_packetBit++;
+	if(_packetBit == 8) {
+		_packetBit = 0;
+		_packetData[_packetByte] = _packetBuffer;
+		_packetBuffer = 0;
+		_packetByte++;
+	}
 }
 
 void SuperGameboy::LogPacket()
@@ -269,9 +271,9 @@ void SuperGameboy::WriteLcdColor(uint8_t scanline, uint8_t pixel, uint8_t color)
 uint8_t SuperGameboy::GetPlayerCount()
 {
 	uint8_t playerCount = ((_control >> 4) & 0x03) + 1;
-	if(playerCount >= 3) {
-		//Unknown: 2 and 3 both mean 4 players?
-		return 4;
+	if(playerCount == 3) {
+		//Based on the sgb-ext-test results, this behaves like 1 player mode
+		return 1;
 	}
 	return playerCount;
 }
@@ -377,14 +379,12 @@ void SuperGameboy::Serialize(Serializer& s)
 	SV(_inputIndex);
 	SV(_listeningForPacket);
 	SV(_packetReady);
-	SV(_inputWriteClock);
 	SV(_inputValue);
 	SV(_packetByte);
 	SV(_packetBuffer);
 	SV(_packetBit);
 	SV(_lcdRowSelect);
 	SV(_readPosition);
-	SV(_waitForHigh);
 	SV(_clockRatio);
 	SV(_row);
 	SV(_bank);
