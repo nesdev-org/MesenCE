@@ -288,6 +288,9 @@ void GbaDmaController::RunDma(GbaDmaChannel& ch, uint8_t chIndex)
 		ch.Enabled = false;
 		ch.Control &= ~0x8000;
 	} else {
+		//Length is reloaded from the register on each repeat
+		ch.LenLatch = ch.Length;
+
 		if(destMode == GbaDmaAddrMode::IncrementReload) {
 			ch.DestLatch = ch.Destination;
 		}
