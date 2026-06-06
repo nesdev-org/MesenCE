@@ -638,8 +638,12 @@ PpuFrameInfo Emulator::GetPpuFrame()
 
 ConsoleRegion Emulator::GetRegion()
 {
+	//Returns last active region when no console is active
 	shared_ptr<IConsole> console = GetConsole();
-	return console ? console->GetRegion() : ConsoleRegion::Ntsc;
+	if(console) {
+		_lastRegion = console->GetRegion();
+	}
+	return _lastRegion;
 }
 
 shared_ptr<IConsole> Emulator::GetConsole()

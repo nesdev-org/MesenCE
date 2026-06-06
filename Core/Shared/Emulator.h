@@ -112,6 +112,7 @@ private:
 
 	RomInfo _rom;
 	ConsoleType _consoleType = {};
+	ConsoleRegion _lastRegion = ConsoleRegion::Ntsc;
 
 	ConsoleMemoryInfo _consoleMemory[DebugUtilities::GetMemoryTypeCount()] = {};
 
