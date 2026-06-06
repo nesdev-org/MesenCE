@@ -37,6 +37,14 @@ public:
 		return nullptr;
 	}
 
+	void Reset(bool softReset) override
+	{
+		//Force a full reset of the PPU for NSFs. Otherwise, the option to prevent
+		//PPU reset on console reset (Famicom behavior) prevents the time from
+		//resetting to 0:00 when switching tracks.
+		NesPpu::Reset(false);
+	}
+
 	void Run(uint64_t runTo) override
 	{
 		do {
