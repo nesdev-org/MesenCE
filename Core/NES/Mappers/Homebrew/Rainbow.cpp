@@ -69,10 +69,11 @@ void Rainbow::Reset(bool softReset)
 	WriteRegister(0x412D, 0x00);
 	WriteRegister(0x412F, 0x80);
 	WriteRegister(0x4241, 0x07);
-	WriteRegister(0x4242, 0x1B);
+	WriteRegister(0x4242, 0x06);
 	WriteRegister(0x4152, 0x00);
 	WriteRegister(0x4153, 0x87);
 	WriteRegister(0x415A, 0x00);
+	WriteRegister(0x416B, 0x00);
 	WriteRegister(0x4190, 0x00);
 	WriteRegister(0x41A9, 0x03);
 	WriteRegister(0x41AA, 0x0F);
@@ -116,34 +117,6 @@ uint8_t Rainbow::ReadRam(uint16_t addr)
 	return BaseMapper::InternalRead(addr);
 }
 
-void Rainbow::GenerateOamClear()
-{
-	if(_oamCodeLocked) {
-		return;
-	}
-	_oamCodeLocked = true;
-
-	int i = 6;
-	for(int spr = 0; spr < 64; spr++) {
-		_oamCode[i++] = 0xA9; //LDA #spr
-		_oamCode[i++] = spr * 4;
-
-		if(spr == 0) {
-			_oamCode[i++] = 0xAA; //TAX
-			_oamCode[i++] = 0xCA; //DEX
-		}
-
-		_oamCode[i++] = 0x8D; //STA $2003
-		_oamCode[i++] = 0x03;
-		_oamCode[i++] = 0x20;
-
-		_oamCode[i++] = 0x8E; //STX $2004
-		_oamCode[i++] = 0x04;
-		_oamCode[i++] = 0x20;
-	}
-	_oamCode[i++] = 0x60; //RTS
-}
-
 void Rainbow::GenerateExtUpdate()
 {
 	if(_oamCodeLocked) {
@@ -152,9 +125,9 @@ void Rainbow::GenerateExtUpdate()
 	_oamCodeLocked = true;
 
 	int i = 2;
-	for(int spr = 0; spr < 64; spr++) {
+	for(int spr = 0; spr <= _oamSpriteLimit; spr++) {
 		_oamCode[i++] = 0xA9; //LDA #[fpga ram value]
-		_oamCode[i++] = _mapperRam[0x1800 + (_oamExtUpdatePage * 0x40) + spr];
+		_oamCode[i++] = _mapperRam[0x1800 + (_oamExtUpdatePage * 0x100) + spr * 4];
 
 		_oamCode[i++] = 0x8D; //STA $42xx
 		_oamCode[i++] = spr;
@@ -169,16 +142,9 @@ void Rainbow::GenerateOamSlowUpdate()
 		return;
 	}
 	_oamCodeLocked = true;
-
+	uint8_t oamIndexLimit = (_oamSpriteLimit << 2) | 3;
 	int i = 0;
-	_oamCode[i++] = 0xA9; //LDA #00
-	_oamCode[i++] = 0x00;
-
-	_oamCode[i++] = 0x8D; //STA $2003
-	_oamCode[i++] = 0x03;
-	_oamCode[i++] = 0x20;
-
-	for(int j = 0; j < 256; j++) {
+	for(int j = 0; j <= oamIndexLimit; j++) {
 		_oamCode[i++] = 0xA9; //LDA #[fpga ram value]
 		_oamCode[i++] = _mapperRam[0x1800 + (_oamSlowUpdatePage * 0x100) + j];
 
@@ -411,11 +377,11 @@ uint8_t Rainbow::MapperReadVram(uint16_t addr, MemoryOperationType memoryOperati
 				return _fillModeTileIndex;
 			}
 		} else {
-			if(ctrl.AttrExtMode) {
+			if(ctrl.FillMode) {
+				return _fillModeAttrIndex * 0x55;
+			} else if(ctrl.AttrExtMode) {
 				uint8_t attr = (_extData & 0xC0) >> 6;
 				return attr * 0x55;
-			} else if(ctrl.FillMode) {
-				return _fillModeAttrIndex * 0x55;
 			}
 		}
 
@@ -499,9 +465,6 @@ void Rainbow::UpdateIrqStatus()
 void Rainbow::AckCpuIrq()
 {
 	_cpuIrqEnabled = _cpuIrqEnableAfterAck;
-	if(_cpuIrqEnabled) {
-		_cpuIrqCounter = _cpuIrqReloadValue;
-	}
 	_cpuIrqPending = false;
 	UpdateIrqStatus();
 }
@@ -579,8 +542,7 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 			UpdateIrqStatus();
 			return (
 				((uint8_t)_inHBlank << 7) |
-				((uint8_t)_inFrame << 6) |
-				(uint8_t)_slIrqPending);
+				((uint8_t)_inFrame << 6));
 
 		case 0x4154: return _jitterCounter;
 		case 0x4157: return ((uint8_t)_parityCounter << 7);
@@ -600,7 +562,6 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 
 		case 0x4280: GenerateOamSlowUpdate(); break;
 		case 0x4282: GenerateExtUpdate(); break;
-		case 0x4286: GenerateOamClear(); break;
 
 		case 0x4190: return (uint8_t)_espEnabled | ((uint8_t)_wifiIrqEnabled << 1);
 		case 0x4191: return ((uint8_t)_dataReady << 6) | ((uint8_t)_dataReceived << 7);
@@ -629,7 +590,7 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 
 	if(addr >= 0x4280 && addr < 0x4800) {
 		//Built-in OAM functions
-		if(addr >= 0x4286) {
+		if(addr >= 0x4282) {
 			_oamCodeLocked = false;
 		}
 		return _oamCode[addr - 0x4280];
@@ -753,7 +714,8 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value)
 
 		case 0x4240: _spriteExtBank = value & 0x07; break;
 		case 0x4241: _oamSlowUpdatePage = value & 0x07; break;
-		case 0x4242: _oamExtUpdatePage = value & 0x1F; break;
+		case 0x4242: _oamExtUpdatePage = value & 0x07; break;
+		case 0x4243: _oamSpriteLimit = value & 0x3f; break;
 	}
 
 	if(addr >= 0x4106 && addr <= 0x4107) {
@@ -953,6 +915,7 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 	entries.push_back(MapperStateEntry("", "OAM Functions"));
 	entries.push_back(MapperStateEntry("$4241", "OAM Update Page", _oamSlowUpdatePage, MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4242", "OAM Ext. Update Page", _oamExtUpdatePage, MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4243", "OAM Sprite Limit", _oamSpriteLimit, MapperStateValueType::Number8));
 
 	//todo audio?
 
@@ -1117,6 +1080,7 @@ void Rainbow::Serialize(Serializer& s)
 	SV(_oamAddr);
 	SV(_oamExtUpdatePage);
 	SV(_oamSlowUpdatePage);
+	SV(_oamSpriteLimit);
 	SVArray(_oamCode, 0x506);
 	SV(_oamCodeLocked);
 
