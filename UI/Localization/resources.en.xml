@@ -1625,6 +1625,7 @@
 		<Form ID="MemorySearchWindow">
 			<Control ID="wndTitle">Memory Search</Control>
 			<Control ID="btnApplyFilter">Apply filter</Control>
+			<Control ID="btnUpdateValues">Update values</Control>
 			<Control ID="btnReset">Reset</Control>
 			<Control ID="btnUndo">Undo</Control>
 
@@ -3115,7 +3116,7 @@ E
 			<Value ID="Dword">32-bit</Value>
 		</Enum>
 		<Enum ID="MemorySearchCompareTo">
-			<Value ID="PreviousSearchValue">Previous search value</Value>
+			<Value ID="PreviousSearchValue">Last value</Value>
 			<Value ID="PreviousRefreshValue">Previous refresh value</Value>
 			<Value ID="SpecificValue">Specific value:</Value>
 			<Value ID="SpecificAddress">Specific address:</Value>
