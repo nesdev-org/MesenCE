@@ -70,6 +70,7 @@
 								Grid.Row="1"
 								Value="{Binding CompareTo}"
 								CheckedWhen="{x:Static dvm:MemorySearchCompareTo.PreviousRefreshValue}"
+								IsVisible="False"
 							/>
 							<c:EnumRadioButton
 								Grid.Row="2"
@@ -133,14 +134,22 @@
 					</c:GroupBox>
 				
 					<DockPanel>
-						<c:ButtonWithIcon
-							Icon="Assets/Find.png"
-							DockPanel.Dock="Left"
-							HorizontalAlignment="Right"
-							VerticalAlignment="Top"
-							Text="{l:Translate btnApplyFilter}"
-							Command="{Binding AddFilter}"
-						/>
+						<StackPanel DockPanel.Dock="Left">
+							<c:ButtonWithIcon
+								Icon="Assets/Find.png"
+								HorizontalAlignment="Left"
+								VerticalAlignment="Top"
+								Text="{l:Translate btnApplyFilter}"
+								Command="{Binding AddFilter}"
+							/>
+							<c:ButtonWithIcon
+								Icon="Assets/Reload.png"
+								HorizontalAlignment="Left"
+								VerticalAlignment="Top"
+								Text="{l:Translate btnUpdateValues}"
+								Command="{Binding UpdateValues}"
+							/>
+						</StackPanel>
 						<StackPanel>
 							<c:ButtonWithIcon
 								Icon="Assets/Undo.png"

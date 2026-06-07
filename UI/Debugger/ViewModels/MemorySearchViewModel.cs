@@ -31,7 +31,7 @@ public class MemorySearchViewModel : DisposableViewModel
 	[Reactive] public MemorySearchFormat Format { get; set; } = MemorySearchFormat.Hex;
 	[Reactive] public MemorySearchValueSize ValueSize { get; set; } = MemorySearchValueSize.Byte;
 
-	[Reactive] public MemorySearchCompareTo CompareTo { get; set; } = MemorySearchCompareTo.PreviousRefreshValue;
+	[Reactive] public MemorySearchCompareTo CompareTo { get; set; } = MemorySearchCompareTo.PreviousSearchValue;
 	[Reactive] public MemorySearchOperator Operator { get; set; } = MemorySearchOperator.Equal;
 
 	[Reactive] public MesenList<MemoryAddressViewModel> ListData { get; private set; } = new();
@@ -56,6 +56,7 @@ public class MemorySearchViewModel : DisposableViewModel
 	public int[] AddressLookup => _addressLookup;
 	public byte[] MemoryState => _memoryState;
 	public byte[] PrevMemoryState => _prevMemoryState;
+	public byte[] LastSearchSnapshot => _lastSearchSnapshot;
 
 	private List<MemoryAddressViewModel> _innerData = new();
 
@@ -294,6 +295,16 @@ public class MemorySearchViewModel : DisposableViewModel
 		RefreshList(true);
 	}
 
+	public void UpdateValues()
+	{
+		//Add an "empty" filter that only updates the "last values" that the next filter will be based on
+		_undoHistory.Add(new SearchHistory(_hiddenAddresses, _lastSearchSnapshot));
+		IsUndoEnabled = true;
+		UpdateAddressLookup();
+		_lastSearchSnapshot = DebugApi.GetMemoryState(MemoryType);
+		RefreshList(true);
+	}
+
 	private void UpdateAddressLookup()
 	{
 		int count = _lastSearchSnapshot.Length;
@@ -429,11 +440,13 @@ public class MemoryAddressViewModel : INotifyPropertyChanged
 		int address = _search.AddressLookup[_index];
 		_addressString = address.ToString("X4");
 
+		byte[] prevData = _search.CompareTo == MemorySearchCompareTo.PreviousRefreshValue ? _search.PrevMemoryState : _search.LastSearchSnapshot;
+
 		uint value = 0;
 		uint prevValue = 0;
 		for(int i = 0; i < (int)_search.ValueSize && address + i < _search.MemoryState.Length; i++) {
 			value |= (uint)_search.MemoryState[address + i] << (i * 8);
-			prevValue |= (uint)_search.PrevMemoryState[address + i] << (i * 8);
+			prevValue |= (address + i < prevData.Length) ? (uint)prevData[address + i] << (i * 8) : 0;
 		}
 
 		switch(_search.Format) {
