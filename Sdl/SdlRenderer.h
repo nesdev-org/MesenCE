@@ -68,5 +68,5 @@ public:
 	void Reset() override;
 	void OnRendererThreadStarted() override;
 
-	void SetExclusiveFullscreenMode(FullscreenSettings settings) override;
+	void SetFullscreenMode(FullscreenSettings settings) override;
 };
