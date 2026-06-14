@@ -37,6 +37,21 @@ struct RenderSurfaceInfo
 	}
 };
 
+enum class FullscreenMode
+{
+	Disabled,
+	Borderless,
+	Exclusive
+};
+
+struct FullscreenSettings
+{
+	void* WindowHandle;
+	uint32_t Width;
+	uint32_t Height;
+	FullscreenMode Mode;
+};
+
 class IRenderingDevice
 {
 public:
@@ -46,5 +61,5 @@ public:
 	virtual void Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud) = 0;
 	virtual void Reset() = 0;
 	virtual void OnRendererThreadStarted() {}
-	virtual void SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle) = 0;
+	virtual void SetFullscreenMode(FullscreenSettings settings) = 0;
 };

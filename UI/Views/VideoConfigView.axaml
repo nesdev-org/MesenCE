@@ -51,6 +51,12 @@
 								/>
 							</StackPanel>
 						</Grid>
+						
+						<CheckBox
+							Content="{l:Translate chkEnableVariableRefreshRate}"
+							IsChecked="{Binding Config.EnableVariableRefreshRate}"
+							IsVisible="{Binding IsWindows}"
+						/>
 
 						<CheckBox Content="{l:Translate chkIntegerFpsMode}" IsChecked="{Binding Config.IntegerFpsMode}" />
 						<CheckBox

@@ -112,12 +112,11 @@ struct VideoConfig
 	double NtscIFilterLength = 1.0;
 	double NtscQFilterLength = 1.0;
 
+	bool EnableVariableRefreshRate = false;
 	bool FullscreenForceIntegerScale = false;
 	bool UseExclusiveFullscreen = false;
 	uint32_t ExclusiveFullscreenRefreshRateNtsc = 60;
 	uint32_t ExclusiveFullscreenRefreshRatePal = 50;
-	uint32_t FullscreenResWidth = 0;
-	uint32_t FullscreenResHeight = 0;
 
 	uint32_t ScreenRotation = 0;
 	bool DisableHighPrecisionFramePacing = false;
