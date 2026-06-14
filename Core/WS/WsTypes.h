@@ -221,6 +221,14 @@ enum class WsIrqSource : uint8_t
 	HorizontalBlankTimer = 0x80
 };
 
+enum class WsRegisterAccess
+{
+	None = 0,
+	Read = 1,
+	Write = 2,
+	ReadWrite = 3
+};
+
 struct WsMemoryManagerState
 {
 	uint8_t ActiveIrqs;
@@ -446,7 +454,8 @@ struct WsEepromState
 struct WsCartState
 {
 	bool HasRtc;
-	uint8_t SelectedBanks[4];
+	bool RomInRamBank;
+	uint16_t SelectedBanks[4];
 };
 
 struct WsRtcState
