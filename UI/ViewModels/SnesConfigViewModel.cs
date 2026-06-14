@@ -1,23 +1,22 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Localization;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 
 namespace Mesen.ViewModels
 {
-	public class SnesConfigViewModel : DisposableViewModel
+	public partial class SnesConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public SnesConfig Config { get; set; }
-		[Reactive] public SnesConfig OriginalConfig { get; set; }
-		[Reactive] public SnesConfigTab SelectedTab { get; set; } = 0;
+		[ObservableProperty] public partial SnesConfig Config { get; set; }
+		[ObservableProperty] public partial SnesConfig OriginalConfig { get; set; }
+		[ObservableProperty] public partial SnesConfigTab SelectedTab { get; set; } = 0;
 
 		public SnesInputConfigViewModel Input { get; private set; }
 
-		[Reactive] public bool IsDefaultSpcClockSpeed { get; set; } = true;
-		[Reactive] public string SpcEffectiveClockSpeed { get; set; } = "";
+		[ObservableProperty] public partial bool IsDefaultSpcClockSpeed { get; set; } = true;
+		[ObservableProperty] public partial string SpcEffectiveClockSpeed { get; set; } = "";
 
 		public Enum[] AvailableRegions => new Enum[] {
 			ConsoleRegion.Auto,
@@ -38,9 +37,9 @@ namespace Mesen.ViewModels
 			AddDisposable(Input);
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.SpcClockSpeedAdjustment).Subscribe(x => {
-				SpcEffectiveClockSpeed = ResourceHelper.GetMessage("SpcClockSpeedMsg", ((32000 + x) * 32).ToString());
-				IsDefaultSpcClockSpeed = x == 40;
+			AddDisposable(Config.ObserveProp(nameof(SnesConfig.SpcClockSpeedAdjustment), () => {
+				SpcEffectiveClockSpeed = ResourceHelper.GetMessage("SpcClockSpeedMsg", ((32000 + Config.SpcClockSpeedAdjustment) * 32).ToString());
+				IsDefaultSpcClockSpeed = Config.SpcClockSpeedAdjustment == 40;
 			}));
 		}
 	}

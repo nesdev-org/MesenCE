@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DataBoxControl;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
@@ -11,8 +12,6 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,10 +20,10 @@ using System.Linq;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class ProfilerWindowViewModel : DisposableViewModel
+	public partial class ProfilerWindowViewModel : DisposableViewModel
 	{
-		[Reactive] public List<ProfilerTab> ProfilerTabs { get; set; } = new List<ProfilerTab>();
-		[Reactive] public ProfilerTab? SelectedTab { get; set; } = null;
+		[ObservableProperty] public partial List<ProfilerTab> ProfilerTabs { get; set; } = new List<ProfilerTab>();
+		[ObservableProperty] public partial ProfilerTab? SelectedTab { get; set; } = null;
 
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
@@ -41,7 +40,7 @@ namespace Mesen.Debugger.ViewModels
 
 			UpdateAvailableTabs();
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedTab).Subscribe(x => {
+			AddDisposable(this.ObserveProp(nameof(SelectedTab), () => {
 				if(SelectedTab != null && EmuApi.IsPaused()) {
 					RefreshData();
 				}
@@ -132,13 +131,13 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class ProfilerTab : ReactiveObject
+	public partial class ProfilerTab : ObservableObject
 	{
-		[Reactive] public string TabName { get; set; } = "";
-		[Reactive] public CpuType CpuType { get; set; } = CpuType.Snes;
-		[Reactive] public MesenList<ProfiledFunctionViewModel> GridData { get; private set; } = new();
-		[Reactive] public SelectionModel<ProfiledFunctionViewModel> Selection { get; set; } = new();
-		[Reactive] public SortState SortState { get; set; } = new();
+		[ObservableProperty] public partial string TabName { get; set; } = "";
+		[ObservableProperty] public partial CpuType CpuType { get; set; } = CpuType.Snes;
+		[ObservableProperty] public partial MesenList<ProfiledFunctionViewModel> GridData { get; private set; } = new();
+		[ObservableProperty] public partial SelectionModel<ProfiledFunctionViewModel> Selection { get; set; } = new();
+		[ObservableProperty] public partial SortState SortState { get; set; } = new();
 		public ProfilerConfig Config => ConfigManager.Config.Debug.Profiler;
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Profiler.ColumnWidths;
 

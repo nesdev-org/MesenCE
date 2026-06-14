@@ -1,10 +1,10 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Utilities;
+using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,29 +13,29 @@ using System.Text.RegularExpressions;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class MemoryViewerFindViewModel : DisposableViewModel
+public partial class MemoryViewerFindViewModel : DisposableViewModel
 {
-	[Reactive] public SearchDataType DataType { get; set; }
-	[Reactive] public SearchIntType IntType { get; set; }
-	[Reactive] public bool CaseSensitive { get; set; }
-	[Reactive] public bool UseTblMappings { get; set; }
+	[ObservableProperty] public partial SearchDataType DataType { get; set; }
+	[ObservableProperty] public partial SearchIntType IntType { get; set; }
+	[ObservableProperty] public partial bool CaseSensitive { get; set; }
+	[ObservableProperty] public partial bool UseTblMappings { get; set; }
 
-	[Reactive] public bool FilterNotAccessed { get; set; }
-	[Reactive] public bool FilterRead { get; set; }
-	[Reactive] public bool FilterWrite { get; set; }
-	[Reactive] public bool FilterExec { get; set; }
-	[Reactive] public bool FilterTimeSpanEnabled { get; set; }
-	[Reactive] public int FilterTimeSpan { get; set; }
+	[ObservableProperty] public partial bool FilterNotAccessed { get; set; }
+	[ObservableProperty] public partial bool FilterRead { get; set; }
+	[ObservableProperty] public partial bool FilterWrite { get; set; }
+	[ObservableProperty] public partial bool FilterExec { get; set; }
+	[ObservableProperty] public partial bool FilterTimeSpanEnabled { get; set; }
+	[ObservableProperty] public partial int FilterTimeSpan { get; set; }
 
-	[Reactive] public bool FilterCode { get; set; }
-	[Reactive] public bool FilterData { get; set; }
-	[Reactive] public bool FilterUnidentified { get; set; }
+	[ObservableProperty] public partial bool FilterCode { get; set; }
+	[ObservableProperty] public partial bool FilterData { get; set; }
+	[ObservableProperty] public partial bool FilterUnidentified { get; set; }
 
-	[Reactive] public bool IsInteger { get; private set; }
-	[Reactive] public bool IsString { get; private set; }
-	[Reactive] public bool IsValid { get; private set; } = false;
-	[Reactive] public bool ShowNotFoundError { get; set; }
-	[Reactive] public string SearchString { get; set; } = "";
+	[ObservableProperty] public partial bool IsInteger { get; private set; }
+	[ObservableProperty] public partial bool IsString { get; private set; }
+	[ObservableProperty] public partial bool IsValid { get; private set; } = false;
+	[ObservableProperty] public partial bool ShowNotFoundError { get; set; }
+	[ObservableProperty] public partial string SearchString { get; set; } = "";
 
 	private MemoryToolsViewModel _memToolsModel;
 
@@ -46,12 +46,12 @@ public class MemoryViewerFindViewModel : DisposableViewModel
 	{
 		_memToolsModel = memToolsModel;
 
-		AddDisposable(this.WhenAnyValue(x => x.DataType).Subscribe(x => {
+		AddDisposable(this.ObserveProp(nameof(DataType), () => {
 			IsInteger = DataType == SearchDataType.Integer;
 			IsString = DataType == SearchDataType.String;
 		}));
 
-		AddDisposable(this.WhenAnyValue(x => x.SearchString).Subscribe(x => {
+		AddDisposable(this.ObserveProp(nameof(SearchString), () => {
 			if(SearchString.Contains(Environment.NewLine)) {
 				//Run asynchronously to allow the textbox to update its content correctly
 				Dispatcher.UIThread.Post(() => {
@@ -60,7 +60,7 @@ public class MemoryViewerFindViewModel : DisposableViewModel
 			}
 		}));
 
-		AddDisposable(this.WhenAnyValue(x => x.DataType, x => x.IntType, x => x.SearchString).Subscribe(x => {
+		AddDisposable(this.ObserveProp([nameof(DataType), nameof(IntType), nameof(SearchString)], () => {
 			SearchData? searchData = GetSearchData();
 			IsValid = searchData != null && searchData.Data.Length > 0;
 		}));

@@ -1,5 +1,5 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,42 +11,42 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config;
 
-public class SmsConfig : BaseConfig<SmsConfig>
+public partial class SmsConfig : BaseConfig<SmsConfig>
 {
-	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
-	[Reactive] public ConsoleOverrideConfig GgConfigOverrides { get; set; } = new();
+	[ObservableProperty] public partial ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
+	[ObservableProperty] public partial ConsoleOverrideConfig GgConfigOverrides { get; set; } = new();
 
-	[Reactive] public SmsControllerConfig Port1 { get; set; } = new();
-	[Reactive] public SmsControllerConfig Port2 { get; set; } = new();
+	[ObservableProperty] public partial SmsControllerConfig Port1 { get; set; } = new();
+	[ObservableProperty] public partial SmsControllerConfig Port2 { get; set; } = new();
 
-	[Reactive] public bool AllowInvalidInput { get; set; } = false;
+	[ObservableProperty] public partial bool AllowInvalidInput { get; set; } = false;
 
 	[ValidValues(ConsoleRegion.Auto, ConsoleRegion.Ntsc, ConsoleRegion.Pal)]
-	[Reactive] public ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
+	[ObservableProperty] public partial ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
 
 	[ValidValues(ConsoleRegion.Auto, ConsoleRegion.Ntsc, ConsoleRegion.NtscJapan, ConsoleRegion.Pal)]
-	[Reactive] public ConsoleRegion GameGearRegion { get; set; } = ConsoleRegion.Auto;
+	[ObservableProperty] public partial ConsoleRegion GameGearRegion { get; set; } = ConsoleRegion.Auto;
 
-	[Reactive] public RamState RamPowerOnState { get; set; } = RamState.Random;
+	[ObservableProperty] public partial RamState RamPowerOnState { get; set; } = RamState.Random;
 
-	[Reactive] public SmsRevision Revision { get; set; } = SmsRevision.Compatibility;
+	[ObservableProperty] public partial SmsRevision Revision { get; set; } = SmsRevision.Compatibility;
 
-	[Reactive] public bool UseSgPalette { get; set; } = true;
-	[Reactive] public bool GgBlendFrames { get; set; } = true;
-	[Reactive] public bool RemoveSpriteLimit { get; set; } = false;
-	[Reactive] public bool DisableSprites { get; set; } = false;
-	[Reactive] public bool DisableBackground { get; set; } = false;
+	[ObservableProperty] public partial bool UseSgPalette { get; set; } = true;
+	[ObservableProperty] public partial bool GgBlendFrames { get; set; } = true;
+	[ObservableProperty] public partial bool RemoveSpriteLimit { get; set; } = false;
+	[ObservableProperty] public partial bool DisableSprites { get; set; } = false;
+	[ObservableProperty] public partial bool DisableBackground { get; set; } = false;
 
-	[Reactive][MinMax(0, 100)] public UInt32 Tone1Vol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 Tone2Vol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 Tone3Vol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 NoiseVol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 FmAudioVolume { get; set; } = 100;
-	[Reactive] public bool EnableFmAudio { get; set; } = true;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Tone1Vol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Tone2Vol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Tone3Vol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 NoiseVol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 FmAudioVolume { get; set; } = 100;
+	[ObservableProperty] public partial bool EnableFmAudio { get; set; } = true;
 
-	[Reactive] public OverscanConfig NtscOverscan { get; set; } = new() { Top = 24, Bottom = 24 };
-	[Reactive] public OverscanConfig PalOverscan { get; set; } = new() { Top = 24, Bottom = 24 };
-	[Reactive] public OverscanConfig GameGearOverscan { get; set; } = new() { Top = 48, Bottom = 48, Left = 48, Right = 48 };
+	[ObservableProperty] public partial OverscanConfig NtscOverscan { get; set; } = new() { Top = 24, Bottom = 24 };
+	[ObservableProperty] public partial OverscanConfig PalOverscan { get; set; } = new() { Top = 24, Bottom = 24 };
+	[ObservableProperty] public partial OverscanConfig GameGearOverscan { get; set; } = new() { Top = 48, Bottom = 48, Left = 48, Right = 48 };
 
 	public void ApplyConfig()
 	{

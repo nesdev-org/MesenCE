@@ -24,9 +24,6 @@ namespace Mesen.Debugger.Windows
 		public TilemapViewerWindow(CpuType cpuType)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			ScrollPictureViewer scrollViewer = this.GetControl<ScrollPictureViewer>("picViewer");
 			_picViewer = scrollViewer.InnerViewer;

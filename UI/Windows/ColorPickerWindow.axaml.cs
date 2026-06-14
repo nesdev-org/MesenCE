@@ -10,9 +10,6 @@ namespace Mesen.Windows
 		public ColorPickerWindow()
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()

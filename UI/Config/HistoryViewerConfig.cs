@@ -1,10 +1,10 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Config
 {
-	public class HistoryViewerConfig : BaseWindowConfig<HistoryViewerConfig>
+	public partial class HistoryViewerConfig : BaseWindowConfig<HistoryViewerConfig>
 	{
-		[Reactive] public int Volume { get; set; } = 100;
+		[ObservableProperty] public partial int Volume { get; set; } = 100;
 	}
 }

@@ -124,7 +124,7 @@ namespace Mesen.Utilities
 			using(FileStream? stream = FileHelper.OpenRead(filename)) {
 				if(stream != null) {
 					byte[] header = new byte[5];
-					stream.Read(header, 0, 5);
+					stream.ReadExactly(header, 0, 5);
 					if(header[0] == 'P' && header[1] == 'A' && header[2] == 'T' && header[3] == 'C' && header[4] == 'H') {
 						return true;
 					} else if((header[0] == 'U' || header[0] == 'B') && header[1] == 'P' && header[2] == 'S' && header[3] == '1') {

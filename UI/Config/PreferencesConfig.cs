@@ -8,7 +8,7 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,77 +19,77 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class PreferencesConfig : BaseConfig<PreferencesConfig>
+	public partial class PreferencesConfig : BaseConfig<PreferencesConfig>
 	{
-		[Reactive] public MesenTheme Theme { get; set; } = MesenTheme.Light;
-		[Reactive] public bool AutomaticallyCheckForUpdates { get; set; } = true;
-		[Reactive] public bool SingleInstance { get; set; } = true;
-		[Reactive] public bool AutoLoadPatches { get; set; } = true;
+		[ObservableProperty] public partial MesenTheme Theme { get; set; } = MesenTheme.Light;
+		[ObservableProperty] public partial bool AutomaticallyCheckForUpdates { get; set; } = true;
+		[ObservableProperty] public partial bool SingleInstance { get; set; } = true;
+		[ObservableProperty] public partial bool AutoLoadPatches { get; set; } = true;
 
-		[Reactive] public bool PauseWhenInBackground { get; set; } = false;
-		[Reactive] public bool PauseWhenInMenusAndConfig { get; set; } = false;
-		[Reactive] public bool AllowBackgroundInput { get; set; } = false;
-		[Reactive] public bool PauseOnMovieEnd { get; set; } = true;
-		[Reactive] public bool ShowMovieIcons { get; set; } = true;
-		[Reactive] public bool ShowTurboRewindIcons { get; set; } = true;
-		[Reactive] public bool ConfirmExitResetPower { get; set; } = false;
+		[ObservableProperty] public partial bool PauseWhenInBackground { get; set; } = false;
+		[ObservableProperty] public partial bool PauseWhenInMenusAndConfig { get; set; } = false;
+		[ObservableProperty] public partial bool AllowBackgroundInput { get; set; } = false;
+		[ObservableProperty] public partial bool PauseOnMovieEnd { get; set; } = true;
+		[ObservableProperty] public partial bool ShowMovieIcons { get; set; } = true;
+		[ObservableProperty] public partial bool ShowTurboRewindIcons { get; set; } = true;
+		[ObservableProperty] public partial bool ConfirmExitResetPower { get; set; } = false;
 
-		[Reactive] public bool AssociateSnesRomFiles { get; set; } = false;
-		[Reactive] public bool AssociateSnesMusicFiles { get; set; } = false;
-		[Reactive] public bool AssociateNesRomFiles { get; set; } = false;
-		[Reactive] public bool AssociateNesMusicFiles { get; set; } = false;
-		[Reactive] public bool AssociateGbRomFiles { get; set; } = false;
-		[Reactive] public bool AssociateGbMusicFiles { get; set; } = false;
-		[Reactive] public bool AssociateGbaRomFiles { get; set; } = false;
-		[Reactive] public bool AssociatePceRomFiles { get; set; } = false;
-		[Reactive] public bool AssociatePceMusicFiles { get; set; } = false;
-		[Reactive] public bool AssociateSmsRomFiles { get; set; } = false;
-		[Reactive] public bool AssociateGameGearRomFiles { get; set; } = false;
-		[Reactive] public bool AssociateSgRomFiles { get; set; } = false;
-		[Reactive] public bool AssociateCvRomFiles { get; set; } = false;
-		[Reactive] public bool AssociateWsRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateSnesRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateSnesMusicFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateNesRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateNesMusicFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateGbRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateGbMusicFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateGbaRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociatePceRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociatePceMusicFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateSmsRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateGameGearRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateSgRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateCvRomFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AssociateWsRomFiles { get; set; } = false;
 
-		[Reactive] public bool EnableAutoSaveState { get; set; } = true;
-		[Reactive] public UInt32 AutoSaveStateDelay { get; set; } = 5;
+		[ObservableProperty] public partial bool EnableAutoSaveState { get; set; } = true;
+		[ObservableProperty] public partial UInt32 AutoSaveStateDelay { get; set; } = 5;
 
-		[Reactive] public bool EnableRewind { get; set; } = true;
-		[Reactive] public UInt32 RewindBufferSize { get; set; } = 300;
+		[ObservableProperty] public partial bool EnableRewind { get; set; } = true;
+		[ObservableProperty] public partial UInt32 RewindBufferSize { get; set; } = 300;
 
-		[Reactive] public bool AlwaysOnTop { get; set; } = false;
+		[ObservableProperty] public partial bool AlwaysOnTop { get; set; } = false;
 
-		[Reactive] public bool AutoHideMenu { get; set; } = false;
+		[ObservableProperty] public partial bool AutoHideMenu { get; set; } = false;
 
-		[Reactive] public bool ShowFps { get; set; } = false;
-		[Reactive] public bool ShowFrameCounter { get; set; } = false;
-		[Reactive] public bool ShowGameTimer { get; set; } = false;
-		[Reactive] public bool ShowLagCounter { get; set; } = false;
-		[Reactive] public bool ShowTitleBarInfo { get; set; } = false;
-		[Reactive] public bool ShowDebugInfo { get; set; } = false;
-		[Reactive] public bool DisableOsd { get; set; } = false;
-		[Reactive] public HudDisplaySize HudSize { get; set; } = HudDisplaySize.Fixed;
-		[Reactive] public GameSelectionMode GameSelectionScreenMode { get; set; } = GameSelectionMode.ResumeState;
+		[ObservableProperty] public partial bool ShowFps { get; set; } = false;
+		[ObservableProperty] public partial bool ShowFrameCounter { get; set; } = false;
+		[ObservableProperty] public partial bool ShowGameTimer { get; set; } = false;
+		[ObservableProperty] public partial bool ShowLagCounter { get; set; } = false;
+		[ObservableProperty] public partial bool ShowTitleBarInfo { get; set; } = false;
+		[ObservableProperty] public partial bool ShowDebugInfo { get; set; } = false;
+		[ObservableProperty] public partial bool DisableOsd { get; set; } = false;
+		[ObservableProperty] public partial HudDisplaySize HudSize { get; set; } = HudDisplaySize.Fixed;
+		[ObservableProperty] public partial GameSelectionMode GameSelectionScreenMode { get; set; } = GameSelectionMode.ResumeState;
 
-		[Reactive] public FontAntialiasing FontAntialiasing { get; set; } = FontAntialiasing.SubPixelAntialias;
-		[Reactive] public FontConfig MesenFont { get; set; } = new FontConfig() { FontFamily = "Microsoft Sans Serif", FontSize = 11 };
-		[Reactive] public FontConfig MesenMenuFont { get; set; } = new FontConfig() { FontFamily = "Segoe UI", FontSize = 12 };
+		[ObservableProperty] public partial FontAntialiasing FontAntialiasing { get; set; } = FontAntialiasing.SubPixelAntialias;
+		[ObservableProperty] public partial FontConfig MesenFont { get; set; } = new FontConfig() { FontFamily = "Microsoft Sans Serif", FontSize = 11 };
+		[ObservableProperty] public partial FontConfig MesenMenuFont { get; set; } = new FontConfig() { FontFamily = "Segoe UI", FontSize = 12 };
 
-		[Reactive] public List<ShortcutKeyInfo> ShortcutKeys { get; set; } = new List<ShortcutKeyInfo>();
+		[ObservableProperty] public partial List<ShortcutKeyInfo> ShortcutKeys { get; set; } = new List<ShortcutKeyInfo>();
 
-		[Reactive] public bool OverrideGameFolder { get; set; } = false;
-		[Reactive] public bool OverrideAviFolder { get; set; } = false;
-		[Reactive] public bool OverrideMovieFolder { get; set; } = false;
-		[Reactive] public bool OverrideSaveDataFolder { get; set; } = false;
-		[Reactive] public bool OverrideSaveStateFolder { get; set; } = false;
-		[Reactive] public bool OverrideScreenshotFolder { get; set; } = false;
-		[Reactive] public bool OverrideWaveFolder { get; set; } = false;
+		[ObservableProperty] public partial bool OverrideGameFolder { get; set; } = false;
+		[ObservableProperty] public partial bool OverrideAviFolder { get; set; } = false;
+		[ObservableProperty] public partial bool OverrideMovieFolder { get; set; } = false;
+		[ObservableProperty] public partial bool OverrideSaveDataFolder { get; set; } = false;
+		[ObservableProperty] public partial bool OverrideSaveStateFolder { get; set; } = false;
+		[ObservableProperty] public partial bool OverrideScreenshotFolder { get; set; } = false;
+		[ObservableProperty] public partial bool OverrideWaveFolder { get; set; } = false;
 
-		[Reactive] public string GameFolder { get; set; } = "";
-		[Reactive] public string AviFolder { get; set; } = "";
-		[Reactive] public string MovieFolder { get; set; } = "";
-		[Reactive] public string SaveDataFolder { get; set; } = "";
-		[Reactive] public string SaveStateFolder { get; set; } = "";
-		[Reactive] public string ScreenshotFolder { get; set; } = "";
-		[Reactive] public string WaveFolder { get; set; } = "";
+		[ObservableProperty] public partial string GameFolder { get; set; } = "";
+		[ObservableProperty] public partial string AviFolder { get; set; } = "";
+		[ObservableProperty] public partial string MovieFolder { get; set; } = "";
+		[ObservableProperty] public partial string SaveDataFolder { get; set; } = "";
+		[ObservableProperty] public partial string SaveStateFolder { get; set; } = "";
+		[ObservableProperty] public partial string ScreenshotFolder { get; set; } = "";
+		[ObservableProperty] public partial string WaveFolder { get; set; } = "";
 
 		public PreferencesConfig()
 		{

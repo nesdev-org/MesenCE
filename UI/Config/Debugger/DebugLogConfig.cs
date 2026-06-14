@@ -2,7 +2,7 @@
 
 namespace Mesen.Config
 {
-	public class DebugLogConfig : BaseWindowConfig<DebugLogConfig>
+	public partial class DebugLogConfig : BaseWindowConfig<DebugLogConfig>
 	{
 	}
 }

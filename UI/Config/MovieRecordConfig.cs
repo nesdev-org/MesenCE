@@ -1,12 +1,12 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.Config
 {
-	public class MovieRecordConfig : BaseConfig<MovieRecordConfig>
+	public partial class MovieRecordConfig : BaseConfig<MovieRecordConfig>
 	{
-		[Reactive] public RecordMovieFrom RecordFrom { get; set; } = RecordMovieFrom.CurrentState;
-		[Reactive] public string Author { get; set; } = "";
-		[Reactive] public string Description { get; set; } = "";
+		[ObservableProperty] public partial RecordMovieFrom RecordFrom { get; set; } = RecordMovieFrom.CurrentState;
+		[ObservableProperty] public partial string Author { get; set; } = "";
+		[ObservableProperty] public partial string Description { get; set; } = "";
 	}
 }

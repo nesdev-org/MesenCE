@@ -1,6 +1,6 @@
 ﻿using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config;
 
-public class ConsoleOverrideConfig : BaseConfig<GameConfig>
+public partial class ConsoleOverrideConfig : BaseConfig<GameConfig>
 {
-	[Reactive] public bool OverrideVideoFilter { get; set; } = false;
-	[Reactive] public VideoFilterType VideoFilter { get; set; } = VideoFilterType.None;
+	[ObservableProperty] public partial bool OverrideVideoFilter { get; set; } = false;
+	[ObservableProperty] public partial VideoFilterType VideoFilter { get; set; } = VideoFilterType.None;
 
-	[Reactive] public bool OverrideAspectRatio { get; set; } = false;
-	[Reactive] public VideoAspectRatio AspectRatio { get; set; } = VideoAspectRatio.NoStretching;
-	[Reactive][MinMax(0.1, 5.0)] public double CustomAspectRatio { get; set; } = 1.0;
+	[ObservableProperty] public partial bool OverrideAspectRatio { get; set; } = false;
+	[ObservableProperty] public partial VideoAspectRatio AspectRatio { get; set; } = VideoAspectRatio.NoStretching;
+	[ObservableProperty][MinMax(0.1, 5.0)] public partial double CustomAspectRatio { get; set; } = 1.0;
 
 	public static ConsoleOverrideConfig? GetActiveOverride()
 	{

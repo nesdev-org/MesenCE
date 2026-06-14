@@ -110,9 +110,6 @@ namespace Mesen.Windows
 
 			Console.CancelKeyPress += Console_CancelKeyPress;
 
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private static void InitGlobalShortcuts()
@@ -540,7 +537,7 @@ namespace Mesen.Windows
 				height = width / aspectRatio;
 			}
 
-			if(ConfigManager.Config.Video.FullscreenForceIntegerScale && VisualRoot is Window wnd && (wnd.WindowState == WindowState.FullScreen || wnd.WindowState == WindowState.Maximized)) {
+			if(ConfigManager.Config.Video.FullscreenForceIntegerScale && (WindowState == WindowState.FullScreen || WindowState == WindowState.Maximized)) {
 				FrameInfo baseSize = EmuApi.GetBaseScreenSize();
 				double scale = height * dpiScale / baseSize.Height;
 				if(scale != Math.Floor(scale)) {
@@ -616,7 +613,7 @@ namespace Mesen.Windows
 			}
 		}
 
-		protected override void OnLostFocus(RoutedEventArgs e)
+		protected override void OnLostFocus(FocusChangedEventArgs e)
 		{
 			base.OnLostFocus(e);
 			if(WindowState == WindowState.FullScreen && ConfigManager.Config.Video.UseExclusiveFullscreen) {

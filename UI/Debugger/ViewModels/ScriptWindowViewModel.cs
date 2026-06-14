@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Utilities;
 using Mesen.Debugger.Windows;
@@ -8,55 +9,51 @@ using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class ScriptWindowViewModel : ViewModelBase
+	public partial class ScriptWindowViewModel : ViewModelBase
 	{
 		public ScriptWindowConfig Config { get; } = ConfigManager.Config.Debug.ScriptWindow;
 
-		[Reactive] public string Code { get; set; } = "";
-		[Reactive] public string FilePath { get; set; } = "";
-		[Reactive] public int ScriptId { get; set; } = -1;
-		[Reactive] public string Log { get; set; } = "";
-		[Reactive] public string ScriptName { get; set; } = "";
+		[ObservableProperty] public partial string Code { get; set; } = "";
+		[ObservableProperty] public partial string FilePath { get; set; } = "";
+		[ObservableProperty] public partial int ScriptId { get; set; } = -1;
+		[ObservableProperty] public partial string Log { get; set; } = "";
+		[ObservableProperty] public partial string ScriptName { get; set; } = "";
 
-		[ObservableAsProperty] public string WindowTitle { get; } = "";
+		[ObservableProperty] public partial string WindowTitle { get; private set; } = "";
 
 		private string _originalText = "";
 		private ScriptWindow? _wnd = null;
 		private FileSystemWatcher _fileWatcher = new();
 
-		private ContextMenuAction _recentScriptsAction = new();
-
-		[Reactive] public List<ContextMenuAction> FileMenuActions { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> ScriptMenuActions { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> HelpMenuActions { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> ToolbarActions { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> FileMenuActions { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> ScriptMenuActions { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> HelpMenuActions { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> ToolbarActions { get; private set; } = new();
 
 		[Obsolete("For designer only")]
 		public ScriptWindowViewModel() : this(null) { }
 
 		public ScriptWindowViewModel(ScriptStartupBehavior? behavior)
 		{
-			this.WhenAnyValue(x => x.ScriptName).Select(x => {
+			this.ObserveProp(nameof(ScriptName), () => {
 				string wndTitle = ResourceHelper.GetViewLabel(nameof(ScriptWindow), "wndTitle");
-				if(!string.IsNullOrWhiteSpace(x)) {
-					return wndTitle + " - " + x;
+				if(!string.IsNullOrWhiteSpace(ScriptName)) {
+					WindowTitle = wndTitle + " - " + ScriptName;
+				} else {
+					WindowTitle = wndTitle;
 				}
-				return wndTitle;
-			}).ToPropertyEx(this, x => x.WindowTitle);
+			});
 
 			switch(behavior ?? Config.ScriptStartupBehavior) {
 				case ScriptStartupBehavior.ShowBlankWindow: break;

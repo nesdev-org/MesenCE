@@ -1,10 +1,10 @@
 ﻿using Avalonia.Media;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.ViewModels
 {
-	public class ColorPickerViewModel : ViewModelBase
+	public partial class ColorPickerViewModel : ViewModelBase
 	{
-		[Reactive] public Color Color { get; set; }
+		[ObservableProperty] public partial Color Color { get; set; }
 	}
 }

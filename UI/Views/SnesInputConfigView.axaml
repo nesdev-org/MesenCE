@@ -31,12 +31,12 @@
 
 					<c:GroupBox
 						Header="{l:Translate grpMultitap}"
-						IsVisible="{Binding HasMultitap1}"
-						HorizontalAlignment="Right"
+						IsVisible="{Binding Config.Port1.Type, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:ControllerType.Multitap}}"
+						HorizontalAlignment="Left"
 						Margin="0 5 -6 5"
 						Grid.Row="1"
-						Grid.Column="0"
-						Grid.ColumnSpan="3"
+						Grid.Column="1"
+						Grid.ColumnSpan="2"
 					>
 						<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
 							<TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Translate lblMultitap1A}" />
@@ -83,12 +83,12 @@
 
 					<c:GroupBox
 						Header="{l:Translate grpMultitap}"
-						IsVisible="{Binding HasMultitap2}"
-						HorizontalAlignment="Right"
+						IsVisible="{Binding Config.Port2.Type, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:ControllerType.Multitap}}"
+						HorizontalAlignment="Left"
 						Margin="0 5 -6 5"
 						Grid.Row="3"
-						Grid.Column="0"
-						Grid.ColumnSpan="3"
+						Grid.Column="1"
+						Grid.ColumnSpan="2"
 					>
 						<Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
 							<TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Translate lblMultitap2A}" />

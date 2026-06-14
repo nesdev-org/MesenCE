@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Config.Shortcuts;
 using Mesen.Controls;
@@ -10,16 +11,12 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -27,16 +24,16 @@ using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class MainMenuViewModel : ViewModelBase
+	public partial class MainMenuViewModel : ViewModelBase
 	{
 		public MainWindowViewModel MainWindow { get; set; }
 
-		[Reactive] public List<object> FileMenuItems { get; set; } = new();
-		[Reactive] public List<object> GameMenuItems { get; set; } = new();
-		[Reactive] public List<object> OptionsMenuItems { get; set; } = new();
-		[Reactive] public List<object> ToolsMenuItems { get; set; } = new();
-		[Reactive] public List<object> DebugMenuItems { get; set; } = new();
-		[Reactive] public List<object> HelpMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<object> FileMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<object> GameMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<object> OptionsMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<object> ToolsMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<object> DebugMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<object> HelpMenuItems { get; set; } = new();
 
 		private RomInfo RomInfo => MainWindow.RomInfo;
 		private bool IsGameRunning => RomInfo.Format != RomFormat.Unknown;
@@ -762,12 +759,12 @@ namespace Mesen.ViewModels
 				GetVideoRecorderMenu(wnd),
 
 				new ContextMenuSeparator() {
-					IsVisible = () => MainWindow.RomInfo.ConsoleType == ConsoleType.Nes
+					IsVisible = () =>  MainWindow.RomInfo.ConsoleType == ConsoleType.Nes && MainWindow.RomInfo.Format != RomFormat.Nsf
 				},
 
 				new MainMenuAction() {
 					ActionType = ActionType.HdPacks,
-					IsVisible = () => MainWindow.RomInfo.ConsoleType == ConsoleType.Nes,
+					IsVisible = () => MainWindow.RomInfo.ConsoleType == ConsoleType.Nes && MainWindow.RomInfo.Format != RomFormat.Nsf,
 					SubActions = new List<object> {
 						new MainMenuAction() {
 							ActionType = ActionType.InstallHdPack,

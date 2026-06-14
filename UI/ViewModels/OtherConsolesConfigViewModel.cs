@@ -1,22 +1,20 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Controls;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
-	public class OtherConsolesConfigViewModel : DisposableViewModel
+	public partial class OtherConsolesConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public CvConfig CvConfig { get; set; }
-		[Reactive] public CvConfig CvOriginalConfig { get; set; }
-		[Reactive] public OtherConsolesConfigTab SelectedTab { get; set; } = 0;
+		[ObservableProperty] public partial CvConfig CvConfig { get; set; }
+		[ObservableProperty] public partial CvConfig CvOriginalConfig { get; set; }
+		[ObservableProperty] public partial OtherConsolesConfigTab SelectedTab { get; set; } = 0;
 
 		public CvInputConfigViewModel CvInput { get; private set; }
 

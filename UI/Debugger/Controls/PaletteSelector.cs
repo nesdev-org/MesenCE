@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -110,18 +111,18 @@ namespace Mesen.Debugger.Controls
 		{
 			AffectsRender<PaletteSelector>(IsEnabledProperty, SelectionModeProperty, SelectedPaletteProperty, PaletteColorsProperty, ColumnCountProperty, ShowIndexesProperty, PaletteIndexValuesProperty);
 			AffectsMeasure<PaletteSelector>(ColumnCountProperty, BlockSizeProperty, PaletteColorsProperty);
+
+			SelectionModeProperty.Changed.AddClassHandler<PaletteSelector>((x, e) => {
+				x.CoerceValue(SelectedPaletteProperty);
+			});
+
+			PaletteColorsProperty.Changed.AddClassHandler<PaletteSelector>((x, e) => {
+				x.CoerceValue(SelectedPaletteProperty);
+			});
 		}
 
 		public PaletteSelector()
 		{
-			this.GetObservable(SelectionModeProperty).Subscribe((mode) => {
-				this.CoerceValue(SelectedPaletteProperty);
-			});
-
-			this.GetObservable(PaletteColorsProperty).Subscribe((mode) => {
-				this.CoerceValue(SelectedPaletteProperty);
-			});
-
 			Focusable = true;
 			ClipToBounds = true;
 		}

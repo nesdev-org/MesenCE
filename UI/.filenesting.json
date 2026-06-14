@@ -1,0 +1,19 @@
+{
+  "help": "https://go.microsoft.com/fwlink/?linkid=866610",
+  "root": true,
+
+  "dependentFileProviders": {
+    "add": {
+      "extensionToExtension": {
+        "add": {
+          ".cs": [
+            ".axaml.cs"
+          ],
+          ".designer.cs": [
+            ".resx"
+          ]
+        }
+      }
+    }
+  }
+}

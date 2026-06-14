@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Labels;
@@ -7,39 +8,36 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class MemoryToolsViewModel : DisposableViewModel
+	public partial class MemoryToolsViewModel : DisposableViewModel
 	{
-		[Reactive] public HexEditorConfig Config { get; set; }
-		[Reactive] public int ScrollPosition { get; set; }
-		[Reactive] public HexEditorDataProvider? DataProvider { get; set; }
-		[Reactive] public TblByteCharConverter? TblConverter { get; set; }
+		[ObservableProperty] public partial HexEditorConfig Config { get; set; }
+		[ObservableProperty] public partial int ScrollPosition { get; set; }
+		[ObservableProperty] public partial HexEditorDataProvider? DataProvider { get; set; }
+		[ObservableProperty] public partial TblByteCharConverter? TblConverter { get; set; }
 
-		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
+		[ObservableProperty] public partial Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
 
-		[Reactive] public int SelectionStart { get; set; }
-		[Reactive] public int SelectionLength { get; set; }
+		[ObservableProperty] public partial int SelectionStart { get; set; }
+		[ObservableProperty] public partial int SelectionLength { get; set; }
 
-		[Reactive] public string LocationText { get; private set; } = "";
-		[Reactive] public string LengthText { get; private set; } = "";
+		[ObservableProperty] public partial string LocationText { get; private set; } = "";
+		[ObservableProperty] public partial string LengthText { get; private set; } = "";
 
-		[Reactive] public List<ContextMenuAction> FileMenuItems { get; set; } = new();
-		[Reactive] public List<ContextMenuAction> ViewMenuItems { get; set; } = new();
-		[Reactive] public List<ContextMenuAction> SearchMenuItems { get; set; } = new();
-		[Reactive] public List<ContextMenuAction> ToolbarItems { get; set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> FileMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> ViewMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> SearchMenuItems { get; set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> ToolbarItems { get; set; } = new();
 
-		[Reactive] public int MaxScrollValue { get; private set; }
+		[ObservableProperty] public partial int MaxScrollValue { get; private set; }
 
 		private HexEditor _editor;
 		public MemoryToolsDisplayOptionsViewModel Options { get; }
@@ -68,7 +66,8 @@ namespace Mesen.Debugger.ViewModels
 
 			UpdateAvailableMemoryTypes();
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectionStart, x => x.SelectionLength).Subscribe(((int start, int length) o) => {
+			AddDisposable(this.ObserveProp([nameof(SelectionStart), nameof(SelectionLength)], () => {
+				(int start, int length) o = (SelectionStart, SelectionLength);
 				string location;
 				string length = "";
 				if(o.length <= 1) {
@@ -96,13 +95,11 @@ namespace Mesen.Debugger.ViewModels
 			}));
 
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => UpdateDataProvider()));
-			AddDisposable(this.WhenAnyValue(x => x.TblConverter).Subscribe(x => UpdateDataProvider()));
 
-			AddDisposable(this.WhenAnyValue(
-				x => x.Config.MemoryType,
-				x => x.Config.BytesPerRow
-			).Subscribe(((MemoryType memType, int bytesPerRow) o) => {
-				MaxScrollValue = (DebugApi.GetMemorySize(o.memType) / o.bytesPerRow) - 1;
+			AddDisposable(this.ObserveProp(nameof(TblConverter), () => UpdateDataProvider()));
+
+			AddDisposable(Config.ObserveProp([nameof(Config.MemoryType), nameof(Config.BytesPerRow)], () => {
+				MaxScrollValue = (DebugApi.GetMemorySize(Config.MemoryType) / Config.BytesPerRow) - 1;
 				_editor.SetCursorPosition(0, false, true);
 			}));
 		}

@@ -1,5 +1,5 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,33 +9,33 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config;
 
-public class WsConfig : BaseConfig<WsConfig>
+public partial class WsConfig : BaseConfig<WsConfig>
 {
-	[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
+	[ObservableProperty] public partial ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
-	[Reactive] public ControllerConfig ControllerHorizontal { get; set; } = new();
-	[Reactive] public ControllerConfig ControllerVertical { get; set; } = new();
-	[Reactive] public ControllerConfig ControllerPcv2 { get; set; } = new();
+	[ObservableProperty] public partial ControllerConfig ControllerHorizontal { get; set; } = new();
+	[ObservableProperty] public partial ControllerConfig ControllerVertical { get; set; } = new();
+	[ObservableProperty] public partial ControllerConfig ControllerPcv2 { get; set; } = new();
 
-	[Reactive] public WsModel Model { get; set; } = WsModel.Auto;
-	[Reactive] public bool UseBootRom { get; set; } = false;
+	[ObservableProperty] public partial WsModel Model { get; set; } = WsModel.Auto;
+	[ObservableProperty] public partial bool UseBootRom { get; set; } = false;
 
-	[Reactive] public bool AutoRotate { get; set; } = true;
+	[ObservableProperty] public partial bool AutoRotate { get; set; } = true;
 
-	[Reactive] public bool BlendFrames { get; set; } = true;
-	[Reactive] public bool LcdAdjustColors { get; set; } = true;
-	[Reactive] public bool LcdShowIcons { get; set; } = true;
+	[ObservableProperty] public partial bool BlendFrames { get; set; } = true;
+	[ObservableProperty] public partial bool LcdAdjustColors { get; set; } = true;
+	[ObservableProperty] public partial bool LcdShowIcons { get; set; } = true;
 
-	[Reactive] public bool HideBgLayer1 { get; set; } = false;
-	[Reactive] public bool HideBgLayer2 { get; set; } = false;
-	[Reactive] public bool DisableSprites { get; set; } = false;
+	[ObservableProperty] public partial bool HideBgLayer1 { get; set; } = false;
+	[ObservableProperty] public partial bool HideBgLayer2 { get; set; } = false;
+	[ObservableProperty] public partial bool DisableSprites { get; set; } = false;
 
-	[Reactive] public WsAudioMode AudioMode { get; set; } = WsAudioMode.Headphones;
-	[Reactive][MinMax(0, 100)] public UInt32 Channel1Vol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 Channel2Vol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 Channel3Vol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 Channel4Vol { get; set; } = 100;
-	[Reactive][MinMax(0, 100)] public UInt32 Channel5Vol { get; set; } = 100;
+	[ObservableProperty] public partial WsAudioMode AudioMode { get; set; } = WsAudioMode.Headphones;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel1Vol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel2Vol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel3Vol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel4Vol { get; set; } = 100;
+	[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel5Vol { get; set; } = 100;
 
 	public void ApplyConfig()
 	{

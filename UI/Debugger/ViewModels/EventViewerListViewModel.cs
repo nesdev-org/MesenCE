@@ -1,22 +1,21 @@
 ﻿using Avalonia.Collections;
 using Avalonia.Controls.Selection;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DataBoxControl;
 using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Windows.Input;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class EventViewerListViewModel : DisposableViewModel
+	public partial class EventViewerListViewModel : DisposableViewModel
 	{
 		public DebugEventInfo[] RawDebugEvents => _debugEvents;
 		private DebugEventInfo[] _debugEvents = new DebugEventInfo[0];
@@ -25,7 +24,7 @@ namespace Mesen.Debugger.ViewModels
 		public SelectionModel<DebugEventViewModel?> Selection { get; set; } = new();
 		public EventViewerViewModel EventViewer { get; }
 
-		[Reactive] public SortState SortState { get; set; } = new();
+		[ObservableProperty] public partial SortState SortState { get; set; } = new();
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.EventViewer.ColumnWidths;
 
 		public ICommand SortCommand { get; }
@@ -38,7 +37,7 @@ namespace Mesen.Debugger.ViewModels
 			SortState.SetColumnSort("Scanline", ListSortDirection.Ascending, false);
 			SortState.SetColumnSort("Cycle", ListSortDirection.Ascending, false);
 
-			SortCommand = ReactiveCommand.Create<string?>(sortMemberPath => {
+			SortCommand = new RelayCommand(() => {
 				RefreshList();
 			});
 		}

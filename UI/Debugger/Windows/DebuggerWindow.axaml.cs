@@ -36,9 +36,6 @@ namespace Mesen.Debugger.Windows
 		public DebuggerWindow(CpuType? cpuType, int? scrollToAddress = null)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_model = new DebuggerWindowViewModel(cpuType);
 			_scrollToAddress = scrollToAddress;

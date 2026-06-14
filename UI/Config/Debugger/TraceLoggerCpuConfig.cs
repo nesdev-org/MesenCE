@@ -1,29 +1,29 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.Config
 {
-	public class TraceLoggerCpuConfig : BaseConfig<TraceLoggerCpuConfig>
+	public partial class TraceLoggerCpuConfig : BaseConfig<TraceLoggerCpuConfig>
 	{
-		[Reactive] public bool Enabled { get; set; } = true;
+		[ObservableProperty] public partial bool Enabled { get; set; } = true;
 
-		[Reactive] public bool ShowRegisters { get; set; } = true;
-		[Reactive] public bool ShowStatusFlags { get; set; } = true;
-		[Reactive] public StatusFlagFormat StatusFormat { get; set; } = StatusFlagFormat.Text;
+		[ObservableProperty] public partial bool ShowRegisters { get; set; } = true;
+		[ObservableProperty] public partial bool ShowStatusFlags { get; set; } = true;
+		[ObservableProperty] public partial StatusFlagFormat StatusFormat { get; set; } = StatusFlagFormat.Text;
 
-		[Reactive] public bool ShowEffectiveAddresses { get; set; } = true;
-		[Reactive] public bool ShowMemoryValues { get; set; } = true;
-		[Reactive] public bool ShowByteCode { get; set; } = false;
+		[ObservableProperty] public partial bool ShowEffectiveAddresses { get; set; } = true;
+		[ObservableProperty] public partial bool ShowMemoryValues { get; set; } = true;
+		[ObservableProperty] public partial bool ShowByteCode { get; set; } = false;
 
-		[Reactive] public bool ShowClockCounter { get; set; } = false;
-		[Reactive] public bool ShowFrameCounter { get; set; } = false;
-		[Reactive] public bool ShowFramePosition { get; set; } = true;
+		[ObservableProperty] public partial bool ShowClockCounter { get; set; } = false;
+		[ObservableProperty] public partial bool ShowFrameCounter { get; set; } = false;
+		[ObservableProperty] public partial bool ShowFramePosition { get; set; } = true;
 
-		[Reactive] public bool UseLabels { get; set; } = true;
-		[Reactive] public bool IndentCode { get; set; } = false;
+		[ObservableProperty] public partial bool UseLabels { get; set; } = true;
+		[ObservableProperty] public partial bool IndentCode { get; set; } = false;
 
-		[Reactive] public bool UseCustomFormat { get; set; } = false;
-		[Reactive] public string Format { get; set; } = "";
-		[Reactive] public string Condition { get; set; } = "";
+		[ObservableProperty] public partial bool UseCustomFormat { get; set; } = false;
+		[ObservableProperty] public partial string Format { get; set; } = "";
+		[ObservableProperty] public partial string Condition { get; set; } = "";
 	}
 
 	public enum StatusFlagFormat

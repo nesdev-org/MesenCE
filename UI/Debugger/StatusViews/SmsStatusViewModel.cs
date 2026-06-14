@@ -1,74 +1,85 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
+using Mesen.Utilities;
 using System;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class SmsStatusViewModel : BaseConsoleStatusViewModel
+	public partial class SmsStatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public byte RegA { get; set; }
-		[Reactive] public byte RegB { get; set; }
-		[Reactive] public byte RegC { get; set; }
-		[Reactive] public byte RegD { get; set; }
-		[Reactive] public byte RegE { get; set; }
-		[Reactive] public byte RegFlags { get; set; }
+		[ObservableProperty] public partial byte RegA { get; set; }
+		[ObservableProperty] public partial byte RegB { get; set; }
+		[ObservableProperty] public partial byte RegC { get; set; }
+		[ObservableProperty] public partial byte RegD { get; set; }
+		[ObservableProperty] public partial byte RegE { get; set; }
+		[ObservableProperty] public partial byte RegFlags { get; set; }
 
-		[Reactive] public byte RegH { get; set; }
-		[Reactive] public byte RegL { get; set; }
+		[ObservableProperty] public partial byte RegH { get; set; }
+		[ObservableProperty] public partial byte RegL { get; set; }
 
-		[Reactive] public UInt16 RegIX { get; set; }
-		[Reactive] public UInt16 RegIY { get; set; }
+		[ObservableProperty] public partial UInt16 RegIX { get; set; }
+		[ObservableProperty] public partial UInt16 RegIY { get; set; }
 
-		[Reactive] public byte RegR { get; set; }
-		[Reactive] public byte RegI { get; set; }
+		[ObservableProperty] public partial byte RegR { get; set; }
+		[ObservableProperty] public partial byte RegI { get; set; }
 
-		[Reactive] public byte RegAltA { get; set; }
-		[Reactive] public byte RegAltFlags { get; set; }
-		[Reactive] public byte RegAltB { get; set; }
-		[Reactive] public byte RegAltC { get; set; }
-		[Reactive] public byte RegAltD { get; set; }
-		[Reactive] public byte RegAltE { get; set; }
-		[Reactive] public byte RegAltH { get; set; }
-		[Reactive] public byte RegAltL { get; set; }
+		[ObservableProperty] public partial byte RegAltA { get; set; }
+		[ObservableProperty] public partial byte RegAltFlags { get; set; }
+		[ObservableProperty] public partial byte RegAltB { get; set; }
+		[ObservableProperty] public partial byte RegAltC { get; set; }
+		[ObservableProperty] public partial byte RegAltD { get; set; }
+		[ObservableProperty] public partial byte RegAltE { get; set; }
+		[ObservableProperty] public partial byte RegAltH { get; set; }
+		[ObservableProperty] public partial byte RegAltL { get; set; }
 
-		[Reactive] public UInt16 RegSP { get; set; }
-		[Reactive] public UInt16 RegPC { get; set; }
+		[ObservableProperty] public partial UInt16 RegSP { get; set; }
+		[ObservableProperty] public partial UInt16 RegPC { get; set; }
 
-		[Reactive] public UInt16 Scanline { get; set; }
-		[Reactive] public UInt16 Cycle { get; set; }
+		[ObservableProperty] public partial UInt16 Scanline { get; set; }
+		[ObservableProperty] public partial UInt16 Cycle { get; set; }
 
-		[Reactive] public bool FlagCarry { get; set; }
-		[Reactive] public bool FlagAddSub { get; set; }
-		[Reactive] public bool FlagParity { get; set; }
-		[Reactive] public bool FlagF3 { get; set; }
-		[Reactive] public bool FlagHalf { get; set; }
-		[Reactive] public bool FlagF5 { get; set; }
-		[Reactive] public bool FlagZero { get; set; }
-		[Reactive] public bool FlagSign { get; set; }
+		[ObservableProperty] public partial bool FlagCarry { get; set; }
+		[ObservableProperty] public partial bool FlagAddSub { get; set; }
+		[ObservableProperty] public partial bool FlagParity { get; set; }
+		[ObservableProperty] public partial bool FlagF3 { get; set; }
+		[ObservableProperty] public partial bool FlagHalf { get; set; }
+		[ObservableProperty] public partial bool FlagF5 { get; set; }
+		[ObservableProperty] public partial bool FlagZero { get; set; }
+		[ObservableProperty] public partial bool FlagSign { get; set; }
 
-		[Reactive] public bool FlagIFF1 { get; set; }
-		[Reactive] public bool FlagIFF2 { get; set; }
-		[Reactive] public bool FlagHalted { get; set; }
-		[Reactive] public byte IM { get; set; }
+		[ObservableProperty] public partial bool FlagIFF1 { get; set; }
+		[ObservableProperty] public partial bool FlagIFF2 { get; set; }
+		[ObservableProperty] public partial bool FlagHalted { get; set; }
+		[ObservableProperty] public partial byte IM { get; set; }
 
-		[Reactive] public string StackPreview { get; private set; } = "";
+		[ObservableProperty] public partial string StackPreview { get; private set; } = "";
 
 		public SmsStatusViewModel()
 		{
-			this.WhenAnyValue(x => x.FlagCarry, x => x.FlagHalf, x => x.FlagAddSub, x => x.FlagZero).Subscribe(x => UpdateFlagsValue());
+			bool preventUpdate = false;
 
-			this.WhenAnyValue(x => x.RegFlags).Subscribe(x => {
-				using var delayNotifs = DelayChangeNotifications(); //don't reupdate RegFlags while updating the flags
-				FlagCarry = (x & (byte)SmsCpuFlags.Carry) != 0;
-				FlagAddSub = (x & (byte)SmsCpuFlags.AddSub) != 0;
-				FlagParity = (x & (byte)SmsCpuFlags.Parity) != 0;
-				FlagF3 = (x & (byte)SmsCpuFlags.F3) != 0;
-				FlagHalf = (x & (byte)SmsCpuFlags.HalfCarry) != 0;
-				FlagF5 = (x & (byte)SmsCpuFlags.F5) != 0;
-				FlagZero = (x & (byte)SmsCpuFlags.Zero) != 0;
-				FlagSign = (x & (byte)SmsCpuFlags.Sign) != 0;
+			this.ObserveProp([
+				nameof(FlagCarry), nameof(FlagAddSub), nameof(FlagParity), nameof(FlagF3),
+				nameof(FlagHalf), nameof(FlagF5), nameof(FlagZero), nameof(FlagSign),
+
+			], () => {
+				if(!preventUpdate) {
+					UpdateFlagsValue();
+				}
+			});
+
+			this.ObserveProp(nameof(RegFlags), () => {
+				preventUpdate = true;
+				FlagCarry = (RegFlags & (byte)SmsCpuFlags.Carry) != 0;
+				FlagAddSub = (RegFlags & (byte)SmsCpuFlags.AddSub) != 0;
+				FlagParity = (RegFlags & (byte)SmsCpuFlags.Parity) != 0;
+				FlagF3 = (RegFlags & (byte)SmsCpuFlags.F3) != 0;
+				FlagHalf = (RegFlags & (byte)SmsCpuFlags.HalfCarry) != 0;
+				FlagF5 = (RegFlags & (byte)SmsCpuFlags.F5) != 0;
+				FlagZero = (RegFlags & (byte)SmsCpuFlags.Zero) != 0;
+				FlagSign = (RegFlags & (byte)SmsCpuFlags.Sign) != 0;
+				preventUpdate = false;
 			});
 		}
 

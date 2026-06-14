@@ -1,11 +1,11 @@
-﻿using Mesen.Utilities;
-using ReactiveUI;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Utilities;
 using System;
 using System.Text.Json;
 
 namespace Mesen.Config
 {
-	public class BaseConfig<T> : ReactiveObject where T : class
+	public partial class BaseConfig<T> : ObservableObject where T : class
 	{
 		public T Clone()
 		{
