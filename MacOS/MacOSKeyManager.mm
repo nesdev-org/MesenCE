@@ -48,6 +48,11 @@ MacOSKeyManager::MacOSKeyManager(Emulator* emu)
 	// only on older versions of intel MacOS, so it's hard to be 100% certain, but this reliably fixes
 	// the issue in my testing.
 	dispatch_async(dispatch_get_main_queue(), ^{
+		// On start up, load the list of existing controllers and add them.
+		// The callbacks only add controllers that are connected after launch.
+		for(GCController* controller in [GCController controllers]) {
+			AddController(controller);
+		}
 		if(@available(macOS 11.3, *)) {
 			GCController.shouldMonitorBackgroundEvents = YES;
 		}
@@ -78,13 +83,7 @@ MacOSKeyManager::MacOSKeyManager(Emulator* emu)
 
 	_connectObserver = [[NSNotificationCenter defaultCenter] addObserverForName:GCControllerDidConnectNotification object:nil queue:nil usingBlock:^ void (NSNotification* notification) {
 		GCController* controller = (GCController*) [notification object];
-
-		if([controller extendedGamepad] == nil) {
-			MessageManager::Log(std::string("[Input] Device ignored (Does not support extended gamepad) - Name: ") + [[controller vendorName] UTF8String]);
-		} else {
-			_controllers.push_back(std::shared_ptr<MacOSGameController>(new MacOSGameController(_emu, controller)));
-			MessageManager::Log(std::string("[Input Connected] Name: ") + [[controller vendorName] UTF8String]);
-		}
+		AddController(controller);
 	}];
 
 	_disconnectObserver = [[NSNotificationCenter defaultCenter] addObserverForName:GCControllerDidDisconnectNotification object:nil queue:nil usingBlock:^ void (NSNotification* notification) {
@@ -110,6 +109,17 @@ MacOSKeyManager::~MacOSKeyManager()
 	[NSEvent removeMonitor:(id) _eventMonitor];
 	[[NSNotificationCenter defaultCenter] removeObserver:(id) _connectObserver];
 	[[NSNotificationCenter defaultCenter] removeObserver:(id) _disconnectObserver];
+}
+
+void MacOSKeyManager::AddController(void* cont)
+{
+	GCController* controller = static_cast<GCController*>(cont);
+	if([controller extendedGamepad] == nil) {
+		MessageManager::Log(std::string("[Input] Device ignored (Does not support extended gamepad) - Name: ") + [[controller vendorName] UTF8String]);
+	} else {
+		_controllers.push_back(std::shared_ptr<MacOSGameController>(new MacOSGameController(_emu, controller)));
+		MessageManager::Log(std::string("[Input Connected] Name: ") + [[controller vendorName] UTF8String]);
+	}
 }
 
 void MacOSKeyManager::HandleModifiers(uint32_t flags)
