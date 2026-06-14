@@ -321,7 +321,9 @@ void WsConsole::InitPostBootRomState()
 	WsEepromState& eeprom = _internalEeprom->GetState();
 	eeprom.ReadDone = true;
 	eeprom.Idle = true;
-	eeprom.InternalEepromWriteProtected = true;
+	if(!(_prgRom[_prgRomSize - 0x10 + 9] & 0x80)) {
+		eeprom.InternalEepromWriteProtected = true;
+	}
 
 	//Copy data from rom header to internal eeprom, like the boot rom would
 	for(int i = 0; i < 3; i++) {
