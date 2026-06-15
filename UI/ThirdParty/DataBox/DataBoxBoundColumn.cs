@@ -5,21 +5,21 @@ namespace DataBoxControl;
 
 public abstract class DataBoxBoundColumn : DataBoxColumn
 {
-	public static readonly StyledProperty<IBinding?> BindingProperty =
-		 AvaloniaProperty.Register<DataBoxBoundColumn, IBinding?>(nameof(Binding));
+	public static readonly StyledProperty<BindingBase?> BindingProperty =
+		 AvaloniaProperty.Register<DataBoxBoundColumn, BindingBase?>(nameof(Binding));
 
-	public static readonly StyledProperty<IBinding?> IsVisibleProperty =
-	 AvaloniaProperty.Register<DataBoxBoundColumn, IBinding?>(nameof(IsVisible));
+	public static readonly StyledProperty<BindingBase?> IsVisibleProperty =
+	 AvaloniaProperty.Register<DataBoxBoundColumn, BindingBase?>(nameof(IsVisible));
 
 	[AssignBinding]
-	public IBinding? Binding
+	public BindingBase? Binding
 	{
 		get => GetValue(BindingProperty);
 		set => SetValue(BindingProperty, value);
 	}
 
 	[AssignBinding]
-	public IBinding? IsVisible
+	public BindingBase? IsVisible
 	{
 		get => GetValue(IsVisibleProperty);
 		set => SetValue(IsVisibleProperty, value);

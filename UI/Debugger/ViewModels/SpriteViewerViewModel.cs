@@ -5,6 +5,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Utilities;
@@ -13,8 +14,6 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,36 +22,36 @@ using System.Linq;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
+	public partial class SpriteViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
 	{
 		public SpriteViewerConfig Config { get; }
-		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
+		[ObservableProperty] public partial RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		public CpuType CpuType { get; set; }
 
-		[Reactive] public SpritePreviewModel? SelectedSprite { get; set; }
-		[Reactive] public DynamicTooltip? SelectedPreviewPanel { get; set; }
+		[ObservableProperty] public partial SpritePreviewModel? SelectedSprite { get; set; }
+		[ObservableProperty] public partial DynamicTooltip? SelectedPreviewPanel { get; set; }
 
-		[Reactive] public DynamicTooltip? PreviewPanelTooltip { get; set; }
-		[Reactive] public SpritePreviewModel? PreviewPanelSprite { get; set; }
+		[ObservableProperty] public partial DynamicTooltip? PreviewPanelTooltip { get; set; }
+		[ObservableProperty] public partial SpritePreviewModel? PreviewPanelSprite { get; set; }
 
-		[Reactive] public DynamicTooltip? ViewerTooltip { get; set; }
-		[Reactive] public PixelPoint? ViewerMousePos { get; set; }
+		[ObservableProperty] public partial DynamicTooltip? ViewerTooltip { get; set; }
+		[ObservableProperty] public partial PixelPoint? ViewerMousePos { get; set; }
 
-		[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
-		[Reactive] public Rect SelectionRect { get; set; }
-		[Reactive] public Rect? MouseOverRect { get; set; }
+		[ObservableProperty] public partial DynamicBitmap ViewerBitmap { get; private set; }
+		[ObservableProperty] public partial Rect SelectionRect { get; set; }
+		[ObservableProperty] public partial Rect? MouseOverRect { get; set; }
 
-		[Reactive] public int TopClipSize { get; set; }
-		[Reactive] public int BottomClipSize { get; set; }
-		[Reactive] public int LeftClipSize { get; set; }
-		[Reactive] public int RightClipSize { get; set; }
+		[ObservableProperty] public partial int TopClipSize { get; set; }
+		[ObservableProperty] public partial int BottomClipSize { get; set; }
+		[ObservableProperty] public partial int LeftClipSize { get; set; }
+		[ObservableProperty] public partial int RightClipSize { get; set; }
 
-		[Reactive] public List<SpritePreviewModel> SpritePreviews { get; set; } = new();
+		[ObservableProperty] public partial List<SpritePreviewModel> SpritePreviews { get; set; } = new();
 
 		public SpriteViewerListViewModel ListView { get; }
 
-		[Reactive] public int MaxSourceOffset { get; set; } = 0;
+		[ObservableProperty] public partial int MaxSourceOffset { get; set; } = 0;
 
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
@@ -171,25 +170,26 @@ namespace Mesen.Debugger.ViewModels
 				GetCopyHdPackFormatAction()
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedSprite).Subscribe(x => {
-				UpdateSelectionPreview();
-				if(x != null) {
-					ListView.SelectSprite(x.SpriteIndex);
-				}
-			}));
-
-			AddDisposable(this.WhenAnyValue(x => x.ViewerMousePos, x => x.PreviewPanelSprite).Subscribe(x => UpdateMouseOverRect()));
-
-			AddDisposable(this.WhenAnyValue(x => x.Config.Source, x => x.Config.SourceOffset).Subscribe(x => RefreshData()));
-
-			AddDisposable(this.WhenAnyValue(x => x.Config.ShowOffscreenRegions).Subscribe(x => RefreshTab()));
-
-			ListView.InitListViewObservers();
-
+			AddDisposable(this.ObserveProp([nameof(ViewerMousePos), nameof(PreviewPanelSprite)], UpdateMouseOverRect));
+			AddDisposable(Config.ObserveProp([nameof(Config.Source), nameof(Config.SourceOffset)], RefreshData));
+			AddDisposable(Config.ObserveProp(nameof(Config.ShowOffscreenRegions), RefreshTab));
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, Config_PropertyChanged));
 
 			DebugShortcutManager.RegisterActions(wnd, FileMenuActions);
 			DebugShortcutManager.RegisterActions(wnd, ViewMenuActions);
+		}
+
+		partial void OnSelectedSpriteChanged(SpritePreviewModel? value)
+		{
+			UpdateSelectionPreview();
+			if(value != null) {
+				ListView.SelectSprite(value.SpriteIndex);
+			}
+		}
+
+		partial void OnSpritePreviewsChanged(List<SpritePreviewModel> value)
+		{
+			ListView.RefreshList(true);
 		}
 
 		private ContextMenuAction GetEditTileAction(Window wnd)

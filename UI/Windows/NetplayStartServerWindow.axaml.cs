@@ -14,9 +14,6 @@ namespace Mesen.Windows
 		public NetplayStartServerWindow()
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()

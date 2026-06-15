@@ -1,50 +1,57 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
+using Mesen.Utilities;
 using System;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class GbStatusViewModel : BaseConsoleStatusViewModel
+	public partial class GbStatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public byte RegA { get; set; }
-		[Reactive] public byte RegB { get; set; }
-		[Reactive] public byte RegC { get; set; }
-		[Reactive] public byte RegD { get; set; }
-		[Reactive] public byte RegE { get; set; }
-		[Reactive] public byte RegFlags { get; set; }
+		[ObservableProperty] public partial byte RegA { get; set; }
+		[ObservableProperty] public partial byte RegB { get; set; }
+		[ObservableProperty] public partial byte RegC { get; set; }
+		[ObservableProperty] public partial byte RegD { get; set; }
+		[ObservableProperty] public partial byte RegE { get; set; }
+		[ObservableProperty] public partial byte RegFlags { get; set; }
 
-		[Reactive] public byte RegH { get; set; }
-		[Reactive] public byte RegL { get; set; }
+		[ObservableProperty] public partial byte RegH { get; set; }
+		[ObservableProperty] public partial byte RegL { get; set; }
 
-		[Reactive] public UInt16 RegSP { get; set; }
-		[Reactive] public UInt16 RegPC { get; set; }
+		[ObservableProperty] public partial UInt16 RegSP { get; set; }
+		[ObservableProperty] public partial UInt16 RegPC { get; set; }
 
-		[Reactive] public UInt16 Scanline { get; set; }
-		[Reactive] public UInt16 Cycle { get; set; }
+		[ObservableProperty] public partial UInt16 Scanline { get; set; }
+		[ObservableProperty] public partial UInt16 Cycle { get; set; }
 
-		[Reactive] public bool FlagCarry { get; set; }
-		[Reactive] public bool FlagHalf { get; set; }
-		[Reactive] public bool FlagAddSub { get; set; }
-		[Reactive] public bool FlagZero { get; set; }
+		[ObservableProperty] public partial bool FlagCarry { get; set; }
+		[ObservableProperty] public partial bool FlagHalf { get; set; }
+		[ObservableProperty] public partial bool FlagAddSub { get; set; }
+		[ObservableProperty] public partial bool FlagZero { get; set; }
 
-		[Reactive] public bool FlagHalted { get; set; }
-		[Reactive] public bool FlagEiPending { get; set; }
-		[Reactive] public bool FlagIme { get; set; }
+		[ObservableProperty] public partial bool FlagHalted { get; set; }
+		[ObservableProperty] public partial bool FlagEiPending { get; set; }
+		[ObservableProperty] public partial bool FlagIme { get; set; }
 
-		[Reactive] public string StackPreview { get; private set; } = "";
+		[ObservableProperty] public partial string StackPreview { get; private set; } = "";
 
 		public GbStatusViewModel()
 		{
-			this.WhenAnyValue(x => x.FlagCarry, x => x.FlagHalf, x => x.FlagAddSub, x => x.FlagZero).Subscribe(x => UpdateFlagsValue());
+			bool preventUpdate = false;
 
-			this.WhenAnyValue(x => x.RegFlags).Subscribe(x => {
-				using var delayNotifs = DelayChangeNotifications(); //don't reupdate RegFlags while updating the flags
-				FlagCarry = (x & (byte)GameboyFlags.Carry) != 0;
-				FlagHalf = (x & (byte)GameboyFlags.HalfCarry) != 0;
-				FlagAddSub = (x & (byte)GameboyFlags.AddSub) != 0;
-				FlagZero = (x & (byte)GameboyFlags.Zero) != 0;
+			this.ObserveProp([nameof(FlagCarry), nameof(FlagHalf), nameof(FlagAddSub), nameof(FlagZero)], () => {
+				if(!preventUpdate) {
+					UpdateFlagsValue();
+				}
+			});
+
+			this.ObserveProp(nameof(RegFlags), () => {
+				preventUpdate = true;
+				FlagCarry = (RegFlags & (byte)GameboyFlags.Carry) != 0;
+				FlagHalf = (RegFlags & (byte)GameboyFlags.HalfCarry) != 0;
+				FlagAddSub = (RegFlags & (byte)GameboyFlags.AddSub) != 0;
+				FlagZero = (RegFlags & (byte)GameboyFlags.Zero) != 0;
+				preventUpdate = false;
 			});
 		}
 

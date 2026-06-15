@@ -25,9 +25,6 @@ namespace Mesen.Debugger.Windows
 			DataContext = model;
 			_model = model;
 
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()

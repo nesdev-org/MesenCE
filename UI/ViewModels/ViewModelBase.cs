@@ -1,15 +1,15 @@
-﻿using ReactiveUI;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Mesen.ViewModels
 {
-	public class ViewModelBase : ReactiveObject
+	public partial class ViewModelBase : ObservableObject
 	{
 	}
 
-	public class DisposableViewModel : ViewModelBase, IDisposable
+	public partial class DisposableViewModel : ViewModelBase, IDisposable
 	{
 		private HashSet<IDisposable> _disposables = new();
 		public bool Disposed { get; private set; } = false;

@@ -1,31 +1,30 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Debugger.Labels;
 using Mesen.Debugger.Utilities;
 using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Localization;
+using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class BreakpointEditViewModel : DisposableViewModel
+	public partial class BreakpointEditViewModel : DisposableViewModel
 	{
-		[Reactive] public Breakpoint Breakpoint { get; set; }
+		[ObservableProperty] public partial Breakpoint Breakpoint { get; set; }
 
 		public Control? HelpTooltip { get; } = null;
 		public string WindowTitle { get; } = "";
-		[Reactive] public bool IsConditionValid { get; private set; }
-		[Reactive] public bool OkEnabled { get; private set; }
-		[Reactive] public string MaxAddress { get; private set; } = "";
-		[Reactive] public bool CanExec { get; private set; } = false;
-		[Reactive] public bool HasDummyOperations { get; private set; } = false;
+		[ObservableProperty] public partial bool IsConditionValid { get; private set; }
+		[ObservableProperty] public partial bool OkEnabled { get; private set; }
+		[ObservableProperty] public partial string MaxAddress { get; private set; } = "";
+		[ObservableProperty] public partial bool CanExec { get; private set; } = false;
+		[ObservableProperty] public partial bool HasDummyOperations { get; private set; } = false;
 
 		public Enum[] AvailableMemoryTypes { get; private set; } = Array.Empty<Enum>();
 
@@ -54,22 +53,18 @@ namespace Mesen.Debugger.ViewModels
 				Breakpoint.MemoryType = (MemoryType)AvailableMemoryTypes[0];
 			}
 
-			AddDisposable(this.WhenAnyValue(x => x.Breakpoint.StartAddress)
-				.Buffer(2, 1)
-				.Select(b => (Previous: b[0], Current: b[1]))
-				.Subscribe(t => {
-					if(t.Previous == Breakpoint.EndAddress) {
-						Breakpoint.EndAddress = t.Current;
-					}
+			UInt32 prevStart = Breakpoint.StartAddress;
+			AddDisposable(Breakpoint.ObserveProp(nameof(Breakpoint.StartAddress), () => {
+				if(prevStart == Breakpoint.EndAddress) {
+					Breakpoint.EndAddress = Breakpoint.StartAddress;
 				}
-			));
-
-			AddDisposable(this.WhenAnyValue(x => x.Breakpoint.MemoryType).Subscribe(memoryType => {
-				CanExec = memoryType.SupportsExecBreakpoints();
+				prevStart = Breakpoint.StartAddress;
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Breakpoint.MemoryType).Subscribe(memoryType => {
-				int maxAddress = DebugApi.GetMemorySize(memoryType) - 1;
+			AddDisposable(Breakpoint.ObserveProp(nameof(Breakpoint.MemoryType), () => {
+				CanExec = Breakpoint.MemoryType.SupportsExecBreakpoints();
+
+				int maxAddress = DebugApi.GetMemorySize(Breakpoint.MemoryType) - 1;
 				if(maxAddress <= 0) {
 					MaxAddress = "(unavailable)";
 				} else {
@@ -77,38 +72,43 @@ namespace Mesen.Debugger.ViewModels
 				}
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Breakpoint.Condition).Subscribe(condition => {
-				if(!string.IsNullOrWhiteSpace(condition)) {
+			AddDisposable(Breakpoint.ObserveProp(nameof(Breakpoint.Condition), () => {
+				if(!string.IsNullOrWhiteSpace(Breakpoint.Condition)) {
 					EvalResultType resultType;
-					DebugApi.EvaluateExpression(condition.Replace(Environment.NewLine, " "), Breakpoint.CpuType, out resultType, false);
+					DebugApi.EvaluateExpression(Breakpoint.Condition.Replace(Environment.NewLine, " "), Breakpoint.CpuType, out resultType, false);
 					if(resultType == EvalResultType.Invalid) {
 						IsConditionValid = false;
 						return;
 					}
 				}
 				IsConditionValid = true;
+				UpdateButtonState();
 			}));
 
-			AddDisposable(this.WhenAnyValue(
-				x => x.Breakpoint.BreakOnExec,
-				x => x.Breakpoint.BreakOnRead,
-				x => x.Breakpoint.BreakOnWrite,
-				x => x.Breakpoint.MemoryType,
-				x => x.Breakpoint.StartAddress,
-				x => x.Breakpoint.EndAddress,
-				x => x.IsConditionValid
-			).Subscribe(_ => {
-				bool enabled = true;
-				if(Breakpoint.Type == BreakpointTypeFlags.None || !IsConditionValid) {
-					enabled = false;
-				} else {
-					int maxAddress = DebugApi.GetMemorySize(Breakpoint.MemoryType) - 1;
-					if(Breakpoint.StartAddress > maxAddress || Breakpoint.EndAddress > maxAddress || Breakpoint.StartAddress > Breakpoint.EndAddress) {
-						enabled = false;
-					}
-				}
-				OkEnabled = enabled;
+			AddDisposable(Breakpoint.ObserveProp([
+				nameof(Breakpoint.BreakOnExec),
+				nameof(Breakpoint.BreakOnRead),
+				nameof(Breakpoint.BreakOnWrite),
+				nameof(Breakpoint.MemoryType),
+				nameof(Breakpoint.StartAddress),
+				nameof(Breakpoint.EndAddress)
+			], () => {
+				UpdateButtonState();
 			}));
+		}
+
+		private void UpdateButtonState()
+		{
+			bool enabled = true;
+			if(Breakpoint.Type == BreakpointTypeFlags.None || !IsConditionValid) {
+				enabled = false;
+			} else {
+				int maxAddress = DebugApi.GetMemorySize(Breakpoint.MemoryType) - 1;
+				if(Breakpoint.StartAddress > maxAddress || Breakpoint.EndAddress > maxAddress || Breakpoint.StartAddress > Breakpoint.EndAddress) {
+					enabled = false;
+				}
+			}
+			OkEnabled = enabled;
 		}
 	}
 }

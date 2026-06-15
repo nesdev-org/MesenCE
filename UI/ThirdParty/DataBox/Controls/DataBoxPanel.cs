@@ -4,6 +4,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using DataBoxControl.Primitives.Layout;
+using Mesen.Utilities;
 using System;
 using System.Linq;
 
@@ -24,7 +25,7 @@ public class DataBoxPanel : VirtualizingStackPanel
 
 	protected override Size MeasureOverride(Size availableSize)
 	{
-		if(this.GetVisualRoot() == null) {
+		if(this.GetWindow() == null) {
 			//Prevent issues when measure is called after window was closed
 			//Otherwise EstimateViewport in VirtualizingStackPanel uses a 500+k pixel height which causes performance problems
 			return default;
@@ -39,7 +40,7 @@ public class DataBoxPanel : VirtualizingStackPanel
 
 	protected override Size ArrangeOverride(Size finalSize)
 	{
-		if(DataBox is null || this.GetVisualRoot() == null) {
+		if(DataBox is null || this.GetWindow() == null) {
 			return finalSize;
 		}
 

@@ -1,15 +1,15 @@
 ﻿using Avalonia.Controls;
 using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class ControllerListViewModel : ViewModelBase
+	public partial class ControllerListViewModel : ViewModelBase
 	{
-		[Reactive] public List<ControllerInputViewModel> Controllers { get; set; } = new();
+		[ObservableProperty] public partial List<ControllerInputViewModel> Controllers { get; set; } = new();
 
 		[Obsolete("For designer only")]
 		public ControllerListViewModel() : this(ConsoleType.Snes) { }

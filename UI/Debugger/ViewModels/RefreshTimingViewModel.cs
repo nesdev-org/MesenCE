@@ -1,22 +1,25 @@
-﻿using Mesen.Config;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Mesen.Config;
 using Mesen.Interop;
+using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
-using System.Reactive;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class RefreshTimingViewModel : ViewModelBase
+	public partial class RefreshTimingViewModel : ViewModelBase
 	{
 		public RefreshTimingConfig Config { get; }
 		public RefreshTimingConsoleConfig ConsoleConfig { get; }
-		[Reactive] public int MinScanline { get; private set; }
-		[Reactive] public int MaxScanline { get; private set; }
-		[Reactive] public int MaxCycle { get; private set; }
+		[ObservableProperty] public partial int RefreshCycle { get; private set; }
+		[ObservableProperty] public partial int RefreshScanline { get; private set; }
 
-		public ReactiveCommand<Unit, Unit> ResetCommand { get; }
+		[ObservableProperty] public partial int MinScanline { get; private set; }
+		[ObservableProperty] public partial int MaxScanline { get; private set; }
+		[ObservableProperty] public partial int MaxCycle { get; private set; }
+
+		public IRelayCommand ResetCommand { get; }
 
 		private CpuType _cpuType;
 
@@ -30,9 +33,21 @@ namespace Mesen.Debugger.ViewModels
 			_cpuType = cpuType;
 
 			UpdateMinMaxValues(_cpuType);
-			ResetCommand = ReactiveCommand.Create(Reset);
+			ResetCommand = new RelayCommand(Reset);
+			UpdateMinMax();
 
-			ConsoleConfig.WhenAnyValue(x => x.RefreshScanline, x => x.RefreshCycle).Subscribe(x => UpdateMinMax());
+			RefreshCycle = ConsoleConfig.RefreshCycle;
+			RefreshScanline = ConsoleConfig.RefreshScanline;
+		}
+
+		partial void OnRefreshCycleChanged(int value)
+		{
+			UpdateMinMax();
+		}
+
+		partial void OnRefreshScanlineChanged(int value)
+		{
+			UpdateMinMax();
 		}
 
 		private void UpdateMinMax()
@@ -40,13 +55,16 @@ namespace Mesen.Debugger.ViewModels
 			//Manually enforce min/max to avoid issues when switching from one console type to another where the UI
 			//could end up setting the new console's scanline value to the max scanline value of the previous console
 			//(presumably due to the order in which the property bindings were processed)
-			ConsoleConfig.RefreshScanline = Math.Max(MinScanline, Math.Min(MaxScanline, ConsoleConfig.RefreshScanline));
-			ConsoleConfig.RefreshCycle = Math.Max(0, Math.Min(MaxCycle, ConsoleConfig.RefreshCycle));
+			RefreshScanline = Math.Max(MinScanline, Math.Min(MaxScanline, RefreshScanline));
+			RefreshCycle = Math.Max(0, Math.Min(MaxCycle, RefreshCycle));
+
+			ConsoleConfig.RefreshCycle = RefreshCycle;
+			ConsoleConfig.RefreshScanline = RefreshScanline;
 		}
 
 		public void Reset()
 		{
-			ConsoleConfig.RefreshScanline = _cpuType.GetConsoleType() switch {
+			RefreshScanline = _cpuType.GetConsoleType() switch {
 				ConsoleType.Snes => 240,
 				ConsoleType.Nes => 241,
 				ConsoleType.Gameboy => 144,
@@ -57,7 +75,7 @@ namespace Mesen.Debugger.ViewModels
 				_ => throw new Exception("Invalid console type")
 			};
 
-			ConsoleConfig.RefreshCycle = 0;
+			RefreshCycle = 0;
 		}
 
 		private void UpdateMinMaxValues(CpuType cpuType)

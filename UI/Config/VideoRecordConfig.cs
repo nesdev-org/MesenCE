@@ -1,4 +1,4 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class VideoRecordConfig : BaseConfig<VideoRecordConfig>
+	public partial class VideoRecordConfig : BaseConfig<VideoRecordConfig>
 	{
-		[Reactive] public VideoCodec Codec { get; set; } = VideoCodec.CSCD;
-		[Reactive] public UInt32 CompressionLevel { get; set; } = 6;
-		[Reactive] public bool RecordSystemHud { get; set; } = false;
-		[Reactive] public bool RecordInputHud { get; set; } = false;
+		[ObservableProperty] public partial VideoCodec Codec { get; set; } = VideoCodec.CSCD;
+		[ObservableProperty] public partial UInt32 CompressionLevel { get; set; } = 6;
+		[ObservableProperty] public partial bool RecordSystemHud { get; set; } = false;
+		[ObservableProperty] public partial bool RecordInputHud { get; set; } = false;
 	}
 
 	public enum VideoCodec

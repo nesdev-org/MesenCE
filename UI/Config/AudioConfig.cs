@@ -1,6 +1,5 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,54 +9,54 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class AudioConfig : BaseConfig<AudioConfig>
+	public partial class AudioConfig : BaseConfig<AudioConfig>
 	{
-		[Reactive] public string AudioDevice { get; set; } = "";
-		[Reactive] public bool EnableAudio { get; set; } = true;
-		[Reactive] public bool DisableDynamicSampleRate { get; set; } = false;
+		[ObservableProperty] public partial string AudioDevice { get; set; } = "";
+		[ObservableProperty] public partial bool EnableAudio { get; set; } = true;
+		[ObservableProperty] public partial bool DisableDynamicSampleRate { get; set; } = false;
 
-		[Reactive][MinMax(0, 100)] public UInt32 MasterVolume { get; set; } = 100;
-		[Reactive] public AudioSampleRate SampleRate { get; set; } = AudioSampleRate._48000;
-		[Reactive][MinMax(15, 300)] public UInt32 AudioLatency { get; set; } = 60;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 MasterVolume { get; set; } = 100;
+		[ObservableProperty] public partial AudioSampleRate SampleRate { get; set; } = AudioSampleRate._48000;
+		[ObservableProperty][MinMax(15, 300)] public partial UInt32 AudioLatency { get; set; } = 60;
 
-		[Reactive] public bool MuteSoundInBackground { get; set; } = false;
-		[Reactive] public bool ReduceSoundInBackground { get; set; } = true;
-		[Reactive] public bool ReduceSoundInFastForward { get; set; } = false;
-		[Reactive][MinMax(0, 100)] public int VolumeReduction { get; set; } = 75;
+		[ObservableProperty] public partial bool MuteSoundInBackground { get; set; } = false;
+		[ObservableProperty] public partial bool ReduceSoundInBackground { get; set; } = true;
+		[ObservableProperty] public partial bool ReduceSoundInFastForward { get; set; } = false;
+		[ObservableProperty][MinMax(0, 100)] public partial int VolumeReduction { get; set; } = 75;
 
-		[Reactive] public bool ReverbEnabled { get; set; } = false;
-		[Reactive][MinMax(1, 10)] public UInt32 ReverbStrength { get; set; } = 5;
-		[Reactive][MinMax(1, 30)] public UInt32 ReverbDelay { get; set; } = 10;
+		[ObservableProperty] public partial bool ReverbEnabled { get; set; } = false;
+		[ObservableProperty][MinMax(1, 10)] public partial UInt32 ReverbStrength { get; set; } = 5;
+		[ObservableProperty][MinMax(1, 30)] public partial UInt32 ReverbDelay { get; set; } = 10;
 
-		[Reactive] public bool CrossFeedEnabled { get; set; } = false;
-		[Reactive][MinMax(0, 100)] public UInt32 CrossFeedRatio { get; set; } = 0;
+		[ObservableProperty] public partial bool CrossFeedEnabled { get; set; } = false;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 CrossFeedRatio { get; set; } = 0;
 
-		[Reactive] public bool EnableEqualizer { get; set; } = false;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band1Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band2Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band3Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band4Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band5Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band6Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band7Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band8Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band9Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band10Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band11Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band12Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band13Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band14Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band15Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band16Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band17Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band18Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band19Gain { get; set; } = 0;
-		[Reactive][MinMax(-20.0, 20.0)] public double Band20Gain { get; set; } = 0;
+		[ObservableProperty] public partial bool EnableEqualizer { get; set; } = false;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band1Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band2Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band3Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band4Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band5Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band6Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band7Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band8Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band9Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band10Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band11Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band12Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band13Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band14Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band15Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band16Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band17Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band18Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band19Gain { get; set; } = 0;
+		[ObservableProperty][MinMax(-20.0, 20.0)] public partial double Band20Gain { get; set; } = 0;
 
-		[Reactive] public bool AudioPlayerEnableTrackLength { get; set; } = true;
-		[Reactive][MinMax(0, 9999)] public UInt32 AudioPlayerTrackLength { get; set; } = 120;
-		[Reactive] public bool AudioPlayerAutoDetectSilence { get; set; } = true;
-		[Reactive][MinMax(0, 999999)] public UInt32 AudioPlayerSilenceDelay { get; set; } = 3;
+		[ObservableProperty] public partial bool AudioPlayerEnableTrackLength { get; set; } = true;
+		[ObservableProperty][MinMax(0, 9999)] public partial UInt32 AudioPlayerTrackLength { get; set; } = 120;
+		[ObservableProperty] public partial bool AudioPlayerAutoDetectSilence { get; set; } = true;
+		[ObservableProperty][MinMax(0, 999999)] public partial UInt32 AudioPlayerSilenceDelay { get; set; } = 3;
 
 		public void ApplyConfig()
 		{

@@ -88,8 +88,6 @@ insert_final_newline = true
 #### .NET Coding Conventions ####
 
 # Organize usings
-dotnet_separate_import_directive_groups = false
-dotnet_sort_system_directives_first = false
 file_header_template = unset
 
 # this. and Me. preferences

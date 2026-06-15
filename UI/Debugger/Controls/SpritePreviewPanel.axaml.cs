@@ -2,12 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.ViewModels;
 using Mesen.Utilities;
-using ReactiveUI;
 using System;
-using System.Reactive.Linq;
 
 namespace Mesen.Debugger.Controls
 {
@@ -55,9 +54,13 @@ namespace Mesen.Debugger.Controls
 			Model = model;
 			Config = config;
 
-			AddDisposable(this.WhenAnyValue(x => x.Model.FadePreview, x => x.Config.DimOffscreenSprites).Subscribe(x => {
-				FadePreview = Model.FadePreview == true && Config.DimOffscreenSprites == true;
-			}));
+			AddDisposable(Model.ObserveProp(nameof(Model.FadePreview), UpdateFadePreviewFlag));
+			AddDisposable(Config.ObserveProp(nameof(Config.DimOffscreenSprites), UpdateFadePreviewFlag));
+		}
+
+		private void UpdateFadePreviewFlag()
+		{
+			FadePreview = Model.FadePreview == true && Config.DimOffscreenSprites == true;
 		}
 
 		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)

@@ -30,9 +30,6 @@ namespace Mesen.Debugger.Windows
 		public TileEditorWindow(TileEditorViewModel model)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_picViewer = this.GetControl<ScrollPictureViewer>("picViewer").InnerViewer;
 			_picViewer.PositionClicked += PicViewer_PositionClicked;

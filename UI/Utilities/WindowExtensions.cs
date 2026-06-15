@@ -14,14 +14,14 @@ namespace Mesen.Utilities
 {
 	static class WindowExtensions
 	{
-		public static void CenterWindow(Window child, Visual parent)
+		public static void CenterWindow(Window child, Control parent)
 		{
 			EventHandler? handler = null;
 			handler = (s, e) => {
 				//This logic is inside the Opened event because running it immediately
 				//before showing the window appears to break some things in some configurations (multi-monitor+high DPI)
 
-				WindowBase? parentWnd = parent.GetVisualRoot() as WindowBase;
+				WindowBase? parentWnd = parent.GetWindow();
 				Screen? screen = null;
 				double scale = 1;
 				if(parentWnd != null) {
@@ -67,7 +67,7 @@ namespace Mesen.Utilities
 			return startPosition;
 		}
 
-		public static void ShowCentered(this Window child, Visual? parent)
+		public static void ShowCentered(this Window child, Control? parent)
 		{
 			if(parent != null) {
 				CenterWindow(child, parent);
@@ -81,12 +81,12 @@ namespace Mesen.Utilities
 			child.Show(parent);
 		}
 
-		public static Task ShowCenteredDialog(this Window child, Visual? parent)
+		public static Task ShowCenteredDialog(this Window child, Control? parent)
 		{
 			return ShowCenteredDialog<object>(child, parent);
 		}
 
-		public static Task<TResult> ShowCenteredDialog<TResult>(this Window child, Visual? parent)
+		public static Task<TResult> ShowCenteredDialog<TResult>(this Window child, Control? parent)
 		{
 			if(parent != null) {
 				CenterWindow(child, parent);
@@ -94,14 +94,14 @@ namespace Mesen.Utilities
 			return InternalShowDialog<TResult>(child, parent);
 		}
 
-		public static Task<TResult> ShowDialogAtPosition<TResult>(this Window child, Visual? parent, PixelPoint startPosition)
+		public static Task<TResult> ShowDialogAtPosition<TResult>(this Window child, Control? parent, PixelPoint startPosition)
 		{
 			child.WindowStartupLocation = WindowStartupLocation.Manual;
 			child.Position = startPosition;
 
 			EventHandler? handler = null;
 			handler = (s, e) => {
-				WindowBase? parentWnd = parent?.GetVisualRoot() as WindowBase;
+				WindowBase? parentWnd = parent?.GetWindow();
 				if(parentWnd != null && parent != null) {
 					Screen? screen = parentWnd.Screens.ScreenFromVisual(parent);
 					double scale = LayoutHelper.GetLayoutScale(parentWnd);

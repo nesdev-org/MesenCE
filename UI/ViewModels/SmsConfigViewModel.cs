@@ -1,22 +1,20 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Controls;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
-	public class SmsConfigViewModel : DisposableViewModel
+	public partial class SmsConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public SmsConfig Config { get; set; }
-		[Reactive] public SmsConfig OriginalConfig { get; set; }
-		[Reactive] public SmsConfigTab SelectedTab { get; set; } = 0;
+		[ObservableProperty] public partial SmsConfig Config { get; set; }
+		[ObservableProperty] public partial SmsConfig OriginalConfig { get; set; }
+		[ObservableProperty] public partial SmsConfigTab SelectedTab { get; set; } = 0;
 
 		public SmsInputConfigViewModel Input { get; private set; }
 

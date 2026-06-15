@@ -20,9 +20,6 @@ namespace Mesen.Windows
 			DataContext = _model;
 
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		protected override void OnClosing(WindowClosingEventArgs e)

@@ -1,5 +1,5 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,25 +9,25 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class IntegrationConfig : BaseConfig<IntegrationConfig>
+	public partial class IntegrationConfig : BaseConfig<IntegrationConfig>
 	{
-		[Reactive] public bool AutoLoadDbgFiles { get; set; } = true;
-		[Reactive] public bool AutoLoadMlbFiles { get; set; } = true;
-		[Reactive] public bool AutoLoadCdlFiles { get; set; } = false;
-		[Reactive] public bool AutoLoadSymFiles { get; set; } = true;
-		[Reactive] public bool AutoLoadCdbFiles { get; set; } = true;
-		[Reactive] public bool AutoLoadElfFiles { get; set; } = true;
-		[Reactive] public bool AutoLoadFnsFiles { get; set; } = true;
+		[ObservableProperty] public partial bool AutoLoadDbgFiles { get; set; } = true;
+		[ObservableProperty] public partial bool AutoLoadMlbFiles { get; set; } = true;
+		[ObservableProperty] public partial bool AutoLoadCdlFiles { get; set; } = false;
+		[ObservableProperty] public partial bool AutoLoadSymFiles { get; set; } = true;
+		[ObservableProperty] public partial bool AutoLoadCdbFiles { get; set; } = true;
+		[ObservableProperty] public partial bool AutoLoadElfFiles { get; set; } = true;
+		[ObservableProperty] public partial bool AutoLoadFnsFiles { get; set; } = true;
 
-		[Reactive] public bool ResetLabelsOnImport { get; set; } = true;
+		[ObservableProperty] public partial bool ResetLabelsOnImport { get; set; } = true;
 
-		[Reactive] public bool ImportPrgRomLabels { get; set; } = true;
-		[Reactive] public bool ImportWorkRamLabels { get; set; } = true;
-		[Reactive] public bool ImportSaveRamLabels { get; set; } = true;
-		[Reactive] public bool ImportOtherLabels { get; set; } = true;
-		[Reactive] public bool ImportComments { get; set; } = true;
+		[ObservableProperty] public partial bool ImportPrgRomLabels { get; set; } = true;
+		[ObservableProperty] public partial bool ImportWorkRamLabels { get; set; } = true;
+		[ObservableProperty] public partial bool ImportSaveRamLabels { get; set; } = true;
+		[ObservableProperty] public partial bool ImportOtherLabels { get; set; } = true;
+		[ObservableProperty] public partial bool ImportComments { get; set; } = true;
 
-		[Reactive] public int TabSize { get; set; } = 4;
+		[ObservableProperty] public partial int TabSize { get; set; } = 4;
 
 		public bool IsMemoryTypeImportEnabled(MemoryType memType)
 		{

@@ -25,9 +25,6 @@ namespace Mesen.Windows
 		public ConfigWindow(ConfigWindowTab tab)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_model = new ConfigViewModel(tab);
 			DataContext = _model;
@@ -71,7 +68,7 @@ namespace Mesen.Windows
 
 		private async void ResetAllSettings(object sender, RoutedEventArgs e)
 		{
-			if(await MesenMsgBox.Show(VisualRoot, "ResetSettingsConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
+			if(await MesenMsgBox.Show(this.GetWindow(), "ResetSettingsConfirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
 				ConfigManager.ResetSettings();
 				_promptToSave = false;
 				Close();

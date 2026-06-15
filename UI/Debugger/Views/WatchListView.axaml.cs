@@ -147,7 +147,7 @@ namespace Mesen.Debugger.Views
 			_listView = this.FindLogicalAncestorOfType<WatchListView>();
 		}
 
-		protected override void OnGotFocus(GotFocusEventArgs e)
+		protected override void OnGotFocus(FocusChangedEventArgs e)
 		{
 			base.OnGotFocus(e);
 

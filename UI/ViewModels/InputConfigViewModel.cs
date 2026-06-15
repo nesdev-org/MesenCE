@@ -1,14 +1,14 @@
 ﻿using Avalonia.Controls;
 using Mesen.Config;
 using Mesen.Utilities;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.ViewModels
 {
-	public class InputConfigViewModel : DisposableViewModel
+	public partial class InputConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public InputConfig Config { get; set; }
-		[Reactive] public InputConfig OriginalConfig { get; set; }
+		[ObservableProperty] public partial InputConfig Config { get; set; }
+		[ObservableProperty] public partial InputConfig OriginalConfig { get; set; }
 
 		public InputConfigViewModel()
 		{

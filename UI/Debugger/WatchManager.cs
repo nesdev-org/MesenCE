@@ -1,10 +1,9 @@
 ﻿using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
 using Mesen.Debugger.Utilities;
 using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -307,11 +306,11 @@ namespace Mesen.Debugger
 		}
 	}
 
-	public class WatchValueInfo : ReactiveObject
+	public partial class WatchValueInfo : ObservableObject
 	{
-		[Reactive] public string Value { get; set; } = "";
-		[Reactive] public string Expression { get; set; } = "";
-		[Reactive] public bool IsChanged { get; set; } = false;
+		[ObservableProperty] public partial string Value { get; set; } = "";
+		[ObservableProperty] public partial string Expression { get; set; } = "";
+		[ObservableProperty] public partial bool IsChanged { get; set; } = false;
 		public Int64 NumericValue { get; set; } = -1;
 	}
 
