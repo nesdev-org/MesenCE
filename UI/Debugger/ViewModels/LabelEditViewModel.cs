@@ -127,7 +127,7 @@ namespace Mesen.Debugger.ViewModels
 				Comment = label.Comment;
 				MemoryType = label.MemoryType;
 				Flags = label.Flags;
-				Length = label.Length;
+				Length = label.Length > LabelManager.MaxLength ? LabelManager.MaxLength : label.Length;
 			}
 
 			public void Commit()
