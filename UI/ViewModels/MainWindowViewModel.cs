@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Threading;
 using Mesen.Config;
 using Mesen.Controls;
 using Mesen.Interop;
@@ -38,6 +39,7 @@ namespace Mesen.ViewModels
 		public SoftwareRendererViewModel SoftwareRenderer { get; } = new();
 
 		public Configuration Config { get; }
+		public NativeRenderer? Renderer { get; internal set; }
 
 		public MainWindowViewModel()
 		{
@@ -59,6 +61,12 @@ namespace Mesen.ViewModels
 			this.WhenAnyValue(x => x.RecentGames.Visible, x => x.SoftwareRenderer.FrameSurface).Subscribe(x => {
 				IsNativeRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface == null;
 				IsSoftwareRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface != null;
+
+				if(Renderer != null) {
+					Dispatcher.UIThread.Post(() => {
+						Renderer.IsVisible = IsNativeRendererVisible;
+					});
+				}
 			});
 
 			this.WhenAnyValue(x => x.RomInfo).Subscribe(x => {

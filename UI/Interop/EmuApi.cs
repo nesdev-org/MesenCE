@@ -75,7 +75,7 @@ namespace Mesen.Interop
 
 		[DllImport(DllPath)] public static extern void AddKnownGameFolder([MarshalAs(UnmanagedType.LPUTF8Str)] string folder);
 
-		[DllImport(DllPath)] public static extern void SetExclusiveFullscreenMode([MarshalAs(UnmanagedType.I1)] bool fullscreen, IntPtr windowHandle);
+		[DllImport(DllPath)] public static extern void SetFullscreenMode(FullscreenSettings settings);
 
 		[DllImport(DllPath)] public static extern TimingInfo GetTimingInfo(CpuType cpuType);
 
@@ -398,4 +398,19 @@ namespace Mesen.Interop
 		public SoftwareRendererSurface EmuHud;
 		public SoftwareRendererSurface ScriptHud;
 	}
+
+	public enum FullscreenMode
+	{
+		Disabled,
+		Borderless,
+		Exclusive
+	}
+
+	public struct FullscreenSettings
+	{
+		public IntPtr WindowHandle;
+		public UInt32 Width;
+		public UInt32 Height;
+		public FullscreenMode Mode;
+	};
 }

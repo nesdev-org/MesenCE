@@ -6,6 +6,7 @@
 #include "Shared/EmuSettings.h"
 #include "Shared/Video/DebugHud.h"
 #include "Shared/Video/SystemHud.h"
+#include "Shared/Video/DebugStats.h"
 #include "Shared/InputHud.h"
 #include "Shared/MessageManager.h"
 #include "Utilities/Video/IVideoRecorder.h"
@@ -73,6 +74,7 @@ void VideoRenderer::RenderThread()
 		_renderer->OnRendererThreadStarted();
 	}
 
+	Timer lastFrameTimer;
 	while(!_stopFlag.load()) {
 		//Wait until a frame is ready, or until 32ms have passed (to allow HUD to update at ~30fps when paused)
 		bool forceRender = !_waitForRender.Wait(32);
@@ -91,13 +93,27 @@ void VideoRenderer::RenderThread()
 				frame = _lastFrame;
 			}
 
+			bool showDebugInfo = _emu->GetSettings()->GetPreferences().ShowDebugInfo;
+			if(showDebugInfo) {
+				_emuHudSurface.Clear();
+				_rendererHud->ClearScreen();
+			}
+
 			_inputHud->DrawControllers(size, frame.InputData);
+
 			{
 				auto lock = _hudLock.AcquireSafe();
 				_systemHud->Draw(_rendererHud.get(), size.Width, size.Height);
 			}
 
-			_emuHudSurface.IsDirty = _rendererHud->Draw(_emuHudSurface.Buffer, size, {}, 0, {}, true);
+			if(showDebugInfo) {
+				double lastFrameTime = lastFrameTimer.GetElapsedMS();
+				lastFrameTimer.Reset();
+				_emu->GetDebugStats()->UpdateStats(_emu, true, lastFrameTime);
+				_emu->GetDebugStats()->DisplayStats(_emu, _rendererHud.get());
+			}
+
+			_emuHudSurface.IsDirty = _rendererHud->Draw(_emuHudSurface.Buffer, size, {}, 0, {}, !showDebugInfo);
 			_scriptHudSurface.IsDirty = DrawScriptHud(frame);
 
 			if(forceRender || _needRedraw || _emuHudSurface.IsDirty || _scriptHudSurface.IsDirty) {

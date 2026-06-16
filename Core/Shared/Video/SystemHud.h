@@ -21,10 +21,7 @@ private:
 	Timer _fpsTimer;
 	Timer _animationTimer;
 	uint32_t _lastFrameCount = 0;
-	uint32_t _lastRenderedFrameCount = 0;
-	uint32_t _currentFPS = 0;
-	uint32_t _currentRenderedFPS = 0;
-	uint32_t _renderedFrameCount = 0;
+	double _currentFPS = 0;
 
 	void DrawMessages(DebugHud* hud, uint32_t screenWidth, uint32_t screenHeight) const;
 	void DrawBar(DebugHud* hud, int x, int y, int width, int height) const;

@@ -140,6 +140,8 @@
 			<Control ID="lblCustomRatio">Custom Ratio: </Control>
 			<Control ID="chkBilinearInterpolation">Use bilinear interpolation when scaling</Control>
 			<Control ID="chkUseSrgbTextureFormat">Use sRGB when applying interpolation</Control>
+			<Control ID="chkEnableVariableRefreshRate">Enable variable refresh rate (fullscreen only)</Control>
+			<Control ID="chkEnableVariableRefreshRateHint">When using a monitor that supports VRR (FreeSync, G-Sync), VRR will be enabled when running in borderless (not exclusive) fullscreen mode. This improves frame pacing and is recommended when supported.&#13;&#13;Warning: When enabled on a display that does not support VRR at all (or using a core that runs at an FPS outside of the monitor's supported VRR range), enabling this option will cause screen tearing when in fullscreen mode.</Control>
 			<Control ID="lblFullscreenResolution">Fullscreen Resolution:</Control>
 			<Control ID="chkFullscreenForceIntegerScale">Use integer scale values when entering fullscreen mode</Control>
 			<Control ID="chkUseExclusiveFullscreen">Use exclusive fullscreen mode</Control>
@@ -193,6 +195,7 @@
 			<Control ID="tpgAdvanced">Advanced</Control>
 			<Control ID="lblScreenRotation">Screen Rotation:</Control>
 			<Control ID="chkUseSoftwareRenderer">Use software renderer (requires restart)</Control>
+			<Control ID="chkDisableHighPrecisionFramePacing">Disable high precision frame pacing (may improve battery life)</Control>
 		</Form>
 		<Form ID="EmulationConfigView">
 			<Control ID="tpgGeneral">General</Control>

@@ -47,6 +47,7 @@ namespace Mesen.Config
 		[Reactive][MinMax(0, 400)] public Int32 NtscIFilterLength { get; set; } = 50;
 		[Reactive][MinMax(0, 400)] public Int32 NtscQFilterLength { get; set; } = 50;
 
+		[Reactive] public bool EnableVariableRefreshRate { get; set; } = false;
 		[Reactive] public bool FullscreenForceIntegerScale { get; set; } = false;
 		[Reactive] public bool UseExclusiveFullscreen { get; set; } = false;
 		[Reactive] public UInt32 ExclusiveFullscreenRefreshRateNtsc { get; set; } = 60;
@@ -54,6 +55,7 @@ namespace Mesen.Config
 		[Reactive] public FullscreenResolution ExclusiveFullscreenResolution { get; set; } = 0;
 
 		[Reactive] public ScreenRotation ScreenRotation { get; set; } = ScreenRotation.None;
+		[Reactive] public bool DisableHighPrecisionFramePacing { get; set; } = false;
 
 		public VideoConfig()
 		{
@@ -81,7 +83,7 @@ namespace Mesen.Config
 				AspectRatio = aspectRatio,
 
 				UseBilinearInterpolation = this.UseBilinearInterpolation,
-				UseSrgbTextureFormat = this.UseSrgbTextureFormat,
+				UseSrgbTextureFormat = this.UseSrgbTextureFormat && this.UseBilinearInterpolation,
 				VerticalSync = this.VerticalSync,
 				IntegerFpsMode = this.IntegerFpsMode,
 
@@ -109,15 +111,36 @@ namespace Mesen.Config
 				NtscIFilterLength = this.NtscIFilterLength / 100.0,
 				NtscQFilterLength = this.NtscQFilterLength / 100.0,
 
+				EnableVariableRefreshRate = this.EnableVariableRefreshRate,
+
 				FullscreenForceIntegerScale = this.FullscreenForceIntegerScale,
 				UseExclusiveFullscreen = this.UseExclusiveFullscreen,
 				ExclusiveFullscreenRefreshRateNtsc = this.ExclusiveFullscreenRefreshRateNtsc,
 				ExclusiveFullscreenRefreshRatePal = this.ExclusiveFullscreenRefreshRatePal,
-				FullscreenResWidth = (uint)(ExclusiveFullscreenResolution == FullscreenResolution.Default ? (ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Width ?? 1920) : ExclusiveFullscreenResolution.GetWidth()),
-				FullscreenResHeight = (uint)(ExclusiveFullscreenResolution == FullscreenResolution.Default ? (ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Height ?? 1080) : ExclusiveFullscreenResolution.GetHeight()),
 
-				ScreenRotation = (uint)ScreenRotation
+				ScreenRotation = (uint)ScreenRotation,
+				DisableHighPrecisionFramePacing = this.DisableHighPrecisionFramePacing
 			});
+		}
+
+		public UInt32 GetFullscreenWidth()
+		{
+			uint monitorWidth = (uint)(ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Width ?? 1920);
+			if(UseExclusiveFullscreen) {
+				return ExclusiveFullscreenResolution == FullscreenResolution.Default ? monitorWidth : (uint)ExclusiveFullscreenResolution.GetWidth();
+			} else {
+				return monitorWidth;
+			}
+		}
+
+		public UInt32 GetFullscreenHeight()
+		{
+			uint monitorHeight = (uint)(ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Height ?? 1080);
+			if(UseExclusiveFullscreen) {
+				return ExclusiveFullscreenResolution == FullscreenResolution.Default ? monitorHeight : (uint)ExclusiveFullscreenResolution.GetHeight();
+			} else {
+				return monitorHeight;
+			}
 		}
 	}
 
@@ -157,14 +180,15 @@ namespace Mesen.Config
 		public double NtscIFilterLength;
 		public double NtscQFilterLength;
 
+		[MarshalAs(UnmanagedType.I1)] public bool EnableVariableRefreshRate;
 		[MarshalAs(UnmanagedType.I1)] public bool FullscreenForceIntegerScale;
 		[MarshalAs(UnmanagedType.I1)] public bool UseExclusiveFullscreen;
 		public UInt32 ExclusiveFullscreenRefreshRateNtsc;
 		public UInt32 ExclusiveFullscreenRefreshRatePal;
-		public UInt32 FullscreenResWidth;
-		public UInt32 FullscreenResHeight;
 
 		public UInt32 ScreenRotation;
+
+		[MarshalAs(UnmanagedType.I1)] public bool DisableHighPrecisionFramePacing;
 	}
 
 	public enum VideoFilterType

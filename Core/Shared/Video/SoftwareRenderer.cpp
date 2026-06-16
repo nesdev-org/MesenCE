@@ -91,7 +91,7 @@ void SoftwareRenderer::Reset()
 {
 }
 
-void SoftwareRenderer::SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle)
+void SoftwareRenderer::SetFullscreenMode(FullscreenSettings settings)
 {
 	//not supported
 }
