@@ -68,6 +68,7 @@ namespace Mesen.Debugger.ViewModels
 							//and the label we're editing aren't the same label.  Can't override an existing label with a different one.
 							ErrorMessage = ResourceHelper.GetMessage("AddressHasOtherLabel", sameAddress.Label.Length > 0 ? sameAddress.Label : sameAddress.Comment);
 							OkEnabled = false;
+							return;
 						}
 					}
 				}
@@ -98,11 +99,11 @@ namespace Mesen.Debugger.ViewModels
 
 				if(Label.Length >= 1 && Label.Length <= 65536 && !Label.Comment.Contains('\x1')) {
 					ErrorMessage = "";
-					OkEnabled = false;
+					OkEnabled = true;
 					return;
 				}
 
-				OkEnabled = true;
+				OkEnabled = false;
 			};
 		}
 
