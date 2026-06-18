@@ -44,6 +44,7 @@ private:
 	unique_ptr<MgbaLogHandler> _mgbaLog;
 
 	uint64_t _masterClock = 0;
+	uint64_t _openBusReadStamp = 0;
 	bool _hasPendingUpdates = false;
 	bool _hasPendingLateUpdates = false;
 	GbaMemoryManagerState _state = {};
@@ -80,12 +81,17 @@ private:
 	__noinline void ProcessVramStalling(uint8_t memType);
 
 	template<uint8_t width>
-	void UpdateOpenBus(uint32_t addr, uint32_t value);
+	__forceinline void UpdateOpenBusRead(uint32_t addr, uint32_t value);
+
+	template<uint8_t width>
+	__forceinline void UpdateOpenBus(uint32_t value);
+
+	void UpdateOamOpenBus(uint32_t addr);
 
 	template<bool debug = false>
 	uint32_t RotateValue(GbaAccessModeVal mode, uint32_t addr, uint32_t value, bool isSigned);
 
-	__forceinline uint8_t InternalRead(GbaAccessModeVal mode, uint32_t addr, uint32_t readAddr);
+	__forceinline uint8_t InternalRead(uint32_t addr, uint32_t readAddr);
 	__forceinline void InternalWrite(GbaAccessModeVal mode, uint32_t addr, uint8_t value, uint32_t writeAddr, uint32_t fullValue);
 
 	uint32_t ReadRegister(uint32_t addr);

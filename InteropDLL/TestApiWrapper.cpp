@@ -96,7 +96,9 @@ extern "C"
 			"GB/GBEmulatorShootout/mooneye/misc/boot_div-cgbABCDE.mtp",
 
 			//SGB tests can't run properly without the SGB ROM
-			"SNES/sgb_packet_test.mtp"
+			"SNES/sgb_packet_test.mtp",
+			"SNES/sgb-ext-test.mtp",
+			"SNES/sgb-mlt-test.mtp"
 		};
 
 		vector<string> tests = FolderUtilities::GetFilesInFolder(testFolder, { ".mtp" }, true, 5);

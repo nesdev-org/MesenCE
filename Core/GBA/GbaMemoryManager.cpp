@@ -258,13 +258,26 @@ void GbaMemoryManager::ProcessVramStalling(uint8_t memType)
 	}
 }
 
-template<uint8_t width>
-void GbaMemoryManager::UpdateOpenBus(uint32_t addr, uint32_t value)
+void GbaMemoryManager::UpdateOamOpenBus(uint32_t addr)
 {
-	if(addr >= 0x10000000) {
-		//Accessing open bus addresses should probably not update the current open bus value
+	//Prevent UpdateOpenBusRead from re-updating the value after this
+	_openBusReadStamp = _masterClock;
+
+	//Reading OAM in 16-bit mode (and presumably 8-bit mode?)
+	//appears to update all 32 bits of the CPU's data bus with the OAM value.
+	//(DMA_OAM_Bus test)
+	_state.InternalOpenBus[0] = _oam[addr & (GbaConsole::SpriteRamSize - 1)];
+	_state.InternalOpenBus[1] = _oam[(addr + 1) & (GbaConsole::SpriteRamSize - 1)];
+	_state.InternalOpenBus[2] = _oam[(addr + 2) & (GbaConsole::SpriteRamSize - 1)];
+	_state.InternalOpenBus[3] = _oam[(addr + 3) & (GbaConsole::SpriteRamSize - 1)];
+}
+
+template<uint8_t width>
+void GbaMemoryManager::UpdateOpenBusRead(uint32_t addr, uint32_t value)
+{
+	if(_openBusReadStamp == _masterClock) {
+		//Accessing open bus addresses does not update the current open bus value
 		//This is needed to pass the test rom that dumps the bios to save ram by abusing open bus (See: https://gist.github.com/profi200/c7fef99003fa5d07235d97296da23db3)
-		//TODOGBA reading other open bus addresses probably should behave the same? (e.g registers that don't exist, etc.)
 		return;
 	}
 
@@ -277,7 +290,15 @@ void GbaMemoryManager::UpdateOpenBus(uint32_t addr, uint32_t value)
 			value >>= 8;
 		}
 		memcpy(_state.InternalOpenBus, _state.IwramOpenBus, sizeof(_state.IwramOpenBus));
-	} else if constexpr(width == 4) {
+	} else {
+		UpdateOpenBus<width>(value);
+	}
+}
+
+template<uint8_t width>
+void GbaMemoryManager::UpdateOpenBus(uint32_t value)
+{
+	if constexpr(width == 4) {
 		_state.InternalOpenBus[0] = value;
 		_state.InternalOpenBus[1] = value >> 8;
 		_state.InternalOpenBus[2] = value >> 16;
@@ -309,27 +330,27 @@ uint32_t GbaMemoryManager::Read(GbaAccessModeVal mode, uint32_t addr)
 
 	bool isSigned = mode & GbaAccessMode::Signed;
 	if(mode & GbaAccessMode::Byte) {
-		value = InternalRead(mode, addr, addr);
-		UpdateOpenBus<1>(addr, value);
+		value = InternalRead(addr, addr);
+		UpdateOpenBusRead<1>(addr, value);
 		value = isSigned ? (uint32_t)(int8_t)value : (uint8_t)value;
 		_emu->ProcessMemoryRead<CpuType::Gba, 1>(addr, value, MemoryOperationType::Read);
 	} else if(mode & GbaAccessMode::HalfWord) {
-		uint8_t b0 = InternalRead(mode, addr & ~0x01, addr);
-		uint8_t b1 = InternalRead(mode, addr | 1, addr);
+		uint8_t b0 = InternalRead(addr & ~0x01, addr);
+		uint8_t b1 = InternalRead(addr | 1, addr);
 		value = b0 | (b1 << 8);
-		UpdateOpenBus<2>(addr, value);
+		UpdateOpenBusRead<2>(addr, value);
 		value = isSigned ? (uint32_t)(int16_t)value : (uint16_t)value;
 		if(!(mode & GbaAccessMode::NoRotate) && (addr & 0x01)) {
 			value = RotateValue(mode, addr, value, isSigned);
 		}
 		_emu->ProcessMemoryRead<CpuType::Gba, 2>(addr & ~0x01, value, mode & GbaAccessMode::Prefetch ? MemoryOperationType::ExecOpCode : MemoryOperationType::Read);
 	} else {
-		uint8_t b0 = InternalRead(mode, addr & ~0x03, addr);
-		uint8_t b1 = InternalRead(mode, (addr & ~0x03) | 1, addr);
-		uint8_t b2 = InternalRead(mode, (addr & ~0x03) | 2, addr);
-		uint8_t b3 = InternalRead(mode, addr | 3, addr);
+		uint8_t b0 = InternalRead(addr & ~0x03, addr);
+		uint8_t b1 = InternalRead((addr & ~0x03) | 1, addr);
+		uint8_t b2 = InternalRead((addr & ~0x03) | 2, addr);
+		uint8_t b3 = InternalRead(addr | 3, addr);
 		value = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
-		UpdateOpenBus<4>(addr, value);
+		UpdateOpenBusRead<4>(addr, value);
 		if(!(mode & GbaAccessMode::NoRotate) && (addr & 0x03)) {
 			value = RotateValue(mode, addr, value, isSigned);
 		}
@@ -367,11 +388,13 @@ void GbaMemoryManager::Write(GbaAccessModeVal mode, uint32_t addr, uint32_t valu
 	if(mode & GbaAccessMode::Byte) {
 		if(_emu->ProcessMemoryWrite<CpuType::Gba, 1>(addr, value, MemoryOperationType::Write)) {
 			InternalWrite(mode, addr, (uint8_t)value, addr, value);
+			UpdateOpenBus<1>(value);
 		}
 	} else if(mode & GbaAccessMode::HalfWord) {
 		if(_emu->ProcessMemoryWrite<CpuType::Gba, 2>(addr & ~0x01, value, MemoryOperationType::Write)) {
 			InternalWrite(mode, addr & ~0x01, (uint8_t)value, addr, value);
 			InternalWrite(mode, (addr & ~0x01) | 0x01, (uint8_t)(value >> 8), addr, value);
+			UpdateOpenBus<2>(value);
 		}
 	} else {
 		if(_emu->ProcessMemoryWrite<CpuType::Gba, 4>(addr & ~0x03, value, MemoryOperationType::Write)) {
@@ -379,11 +402,12 @@ void GbaMemoryManager::Write(GbaAccessModeVal mode, uint32_t addr, uint32_t valu
 			InternalWrite(mode, (addr & ~0x03) | 0x01, (uint8_t)(value >> 8), addr, value);
 			InternalWrite(mode, (addr & ~0x03) | 0x02, (uint8_t)(value >> 16), addr, value);
 			InternalWrite(mode, (addr & ~0x03) | 0x03, (uint8_t)(value >> 24), addr, value);
+			UpdateOpenBus<4>(value);
 		}
 	}
 }
 
-uint8_t GbaMemoryManager::InternalRead(GbaAccessModeVal mode, uint32_t addr, uint32_t readAddr)
+uint8_t GbaMemoryManager::InternalRead(uint32_t addr, uint32_t readAddr)
 {
 	uint8_t bank = (addr >> 24);
 	addr &= 0xFFFFFF;
@@ -397,6 +421,7 @@ uint8_t GbaMemoryManager::InternalRead(GbaAccessModeVal mode, uint32_t addr, uin
 					return _state.BootRomOpenBus[addr & 0x03];
 				}
 			}
+			_openBusReadStamp = _masterClock;
 			return _state.InternalOpenBus[addr & 0x03];
 
 		case 0x02: return _extWorkRam[addr & (GbaConsole::ExtWorkRamSize - 1)];
@@ -418,7 +443,9 @@ uint8_t GbaMemoryManager::InternalRead(GbaAccessModeVal mode, uint32_t addr, uin
 				return _vram[addr & 0xFFFF];
 			}
 
-		case 0x07: return _oam[addr & (GbaConsole::SpriteRamSize - 1)];
+		case 0x07:
+			UpdateOamOpenBus(addr & ~0x03);
+			return _oam[addr & (GbaConsole::SpriteRamSize - 1)];
 
 		case 0x08:
 		case 0x09:
@@ -435,6 +462,7 @@ uint8_t GbaMemoryManager::InternalRead(GbaAccessModeVal mode, uint32_t addr, uin
 			return _cart->ReadRam((bank << 24) | addr, readAddr);
 	}
 
+	_openBusReadStamp = _masterClock;
 	return _state.InternalOpenBus[addr & 0x03];
 }
 
@@ -442,8 +470,6 @@ void GbaMemoryManager::InternalWrite(GbaAccessModeVal mode, uint32_t addr, uint8
 {
 	uint8_t bank = (addr >> 24);
 	addr &= 0xFFFFFF;
-
-	_state.InternalOpenBus[addr & 0x03] = value;
 
 	switch(bank) {
 		case 0x00:
@@ -578,6 +604,7 @@ uint32_t GbaMemoryManager::ReadRegister(uint32_t addr)
 				}
 
 				LogDebug("Read unimplemented register: " + HexUtilities::ToHex32(addr));
+				_openBusReadStamp = _masterClock;
 				return _state.InternalOpenBus[addr & 0x03];
 		}
 	}
@@ -738,7 +765,8 @@ bool GbaMemoryManager::UseInlineHalt()
 
 uint8_t GbaMemoryManager::GetOpenBus(uint32_t addr)
 {
-	return _state.InternalOpenBus[addr & 0x01];
+	_openBusReadStamp = _masterClock;
+	return _state.InternalOpenBus[addr & 0x03];
 }
 
 uint32_t GbaMemoryManager::DebugCpuRead(GbaAccessModeVal mode, uint32_t addr)
@@ -989,6 +1017,8 @@ void GbaMemoryManager::Serialize(Serializer& s)
 		SV(_state.BusLocked);
 		SV(_state.StopMode);
 		SV(_state.PostBootFlag);
+
+		SV(_openBusReadStamp);
 	}
 
 	if(!s.IsSaving()) {
