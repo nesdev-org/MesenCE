@@ -275,6 +275,7 @@ void WsConsole::InitPostBootRomState()
 
 	WsPpuState& ppu = _ppu->GetState();
 	ppu.LcdEnabled = true;
+	ppu.LcdControl = 0x01;
 	if(_colorModel) {
 		ppu.Scanline = 127;
 		ppu.Cycle = 232;
