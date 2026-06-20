@@ -9,8 +9,7 @@ struct VideoStats
 	double LastFrameTime = 0;
 	double FrameDurations[60] = {};
 	uint32_t FrameDurationIndex = 0;
-	double FrameMin = 9999;
-	double FrameMax = 0;
+	double MaxGap = 0;
 };
 
 class DebugStats
@@ -18,6 +17,7 @@ class DebugStats
 private:
 	VideoStats _core;
 	VideoStats _render;
+	uint32_t _skipFrames = 0;
 
 	void DrawVideoStats(int x, int y, DebugHud* hud, bool forRender, double fps);
 
