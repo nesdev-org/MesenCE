@@ -104,6 +104,7 @@ void WsCart::WritePort(uint16_t port, uint8_t value)
 uint8_t WsCart::ReadMemory(uint32_t addr)
 {
 	assert(false);
+	return 0;
 }
 
 void WsCart::WriteMemory(uint32_t addr, uint8_t value)
