@@ -1,6 +1,5 @@
 #pragma once
 #include "pch.h"
-#include "SNES/SnesCpuTypes.h"
 #include "SNES/DmaControllerTypes.h"
 #include "Utilities/ISerializable.h"
 
@@ -19,6 +18,7 @@ private:
 	bool _dmaStartDelay = false;
 	bool _dmaPending = false;
 	uint32_t _dmaClockCounter = 0;
+	uint8_t _stoppedHdmaChannels = 0;
 
 	uint8_t _activeChannel = 0; //Used by debugger's event viewer
 
@@ -38,6 +38,9 @@ private:
 	void UpdateNeedToProcessFlag();
 
 	bool HasActiveDmaChannel();
+	uint8_t GetActiveHdmaChannels();
+	bool IsHdmaChannelActive(int i);
+	void StopHdmaChannel(int i);
 
 public:
 	SnesDmaController(SnesMemoryManager* memoryManager);

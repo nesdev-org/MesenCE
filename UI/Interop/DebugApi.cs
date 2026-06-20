@@ -760,7 +760,6 @@ namespace Mesen.Interop
 		public byte HdmaLineCounterAndRepeat;
 
 		[MarshalAs(UnmanagedType.I1)] public bool DoTransfer;
-		[MarshalAs(UnmanagedType.I1)] public bool HdmaFinished;
 		[MarshalAs(UnmanagedType.I1)] public bool UnusedControlFlag;
 
 		public byte UnusedRegister;
