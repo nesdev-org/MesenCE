@@ -25,7 +25,7 @@ public:
 	void GetTraceRow(string& output, NecDspState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
 
-	__forceinline uint32_t GetProgramCounter(NecDspState& state) { return state.PC; }
+	__forceinline uint32_t GetProgramCounter(NecDspState& state) { return state.PC * 3; }
 	__forceinline uint64_t GetCycleCount(NecDspState& state) { return state.CycleCount; }
 	__forceinline uint8_t GetStackPointer(NecDspState& state) { return state.SP; }
 };
