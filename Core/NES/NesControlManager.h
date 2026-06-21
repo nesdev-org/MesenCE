@@ -22,6 +22,9 @@ private:
 	uint16_t _writeAddr = 0;
 	uint8_t _writeValue = 0;
 	uint8_t _writePending = 0;
+	uint16_t _prevReadAddr = 0;
+
+	uint8_t ReadDevice(shared_ptr<BaseControlDevice>& device, uint16_t addr);
 
 protected:
 	NesConsole* _console;

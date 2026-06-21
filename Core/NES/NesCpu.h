@@ -68,7 +68,7 @@ private:
 	{
 		ProcessPendingDma(readAddress, opType);
 	}
-	uint8_t ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool enableInternalRegReads, bool isNesBehavior);
+	uint8_t ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool enableInternalRegReads);
 	__forceinline uint16_t FetchOperand();
 	__forceinline void EndCpuCycle(bool forRead);
 	void IRQ();

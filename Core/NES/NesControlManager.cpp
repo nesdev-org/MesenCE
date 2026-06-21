@@ -226,6 +226,21 @@ void NesControlManager::UpdateInputState()
 	RemapControllerButtons();
 }
 
+uint8_t NesControlManager::ReadDevice(shared_ptr<BaseControlDevice>& device, uint16_t addr)
+{
+	if(_emu->GetSettings()->GetNesConfig().ConsoleType == NesConsoleType::Hvc001 && _console->GetRegion() == ConsoleRegion::Ntsc) {
+		return device->ReadRam(addr);
+	} else {
+		uint8_t value = device->GetPreviousReadValue();
+		uint64_t cpuCycle = _console->GetMasterClock();
+		if(_prevReadAddr != addr || device->GetPreviousReadCycle() < cpuCycle - 1) {
+			value = device->ReadRam(addr);
+		}
+		device->SetPreviousRead(cpuCycle, value);
+		return value;
+	}
+}
+
 uint8_t NesControlManager::ReadRam(uint16_t addr)
 {
 	SetInputReadFlag();
@@ -233,9 +248,11 @@ uint8_t NesControlManager::ReadRam(uint16_t addr)
 	uint8_t value = _console->GetMemoryManager()->GetOpenBus(GetOpenBusMask(addr - 0x4016));
 	for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
 		if(device->IsConnected()) {
-			value |= device->ReadRam(addr);
+			value |= ReadDevice(device, addr);
 		}
 	}
+
+	_prevReadAddr = addr;
 
 	return value;
 }
@@ -273,6 +290,10 @@ void NesControlManager::Serialize(Serializer& s)
 	SV(_writeAddr);
 	SV(_writeValue);
 	SV(_writePending);
+
+	if(s.GetFormat() != SerializeFormat::Map) {
+		SV(_prevReadAddr);
+	}
 
 	if(!s.IsSaving()) {
 		UpdateControlDevices();
