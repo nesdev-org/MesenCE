@@ -187,7 +187,7 @@ void GbaDmaController::RunDma(GbaDmaChannel& ch, uint8_t chIndex)
 
 	_dmaActiveChannel = chIndex;
 
-	while(length-- > 0) {
+	while(length-- > 0 && ch.Enabled) {
 		uint32_t value;
 		if(srcAddr >= 0x2000000) {
 			if(!isRomSrc) {
