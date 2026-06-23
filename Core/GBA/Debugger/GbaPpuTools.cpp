@@ -511,7 +511,6 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 	int16_t centerY = 0;
 
 	for(int y = 0; y < sprite.Height; y++) {
-
 		if(transformEnabled) {
 			uint16_t transformAddr = (sprite.TransformParamIndex << 5) + 6;
 			pa = oam[transformAddr] | (oam[transformAddr + 1] << 8);
