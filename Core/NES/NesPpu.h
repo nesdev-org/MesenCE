@@ -53,15 +53,20 @@ protected:
 	__forceinline uint16_t GetAttributeAddr();
 
 	void ProcessScanlineFirstCycle();
+	__noinline void ProcessRenderingDisabledPixel();
+
 	__forceinline void ProcessScanlineImpl();
 	__forceinline void UpdateProcessSpritesFlag();
 	__forceinline void ProcessSpriteEvaluation();
 	__noinline void ProcessSpriteEvaluationStart();
 
+	__forceinline void ProcessSpriteShifters();
+
 	void BeginVBlank();
 	void TriggerNmi();
 
 	__forceinline void LoadTileInfo();
+
 	void LoadSprite(uint8_t spriteY, uint8_t tileIndex, uint8_t attributes, uint8_t spriteX, bool extraSprite);
 	void LoadSpriteTileInfo();
 	void LoadExtraSprites();
