@@ -683,38 +683,40 @@ template<class T> void NesPpu<T>::WriteVram(uint16_t addr, uint8_t value)
 
 template<class T> void NesPpu<T>::LoadTileInfo()
 {
-	if(IsRenderingEnabled()) {
-		switch(_cycle & 0x07) {
-			case 1: {
-				((T*)this)->StoreTileInformation(); //Used by HD packs
+	switch(_cycle & 0x07) {
+		case 0:
+			//This is the last dot of the 8-dot sequence (e.g dot 8, 16, etc.)
+			//Replace bottom 8 bits of the BG shifters
+			_highBitShift &= 0xFF00;
+			_highBitShift |= _tile.HighByte;
+			_lowBitShift &= 0xFF00;
+			_lowBitShift |= _tile.LowByte;
 
-				_previousTilePalette = _currentTilePalette;
-				_currentTilePalette = _tile.PaletteOffset;
+			_previousTilePalette = _currentTilePalette;
+			_currentTilePalette = _tile.PaletteOffset;
+			((T*)this)->PushTileInformation(); //Used by HD packs
+			break;
 
-				_highBitShift &= 0xFF00; // This shift register pulls in 1's, so we need to mask away the lower 8 bits before bringing in the data from the tile fetch.
-				_highBitShift |= _tile.HighByte;
-				_lowBitShift &= 0xFF00; // Similar to the high bit plane, it's possible there are 1's in the lower 8 bits if you toggle rendering at the right time.
-				_lowBitShift |= _tile.LowByte;
-
-				uint8_t tileIndex = ReadVram(GetNameTableAddr());
-				_tile.TileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
-				break;
-			}
-
-			case 3: {
-				uint8_t shift = ((_videoRamAddr >> 4) & 0x04) | (_videoRamAddr & 0x02);
-				_tile.PaletteOffset = ((ReadVram(GetAttributeAddr()) >> shift) & 0x03) << 2;
-				break;
-			}
-
-			case 5:
-				_tile.LowByte = ReadVram(_tile.TileAddr);
-				break;
-
-			case 7:
-				_tile.HighByte = ReadVram(_tile.TileAddr + 8);
-				break;
+		case 1: {
+			uint8_t tileIndex = ReadVram(GetNameTableAddr());
+			_tile.TileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
+			((T*)this)->StoreTileInformation(); //Used by HD packs
+			break;
 		}
+
+		case 3: {
+			uint8_t shift = ((_videoRamAddr >> 4) & 0x04) | (_videoRamAddr & 0x02);
+			_tile.PaletteOffset = ((ReadVram(GetAttributeAddr()) >> shift) & 0x03) << 2;
+			break;
+		}
+
+		case 5:
+			_tile.LowByte = ReadVram(_tile.TileAddr);
+			break;
+
+		case 7:
+			_tile.HighByte = ReadVram(_tile.TileAddr + 8);
+			break;
 	}
 }
 
@@ -830,6 +832,8 @@ template<class T> void NesPpu<T>::ShiftTileRegisters()
 {
 	_lowBitShift <<= 1;
 	_highBitShift <<= 1;
+
+	//The high bit shifter is filled with 1s as it shifts (the low bit shifter is not)
 	_highBitShift |= 1;
 }
 
@@ -919,15 +923,6 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 {
 	//Only called for cycle 1+
 	if(_cycle <= 256) {
-		LoadTileInfo();
-
-		if(_prevRenderingEnabled && (_cycle & 0x07) == 0) {
-			IncHorizontalScrolling();
-			if(_cycle == 256) {
-				IncVerticalScrolling();
-			}
-		}
-
 		if(_scanline >= 0) {
 			//"Secondary OAM clear and sprite evaluation do not occur on the pre-render line"
 			ProcessSpriteEvaluation();
@@ -941,6 +936,16 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			//Pre-render scanline logic
 			_statusFlags.VerticalBlank = false;
 			_console->GetCpu()->ClearNmiFlag();
+		}
+
+		if(_prevRenderingEnabled) {
+			if((_cycle & 0x07) == 0) {
+				IncHorizontalScrolling();
+				if(_cycle == 256) {
+					IncVerticalScrolling();
+				}
+			}
+			LoadTileInfo();
 		}
 	} else if(_cycle >= 257 && _cycle <= 320) {
 		if(_prevRenderingEnabled) {
@@ -987,17 +992,15 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			}
 		}
 	} else if(_cycle >= 321 && _cycle <= 336) {
-		LoadTileInfo();
-
-		if(_cycle == 321) {
-			if(_prevRenderingEnabled) {
+		if(_prevRenderingEnabled) {
+			if(_cycle == 321) {
 				//Do the final increment, which follows the last set of 8 sprite fetch dots.
 				_secondaryOamAddr++;
+			} else if(_prevRenderingEnabled && (_cycle == 328 || _cycle == 336)) {
+				IncHorizontalScrolling();
 			}
-		} else if(_prevRenderingEnabled && (_cycle == 328 || _cycle == 336)) {
-			_lowBitShift <<= 8;
-			_highBitShift <<= 8;
-			IncHorizontalScrolling();
+			ShiftTileRegisters();
+			LoadTileInfo();
 		}
 	} else if(_cycle == 337) {
 		if(IsRenderingEnabled()) {
