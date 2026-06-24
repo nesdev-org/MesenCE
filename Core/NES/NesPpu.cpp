@@ -778,6 +778,9 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 		_spriteShifterList[_spriteIndex] = BaseNesPpu::SpriteShifterDone;
 	}
 
+	if(!extraSprite) {
+		_activeSpriteShifters &= ~(1 << _spriteIndex);
+	}
 	_spriteIndex++;
 }
 
@@ -1024,8 +1027,6 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 	} else if(_cycle == 339) {
 		if(IsRenderingEnabled()) {
 			_tile.TileAddr = ReadVram(GetNameTableAddr());
-
-			_activeSpriteShifters = 0;
 
 			if(_scanline == -1 && _cycle == 339 && (_frameCount & 0x01) && _region == ConsoleRegion::Ntsc && GetPpuModel() == PpuModel::Ppu2C02) {
 				//This behavior is NTSC-specific - PAL frames are always the same number of cycles
