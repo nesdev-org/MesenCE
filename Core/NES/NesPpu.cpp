@@ -767,6 +767,9 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 
 		if(!extraSprite) {
 			_spriteShifterList[_spriteIndex] = (((uint16_t)spriteX + 1) << 4) | _spriteIndex;
+
+			//Clear expired flag to indicate that the counter was reloaded
+			_expiredSpriteShifters &= ~(1 << _spriteIndex);
 		}
 
 		_spriteCount++;
@@ -778,9 +781,6 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 		_spriteShifterList[_spriteIndex] = BaseNesPpu::SpriteShifterDone;
 	}
 
-	if(!extraSprite) {
-		_activeSpriteShifters &= ~(1 << _spriteIndex);
-	}
 	_spriteIndex++;
 }
 
@@ -1025,8 +1025,20 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			_tile.TileAddr = ReadVram(GetNameTableAddr());
 		}
 	} else if(_cycle == 339) {
+		_activeSpriteShifters = 0;
+
 		if(IsRenderingEnabled()) {
 			_tile.TileAddr = ReadVram(GetNameTableAddr());
+
+			//Set sprite shifters to "count" mode (only if rendering is enabled)
+			//Only do this if the shifter did not finish counting already (which can happen in
+			//some scenarios when rendering is disabled mid-scanline, etc.)
+			for(int i = 0; i < 8; i++) {
+				uint8_t bit = (1 << (_spriteShifterList[i] & 0x07));
+				if(_spriteShifterList[i] != NesPpu::SpriteShifterDone && !(_expiredSpriteShifters & bit)) {
+					_countingSpriteShifters |= bit;
+				}
+			}
 
 			if(_scanline == -1 && _cycle == 339 && (_frameCount & 0x01) && _region == ConsoleRegion::Ntsc && GetPpuModel() == PpuModel::Ppu2C02) {
 				//This behavior is NTSC-specific - PAL frames are always the same number of cycles
@@ -1042,10 +1054,19 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				}
 				_nextSpriteShifterCycle++;
 			}
-		} else {
-			//If rendering is off, the sprites aren't put into counting mode, so make sure they're output+shift in case they got pattern data.
-			_activeSpriteShifters = 0xFF;
 		}
+
+		for(int i = 0; i < 8; i++) {
+			//Any shifter that's not in count mode should be active at the start of the
+			//next scanline and output pixels starting from X=0 (if rendering is enabled)
+			if(_spriteShifterList[i] != NesPpu::SpriteShifterDone) {
+				uint8_t bit = (1 << (_spriteShifterList[i] & 0x07));
+				if(!(_countingSpriteShifters & bit)) {
+					_activeSpriteShifters |= bit;
+				}
+			}
+		}
+
 		UpdateProcessSpritesFlag();
 	}
 }
@@ -1077,8 +1098,14 @@ template<class T> void NesPpu<T>::ProcessSpriteShifters()
 	//Handle sprite shifter counting.
 	if(_nextSpriteShifterCycle == _cycle) {
 		while((uint32_t)(_spriteShifterList[_nextSpriteShifter] >> 4) == _cycle) {
-			_activeSpriteShifters |= (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
-			_spriteShifterList[_nextSpriteShifter] = BaseNesPpu::SpriteShifterDone;
+			uint8_t bit = (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
+			if(_countingSpriteShifters & bit) {
+				//If shifter was in count mode, turn off count mode,
+				//set the expired flag (counting is done) and enable "shift" mode
+				_activeSpriteShifters |= bit;
+				_expiredSpriteShifters |= bit;
+				_countingSpriteShifters &= ~bit;
+			}
 			_nextSpriteShifter++;
 		}
 		_nextSpriteShifterCycle = _spriteShifterList[_nextSpriteShifter] >> 4;
@@ -1674,6 +1701,8 @@ template<class T> void NesPpu<T>::Serialize(Serializer& s)
 		SV(_nextSpriteShifter);
 		SV(_nextSpriteShifterCycle);
 		SV(_activeSpriteShifters);
+		SV(_countingSpriteShifters);
+		SV(_expiredSpriteShifters);
 		SV(_dotSkipped);
 		SV(_processSprites);
 

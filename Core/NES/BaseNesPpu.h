@@ -92,6 +92,8 @@ protected:
 	uint8_t _nextSpriteShifter = 0;
 	uint16_t _nextSpriteShifterCycle = 0;
 	uint8_t _activeSpriteShifters = 0;
+	uint8_t _countingSpriteShifters = 0;
+	uint8_t _expiredSpriteShifters = 0;
 	uint8_t _dotSkipped = 0;
 	bool _processSprites = false;
 
