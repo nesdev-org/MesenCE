@@ -10,6 +10,7 @@
 #include "NES/Input/NesController.h"
 #include "NES/Input/SuborMouse.h"
 #include "NES/Input/PachinkoController.h"
+#include "NES/Input/FcnsController.h"
 #include "NES/Input/VirtualBoyController.h"
 #include "PCE/Input/PceController.h"
 #include "PCE/Input/PceAvenuePad6.h"
@@ -95,6 +96,10 @@ public:
 
 				case ControllerType::Pachinko:
 					_ports[i].reset(new PachinkoController(emu, 0, controllers[i].Keys));
+					break;
+
+				case ControllerType::FcnsController:
+					_ports[i].reset(new FcnsController(emu, controllers[i].Type, 0, controllers[i].Keys));
 					break;
 
 				case ControllerType::PceController:

@@ -895,6 +895,9 @@
     <ClInclude Include="NES\Input\PachinkoController.h">
       <Filter>NES\Input</Filter>
     </ClInclude>
+    <ClInclude Include="NES\Input\FcnsController.h">
+      <Filter>NES\Input</Filter>
+    </ClInclude>
     <ClInclude Include="NES\Input\PartyTap.h">
       <Filter>NES\Input</Filter>
     </ClInclude>
