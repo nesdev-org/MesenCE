@@ -77,13 +77,13 @@ namespace Mesen.Config
 
 			ConfigApi.SetSnesConfig(new InteropSnesConfig() {
 				Port1 = Port1.ToInterop(),
-				Port1A = Port1A.ToInterop(),
+				Port1A = Port1.ToInterop(Port1A.Type),
 				Port1B = Port1B.ToInterop(),
 				Port1C = Port1C.ToInterop(),
 				Port1D = Port1D.ToInterop(),
 
 				Port2 = Port2.ToInterop(),
-				Port2A = Port2A.ToInterop(),
+				Port2A = Port2.ToInterop(Port2A.Type),
 				Port2B = Port2B.ToInterop(),
 				Port2C = Port2C.ToInterop(),
 				Port2D = Port2D.ToInterop(),

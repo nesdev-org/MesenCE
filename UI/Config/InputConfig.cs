@@ -259,15 +259,16 @@ namespace Mesen.Config
 			}
 		}
 
-		public InteropControllerConfig ToInterop()
+		public InteropControllerConfig ToInterop(ControllerType? type = null)
 		{
+			ControllerType effectiveType = type ?? this.Type;
 			return new InteropControllerConfig() {
-				Type = this.Type,
+				Type = effectiveType,
 				Keys = new InteropKeyMappingSet() {
-					Mapping1 = this.Mapping1.ToInterop(Type, 0),
-					Mapping2 = this.Mapping2.ToInterop(Type, 1),
-					Mapping3 = this.Mapping3.ToInterop(Type, 2),
-					Mapping4 = this.Mapping4.ToInterop(Type, 3),
+					Mapping1 = this.Mapping1.ToInterop(effectiveType, 0),
+					Mapping2 = this.Mapping2.ToInterop(effectiveType, 1),
+					Mapping3 = this.Mapping3.ToInterop(effectiveType, 2),
+					Mapping4 = this.Mapping4.ToInterop(effectiveType, 3),
 					TurboSpeed = this.TurboSpeed
 				}
 			};

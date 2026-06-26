@@ -33,7 +33,7 @@ protected:
 	}
 
 public:
-	PachinkoController(Emulator* emu, KeyMappingSet keyMappings) : NesController(emu, ControllerType::Pachinko, BaseControlDevice::ExpDevicePort, keyMappings)
+	PachinkoController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : NesController(emu, ControllerType::Pachinko, port, keyMappings)
 	{
 	}
 
@@ -42,7 +42,10 @@ public:
 		uint8_t output = 0;
 		if(addr == 0x4016) {
 			StrobeProcessRead();
-			output = (_pachinkoState & 0x01) << 1;
+			output = (_pachinkoState & 0x01);
+			if(_port >= 2) {
+				output <<= 1;
+			}
 			_pachinkoState >>= 1;
 		}
 		return output;

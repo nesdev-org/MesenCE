@@ -10,7 +10,7 @@
 	xmlns:cfg="using:Mesen.Config"
 	mc:Ignorable="d"
 	x:DataType="vm:KeyMappingViewModel"
-	x:Class="Mesen.Views.BandaiHypershotControllerView"
+	x:Class="Mesen.Views.NesCustomControllerView"
 >
 	<Design.DataContext>
 		<vm:KeyMappingViewModel />

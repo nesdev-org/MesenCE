@@ -141,15 +141,15 @@ namespace Mesen.Config
 
 			ConfigApi.SetNesConfig(new InteropNesConfig() {
 				Port1 = Port1.ToInterop(),
-				Port1A = Port1A.ToInterop(),
-				Port1B = Port1B.ToInterop(),
+				Port1A = Port1.ToInterop(Port1A.Type),
+				Port1B = Port2.ToInterop(Port1B.Type),
 				Port1C = Port1C.ToInterop(),
 				Port1D = Port1D.ToInterop(),
 
 				Port2 = Port2.ToInterop(),
 
 				ExpPort = ExpPort.ToInterop(),
-				ExpPortA = ExpPortA.ToInterop(),
+				ExpPortA = ExpPort.ToInterop(ExpPortA.Type),
 				ExpPortB = ExpPortB.ToInterop(),
 				ExpPortC = ExpPortC.ToInterop(),
 				ExpPortD = ExpPortD.ToInterop(),

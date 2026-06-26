@@ -3,9 +3,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Mesen.Views
 {
-	public class BandaiHypershotControllerView : UserControl
+	public class NesCustomControllerView : UserControl
 	{
-		public BandaiHypershotControllerView()
+		public NesCustomControllerView()
 		{
 			InitializeComponent();
 		}

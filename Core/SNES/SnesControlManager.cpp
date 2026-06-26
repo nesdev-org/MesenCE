@@ -5,10 +5,6 @@
 #include "SNES/InternalRegisters.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
-#include "Shared/KeyManager.h"
-#include "Shared/Interfaces/IKeyManager.h"
-#include "Shared/Interfaces/IInputProvider.h"
-#include "Shared/Interfaces/IInputRecorder.h"
 #include "SNES/Input/SnesController.h"
 #include "SNES/Input/SnesRumbleController.h"
 #include "SNES/Input/SnesMouse.h"
@@ -17,9 +13,7 @@
 #include "SNES/Input/SnesNttDataKeypad.h"
 #include "SNES/Input/AsciiTurboFileTwinTf2.h"
 #include "SNES/Input/AsciiTurboFileTwinStf.h"
-#include "Shared/EventType.h"
 #include "Utilities/Serializer.h"
-#include "Shared/SystemActionManager.h"
 
 SnesControlManager::SnesControlManager(SnesConsole* console) : BaseControlManager(console->GetEmulator(), CpuType::Snes)
 {
@@ -58,10 +52,8 @@ shared_ptr<BaseControlDevice> SnesControlManager::CreateControllerDevice(Control
 			ControllerConfig controllers[4];
 			if(port == 0) {
 				std::copy(cfg.Port1SubPorts, cfg.Port1SubPorts + 4, controllers);
-				controllers[0].Keys = cfg.Port1.Keys;
 			} else {
 				std::copy(cfg.Port2SubPorts, cfg.Port2SubPorts + 4, controllers);
-				controllers[0].Keys = cfg.Port2.Keys;
 			}
 			device.reset(new Multitap(_console, port, controllers));
 			break;

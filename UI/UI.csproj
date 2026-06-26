@@ -406,7 +406,7 @@
     <Compile Update="Debugger\Windows\MemoryToolsWindow.axaml.cs">
       <DependentUpon>MemoryToolsWindow.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\BandaiHypershotControllerView.axaml.cs">
+    <Compile Update="Views\NesCustomControllerView.axaml.cs">
       <DependentUpon>BandaiHypershotControllerView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\GbaConfigView.axaml.cs">

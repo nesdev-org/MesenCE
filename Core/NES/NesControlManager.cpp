@@ -112,7 +112,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 		case ControllerType::KonamiHyperShot: device.reset(new KonamiHyperShot(_emu, keys)); break;
 		case ControllerType::FamilyBasicKeyboard: device.reset(new FamilyBasicKeyboard(_emu, keys)); break;
 		case ControllerType::PartyTap: device.reset(new PartyTap(_emu, keys)); break;
-		case ControllerType::Pachinko: device.reset(new PachinkoController(_emu, keys)); break;
+		case ControllerType::Pachinko: device.reset(new PachinkoController(_emu, BaseControlDevice::ExpDevicePort, keys)); break;
 		case ControllerType::ExcitingBoxing: device.reset(new ExcitingBoxingController(_emu, keys)); break;
 		case ControllerType::JissenMahjong: device.reset(new JissenMahjongController(_emu, keys)); break;
 		case ControllerType::SuborKeyboard: device.reset(new SuborKeyboard(_emu, keys)); break;
@@ -124,9 +124,6 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 
 		case ControllerType::FourScore: {
 			std::copy(cfg.Port1SubPorts, cfg.Port1SubPorts + 4, controllers);
-			//Use the p1/p2 bindings for the first 2 ports (the UI does this, too)
-			controllers[0].Keys = cfg.Port1.Keys;
-			controllers[1].Keys = cfg.Port2.Keys;
 			device.reset(new FourScore(_emu, type, 0, controllers));
 			break;
 		}
@@ -134,7 +131,6 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 		case ControllerType::TwoPlayerAdapter:
 		case ControllerType::FourPlayerAdapter: {
 			std::copy(cfg.ExpPortSubPorts, cfg.ExpPortSubPorts + 4, controllers);
-			controllers[0].Keys = cfg.ExpPort.Keys;
 			if(type == ControllerType::TwoPlayerAdapter) {
 				device.reset(new TwoPlayerAdapter(_emu, type, controllers));
 			} else {
