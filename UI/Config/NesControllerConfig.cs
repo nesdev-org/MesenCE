@@ -140,10 +140,12 @@ namespace Mesen.Config
 					break;
 
 				case ControllerType.Pachinko:
+					base.ClearKeys(type);
 					PachinkoButtons = new UInt16[2];
 					break;
 
 				case ControllerType.FcnsController:
+					base.ClearKeys(type);
 					FcnsButtons = new UInt16[15];
 					break;
 
@@ -444,7 +446,12 @@ namespace Mesen.Config
 			switch(type) {
 				case ControllerType.FamilyBasicKeyboard: FamilyBasicKeyboardButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.PartyTap: PartyTapButtons = GetDefaultCustomKeys(type, preset); break;
-				case ControllerType.Pachinko: PachinkoButtons = GetDefaultCustomKeys(type, preset); break;
+
+				case ControllerType.Pachinko:
+					base.SetDefaultKeys(type, preset);
+					PachinkoButtons = GetDefaultCustomKeys(type, preset);
+					break;
+
 				case ControllerType.ExcitingBoxing: ExcitingBoxingButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.JissenMahjong: JissenMahjongButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.SuborKeyboard: SuborKeyboardButtons = GetDefaultCustomKeys(type, preset); break;
@@ -457,9 +464,9 @@ namespace Mesen.Config
 				case ControllerType.BandaiMicrophone: BandaiMicrophoneButtons = GetDefaultCustomKeys(type, preset); break;
 
 				case ControllerType.BandaiHyperShot:
-					BandaiHypershotButtons = GetDefaultCustomKeys(type, preset);
 					//Set default controller keys, too
 					base.SetDefaultKeys(type, preset);
+					BandaiHypershotButtons = GetDefaultCustomKeys(type, preset);
 					break;
 
 				case ControllerType.NesArkanoidController: ArkanoidButtons = GetDefaultCustomKeys(type, preset); break;

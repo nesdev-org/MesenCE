@@ -18,6 +18,7 @@
 
 	<StackPanel>
 		<v:NesControllerView />
-		<v:DefaultControllerView />
+		<v:DefaultControllerView MaxWidth="1000" Margin="0 5 0 0" />
 	</StackPanel>
 </UserControl>
+	

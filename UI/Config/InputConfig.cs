@@ -440,6 +440,8 @@ namespace Mesen.Config
 				case ControllerType.WsController:
 				case ControllerType.WsControllerVertical:
 				case ControllerType.Pcv2Controller:
+				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 					return true;
 			}
 
