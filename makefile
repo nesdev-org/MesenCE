@@ -4,6 +4,10 @@
 #The emulation core also requires SDL2.
 #Run "make" to build, "make run" to run
 
+DESTDIR ?= /
+PREFIX ?= /usr/local
+INSTALLBINNAME ?= mesen-ce
+
 ifeq ($(USE_GCC),true)
 	CXX := g++
 	CC := gcc
@@ -208,7 +212,7 @@ ifeq ($(MESENOS),osx)
 	endif
 endif
 
-.PHONY: all ui core pgohelper pgo run clean
+.PHONY: all ui core pgohelper pgo run clean install
 
 all: ui
 
@@ -257,3 +261,6 @@ clean:
 	rm -r -f $(LUAOBJ)
 	rm -r -f $(MACOSOBJ)
 	rm -r -f $(DLLOBJ)
+
+install:
+	install -m 0755 $(OUTFOLDER)/$(MESENPLATFORM)/publish/Mesen "$(DESTDIR)$(PREFIX)/bin/$(INSTALLBINNAME)"
