@@ -2735,7 +2735,7 @@ E
 			<Value ID="VsSystemSwapAB">VS System - Swap A/B buttons</Value>
 			<Value ID="VsZapper">VS Zapper</Value>
 			<Value ID="Zapper">Zapper</Value>
-			<Value ID="TwoZappers">2 zappers</Value>
+			<Value ID="TwoZappers">2 Zappers</Value>
 			<Value ID="BandaiHypershot">Bandai Hypershot</Value>
 			<Value ID="PowerPadSideA">Power Pad Side A</Value>
 			<Value ID="PowerPadSideB">Power Pad Side B</Value>
@@ -2765,8 +2765,8 @@ E
 			<Value ID="Pec586Keyboard">PEC-586 Keyboard</Value>
 			<Value ID="Bit79Keyboard">Bit-79 Keyboard</Value>
 			<Value ID="SuborKeyboard">Subor Keyboard</Value>
-			<Value ID="SuborKeyboardMouse1">Subor Keyboard+Mouse (Type A)</Value>
-			<Value ID="SuborKeyboardMouse2">Subor Keyboard+Mouse (Type B)</Value>
+			<Value ID="SuborKeyboardMouse1">Subor Keyboard+Macro Winners Mouse</Value>
+			<Value ID="SuborKeyboardMouse2">Subor Keyboard+Subor Mouse ($4016)</Value>
 			<Value ID="SnesMouse">SNES Mouse</Value>
 			<Value ID="GenericMulticart">Generic Multicart</Value>
 			<Value ID="SnesControllers">SNES Controllers</Value>
@@ -2776,9 +2776,16 @@ E
 			<Value ID="CityPatrolmanLightgun">City Patrolman Lightgun</Value>
 			<Value ID="SharpC1CassetteInterface">Sharp C1 Cassette Interface</Value>
 			<Value ID="StandardControllerWithSwappedButtons">Standard Controller with swapped Left-Right/Up-Down/B-A</Value>
-			<Value ID="ExcaliborSudokuPad">Excalibor Sudoku Pad</Value>
+			<Value ID="ExcaliburSudokuPad">Excalibur Sudoku Pad</Value>
 			<Value ID="AblPinball">ABL Pinball</Value>
 			<Value ID="GoldenNuggetCasino">Golden Nugget Casino</Value>
+			<Value ID="KedaKeyboard">Keda Keyboard</Value>
+			<Value ID="SuborKeyboardMouse3">Subor Keyboard+Subor Mouse ($4017)</Value>
+			<Value ID="PortTestController">Port Test Controller</Value>
+			<Value ID="BandaiMultiGamePlayer">Bandai Multi Game Player Gamepad</Value>
+			<Value ID="VenomTVDance">Venom TV Dance Mat</Value>
+			<Value ID="LgTvRemote">LG TV Remote</Value>
+			<Value ID="FcnsController">FCNS Controller</Value>
 		</Enum>
 
 		<Enum ID="FirmwareType">
