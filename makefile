@@ -208,6 +208,8 @@ ifeq ($(MESENOS),osx)
 	endif
 endif
 
+.PHONY: all ui core pgohelper pgo run clean
+
 all: ui
 
 ui: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
@@ -226,7 +228,7 @@ pgohelper: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
-	
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
