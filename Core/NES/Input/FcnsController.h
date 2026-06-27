@@ -78,9 +78,7 @@ public:
 
 	void RefreshStateBuffer() override
 	{
-		NesController::RefreshStateBuffer();
-
-		_fcnsState = ((uint8_t)IsPressed(FcnsButtons::Num0) << 8) |
+		uint32_t fcnsData = ((uint8_t)IsPressed(FcnsButtons::Num0) << 8) |
 			((uint8_t)IsPressed(FcnsButtons::Num1) << 9) |
 			((uint8_t)IsPressed(FcnsButtons::Num2) << 10) |
 			((uint8_t)IsPressed(FcnsButtons::Num3) << 11) |
@@ -95,5 +93,8 @@ public:
 			((uint8_t)IsPressed(FcnsButtons::Period) << 20) |
 			((uint8_t)IsPressed(FcnsButtons::C) << 21) |
 			((uint8_t)IsPressed(FcnsButtons::EndCommunication) << 23);
+
+		NesController::RefreshStateBuffer();
+		_fcnsState = (GetControllerStateBuffer() & 0xFF) | fcnsData;
 	}
 };
