@@ -1,8 +1,8 @@
 #Welcome to what must be the most terrible makefile ever (but hey, it works)
 #Both clang & gcc work fine - clang seems to output faster code
-#.NET 6 (and its dev tools) must be installed to compile the UI.
+#.NET 8 (and its dev tools) must be installed to compile the UI.
 #The emulation core also requires SDL2.
-#Run "make" to build, "make run" to run
+#Run "make" to build, "make run" to run, and "make install" to install
 
 MESENFLAGS=
 
@@ -30,6 +30,8 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 	MESENOS := linux
 	SHAREDLIB := MesenCore.so
+	# TODO: what about macOS and Windows?
+	PREFIX := /usr/local
 endif
 
 ifeq ($(UNAME_S),Darwin)
@@ -233,6 +235,13 @@ pgo:
 
 run:
 	$(OUTFOLDER)/$(MESENPLATFORM)/publish/Mesen
+
+install:
+ifeq ($(MESENOS),linux)
+		install -m755 $(OUTFOLDER)/$(MESENPLATFORM)/publish/libHarfBuzzSharp.so $(PREFIX)/lib64
+		install -m755 $(OUTFOLDER)/$(MESENPLATFORM)/publish/libSkiaSharp.so $(PREFIX)/lib64
+		install -m755 $(OUTFOLDER)/$(MESENPLATFORM)/publish/Mesen $(PREFIX)/bin
+endif
 
 clean:
 	rm -r -f $(COREOBJ)
