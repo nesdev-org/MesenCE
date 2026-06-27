@@ -1786,8 +1786,6 @@
 		<Message ID="SetKeyHint">Press any key on your keyboard to set a new binding.</Message>
 		<Message ID="SetKeyMouseHint">Press any key on your keyboard, controller or mouse to set a new binding.</Message>
 
-		<Message ID="ClearHistory">Clear History</Message>
-
 		<Message ID="SpcClockSpeedMsg">= {0} Hz (default: 40)</Message>
 E
 		<Message ID="FirmwareNotFound">This game requires a firmware file for the: {0}&#xA;&#xA;  Filename: {1}&#xA;  Size: {2} bytes&#xA;&#xA;Would you like to select it now?</Message>
@@ -1795,29 +1793,8 @@ E
 		<Message ID="FirmwareFileWrongSize">The selected file does not match the required size ({0} bytes) and cannot be used.</Message>
 
 		<Message ID="MouseModeEnabled">Mouse enabled - pause to release cursor</Message>
-		<Message ID="BandaiMicrophone">Bandai Microphone</Message>
-		<Message ID="DatachBarcodeReader">Datach Barcode Reader</Message>
-
-		<Message ID="HelpFullscreen">/fullscreen - Start Mesen in fullscreen mode</Message>
-		<Message ID="HelpDoNotSaveSettings">/DoNotSaveSettings - Prevent settings from being saved to the disk (useful to prevent command line options from becoming the default settings)</Message>
-		<Message ID="HelpRecordMovie">/RecordMovie="filename.mmo" - Start recording a movie after the specified game is loaded.</Message>
-		<Message ID="HelpLoadLastSession">/LoadLastSession - Resumes the game in the state it was left in when it was last played.</Message>
 
 		<Message ID="RightClickToClearBinding">Right-click to clear binding</Message>
-
-		<Message ID="Resume">Resume</Message>
-		<Message ID="Pause">Pause</Message>
-		<Message ID="StartServer">Start Server</Message>
-		<Message ID="StopServer">Stop Server</Message>
-		<Message ID="ConnectToServer">Connect to Server</Message>
-		<Message ID="Disconnect">Disconnect</Message>
-		<Message ID="PlayerNumber">Player {0}</Message>
-		<Message ID="ExpansionDevice">Expansion Device</Message>
-
-		<Message ID="PressToExitFullscreen">Press {0} to exit fullscreen</Message>
-		<Message ID="DefaultResolution">Default</Message>
-
-		<Message ID="RomsFound">{0} roms found</Message>
 
 		<Message ID="ResetSettingsConfirmation">Warning: This will reset ALL settings and cannot be undone!&#xA;&#xA;Continue?</Message>
 
@@ -1826,25 +1803,13 @@ E
 		<Message ID="ImportLabelsWithErrors">Import completed: {0} labels imported (and {1} errors.)</Message>
 		<Message ID="ImportLabelsWithMissingFiles">Import completed: {0} labels imported.&#xA;&#xA;The following files could not be found:&#xA;{1}</Message>
 		<Message ID="ImportLabelsWithErrorsAndMissingFiles">Import completed: {0} labels imported (and {1} errors.)&#xA;&#xA;The following files could not be found:&#xA;{2}</Message>
-		<Message ID="RandomGameNoGameFound">Mesen could not find any games to load.</Message>
 
 		<Message ID="InvalidPaletteFile">Invalid palette file (too small or too large.)</Message>
 
 		<Message ID="CannotWriteToFolder">The selected folder cannot be written to - please select another folder and try again.&#xA;&#xA;Details:&#xA;{0}</Message>
-		<Message ID="InvalidPaths">The following path overrides are invalid:&#xA;&#xA;{0}&#xA;&#xA;Please use valid and writable folders and try again.</Message>
-		<Message ID="CopyMesenDataPrompt">All files will be copied from:&#xA;&#xA;{0}&#xA;to&#xA;{1}&#xA;&#xA;Once the copy is completed, Mesen will restart.&#xA;Continue?</Message>
-
-		<Message ID="CheatsFound">{0} games in database</Message>
-		<Message ID="CheatsImported">{0} cheats imported for {1}.</Message>
-
-		<Message ID="NsfNextTrack">Next Track (Hold to fast forward)</Message>
-		<Message ID="NsfUnnamedTrack">&lt;no name&gt;</Message>
-		<Message ID="NsfUnknownField">&lt;unknown&gt;</Message>
-
-		<Message ID="CouldNotInstallRuntime">The Visual Studio Runtime could not be installed properly.</Message>
+		
 		<Message ID="EmptyState">&lt;empty&gt;</Message>
 		<Message ID="AutoUpdateNotSupported">The version of Mesen you're using does not support automatic updates. Please visit the website and manually download the latest release.</Message>
-		<Message ID="ErrorWhileCheckingUpdates">An error has occurred while trying to check for updates. Check your internet connection and try again.&#xA;&#xA;Error details:&#xA;{0}</Message>
 		<Message ID="AutoUpdateInvalidFile">The downloaded file did not match the expected file.&#xA;&#xA;   Expected SHA256 signature: {0}&#xA;&#xA;   File SHA256 signature: {1}&#xA;&#xA;Please visit the website and manually download the latest release.</Message>
 		<Message ID="FileNotFound">File not found: {0}</Message>
 		<Message ID="InvalidArgument">Invalid argument: {0}</Message>
@@ -1852,19 +1817,10 @@ E
 		<Message ID="MesenUpToDate">You are running the latest version of Mesen.</Message>
 		<Message ID="PatchAndReset">Patch and reset the current game?</Message>
 		<Message ID="SelectRomIps">Please select a ROM for this patch file.</Message>
-		<Message ID="UnableToDownload">Unable to download file. Check your internet connection and try again.&#xA;&#xA;Details:&#xA;{0}</Message>
 		<Message ID="UnableToStartMissingSdl">Mesen could not launch because SDL2 could not be found. Install SDL2 using your package manager and try again.&#xA;&#xA;Error details:&#xA;{0}</Message>
 		<Message ID="UnableToStartMissingDependencies">Mesen could not launch because of missing dependencies.&#xA;&#xA;Error details:&#xA;{0}</Message>
-		<Message ID="UnableToStartMissingFiles">Mesen was unable to start due to missing files.&#xA;&#xA;Error: MesenCore.dll is missing.</Message>
 		<Message ID="UnexpectedError">An unexpected error has occurred.&#xA;&#xA;Error details:&#xA;{0}</Message>
 		<Message ID="UpdateDownloadFailed">Download failed - the file appears to be corrupted. Please visit the Mesen website to download the latest version manually.</Message>
-		<Message ID="UpgradeSuccess">Upgrade completed successfully.</Message>
-		<Message ID="UpdaterNotFound">The update process could not be started due to missing files.</Message>
-		<Message ID="Net45NotFound">The Microsoft .NET Framework 4.5 could not be found. Please download and install the latest version of the .NET Framework from Microsoft's website and try again.</Message>
-
-		<Message ID="InvalidCheatFile">The selected file ({0}) is not a valid cheat file.</Message>
-		<Message ID="InvalidXmlFile">The selected file ({0}) is not a valid XML file.</Message>
-		<Message ID="NoMatchingCheats">The selected cheat file ({0}) contains no cheats that match the selected game.</Message>
 
 		<Message ID="ConfirmReset">Are you sure you want to reset?</Message>
 		<Message ID="ConfirmPowerCycle">Are you sure you want to power cycle?</Message>

@@ -812,6 +812,28 @@ void GbaDisUtils::ArmDisassemble(DisassemblyInfo& info, string& out, uint32_t me
 			break;
 		}
 
+		case ArmOpCategory::CoprocessorTransfer: {
+			uint8_t cp = (opCode >> 8) & 0x0F;
+			if(cp != 14) {
+				str.Write("INVALID");
+			} else {
+				bool load = opCode & (1 << 20);
+				uint8_t crn = (opCode >> 16) & 0x0F;
+				uint8_t rd = (opCode >> 12) & 0x0F;
+				uint8_t crm = opCode & 0x0F;
+				uint8_t cpOperand = (opCode >> 5) & 0x07;
+				uint8_t cpOperation = (opCode >> 21) & 0x07;
+
+				str.Write(load ? "MRC" : "MCR");
+				str.WriteAll(" P14, #$", HexUtilities::ToHex(cpOperation), ", ");
+				WriteReg(str, rd);
+				str.WriteAll(", C", std::to_string(crn));
+				str.WriteAll(", C", std::to_string(crm));
+				str.WriteAll(", #$", HexUtilities::ToHex(cpOperand));
+			}
+			break;
+		}
+
 		case ArmOpCategory::SoftwareInterrupt: {
 			uint32_t value = opCode & 0xFFFFFF;
 			str.Write("SWI");
