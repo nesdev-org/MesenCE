@@ -55,6 +55,23 @@ namespace Mesen.ViewModels
 			//Exclusive fullscreen is only supported on Windows currently
 			IsWindows = OperatingSystem.IsWindows();
 
+			// Detect available refresh rates on Windows and ensure the configured refresh rates are valid
+			if(IsWindows) {
+				UInt32[] monitorSupportedRefreshRates = DisplayHelper.GetRefreshRatesForCurrentMonitor();
+
+				if(monitorSupportedRefreshRates.Length > 0) {
+					AvailableRefreshRates = monitorSupportedRefreshRates;
+
+					if(!AvailableRefreshRates.Contains(Config.ExclusiveFullscreenRefreshRatePal)) {
+						Config.ExclusiveFullscreenRefreshRatePal = DisplayHelper.GetCompatibleRefreshRate(AvailableRefreshRates, Config.ExclusiveFullscreenRefreshRatePal);
+					}
+
+					if(!AvailableRefreshRates.Contains(Config.ExclusiveFullscreenRefreshRateNtsc)) {
+						Config.ExclusiveFullscreenRefreshRateNtsc = DisplayHelper.GetCompatibleRefreshRate(AvailableRefreshRates, Config.ExclusiveFullscreenRefreshRateNtsc);
+					}
+				}
+			}
+
 			//MacOS only supports the software renderer
 			IsMacOs = OperatingSystem.IsMacOS();
 
