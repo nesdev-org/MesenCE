@@ -57,7 +57,7 @@ protected:
 	}
 
 public:
-	FcnsController(Emulator* emu, ControllerType type, uint8_t port, KeyMappingSet keyMappings) : NesController(emu, ControllerType::FcnsController, port, keyMappings)
+	FcnsController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : NesController(emu, ControllerType::FcnsController, port, keyMappings)
 	{
 	}
 
@@ -66,7 +66,10 @@ public:
 		uint8_t output = 0;
 		if(addr == 0x4016) {
 			StrobeProcessRead();
-			output = (_fcnsState & 0x01) << 1;
+			output = (_fcnsState & 0x01);
+			if(_port >= 2) {
+				output <<= 1;
+			}
 			_fcnsState >>= 1;
 			_fcnsState |= 0x800000;
 		}

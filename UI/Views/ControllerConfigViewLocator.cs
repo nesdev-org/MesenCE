@@ -25,6 +25,7 @@ namespace Mesen.Views
 					ControllerType.FamicomControllerP2 => new NesControllerView(true),
 					ControllerType.BandaiHyperShot => new NesCustomControllerView(),
 					ControllerType.Pachinko => new NesCustomControllerView(),
+					ControllerType.FcnsController => new NesCustomControllerView(),
 					ControllerType.HoriTrack => new NesControllerView(),
 					ControllerType.GameboyController => new NesControllerView(),
 					ControllerType.GbaController => new GbaControllerView(),

@@ -99,7 +99,7 @@ public:
 					break;
 
 				case ControllerType::FcnsController:
-					_ports[i].reset(new FcnsController(emu, controllers[i].Type, 0, controllers[i].Keys));
+					_ports[i].reset(new FcnsController(emu, 0, controllers[i].Keys));
 					break;
 
 				case ControllerType::PceController:
