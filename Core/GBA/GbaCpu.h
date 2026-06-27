@@ -87,6 +87,7 @@ private:
 	void ArmBlockDataTransfer();
 	void ArmSingleDataSwap();
 	void ArmSoftwareInterrupt();
+	void ArmCoprocessorTransfer();
 	void ArmInvalidOp();
 
 	static void InitThumbOpTable();
