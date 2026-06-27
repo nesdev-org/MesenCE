@@ -1,9 +1,11 @@
+#include "WS/Carts/WsCartFlash.h"
 #include "pch.h"
 #include "WS/WsConsole.h"
 #include "WS/WsCpu.h"
 #include "WS/WsPpu.h"
 #include "WS/WsTimer.h"
 #include "WS/Carts/WsCart.h"
+#include "WS/Carts/WsCartFlash.h"
 #include "WS/Carts/WsRtc.h"
 #include "WS/WsControlManager.h"
 #include "WS/WsMemoryManager.h"
@@ -31,6 +33,16 @@ WsConsole::~WsConsole()
 	delete[] _bootRom;
 	delete[] _internalEepromData;
 	delete[] _cartEepromData;
+}
+
+bool WsConsole::IsWWCart()
+{
+	//TODOWS exclude static FreyaBIOS cartridges
+	return _prgRomSize == 0x80000 && _prgRom[0x70000] == 'E' // FreyaBIOS header
+		&& _prgRom[0x70001] == 'L' && _prgRom[0x70002] == 'I' && _prgRom[0x70003] == 'S' && _prgRom[0x70004] == 'A' && _prgRom[0x7fff6] == 0x00 // Publisher ID
+		&& _prgRom[0x7fff8] == 0x00 // Game ID
+		&& _prgRom[0x7fffb] == 0x04 // Save format
+		&& _prgRom[0x7fffd] == 0x01; // Mapper
 }
 
 LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
@@ -78,7 +90,7 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	MessageManager::Log(string("Color supported: ") + (hasColorSupport ? "Yes" : "No"));
 	MessageManager::Log("Save RAM size: " + std::to_string(_saveRamSize / 1024) + " KB");
 	MessageManager::Log("Cart EEPROM size: " + std::to_string(_cartEepromSize) + " bytes");
-	MessageManager::Log(string("Mapper: ") + (mapperType == 0 ? "Bandai 2001 / KARNAK" : (mapperType == 1 ? "Bandai 2003" : ("Unknown: " + std::to_string(mapperType)))));
+	MessageManager::Log(string("Mapper: ") + (IsWWCart() ? "Bandai 2003 + NOR flash" : (mapperType == 0 ? "Bandai 2001 / KARNAK" : (mapperType == 1 ? "Bandai 2003" : ("Unknown: " + std::to_string(mapperType))))));
 
 	MessageManager::Log("------------------------------");
 
@@ -139,9 +151,9 @@ LoadRomResult WsConsole::LoadRom(VirtualFile& romFile)
 	_dmaController.reset(new WsDmaController());
 	_ppu.reset(new WsPpu(_emu, this, _memoryManager.get(), _timer.get(), _workRam));
 	_apu.reset(new WsApu(_emu, this, _memoryManager.get(), _dmaController.get()));
-	_cart.reset(new WsCart());
+	_cart.reset(IsWWCart() ? new WsCartFlash() : new WsCart());
 
-	_cart->Init(_memoryManager.get(), _cartEeprom.get(), _cartRtc.get());
+	_cart->Init(_memoryManager.get(), _cartEeprom.get(), _cartRtc.get(), _prgRom, _prgRomSize, _saveRam, _saveRamSize);
 	_memoryManager->Init(_emu, this, _cpu.get(), _ppu.get(), _controlManager.get(), _cart.get(), _timer.get(), _dmaController.get(), _internalEeprom.get(), _apu.get(), _serial.get());
 	_timer->Init(_memoryManager.get());
 	_dmaController->Init(_memoryManager.get(), _apu.get());
@@ -350,6 +362,9 @@ void WsConsole::LoadBattery()
 		_cartRtc->LoadBattery();
 	}
 
+	if(IsWWCart()) {
+		_emu->GetBatteryManager()->LoadBattery(".flash", _prgRom, _prgRomSize);
+	}
 	if(_saveRam) {
 		_emu->GetBatteryManager()->LoadBattery(".sav", _saveRam, _saveRamSize);
 	}
@@ -365,6 +380,9 @@ void WsConsole::SaveBattery()
 		_cartRtc->SaveBattery();
 	}
 
+	if(IsWWCart()) {
+		_emu->GetBatteryManager()->SaveBattery(".flash", _prgRom, _prgRomSize);
+	}
 	if(_saveRam) {
 		_emu->GetBatteryManager()->SaveBattery(".sav", _saveRam, _saveRamSize);
 	}
