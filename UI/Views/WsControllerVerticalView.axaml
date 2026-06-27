@@ -18,7 +18,7 @@
 		<vm:KeyMappingViewModel />
 	</Design.DataContext>
 
-	<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="2" Width="500" Height="375" HorizontalAlignment="Left" VerticalAlignment="Top">
+	<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Width="500" Height="375" HorizontalAlignment="Left" VerticalAlignment="Top">
 		<Canvas>
 			<Panel Canvas.Bottom="5" Canvas.Left="5" >
 				<Ellipse Width="200" Height="200" Stroke="{StaticResource MesenGrayBorderColor}" StrokeThickness="2" />

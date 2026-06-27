@@ -38,6 +38,7 @@
 #include "NES/Input/AsciiTurboFile.h"
 #include "NES/Input/BattleBox.h"
 #include "NES/Input/VirtualBoyController.h"
+#include "NES/Input/FcnsController.h"
 #include "NES/Epsm.h"
 
 NesControlManager::NesControlManager(NesConsole* console) : BaseControlManager(console->GetEmulator(), CpuType::Nes)
@@ -113,6 +114,7 @@ shared_ptr<BaseControlDevice> NesControlManager::CreateControllerDevice(Controll
 		case ControllerType::FamilyBasicKeyboard: device.reset(new FamilyBasicKeyboard(_emu, keys)); break;
 		case ControllerType::PartyTap: device.reset(new PartyTap(_emu, keys)); break;
 		case ControllerType::Pachinko: device.reset(new PachinkoController(_emu, BaseControlDevice::ExpDevicePort, keys)); break;
+		case ControllerType::FcnsController: device.reset(new FcnsController(_emu, BaseControlDevice::ExpDevicePort, keys)); break;
 		case ControllerType::ExcitingBoxing: device.reset(new ExcitingBoxingController(_emu, keys)); break;
 		case ControllerType::JissenMahjong: device.reset(new JissenMahjongController(_emu, keys)); break;
 		case ControllerType::SuborKeyboard: device.reset(new SuborKeyboard(_emu, keys)); break;

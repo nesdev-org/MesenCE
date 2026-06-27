@@ -2057,6 +2057,7 @@ E
 			<Value ID="FamilyBasicKeyboard">Family Basic Keyboard</Value>
 			<Value ID="PartyTap">Partytap</Value>
 			<Value ID="Pachinko">Pachinko Controller</Value>
+			<Value ID="FcnsController">FCNS Controller</Value>
 			<Value ID="ExcitingBoxing">Exciting Boxing Punching Bag</Value>
 			<Value ID="JissenMahjong">Jissen Mahjong Controller</Value>
 			<Value ID="SuborKeyboard">Subor Keyboard</Value>
@@ -2105,6 +2106,23 @@ E
 		<Enum ID="NesPachinkoButtons">
 			<Value ID="Press">Press</Value>
 			<Value ID="Release">Release</Value>
+		</Enum>
+		<Enum ID="NesFcnsButtons">
+			<Value ID="Num0">Number 0</Value>
+			<Value ID="Num1">Number 1</Value>
+			<Value ID="Num2">Number 2</Value>
+			<Value ID="Num3">Number 3</Value>
+			<Value ID="Num4">Number 4</Value>
+			<Value ID="Num5">Number 5</Value>
+			<Value ID="Num6">Number 6</Value>
+			<Value ID="Num7">Number 7</Value>
+			<Value ID="Num8">Number 8</Value>
+			<Value ID="Num9">Number 9</Value>
+			<Value ID="Star">Star (*)</Value>
+			<Value ID="Pound">Pound (#)</Value>
+			<Value ID="Period">Period (.)</Value>
+			<Value ID="C">C</Value>
+			<Value ID="EndComunication">End communication</Value>
 		</Enum>
 		<Enum ID="NesPartyTapButtons">
 			<Value ID="B1">Button 1</Value>
@@ -2717,7 +2735,7 @@ E
 			<Value ID="VsSystemSwapAB">VS System - Swap A/B buttons</Value>
 			<Value ID="VsZapper">VS Zapper</Value>
 			<Value ID="Zapper">Zapper</Value>
-			<Value ID="TwoZappers">2 zappers</Value>
+			<Value ID="TwoZappers">2 Zappers</Value>
 			<Value ID="BandaiHypershot">Bandai Hypershot</Value>
 			<Value ID="PowerPadSideA">Power Pad Side A</Value>
 			<Value ID="PowerPadSideB">Power Pad Side B</Value>
@@ -2747,8 +2765,8 @@ E
 			<Value ID="Pec586Keyboard">PEC-586 Keyboard</Value>
 			<Value ID="Bit79Keyboard">Bit-79 Keyboard</Value>
 			<Value ID="SuborKeyboard">Subor Keyboard</Value>
-			<Value ID="SuborKeyboardMouse1">Subor Keyboard+Mouse (Type A)</Value>
-			<Value ID="SuborKeyboardMouse2">Subor Keyboard+Mouse (Type B)</Value>
+			<Value ID="SuborKeyboardMouse1">Subor Keyboard+Macro Winners Mouse</Value>
+			<Value ID="SuborKeyboardMouse2">Subor Keyboard+Subor Mouse ($4016)</Value>
 			<Value ID="SnesMouse">SNES Mouse</Value>
 			<Value ID="GenericMulticart">Generic Multicart</Value>
 			<Value ID="SnesControllers">SNES Controllers</Value>
@@ -2758,9 +2776,16 @@ E
 			<Value ID="CityPatrolmanLightgun">City Patrolman Lightgun</Value>
 			<Value ID="SharpC1CassetteInterface">Sharp C1 Cassette Interface</Value>
 			<Value ID="StandardControllerWithSwappedButtons">Standard Controller with swapped Left-Right/Up-Down/B-A</Value>
-			<Value ID="ExcaliborSudokuPad">Excalibor Sudoku Pad</Value>
+			<Value ID="ExcaliburSudokuPad">Excalibur Sudoku Pad</Value>
 			<Value ID="AblPinball">ABL Pinball</Value>
 			<Value ID="GoldenNuggetCasino">Golden Nugget Casino</Value>
+			<Value ID="KedaKeyboard">Keda Keyboard</Value>
+			<Value ID="SuborKeyboardMouse3">Subor Keyboard+Subor Mouse ($4017)</Value>
+			<Value ID="PortTestController">Port Test Controller</Value>
+			<Value ID="BandaiMultiGamePlayer">Bandai Multi Game Player Gamepad</Value>
+			<Value ID="VenomTVDance">Venom TV Dance Mat</Value>
+			<Value ID="LgTvRemote">LG TV Remote</Value>
+			<Value ID="FcnsController">FCNS Controller</Value>
 		</Enum>
 
 		<Enum ID="FirmwareType">

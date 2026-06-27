@@ -17,7 +17,7 @@
 		<vm:KeyMappingViewModel />
 	</Design.DataContext>
 
-	<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="2" Padding="3" Width="610" Height="280" HorizontalAlignment="Left" VerticalAlignment="Top">
+	<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Padding="3" Width="610" Height="280" HorizontalAlignment="Left" VerticalAlignment="Top">
 		<Canvas>
 			<Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" RowDefinitions="Auto,Auto" Width="580" Canvas.Left="10">
 				<c:KeyBindingButton Grid.Column="0" Width="120" KeyBinding="{Binding Mapping.L}" />

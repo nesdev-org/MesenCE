@@ -381,6 +381,7 @@ namespace Mesen.Config
 		FamilyBasicKeyboard,
 		PartyTap,
 		Pachinko,
+		FcnsController,
 		ExcitingBoxing,
 		JissenMahjong,
 		SuborKeyboard,
@@ -439,6 +440,8 @@ namespace Mesen.Config
 				case ControllerType.WsController:
 				case ControllerType.WsControllerVertical:
 				case ControllerType.Pcv2Controller:
+				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 					return true;
 			}
 
@@ -459,6 +462,7 @@ namespace Mesen.Config
 				case ControllerType.PceController:
 				case ControllerType.PceAvenuePad6:
 				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 				case ControllerType.HoriTrack:
 				case ControllerType.BandaiHyperShot:
 				case ControllerType.SmsController:
@@ -487,6 +491,7 @@ namespace Mesen.Config
 				case ControllerType.SuborKeyboard:
 				case ControllerType.FamilyBasicKeyboard:
 				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 				case ControllerType.PartyTap:
 				case ControllerType.VbController:
 				case ControllerType.JissenMahjong:
