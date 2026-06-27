@@ -13,6 +13,7 @@ private:
 	bool _irqEnabled = false;
 	bool _irqCounterEnabled = false;
 	uint16_t _irqCounter = 0;
+	uint8_t _regs[16] = {}; // only used for status display
 
 protected:
 	uint16_t GetPrgPageSize() override { return 0x2000; }
@@ -27,7 +28,7 @@ protected:
 	{
 		_audio.reset(new Sunsoft5bAudio(_console));
 
-		_command = 0;
+		_command = GetPowerOnByte() & 0xF;
 		_workRamValue = 0;
 		_irqEnabled = false;
 		_irqCounterEnabled = false;
@@ -47,6 +48,7 @@ protected:
 		SV(_irqEnabled);
 		SV(_irqCounterEnabled);
 		SV(_irqCounter);
+		SVArray(_regs, 16);
 		if(!s.IsSaving()) {
 			UpdateWorkRam();
 		}
@@ -85,6 +87,7 @@ protected:
 				_command = value & 0x0F;
 				break;
 			case 0xA000:
+				_regs[_command] = value;
 				switch(_command) {
 					case 0:
 					case 1:
@@ -139,5 +142,55 @@ protected:
 				_audio->WriteRegister(addr, value);
 				break;
 		}
+	}
+
+	vector<MapperStateEntry> GetMapperStateEntries() override
+	{
+		vector<MapperStateEntry> entries;
+		string mirroringType;
+		uint8_t mirValue = 0;
+		switch(GetMirroringType()) {
+			case MirroringType::Horizontal:
+				mirroringType = "Horizontal";
+				mirValue = 3;
+				break;
+			case MirroringType::Vertical:
+				mirroringType = "Vertical";
+				mirValue = 2;
+				break;
+			case MirroringType::ScreenBOnly:
+				mirroringType = "Screen B";
+				mirValue = 1;
+				break;
+			case MirroringType::ScreenAOnly:
+				mirroringType = "Screen A";
+				mirValue = 0;
+				break;
+		}
+		entries.push_back(MapperStateEntry("$8000", "Current Register", _command, MapperStateValueType::Number8));
+
+		entries.push_back(MapperStateEntry("", "CHR Bank 0", _regs[0], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 1", _regs[1], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 2", _regs[2], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 3", _regs[3], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 4", _regs[4], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 5", _regs[5], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 6", _regs[6], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 7", _regs[7], MapperStateValueType::Number8));
+
+		entries.push_back(MapperStateEntry("", "PRG Bank 0", _regs[8] & 0x3F, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "PRG Bank 0 is RAM", (_regs[8] & 0x40) == 0x40, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry("", "PRG Bank 1", _regs[9] & 0x3F, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "PRG Bank 2", _regs[10] & 0x3F, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "PRG Bank 3", _regs[11] & 0x3F, MapperStateValueType::Number8));
+
+		entries.push_back(MapperStateEntry("", "RAM Enabled", (_regs[8] & 0x80) == 0x80, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry("", "Mirroring", mirroringType, mirValue));
+
+		entries.push_back(MapperStateEntry("", "IRQ Enabled", _irqEnabled, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry("", "IRQ Count Enabled", _irqCounterEnabled, MapperStateValueType::Bool));
+
+		entries.push_back(MapperStateEntry("", "IRQ Counter Value", _irqCounter, MapperStateValueType::Number16));
+		return entries;
 	}
 };
