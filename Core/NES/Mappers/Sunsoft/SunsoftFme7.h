@@ -13,7 +13,10 @@ private:
 	bool _irqEnabled = false;
 	bool _irqCounterEnabled = false;
 	uint16_t _irqCounter = 0;
-	uint8_t _regs[16] = {}; // only used for status display
+
+	//Only used by register viewer
+	uint8_t _chrRegs[8] = {};
+	uint8_t _prgRegs[3] = {};
 
 protected:
 	uint16_t GetPrgPageSize() override { return 0x2000; }
@@ -48,7 +51,8 @@ protected:
 		SV(_irqEnabled);
 		SV(_irqCounterEnabled);
 		SV(_irqCounter);
-		SVArray(_regs, 16);
+		SVArray(_chrRegs, 8);
+		SVArray(_prgRegs, 3);
 		if(!s.IsSaving()) {
 			UpdateWorkRam();
 		}
@@ -87,7 +91,6 @@ protected:
 				_command = value & 0x0F;
 				break;
 			case 0xA000:
-				_regs[_command] = value;
 				switch(_command) {
 					case 0:
 					case 1:
@@ -97,6 +100,7 @@ protected:
 					case 5:
 					case 6:
 					case 7:
+						_chrRegs[_command] = value;
 						SelectChrPage(_command, value);
 						break;
 
@@ -109,6 +113,7 @@ protected:
 					case 9:
 					case 0xA:
 					case 0xB:
+						_prgRegs[_command - 9] = value & 0x3F;
 						SelectPrgPage(_command - 9, value & 0x3F);
 						break;
 
@@ -169,22 +174,22 @@ protected:
 		}
 		entries.push_back(MapperStateEntry("$8000", "Current Register", _command, MapperStateValueType::Number8));
 
-		entries.push_back(MapperStateEntry("", "CHR Bank 0", _regs[0], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "CHR Bank 1", _regs[1], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "CHR Bank 2", _regs[2], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "CHR Bank 3", _regs[3], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "CHR Bank 4", _regs[4], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "CHR Bank 5", _regs[5], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "CHR Bank 6", _regs[6], MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "CHR Bank 7", _regs[7], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 0", _chrRegs[0], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 1", _chrRegs[1], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 2", _chrRegs[2], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 3", _chrRegs[3], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 4", _chrRegs[4], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 5", _chrRegs[5], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 6", _chrRegs[6], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "CHR Bank 7", _chrRegs[7], MapperStateValueType::Number8));
 
-		entries.push_back(MapperStateEntry("", "PRG Bank 0", _regs[8] & 0x3F, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "PRG Bank 0 is RAM", (_regs[8] & 0x40) == 0x40, MapperStateValueType::Bool));
-		entries.push_back(MapperStateEntry("", "PRG Bank 1", _regs[9] & 0x3F, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "PRG Bank 2", _regs[10] & 0x3F, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("", "PRG Bank 3", _regs[11] & 0x3F, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "PRG Bank 0 ($6000)", _workRamValue & 0x3F, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "PRG Bank 0 is RAM", (_workRamValue & 0x40) == 0x40, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry("", "PRG Bank 1 ($8000)", _prgRegs[0], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "PRG Bank 2 ($A000)", _prgRegs[1], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("", "PRG Bank 3 ($C000)", _prgRegs[2], MapperStateValueType::Number8));
 
-		entries.push_back(MapperStateEntry("", "RAM Enabled", (_regs[8] & 0x80) == 0x80, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry("", "RAM Enabled", (_workRamValue & 0x80) == 0x80, MapperStateValueType::Bool));
 		entries.push_back(MapperStateEntry("", "Mirroring", mirroringType, mirValue));
 
 		entries.push_back(MapperStateEntry("", "IRQ Enabled", _irqEnabled, MapperStateValueType::Bool));
