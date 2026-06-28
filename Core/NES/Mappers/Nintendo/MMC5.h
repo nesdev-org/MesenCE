@@ -439,11 +439,20 @@ protected:
 		}
 	}
 
+	void UpdateIrqState()
+	{
+		if((_irqEnabled && _irqPending) || _audio->GetPcmIRQLine()) {
+			_console->GetCpu()->SetIrqSource(IRQSource::External);
+		} else {
+			_console->GetCpu()->ClearIrqSource(IRQSource::External);
+		}
+	}
+
 	uint8_t ReadRam(uint16_t addr) override
 	{
 		uint8_t value = BaseMapper::InternalRead(addr);
-		if(_audio->GetPcmReadMode()) {
-			_audio->HandlePcmRead(addr, value);
+		if(_audio->GetPcmReadMode() && (addr & 0xC000) == 0x8000) {
+			_audio->DacWrite(value);
 		}
 		return value;
 	}
@@ -469,9 +478,7 @@ protected:
 				_scanlineCounter++;
 				if(_irqCounterTarget == _scanlineCounter) {
 					_irqPending = true;
-					if(_irqEnabled) {
-						_console->GetCpu()->SetIrqSource(IRQSource::External);
-					}
+					UpdateIrqState();
 				}
 			}
 		} else if(addr >= 0x2000 && addr <= 0x2FFF) {
@@ -641,11 +648,7 @@ protected:
 				case 0x5203: _irqCounterTarget = value; break;
 				case 0x5204:
 					_irqEnabled = (value & 0x80) == 0x80;
-					if(!_irqEnabled) {
-						_console->GetCpu()->ClearIrqSource(IRQSource::External);
-					} else if(_irqEnabled && _irqPending) {
-						_console->GetCpu()->SetIrqSource(IRQSource::External);
-					}
+					UpdateIrqState();
 					break;
 				case 0x5205: _multiplierValue1 = value; break;
 				case 0x5206: _multiplierValue2 = value; break;
@@ -666,7 +669,7 @@ protected:
 			case 0x5204: {
 				uint8_t value = (_ppuInFrame ? 0x40 : 0x00) | (_irqPending ? 0x80 : 0x00);
 				_irqPending = false;
-				_console->GetCpu()->ClearIrqSource(IRQSource::External);
+				UpdateIrqState();
 				return value;
 			}
 
@@ -680,7 +683,7 @@ protected:
 				_lastPpuReadAddr = 0;
 				_scanlineCounter = 0;
 				_irqPending = false;
-				_console->GetCpu()->ClearIrqSource(IRQSource::External);
+				UpdateIrqState();
 				return DebugReadRam(addr);
 		}
 
