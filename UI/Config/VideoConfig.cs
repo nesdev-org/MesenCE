@@ -54,7 +54,7 @@ namespace Mesen.Config
 		[ObservableProperty] public partial FullscreenResolution ExclusiveFullscreenResolution { get; set; } = 0;
 
 		[ObservableProperty] public partial ScreenRotation ScreenRotation { get; set; } = ScreenRotation.None;
-		[ObservableProperty] public bool DisableHighPrecisionFramePacing { get; set; } = false;
+		[ObservableProperty] public partial bool DisableHighPrecisionFramePacing { get; set; } = false;
 
 		public VideoConfig()
 		{
