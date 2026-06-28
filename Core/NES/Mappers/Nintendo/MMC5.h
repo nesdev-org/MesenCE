@@ -355,8 +355,8 @@ protected:
 
 		UpdateChrBanks(true);
 
-		// The same MMC5A chip, tested with repeated power cycles on different days of the week and different moon phases, etc, 
-		// has been observed to power on with a DAC voltage equivalent to DAC value $EF or $FF.
+		//The same MMC5A chip, tested with repeated power cycles on different days of the week and different moon phases, etc,
+		//has been observed to power on with a DAC voltage equivalent to DAC value $EF or $FF.
 		_audio->DacWrite((GetPowerOnByte() & 0x01) ? 0xFF : 0xEF);
 	}
 

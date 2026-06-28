@@ -123,8 +123,8 @@ public:
 	__forceinline bool GetPcmReadMode() { return _pcmReadMode; }
 	__forceinline bool GetPcmIRQLine() { return _pcmIrqEnabled && _pcmIrqPending; }
 
-	// $5011 write
-	// + "Write-by-read writes to this register in PCM read-mode."
+	//$5011 write
+	//+ "Write-by-read writes to this register in PCM read-mode."
 	void DacWrite(uint8_t value)
 	{
 		if(value == 0) {
@@ -178,7 +178,7 @@ public:
 				break;
 
 			case 0x5011:
-				if(!_pcmReadMode) { // $5011 write ignored when read-mode?
+				if(!_pcmReadMode) {
 					DacWrite(value);
 				}
 				break;
