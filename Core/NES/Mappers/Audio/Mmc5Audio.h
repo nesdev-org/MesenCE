@@ -61,7 +61,7 @@ private:
 	bool _pcmReadMode = false;
 	bool _pcmIrqEnabled = false;
 	bool _pcmIrqPending = false;
-	uint8_t _pcmOutput = 0; // really 0?
+	uint8_t _pcmOutput;
 
 protected:
 	void Serialize(Serializer& s) override
@@ -72,6 +72,7 @@ protected:
 		SV(_lastOutput);
 		SV(_pcmReadMode);
 		SV(_pcmIrqEnabled);
+		SV(_pcmIrqPending);
 		SV(_pcmOutput);
 	}
 
