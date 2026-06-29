@@ -57,11 +57,10 @@
 							</StackPanel>
 						</Grid>
 						
-						<StackPanel Orientation="Horizontal">
+						<StackPanel Orientation="Horizontal" IsVisible="{Binding IsWindows10}">
 							<CheckBox
 								Content="{l:Translate chkEnableVariableRefreshRate}"
 								IsChecked="{Binding Config.EnableVariableRefreshRate}"
-								IsVisible="{Binding IsWindows}"
 							/>
 							<c:HelpTooltip Text="{l:Translate chkEnableVariableRefreshRateHint}" />
 						</StackPanel>

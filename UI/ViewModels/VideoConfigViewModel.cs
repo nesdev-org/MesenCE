@@ -11,6 +11,7 @@ namespace Mesen.ViewModels
 	public partial class VideoConfigViewModel : DisposableViewModel
 	{
 		public bool IsWindows { get; }
+		public bool IsWindows10 { get; }
 		public bool IsMacOs { get; }
 
 		public IRelayCommand PresetCompositeCommand { get; }
@@ -44,6 +45,7 @@ namespace Mesen.ViewModels
 
 			//Exclusive fullscreen is only supported on Windows currently
 			IsWindows = OperatingSystem.IsWindows();
+			IsWindows10 = OperatingSystem.IsWindowsVersionAtLeast(10);
 
 			//MacOS only supports the software renderer
 			IsMacOs = OperatingSystem.IsMacOS();
