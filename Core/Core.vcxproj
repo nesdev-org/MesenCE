@@ -939,6 +939,7 @@
     <ClCompile Include="Shared\HistoryViewer.cpp" />
     <ClCompile Include="Shared\Utilities\S3511ARtc.cpp" />
     <ClCompile Include="Shared\Video\DrawStringCommand.cpp" />
+    <ClCompile Include="Shared\Video\DrawStringCommandZhFont.cpp" />
     <ClCompile Include="Shared\Video\RotateFilter.cpp" />
     <ClCompile Include="Shared\Video\SoftwareRenderer.cpp" />
     <ClCompile Include="Shared\Video\SystemHud.cpp" />

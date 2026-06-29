@@ -246,6 +246,7 @@
     <ClInclude Include="sha1.h" />
     <ClInclude Include="spng.h" />
     <ClInclude Include="StaticFor.h" />
+    <ClInclude Include="EncodingUtilities.h" />
     <ClInclude Include="StringUtilities.h" />
     <ClInclude Include="SZReader.h" />
     <ClInclude Include="TimeUtilities.h" />

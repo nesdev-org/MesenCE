@@ -14,6 +14,11 @@ private:
 
 	static unordered_map<int, char const*> _jpFont;
 
+	//12x12 bitmap font for Chinese characters (2 bytes per row, 12 rows = 24 bytes
+	//per glyph).  Keyed by the 3 UTF-8 bytes of the character packed little-endian
+	//(byte0 | byte1<<8 | byte2<<16), the same scheme used by _jpFont.
+	static unordered_map<int, char const*> _zhFont;
+
 	// clang-format off
 	static constexpr uint8_t _font[792] = {
 		6,  0,  0,  0,  0,  0,  0,  0,	// 0x20 - Spacebar
@@ -173,12 +178,34 @@ protected:
 					x += 6;
 				}
 			} else if(c >= 0x80) {
-				//8x12 UTF-8 font for Japanese
-				int code = (uint8_t)c;
-				if(i + 2 < _text.size()) {
-					code |= ((uint8_t)_text[i + 1]) << 8;
-					code |= ((uint8_t)_text[i + 2]) << 16;
+			//3-byte UTF-8 sequences (used by CJK characters)
+			int code = (uint8_t)c;
+			if(i + 2 < _text.size()) {
+				code |= ((uint8_t)_text[i + 1]) << 8;
+				code |= ((uint8_t)_text[i + 2]) << 16;
 
+				auto zhRes = _zhFont.find(code);
+				if(zhRes != _zhFont.end()) {
+					//12x12 bitmap font for Chinese (2 bytes per row, 12 rows)
+					lineWidth += 12;
+					if(_maxWidth > 0 && lineWidth > _maxWidth) {
+						newLine();
+						lineWidth += 12;
+					}
+
+					uint8_t* charDef = (uint8_t*)zhRes->second;
+					for(int row = 0; row < 12; row++) {
+						uint16_t rowData = ((uint16_t)charDef[row * 2] << 8) | charDef[row * 2 + 1];
+						for(int column = 0; column < 12; column++) {
+							int drawFg = (rowData >> (15 - column)) & 0x01;
+							DrawPixel(x + column, y + row - 2, drawFg ? _color : _backColor);
+						}
+					}
+					i += 2;
+					x += 12;
+					lineHeight = 12;
+				} else {
+					//8x12 UTF-8 font for Japanese
 					auto res = _jpFont.find(code);
 					if(res != _jpFont.end()) {
 						lineWidth += 8;
@@ -201,7 +228,8 @@ protected:
 						lineHeight = 12;
 					}
 				}
-			} else {
+			}
+		} else {
 				//Variable size font for standard ASCII
 				int ch = GetCharNumber(c);
 				int width = GetCharWidth(c);
@@ -269,11 +297,20 @@ public:
 					x += 6;
 				}
 			} else if(c >= 0x80) {
-				//8x12 UTF-8 font for Japanese
-				int code = (uint8_t)c;
-				if(i + 2 < text.size()) {
-					code |= ((uint8_t)text[i + 1]) << 8;
-					code |= ((uint8_t)text[i + 2]) << 16;
+				//3-byte UTF-8 sequences (used by CJK characters)
+			int code = (uint8_t)c;
+			if(i + 2 < text.size()) {
+				code |= ((uint8_t)text[i + 1]) << 8;
+				code |= ((uint8_t)text[i + 2]) << 16;
+				auto zhRes = _zhFont.find(code);
+				if(zhRes != _zhFont.end()) {
+					if(maxWidth > 0 && x + 12 > maxWidth) {
+						newLine();
+					}
+					i += 2;
+					x += 12;
+					lineHeight = 12;
+				} else {
 					auto res = _jpFont.find(code);
 					if(res != _jpFont.end()) {
 						if(maxWidth > 0 && x + 8 > maxWidth) {
@@ -285,6 +322,7 @@ public:
 						lineHeight = 12;
 					}
 				}
+			}
 			} else {
 				//Variable size font for standard ASCII
 				int charWidth = GetCharWidth(c);

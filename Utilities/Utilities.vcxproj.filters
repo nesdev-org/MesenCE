@@ -167,6 +167,7 @@
     <ClInclude Include="Socket.h" />
     <ClInclude Include="spng.h" />
     <ClInclude Include="StringUtilities.h" />
+    <ClInclude Include="EncodingUtilities.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="UPnPPortMapper.h" />
     <ClInclude Include="UTF8Util.h" />

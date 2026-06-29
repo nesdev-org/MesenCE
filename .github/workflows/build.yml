@@ -207,6 +207,7 @@ jobs:
 
       - name: Sign binary
         if: github.event_name != 'pull_request'
+        continue-on-error: true
         env:
           APP_NAME: bin/osx-${{ matrix.platform.arch }}/Release/osx-${{ matrix.platform.arch }}/publish/Mesen.app
           CERT_DATA: ${{ secrets.MACOS_CERTIFICATE }}

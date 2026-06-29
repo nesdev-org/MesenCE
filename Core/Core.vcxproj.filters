@@ -1084,6 +1084,9 @@
     <ClCompile Include="Shared\Video\DrawStringCommand.cpp">
       <Filter>Shared\Video</Filter>
     </ClCompile>
+    <ClCompile Include="Shared\Video\DrawStringCommandZhFont.cpp">
+      <Filter>Shared\Video</Filter>
+    </ClCompile>
     <ClInclude Include="Shared\Video\DrawStringCommand.h">
       <Filter>Shared\Video</Filter>
     </ClInclude>

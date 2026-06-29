@@ -21,9 +21,14 @@ namespace Mesen.Localization
 			try {
 				Assembly assembly = Assembly.GetExecutingAssembly();
 
-				using(StreamReader reader = new StreamReader(assembly.GetManifestResourceStream("Mesen.Localization.resources.en.xml")!)) {
-					_resources.LoadXml(reader.ReadToEnd());
-				}
+			//Prefer the Simplified Chinese localization; fall back to English if it is
+			//missing from the embedded resources.
+			Stream? resStream = assembly.GetManifestResourceStream("Mesen.Localization.resources.zh.xml")
+				?? assembly.GetManifestResourceStream("Mesen.Localization.resources.en.xml");
+
+			using(StreamReader reader = new StreamReader(resStream!)) {
+				_resources.LoadXml(reader.ReadToEnd());
+			}
 
 				foreach(XmlNode node in _resources.SelectNodes("/Resources/Messages/Message")!) {
 					_messageCache[node.Attributes!["ID"]!.Value] = node.InnerText;

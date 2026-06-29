@@ -2,6 +2,7 @@
 #include <string.h>
 #include <sstream>
 #include "ZipReader.h"
+#include "EncodingUtilities.h"
 
 ZipReader::ZipReader()
 {
@@ -36,7 +37,10 @@ vector<string> ZipReader::InternalGetFileList()
 				std::cout << "mz_zip_reader_file_stat() failed!" << std::endl;
 			}
 
-			fileList.push_back(file_stat.m_filename);
+			//ZIP archives created on Chinese (CP936/GBK) systems store filenames as
+			//raw GBK bytes without the UTF-8 flag.  Re-encode those names to UTF-8 so
+			//they display correctly instead of turning into "锟斤拷" mojibake.
+			fileList.push_back(EncodingUtilities::ToUtf8(file_stat.m_filename));
 		}
 	}
 	return fileList;
@@ -45,8 +49,28 @@ vector<string> ZipReader::InternalGetFileList()
 bool ZipReader::ExtractFile(string filename, vector<uint8_t>& output)
 {
 	if(_initialized) {
-		size_t uncompSize;
+		size_t uncompSize = 0;
+
+		//Fast path: the requested name matches the bytes stored in the archive
+		//(plain ASCII entries, or entries that were saved with the UTF-8 flag).
 		void* p = mz_zip_reader_extract_file_to_heap(&_zipArchive, filename.c_str(), &uncompSize, 0);
+
+		if(!p) {
+			//Fallback: the displayed filename was converted from GBK to UTF-8, so it
+			//no longer matches the raw bytes stored in the archive.  Match the entry
+			//by normalizing each stored filename the same way and extract by index.
+			for(int i = 0, len = (int)mz_zip_reader_get_num_files(&_zipArchive); i < len; i++) {
+				mz_zip_archive_file_stat file_stat;
+				if(!mz_zip_reader_file_stat(&_zipArchive, i, &file_stat)) {
+					continue;
+				}
+				if(EncodingUtilities::ToUtf8(file_stat.m_filename) == filename) {
+					p = mz_zip_reader_extract_to_heap(&_zipArchive, i, &uncompSize, 0);
+					break;
+				}
+			}
+		}
+
 		if(!p) {
 			return false;
 		}
