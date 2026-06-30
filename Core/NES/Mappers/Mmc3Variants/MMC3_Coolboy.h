@@ -95,7 +95,7 @@ protected:
 				WritePrgRam(addr, value);
 			}
 
-			if((_exRegs[3] & 0x90) != 0x80) {
+			if(((_romInfo.SubMapperID != 1) || (addr < 0x6000)) && (_exRegs[3] & 0x90) != 0x80) {
 				_exRegs[addr & 0x03] = value;
 				UpdateState();
 			}
