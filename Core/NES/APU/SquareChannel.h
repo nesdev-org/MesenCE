@@ -157,7 +157,7 @@ public:
 				_envelope.InitializeEnvelope(value);
 
 				_duty = (value & 0xC0) >> 6;
-				if(_console->GetNesConfig().SwapDutyCycles) {
+				if(_console->GetNesConfig().SwapDutyCycles && !_isMmc5Square) {
 					_duty = ((_duty & 0x02) >> 1) | ((_duty & 0x01) << 1);
 				}
 				break;
