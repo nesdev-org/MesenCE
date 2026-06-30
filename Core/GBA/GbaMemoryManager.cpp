@@ -763,6 +763,20 @@ bool GbaMemoryManager::UseInlineHalt()
 	return result;
 }
 
+uint32_t GbaMemoryManager::GetOpenBus()
+{
+	return (
+		_state.InternalOpenBus[0] |
+		(_state.InternalOpenBus[1] << 8) |
+		(_state.InternalOpenBus[2] << 16) |
+		(_state.InternalOpenBus[3] << 24));
+}
+
+void GbaMemoryManager::SetOpenBus(uint32_t value)
+{
+	UpdateOpenBus<4>(value);
+}
+
 uint8_t GbaMemoryManager::GetOpenBus(uint32_t addr)
 {
 	_openBusReadStamp = _masterClock;

@@ -518,6 +518,45 @@ void GbaCpu::ArmSoftwareInterrupt()
 	ProcessException(GbaCpuMode::Supervisor, GbaCpuVector::SoftwareIrq);
 }
 
+void GbaCpu::ArmCoprocessorTransfer()
+{
+	//MRC/MCR
+	//----_1110_oool_nnnn_dddd_pppp_rrr1_mmmm
+	bool load = _opCode & (1 << 20);
+	//uint8_t crn = (_opCode >> 16) & 0x0F;
+	uint8_t rd = (_opCode >> 12) & 0x0F;
+	//uint8_t crm = _opCode & 0x0F;
+	//uint8_t cpr = (_opCode >> 5) & 0x07;
+	uint8_t cp = (_opCode >> 8) & 0x0F;
+	//uint8_t cpOp = (_opCode >> 21) & 0x07;
+
+	if(cp != 14) {
+		//Any coprocessor except CP14 generates an undefined exception
+#ifndef DUMMYCPU
+		ProcessException(GbaCpuMode::Undefined, GbaCpuVector::Undefined);
+		_emu->BreakIfDebugging(CpuType::Gba, BreakSource::GbaInvalidOpCode);
+#endif
+	} else {
+		Idle();
+		if(load) {
+			//CPU gets the previous value on the bus (since nothing will actually put a value on the bus for CP14)
+			uint32_t value = _memoryManager->GetOpenBus();
+			if(rd == 15) {
+				//Reg 15 does not get modified, and only these 4 flags are updated instead
+				_state.CPSR.Negative = (value & (1 << 31));
+				_state.CPSR.Zero = (value & (1 << 30));
+				_state.CPSR.Carry = (value & (1 << 29));
+				_state.CPSR.Overflow = (value & (1 << 28));
+			} else {
+				_state.R[rd] = value;
+			}
+		} else {
+			//MCR updates the open bus value but doesn't do anything else?
+			_memoryManager->SetOpenBus(_state.R[rd]);
+		}
+	}
+}
+
 void GbaCpu::ArmInvalidOp()
 {
 #ifndef DUMMYCPU
@@ -604,5 +643,11 @@ void GbaCpu::InitArmOpTable()
 
 	for(int i = 0; i <= 0xFF; i++) {
 		addEntry(0xF00 + i, &GbaCpu::ArmSoftwareInterrupt, ArmOpCategory::SoftwareInterrupt);
+	}
+
+	//Coprocessor Register Transfers (MRC, MCR)
+	//----_1110_????_----_----_----_???1_----
+	for(int i = 0; i <= 0x7F; i++) {
+		addEntry(0xE01 | (i << 1), &GbaCpu::ArmCoprocessorTransfer, ArmOpCategory::CoprocessorTransfer);
 	}
 }
