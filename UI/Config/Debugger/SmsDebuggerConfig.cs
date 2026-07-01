@@ -1,16 +1,14 @@
 ﻿using Avalonia;
 using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Debugger;
 using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
-using System.Reactive;
-using System.Reactive.Linq;
 
 namespace Mesen.Config
 {
-	public class SmsDebuggerConfig : ViewModelBase
+	public partial class SmsDebuggerConfig : ViewModelBase
 	{
-		[Reactive] public bool BreakOnNopLoad { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnNopLoad { get; set; } = false;
 	}
 }

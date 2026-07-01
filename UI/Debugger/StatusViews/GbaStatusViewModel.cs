@@ -1,54 +1,63 @@
 ﻿using Avalonia.Collections;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using Mesen.Utilities;
 using System;
+using System.ComponentModel;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class GbaStatusViewModel : BaseConsoleStatusViewModel
+	public partial class GbaStatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public UInt32 Reg0 { get; set; }
-		[Reactive] public UInt32 Reg1 { get; set; }
-		[Reactive] public UInt32 Reg2 { get; set; }
-		[Reactive] public UInt32 Reg3 { get; set; }
-		[Reactive] public UInt32 Reg4 { get; set; }
-		[Reactive] public UInt32 Reg5 { get; set; }
-		[Reactive] public UInt32 Reg6 { get; set; }
-		[Reactive] public UInt32 Reg7 { get; set; }
-		[Reactive] public UInt32 Reg8 { get; set; }
-		[Reactive] public UInt32 Reg9 { get; set; }
-		[Reactive] public UInt32 Reg10 { get; set; }
-		[Reactive] public UInt32 Reg11 { get; set; }
-		[Reactive] public UInt32 Reg12 { get; set; }
-		[Reactive] public UInt32 Reg13 { get; set; }
-		[Reactive] public UInt32 Reg14 { get; set; }
-		[Reactive] public UInt32 Reg15 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg0 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg1 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg2 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg3 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg4 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg5 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg6 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg7 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg8 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg9 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg10 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg11 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg12 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg13 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg14 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg15 { get; set; }
 
-		[Reactive] public UInt32 RegCpsr { get; set; }
+		[ObservableProperty] public partial UInt32 RegCpsr { get; set; }
 
-		[Reactive] public GbaCpuMode Mode { get; set; }
-		[Reactive] public string ModeString { get; set; } = GbaCpuMode.User.ToString();
+		[ObservableProperty] public partial GbaCpuMode Mode { get; set; }
+		[ObservableProperty] public partial string ModeString { get; set; } = GbaCpuMode.User.ToString();
 
-		[Reactive] public bool FlagZero { get; set; }
-		[Reactive] public bool FlagCarry { get; set; }
-		[Reactive] public bool FlagNegative { get; set; }
-		[Reactive] public bool FlagOverflow { get; set; }
+		[ObservableProperty] public partial bool FlagZero { get; set; }
+		[ObservableProperty] public partial bool FlagCarry { get; set; }
+		[ObservableProperty] public partial bool FlagNegative { get; set; }
+		[ObservableProperty] public partial bool FlagOverflow { get; set; }
 
-		[Reactive] public bool FlagThumb { get; set; }
-		[Reactive] public bool FlagIrqDisable { get; set; }
-		[Reactive] public bool FlagFiqDisable { get; set; }
+		[ObservableProperty] public partial bool FlagThumb { get; set; }
+		[ObservableProperty] public partial bool FlagIrqDisable { get; set; }
+		[ObservableProperty] public partial bool FlagFiqDisable { get; set; }
 
-		[Reactive] public string StackPreview { get; set; } = "";
+		[ObservableProperty] public partial string StackPreview { get; set; } = "";
 
-		[Reactive] public UInt16 Scanline { get; set; }
-		[Reactive] public UInt16 Cycle { get; set; }
+		[ObservableProperty] public partial UInt16 Scanline { get; set; }
+		[ObservableProperty] public partial UInt16 Cycle { get; set; }
 
 		public GbaStatusViewModel()
 		{
-			this.WhenAnyValue(x => x.FlagZero, x => x.FlagCarry, x => x.FlagNegative, x => x.FlagOverflow).Subscribe(x => UpdateFlags());
-			this.WhenAnyValue(x => x.FlagThumb, x => x.FlagIrqDisable, x => x.FlagFiqDisable, x => x.Mode).Subscribe(x => UpdateFlags());
+			this.ObserveProp([
+				nameof(FlagZero),
+				nameof(FlagCarry),
+				nameof(FlagNegative),
+				nameof(FlagOverflow),
+				nameof(FlagThumb),
+				nameof(FlagIrqDisable),
+				nameof(FlagFiqDisable),
+				nameof(Mode)
+			], () => UpdateFlags());
 		}
 
 		private void UpdateFlags()

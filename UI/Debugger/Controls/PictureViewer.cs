@@ -271,7 +271,7 @@ namespace Mesen.Debugger.Controls
 		public async void ExportToPng()
 		{
 			if(Source is Bitmap bitmap) {
-				string? filename = await FileDialogHelper.SaveFile(null, null, this.VisualRoot, FileDialogHelper.PngExt);
+				string? filename = await FileDialogHelper.SaveFile(null, null, this.GetWindow(), FileDialogHelper.PngExt);
 				if(filename != null) {
 					bitmap.Save(filename);
 				}
@@ -554,7 +554,7 @@ namespace Mesen.Debugger.Controls
 
 		private DynamicBitmap _source;
 		private double _zoom;
-		private SKBitmap _bitmap;
+		private SKImage _image;
 		private SKPaint _highlightPaint;
 
 		public PictureViewerDrawOperation(PictureViewer viewer)
@@ -568,20 +568,20 @@ namespace Mesen.Debugger.Controls
 			_source = (DynamicBitmap)viewer.Source;
 			_zoom = viewer.Zoom;
 			using(var lockedBuffer = ((WriteableBitmap)_source).Lock()) {
-				var info = new SKImageInfo(
+				SKImageInfo info = new(
 					lockedBuffer.Size.Width,
 					lockedBuffer.Size.Height,
 					lockedBuffer.Format.ToSkColorType(),
 					SKAlphaType.Premul
 				);
-				_bitmap = new SKBitmap();
-				_bitmap.InstallPixels(info, lockedBuffer.Address);
+				_image = SKImage.FromPixels(info, lockedBuffer.Address);
 			}
 			_highlightPaint = new SKPaint() { IsStroke = true, Color = new SKColor(Colors.LightSteelBlue.R, Colors.LightSteelBlue.G, Colors.LightSteelBlue.B) };
 		}
 
 		public void Dispose()
 		{
+			_image.Dispose();
 		}
 
 		public bool Equals(ICustomDrawOperation? other) => false;
@@ -609,7 +609,7 @@ namespace Mesen.Debugger.Controls
 				int height = (int)(_source.Size.Height * _zoom);
 
 				using(_source.Lock(true)) {
-					canvas.DrawBitmap(_bitmap,
+					canvas.DrawImage(_image,
 						new SKRect(0, 0, (int)_source.Size.Width, (int)_source.Size.Height),
 						new SKRect(0, 0, width, height)
 					);

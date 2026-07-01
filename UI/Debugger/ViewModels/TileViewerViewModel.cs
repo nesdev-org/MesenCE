@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Utilities;
@@ -10,56 +12,52 @@ using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
+	public partial class TileViewerViewModel : DisposableViewModel, ICpuTypeModel, IMouseOverViewerModel
 	{
 		public CpuType CpuType { get; set; }
 
 		public TileViewerConfig Config { get; }
-		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
+		[ObservableProperty] public partial RefreshTimingViewModel RefreshTiming { get; private set; }
 
-		[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
+		[ObservableProperty] public partial DynamicBitmap ViewerBitmap { get; private set; }
 
-		[Reactive] public DynamicTooltip? PreviewPanel { get; private set; }
+		[ObservableProperty] public partial DynamicTooltip? PreviewPanel { get; private set; }
 
-		[Reactive] public DynamicTooltip? ViewerTooltip { get; set; }
-		[Reactive] public PixelPoint? ViewerMousePos { get; set; }
+		[ObservableProperty] public partial DynamicTooltip? ViewerTooltip { get; set; }
+		[ObservableProperty] public partial PixelPoint? ViewerMousePos { get; set; }
 
-		[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
-		[Reactive] public UInt32[] RawPalette { get; set; } = Array.Empty<UInt32>();
-		[Reactive] public RawPaletteFormat RawFormat { get; set; }
-		[Reactive] public PaletteSelectionMode PaletteSelectionMode { get; private set; }
-		[Reactive] public int PaletteColumnCount { get; private set; } = 16;
-		[Reactive] public int SelectedPalette { get; set; } = 0;
+		[ObservableProperty] public partial UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
+		[ObservableProperty] public partial UInt32[] RawPalette { get; set; } = Array.Empty<UInt32>();
+		[ObservableProperty] public partial RawPaletteFormat RawFormat { get; set; }
+		[ObservableProperty] public partial PaletteSelectionMode PaletteSelectionMode { get; private set; }
+		[ObservableProperty] public partial int PaletteColumnCount { get; private set; } = 16;
+		[ObservableProperty] public partial int SelectedPalette { get; set; } = 0;
 
-		[Reactive] public int AddressIncrement { get; private set; }
-		[Reactive] public int MaximumAddress { get; private set; } = int.MaxValue;
+		[ObservableProperty] public partial int AddressIncrement { get; private set; }
+		[ObservableProperty] public partial int MaximumAddress { get; private set; } = int.MaxValue;
 
-		[Reactive] public int GridSizeX { get; set; } = 8;
-		[Reactive] public int GridSizeY { get; set; } = 8;
+		[ObservableProperty] public partial int GridSizeX { get; set; } = 8;
+		[ObservableProperty] public partial int GridSizeY { get; set; } = 8;
 
-		[Reactive] public Rect SelectionRect { get; set; }
+		[ObservableProperty] public partial Rect SelectionRect { get; set; }
 
-		[Reactive] public List<PictureViewerLine>? PageDelimiters { get; set; }
+		[ObservableProperty] public partial List<PictureViewerLine>? PageDelimiters { get; set; }
 
-		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
-		[Reactive] public Enum[] AvailableFormats { get; set; } = Array.Empty<Enum>();
-		[Reactive] public bool ShowFormatDropdown { get; set; }
-		[Reactive] public bool ShowFilterDropdown { get; set; }
+		[ObservableProperty] public partial Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
+		[ObservableProperty] public partial Enum[] AvailableFormats { get; set; } = Array.Empty<Enum>();
+		[ObservableProperty] public partial bool ShowFormatDropdown { get; set; }
+		[ObservableProperty] public partial bool ShowFilterDropdown { get; set; }
 
-		[Reactive] public List<List<ConfigPreset>> ConfigPresetRows { get; set; } = new() { new(), new(), new() };
-		[Reactive] public List<ConfigPreset> ConfigPresets { get; set; } = new List<ConfigPreset>();
+		[ObservableProperty] public partial List<List<ConfigPreset>> ConfigPresetRows { get; set; } = new() { new(), new(), new() };
+		[ObservableProperty] public partial List<ConfigPreset> ConfigPresets { get; set; } = new List<ConfigPreset>();
 
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
@@ -189,40 +187,23 @@ namespace Mesen.Debugger.ViewModels
 
 			InitForCpuType();
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Format, x => x.RawPalette).Subscribe(x => {
-				PaletteSelectionMode selMode = PaletteSelectionMode;
-				selMode = x.Item1.GetBitsPerPixel() switch {
-					1 => PaletteSelectionMode.TwoColors,
-					2 => PaletteSelectionMode.FourColors,
-					4 => PaletteSelectionMode.SixteenColors,
-					8 => RawPalette.Length >= 512 ? PaletteSelectionMode._256Colors : PaletteSelectionMode.None,
-					_ => PaletteSelectionMode.None
-				};
-
-				if(selMode != PaletteSelectionMode) {
-					PaletteSelectionMode = selMode;
-
-					PixelSize tileSize = x.Item1.GetTileSize();
-					if(GridSizeX != tileSize.Width || GridSizeY != tileSize.Height) {
-						GridSizeX = tileSize.Width;
-						GridSizeY = tileSize.Height;
-						SelectionRect = default;
-						PreviewPanel = null;
-					}
-
-					RefreshPalette();
-				}
+			AddDisposable(Config.ObserveProp(nameof(Config.Format), () => {
+				UpdatePaletteSelectionMode();
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Layout).Subscribe(x => {
+			AddDisposable(this.ObserveProp(nameof(RawPalette), () => {
+				UpdatePaletteSelectionMode();
+			}));
+
+			AddDisposable(Config.ObserveProp(nameof(Config.Layout), () => {
 				ApplyColumnRowCountRestrictions();
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.StartAddress).Subscribe(x => {
+			AddDisposable(Config.ObserveProp(nameof(Config.StartAddress), () => {
 				RefreshData();
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.ColumnCount, x => x.Config.RowCount, x => x.Config.Format).Subscribe(x => {
+			AddDisposable(Config.ObserveProp([nameof(Config.ColumnCount), nameof(Config.RowCount), nameof(Config.Format)], () => {
 				//Enforce min/max values for column/row counts
 				Config.ColumnCount = ColumnCount;
 				Config.RowCount = RowCount;
@@ -233,26 +214,55 @@ namespace Mesen.Debugger.ViewModels
 				RefreshData();
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Source).Subscribe(memType => {
-				MaximumAddress = Math.Max(0, DebugApi.GetMemorySize(memType) - 1);
+
+			AddDisposable(Config.ObserveProp(nameof(Config.Source), () => {
+				MaximumAddress = Math.Max(0, DebugApi.GetMemorySize(Config.Source) - 1);
 				if(Config.StartAddress > MaximumAddress) {
 					Config.StartAddress = 0;
 				}
-				ShowFilterDropdown = memType.SupportsCdl();
+				ShowFilterDropdown = Config.Source.SupportsCdl();
 				RefreshData();
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedPalette).Subscribe(x => RefreshTab()));
-			AddDisposable(this.WhenAnyValue(x => x.SelectionRect).Subscribe(x => UpdatePreviewPanel()));
+			AddDisposable(this.ObserveProp(nameof(SelectedPalette), () => RefreshTab()));
+			AddDisposable(this.ObserveProp(nameof(SelectionRect), () => UpdatePreviewPanel()));
 
 			LoadSelectedPreset(false);
 
-			AddDisposable(this.WhenAnyValue(
-				x => x.Config.Source, x => x.Config.StartAddress, x => x.Config.ColumnCount,
-				x => x.Config.RowCount, x => x.Config.Format
-			).Skip(1).Subscribe(x => ClearPresetSelection()));
+			Config.ObserveProp([
+				nameof(Config.Source),
+				nameof(Config.StartAddress),
+				nameof(Config.ColumnCount),
+				nameof(Config.RowCount),
+				nameof(Config.Format)
+			], () => ClearPresetSelection());
 
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, Config_PropertyChanged));
+		}
+
+		private void UpdatePaletteSelectionMode()
+		{
+			PaletteSelectionMode selMode = Config.Format.GetBitsPerPixel() switch {
+				1 => PaletteSelectionMode.TwoColors,
+				2 => PaletteSelectionMode.FourColors,
+				4 => PaletteSelectionMode.SixteenColors,
+				8 => RawPalette.Length >= 512 ? PaletteSelectionMode._256Colors : PaletteSelectionMode.None,
+				_ => PaletteSelectionMode.None
+			};
+
+			if(selMode != PaletteSelectionMode) {
+				PaletteSelectionMode = selMode;
+
+				PixelSize tileSize = Config.Format.GetTileSize();
+				if(GridSizeX != tileSize.Width || GridSizeY != tileSize.Height) {
+					GridSizeX = tileSize.Width;
+					GridSizeY = tileSize.Height;
+					SelectionRect = default;
+					PreviewPanel = null;
+				}
+
+				RefreshPalette();
+			}
 		}
 
 		private void ApplyColumnRowCountRestrictions()
@@ -1158,21 +1168,21 @@ namespace Mesen.Debugger.ViewModels
 		}
 	}
 
-	public class ConfigPreset : ViewModelBase
+	public partial class ConfigPreset : ViewModelBase
 	{
 		public string Name { get; }
 		public Func<PresetValues?> GetPresetValues { get; }
-		public ReactiveCommand<Unit, Unit> ClickCommand { get; }
+		public IRelayCommand ClickCommand { get; }
 		public Action ApplyPreset { get; }
 
-		[Reactive] public bool Selected { get; set; }
+		[ObservableProperty] public partial bool Selected { get; set; }
 
 		public ConfigPreset(string name, Func<PresetValues?> getPresetValues, Action applyPreset)
 		{
 			Name = name;
 			GetPresetValues = getPresetValues;
 			ApplyPreset = applyPreset;
-			ClickCommand = ReactiveCommand.Create(ApplyPreset);
+			ClickCommand = new RelayCommand(ApplyPreset);
 		}
 	}
 

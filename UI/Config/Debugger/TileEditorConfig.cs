@@ -1,12 +1,12 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Mesen.Config
 {
-	public class TileEditorConfig : BaseWindowConfig<TileEditorConfig>
+	public partial class TileEditorConfig : BaseWindowConfig<TileEditorConfig>
 	{
-		[Reactive] public double ImageScale { get; set; } = 8;
-		[Reactive] public bool ShowGrid { get; set; } = false;
-		[Reactive] public TileBackground Background { get; set; } = TileBackground.Transparent;
+		[ObservableProperty] public partial double ImageScale { get; set; } = 8;
+		[ObservableProperty] public partial bool ShowGrid { get; set; } = false;
+		[ObservableProperty] public partial TileBackground Background { get; set; } = TileBackground.Transparent;
 	}
 }

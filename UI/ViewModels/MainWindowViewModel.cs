@@ -1,40 +1,37 @@
 ﻿using Avalonia;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Controls;
 using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class MainWindowViewModel : ViewModelBase
+	public partial class MainWindowViewModel : DisposableViewModel
 	{
 		public static MainWindowViewModel Instance { get; private set; } = null!;
 
-		[Reactive] public MainMenuViewModel MainMenu { get; set; }
-		[Reactive] public RomInfo RomInfo { get; set; }
-		[Reactive] public AudioPlayerViewModel? AudioPlayer { get; private set; }
-		[Reactive] public RecentGamesViewModel RecentGames { get; private set; }
+		[ObservableProperty] public partial MainMenuViewModel MainMenu { get; set; }
+		[ObservableProperty] public partial RomInfo RomInfo { get; set; }
+		[ObservableProperty] public partial AudioPlayerViewModel? AudioPlayer { get; private set; }
+		[ObservableProperty] public partial RecentGamesViewModel RecentGames { get; private set; }
 
-		[Reactive] public string WindowTitle { get; private set; } = "MesenCE";
-		[Reactive] public Size RendererSize { get; set; }
+		[ObservableProperty] public partial string WindowTitle { get; private set; } = "MesenCE";
+		[ObservableProperty] public partial Size RendererSize { get; set; }
 
-		[Reactive] public bool IsMenuVisible { get; set; }
+		[ObservableProperty] public partial bool IsMenuVisible { get; set; }
 
-		[Reactive] public bool IsNativeRendererVisible { get; set; }
-		[Reactive] public bool IsSoftwareRendererVisible { get; set; }
+		[ObservableProperty] public partial bool IsNativeRendererVisible { get; private set; }
+		[ObservableProperty] public partial bool IsSoftwareRendererVisible { get; private set; }
 
 		public SoftwareRendererViewModel SoftwareRenderer { get; } = new();
 
@@ -58,35 +55,44 @@ namespace Mesen.ViewModels
 			MainMenu.Initialize(wnd);
 			RecentGames.Init(GameScreenMode.RecentGames);
 
-			this.WhenAnyValue(x => x.RecentGames.Visible, x => x.SoftwareRenderer.FrameSurface).Subscribe(x => {
-				IsNativeRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface == null;
-				IsSoftwareRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface != null;
+			AddDisposable(RecentGames.ObserveProp(nameof(RecentGamesViewModel.Visible), () => {
+				UpdateRendererVisibility();
+			}));
 
-				if(Renderer != null) {
-					Dispatcher.UIThread.Post(() => {
-						Renderer.IsVisible = IsNativeRendererVisible;
-					});
-				}
-			});
+			AddDisposable(SoftwareRenderer.ObserveProp(nameof(SoftwareRendererViewModel.FrameSurface), () => {
+				UpdateRendererVisibility();
+			}));
 
-			this.WhenAnyValue(x => x.RomInfo).Subscribe(x => {
-				bool showAudioPlayer = x.Format == RomFormat.Nsf || x.Format == RomFormat.Spc || x.Format == RomFormat.Gbs || x.Format == RomFormat.PceHes;
-				if(AudioPlayer == null && showAudioPlayer) {
-					AudioPlayer = new AudioPlayerViewModel();
-				} else if(!showAudioPlayer) {
-					AudioPlayer = null;
-				}
-			});
+			AddDisposable(this.ObserveProp(nameof(MainWindowViewModel.RendererSize), UpdateWindowTitle));
 
-			this.WhenAnyValue(
-				x => x.RomInfo,
-				x => x.RendererSize,
-				x => x.Config.Preferences.ShowTitleBarInfo,
-				x => x.Config.Video.AspectRatio,
-				x => x.Config.Video.VideoFilter
-			).Subscribe(x => {
-				UpdateWindowTitle();
-			});
+			AddDisposable(ReactiveHelper.RegisterForeignObserver([(() => Config, nameof(Configuration.Video)), (() => Config.Video, nameof(VideoConfig.AspectRatio))], UpdateWindowTitle));
+			AddDisposable(ReactiveHelper.RegisterForeignObserver([(() => Config, nameof(Configuration.Video)), (() => Config.Video, nameof(VideoConfig.VideoFilter))], UpdateWindowTitle));
+			AddDisposable(ReactiveHelper.RegisterForeignObserver([(() => Config, nameof(Configuration.Preferences)), (() => Config.Preferences, nameof(PreferencesConfig.ShowTitleBarInfo))], UpdateWindowTitle));
+
+			UpdateWindowTitle();
+		}
+
+		private void UpdateRendererVisibility()
+		{
+			IsNativeRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface == null;
+			IsSoftwareRendererVisible = !RecentGames.Visible && SoftwareRenderer.FrameSurface != null;
+
+			if(Renderer != null) {
+				Dispatcher.UIThread.Post(() => {
+					Renderer.IsVisible = IsNativeRendererVisible;
+				});
+			}
+		}
+
+		partial void OnRomInfoChanged(RomInfo value)
+		{
+			bool showAudioPlayer = RomInfo.Format == RomFormat.Nsf || RomInfo.Format == RomFormat.Spc || RomInfo.Format == RomFormat.Gbs || RomInfo.Format == RomFormat.PceHes;
+			AudioPlayer?.Dispose();
+			if(AudioPlayer == null && showAudioPlayer) {
+				AudioPlayer = new AudioPlayerViewModel();
+			} else if(!showAudioPlayer) {
+				AudioPlayer = null;
+			}
 
 			UpdateWindowTitle();
 		}

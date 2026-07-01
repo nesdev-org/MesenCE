@@ -43,7 +43,7 @@ namespace Mesen.Controls
 
 		private async void BtnBrowse_OnClick(object sender, RoutedEventArgs e)
 		{
-			string? folderName = await FileDialogHelper.OpenFolder(VisualRoot);
+			string? folderName = await FileDialogHelper.OpenFolder(this.GetWindow());
 			if(folderName?.Length > 0) {
 				this.Path = folderName;
 			}

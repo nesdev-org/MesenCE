@@ -1,9 +1,9 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Config
 {
-	public class MainWindowConfig : BaseWindowConfig<MainWindowConfig>
+	public partial class MainWindowConfig : BaseWindowConfig<MainWindowConfig>
 	{
 	}
 }

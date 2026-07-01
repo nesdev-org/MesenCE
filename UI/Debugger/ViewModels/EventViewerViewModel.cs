@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DataBoxControl;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
@@ -13,44 +14,41 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Linq;
 using System.Reflection;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class EventViewerViewModel : DisposableViewModel
+	public partial class EventViewerViewModel : DisposableViewModel
 	{
 		public const int HdmaChannelFlag = 0x40;
 
-		[Reactive] public CpuType CpuType { get; set; }
-		[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
+		[ObservableProperty] public partial CpuType CpuType { get; set; }
+		[ObservableProperty] public partial DynamicBitmap ViewerBitmap { get; private set; }
 
-		[Reactive] public ViewModelBase ConsoleConfig { get; set; }
-		[Reactive] public GridRowColumn? GridHighlightPoint { get; set; }
+		[ObservableProperty] public partial ViewModelBase ConsoleConfig { get; set; }
+		[ObservableProperty] public partial GridRowColumn? GridHighlightPoint { get; set; }
 
-		[Reactive] public bool ShowListView { get; set; }
-		[Reactive] public double MinListViewHeight { get; set; }
-		[Reactive] public double ListViewHeight { get; set; }
+		[ObservableProperty] public partial bool ShowListView { get; set; }
+		[ObservableProperty] public partial double MinListViewHeight { get; set; }
+		[ObservableProperty] public partial double ListViewHeight { get; set; }
 		private DateTime _lastListRefresh = DateTime.MinValue;
 
-		[Reactive] public DebugEventInfo? SelectedEvent { get; set; }
-		[Reactive] public Rect SelectionRect { get; set; }
+		[ObservableProperty] public partial DebugEventInfo? SelectedEvent { get; set; }
+		[ObservableProperty] public partial Rect SelectionRect { get; set; }
 
 		public EventViewerListViewModel ListView { get; }
 
 		public EventViewerConfig Config { get; }
 
-		[Reactive] public List<object> FileMenuItems { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
-		[Reactive] public List<object> ViewMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<object> FileMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<object> ViewMenuItems { get; private set; } = new();
 
-		[Reactive] public List<ContextMenuAction> ToolbarItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> ToolbarItems { get; private set; } = new();
 
 		private PictureViewer _picViewer;
 		private bool _refreshPending;
@@ -139,27 +137,27 @@ namespace Mesen.Debugger.ViewModels
 			DebugMenuItems = AddDisposables(DebugSharedActions.GetStepActions(wnd, () => CpuType));
 			ToolbarItems = AddDisposables(DebugSharedActions.GetStepActions(wnd, () => CpuType));
 
-			AddDisposable(this.WhenAnyValue(x => x.CpuType).Subscribe(_ => {
-				InitForCpuType();
-				UpdateConfig();
-				RefreshData();
-			}));
-
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
 				UpdateConfig();
 				RefreshUi(false);
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.ShowListView).Subscribe(showListView => {
-				Config.ShowListView = showListView;
-				ListViewHeight = showListView ? Config.ListViewHeight : 0;
-				MinListViewHeight = showListView ? 100 : 0;
+			AddDisposable(this.ObserveProp(nameof(CpuType), () => {
+				InitForCpuType();
+				UpdateConfig();
+				RefreshData();
+			}));
+
+			AddDisposable(this.ObserveProp(nameof(ShowListView), () => {
+				Config.ShowListView = ShowListView;
+				ListViewHeight = ShowListView ? Config.ListViewHeight : 0;
+				MinListViewHeight = ShowListView ? 100 : 0;
 				RefreshUi(false);
 			}));
 
-			AddDisposable(this.WhenAnyValue(x => x.ListViewHeight).Subscribe(height => {
+			AddDisposable(this.ObserveProp(nameof(ListViewHeight), () => {
 				if(ShowListView) {
-					Config.ListViewHeight = height;
+					Config.ListViewHeight = ListViewHeight;
 				} else {
 					ListViewHeight = 0;
 				}
@@ -401,9 +399,16 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
+		private static PropertyInfo[] GetPublicProperties(ViewModelBase target)
+		{
+#pragma warning disable IL2075 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
+			return target.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+#pragma warning restore IL2075 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
+		}
+
 		public void EnableAllEventTypes()
 		{
-			foreach(PropertyInfo prop in ConsoleConfig.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+			foreach(PropertyInfo prop in GetPublicProperties(ConsoleConfig)) {
 				if(prop.PropertyType == typeof(EventViewerCategoryCfg)) {
 					((EventViewerCategoryCfg)prop.GetValue(ConsoleConfig)!).Visible = true;
 				}
@@ -412,7 +417,7 @@ namespace Mesen.Debugger.ViewModels
 
 		public void DisableAllEventTypes()
 		{
-			foreach(PropertyInfo prop in ConsoleConfig.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+			foreach(PropertyInfo prop in GetPublicProperties(ConsoleConfig)) {
 				if(prop.PropertyType == typeof(EventViewerCategoryCfg)) {
 					((EventViewerCategoryCfg)prop.GetValue(ConsoleConfig)!).Visible = false;
 				}

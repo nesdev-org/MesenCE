@@ -21,9 +21,6 @@ namespace Mesen.Debugger.Windows
 		public ProfilerWindow()
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_model = new ProfilerWindowViewModel(this);
 			DataContext = _model;

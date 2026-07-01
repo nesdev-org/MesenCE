@@ -1,5 +1,5 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,126 +10,126 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class NesConfig : BaseConfig<NesConfig>
+	public partial class NesConfig : BaseConfig<NesConfig>
 	{
-		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
+		[ObservableProperty] public partial ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 		//Input
-		[Reactive] public NesControllerConfig Port1 { get; set; } = new();
-		[Reactive] public NesControllerConfig Port2 { get; set; } = new();
-		[Reactive] public NesControllerConfig ExpPort { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig Port1 { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig Port2 { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig ExpPort { get; set; } = new();
 
-		[Reactive] public NesControllerConfig Port1A { get; set; } = new();
-		[Reactive] public NesControllerConfig Port1B { get; set; } = new();
-		[Reactive] public NesControllerConfig Port1C { get; set; } = new();
-		[Reactive] public NesControllerConfig Port1D { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig Port1A { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig Port1B { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig Port1C { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig Port1D { get; set; } = new();
 
-		[Reactive] public NesControllerConfig ExpPortA { get; set; } = new();
-		[Reactive] public NesControllerConfig ExpPortB { get; set; } = new();
-		[Reactive] public NesControllerConfig ExpPortC { get; set; } = new();
-		[Reactive] public NesControllerConfig ExpPortD { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig ExpPortA { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig ExpPortB { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig ExpPortC { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig ExpPortD { get; set; } = new();
 
-		[Reactive] public NesControllerConfig MapperInput { get; set; } = new();
+		[ObservableProperty] public partial NesControllerConfig MapperInput { get; set; } = new();
 
-		[Reactive][MinMax(0, 3)] public UInt32 LightDetectionRadius { get; set; } = 0;
-		[Reactive] public bool AutoConfigureInput { get; set; } = true;
+		[ObservableProperty][MinMax(0, 3)] public partial UInt32 LightDetectionRadius { get; set; } = 0;
+		[ObservableProperty] public partial bool AutoConfigureInput { get; set; } = true;
 
 		//General
 		[ValidValues(ConsoleRegion.Auto, ConsoleRegion.Ntsc, ConsoleRegion.Pal, ConsoleRegion.Dendy)]
-		[Reactive] public ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
+		[ObservableProperty] public partial ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
 
-		[Reactive] public bool EnableHdPacks { get; set; } = true;
-		[Reactive] public bool DisableGameDatabase { get; set; } = false;
-		[Reactive] public bool FdsAutoLoadDisk { get; set; } = true;
-		[Reactive] public bool FdsFastForwardOnLoad { get; set; } = false;
-		[Reactive] public bool FdsAutoInsertDisk { get; set; } = false;
-		[Reactive] public VsDualOutputOption VsDualVideoOutput { get; set; } = VsDualOutputOption.Both;
-		[Reactive] public VsDualOutputOption VsDualAudioOutput { get; set; } = VsDualOutputOption.Both;
+		[ObservableProperty] public partial bool EnableHdPacks { get; set; } = true;
+		[ObservableProperty] public partial bool DisableGameDatabase { get; set; } = false;
+		[ObservableProperty] public partial bool FdsAutoLoadDisk { get; set; } = true;
+		[ObservableProperty] public partial bool FdsFastForwardOnLoad { get; set; } = false;
+		[ObservableProperty] public partial bool FdsAutoInsertDisk { get; set; } = false;
+		[ObservableProperty] public partial VsDualOutputOption VsDualVideoOutput { get; set; } = VsDualOutputOption.Both;
+		[ObservableProperty] public partial VsDualOutputOption VsDualAudioOutput { get; set; } = VsDualOutputOption.Both;
 
 		//Video
-		[Reactive] public bool DisableSprites { get; set; } = false;
-		[Reactive] public bool DisableBackground { get; set; } = false;
-		[Reactive] public bool ForceBackgroundFirstColumn { get; set; } = false;
-		[Reactive] public bool ForceSpritesFirstColumn { get; set; } = false;
-		[Reactive] public bool RemoveSpriteLimit { get; set; } = false;
-		[Reactive] public bool AdaptiveSpriteLimit { get; set; } = false;
-		[Reactive] public bool EnablePalBorders { get; set; } = false;
+		[ObservableProperty] public partial bool DisableSprites { get; set; } = false;
+		[ObservableProperty] public partial bool DisableBackground { get; set; } = false;
+		[ObservableProperty] public partial bool ForceBackgroundFirstColumn { get; set; } = false;
+		[ObservableProperty] public partial bool ForceSpritesFirstColumn { get; set; } = false;
+		[ObservableProperty] public partial bool RemoveSpriteLimit { get; set; } = false;
+		[ObservableProperty] public partial bool AdaptiveSpriteLimit { get; set; } = false;
+		[ObservableProperty] public partial bool EnablePalBorders { get; set; } = false;
 
-		[Reactive] public bool UseCustomVsPalette { get; set; } = false;
+		[ObservableProperty] public partial bool UseCustomVsPalette { get; set; } = false;
 
-		[Reactive] public OverscanConfig NtscOverscan { get; set; } = new();
-		[Reactive] public OverscanConfig PalOverscan { get; set; } = new();
+		[ObservableProperty] public partial OverscanConfig NtscOverscan { get; set; } = new();
+		[ObservableProperty] public partial OverscanConfig PalOverscan { get; set; } = new();
 
 		//Emulation
-		[Reactive] public bool EnableOamDecay { get; set; } = false;
-		[Reactive] public bool EnablePpuOamRowCorruption { get; set; } = false;
-		[Reactive] public bool EnablePpuSpriteEvalBug { get; set; } = false;
-		[Reactive] public bool DisableOamAddrBug { get; set; } = false;
-		[Reactive] public bool DisablePaletteRead { get; set; } = false;
-		[Reactive] public bool DisablePpu2004Reads { get; set; } = false;
-		[Reactive] public bool EnablePpu2000ScrollGlitch { get; set; } = false;
-		[Reactive] public bool EnablePpu2006ScrollGlitch { get; set; } = false;
-		[Reactive] public bool RestrictPpuAccessOnFirstFrame { get; set; } = false;
-		[Reactive] public bool EnableDmcSampleDuplicationGlitch { get; set; } = false;
-		[Reactive] public bool EnableCpuTestMode { get; set; } = false;
+		[ObservableProperty] public partial bool EnableOamDecay { get; set; } = false;
+		[ObservableProperty] public partial bool EnablePpuOamRowCorruption { get; set; } = false;
+		[ObservableProperty] public partial bool EnablePpuSpriteEvalBug { get; set; } = false;
+		[ObservableProperty] public partial bool DisableOamAddrBug { get; set; } = false;
+		[ObservableProperty] public partial bool DisablePaletteRead { get; set; } = false;
+		[ObservableProperty] public partial bool DisablePpu2004Reads { get; set; } = false;
+		[ObservableProperty] public partial bool EnablePpu2000ScrollGlitch { get; set; } = false;
+		[ObservableProperty] public partial bool EnablePpu2006ScrollGlitch { get; set; } = false;
+		[ObservableProperty] public partial bool RestrictPpuAccessOnFirstFrame { get; set; } = false;
+		[ObservableProperty] public partial bool EnableDmcSampleDuplicationGlitch { get; set; } = false;
+		[ObservableProperty] public partial bool EnableCpuTestMode { get; set; } = false;
 
-		[Reactive] public NesConsoleType ConsoleType { get; set; } = NesConsoleType.Nes001;
-		[Reactive] public bool DisablePpuReset { get; set; } = false;
-		[Reactive] public bool AllowInvalidInput { get; set; } = false;
-		[Reactive] public bool DisableGameGenieBusConflicts { get; set; } = false;
-		[Reactive] public bool DisableFlashSaves { get; set; } = false;
-		[Reactive] public bool OverwriteOriginalRom { get; set; } = false;
+		[ObservableProperty] public partial NesConsoleType ConsoleType { get; set; } = NesConsoleType.Nes001;
+		[ObservableProperty] public partial bool DisablePpuReset { get; set; } = false;
+		[ObservableProperty] public partial bool AllowInvalidInput { get; set; } = false;
+		[ObservableProperty] public partial bool DisableGameGenieBusConflicts { get; set; } = false;
+		[ObservableProperty] public partial bool DisableFlashSaves { get; set; } = false;
+		[ObservableProperty] public partial bool OverwriteOriginalRom { get; set; } = false;
 
-		[Reactive] public bool RandomizeMapperPowerOnState { get; set; } = false;
-		[Reactive] public bool RandomizeCpuPpuAlignment { get; set; } = false;
-		[Reactive] public RamState RamPowerOnState { get; set; } = RamState.AllZeros;
+		[ObservableProperty] public partial bool RandomizeMapperPowerOnState { get; set; } = false;
+		[ObservableProperty] public partial bool RandomizeCpuPpuAlignment { get; set; } = false;
+		[ObservableProperty] public partial RamState RamPowerOnState { get; set; } = RamState.AllZeros;
 
-		[Reactive][MinMax(0, 1000)] public UInt32 PpuExtraScanlinesBeforeNmi { get; set; } = 0;
-		[Reactive][MinMax(0, 1000)] public UInt32 PpuExtraScanlinesAfterNmi { get; set; } = 0;
+		[ObservableProperty][MinMax(0, 1000)] public partial UInt32 PpuExtraScanlinesBeforeNmi { get; set; } = 0;
+		[ObservableProperty][MinMax(0, 1000)] public partial UInt32 PpuExtraScanlinesAfterNmi { get; set; } = 0;
 
 		//Audio
-		[Reactive] public bool DisableNoiseModeFlag { get; set; } = false;
-		[Reactive] public bool ReduceDmcPopping { get; set; } = false;
-		[Reactive] public bool SilenceTriangleHighFreq { get; set; } = false;
-		[Reactive] public bool SwapDutyCycles { get; set; } = false;
-		[Reactive] public bool ReverseDpcmBitOrder { get; set; } = false;
+		[ObservableProperty] public partial bool DisableNoiseModeFlag { get; set; } = false;
+		[ObservableProperty] public partial bool ReduceDmcPopping { get; set; } = false;
+		[ObservableProperty] public partial bool SilenceTriangleHighFreq { get; set; } = false;
+		[ObservableProperty] public partial bool SwapDutyCycles { get; set; } = false;
+		[ObservableProperty] public partial bool ReverseDpcmBitOrder { get; set; } = false;
 
-		[Reactive][MinMax(0, 100)] public UInt32 Square1Volume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Square2Volume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 TriangleVolume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 NoiseVolume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 DmcVolume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 FdsVolume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Mmc5Volume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Vrc6Volume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Vrc7Volume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Namco163Volume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Sunsoft5bVolume { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 EpsmVolume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Square1Volume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Square2Volume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 TriangleVolume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 NoiseVolume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 DmcVolume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 FdsVolume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Mmc5Volume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Vrc6Volume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Vrc7Volume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Namco163Volume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Sunsoft5bVolume { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 EpsmVolume { get; set; } = 100;
 
-		[Reactive][MinMax(-100, 100)] public Int32 Square1Panning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 Square2Panning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 TrianglePanning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 NoisePanning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 DmcPanning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 FdsPanning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 Mmc5Panning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 Vrc6Panning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 Vrc7Panning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 Namco163Panning { get; set; } = 0;
-		[Reactive][MinMax(-100, 100)] public Int32 Sunsoft5bPanning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 Square1Panning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 Square2Panning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 TrianglePanning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 NoisePanning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 DmcPanning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 FdsPanning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 Mmc5Panning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 Vrc6Panning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 Vrc7Panning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 Namco163Panning { get; set; } = 0;
+		[ObservableProperty][MinMax(-100, 100)] public partial Int32 Sunsoft5bPanning { get; set; } = 0;
 
-		[Reactive] public StereoFilter StereoFilter { get; set; } = StereoFilter.None;
-		[Reactive][MinMax(0, 100)] public Int32 StereoDelay { get; set; } = 15;
-		[Reactive][MinMax(-180, 180)] public Int32 StereoPanningAngle { get; set; } = 15;
-		[Reactive][MinMax(1, 100)] public Int32 StereoCombFilterDelay { get; set; } = 5;
-		[Reactive][MinMax(1, 200)] public Int32 StereoCombFilterStrength { get; set; } = 100;
+		[ObservableProperty] public partial StereoFilter StereoFilter { get; set; } = StereoFilter.None;
+		[ObservableProperty][MinMax(0, 100)] public partial Int32 StereoDelay { get; set; } = 15;
+		[ObservableProperty][MinMax(-180, 180)] public partial Int32 StereoPanningAngle { get; set; } = 15;
+		[ObservableProperty][MinMax(1, 100)] public partial Int32 StereoCombFilterDelay { get; set; } = 5;
+		[ObservableProperty][MinMax(1, 200)] public partial Int32 StereoCombFilterStrength { get; set; } = 100;
 
 		//Misc
-		[Reactive] public bool BreakOnCrash { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnCrash { get; set; } = false;
 
-		[Reactive] public Int32 InputScanline { get; set; } = 241;
-		[Reactive] public UInt32[] UserPalette { get; set; } = new UInt32[64] { 0xFF666666, 0xFF002A88, 0xFF1412A7, 0xFF3B00A4, 0xFF5C007E, 0xFF6E0040, 0xFF6C0600, 0xFF561D00, 0xFF333500, 0xFF0B4800, 0xFF005200, 0xFF004F08, 0xFF00404D, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFADADAD, 0xFF155FD9, 0xFF4240FF, 0xFF7527FE, 0xFFA01ACC, 0xFFB71E7B, 0xFFB53120, 0xFF994E00, 0xFF6B6D00, 0xFF388700, 0xFF0C9300, 0xFF008F32, 0xFF007C8D, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFFFFEFF, 0xFF64B0FF, 0xFF9290FF, 0xFFC676FF, 0xFFF36AFF, 0xFFFE6ECC, 0xFFFE8170, 0xFFEA9E22, 0xFFBCBE00, 0xFF88D800, 0xFF5CE430, 0xFF45E082, 0xFF48CDDE, 0xFF4F4F4F, 0xFF000000, 0xFF000000, 0xFFFFFEFF, 0xFFC0DFFF, 0xFFD3D2FF, 0xFFE8C8FF, 0xFFFBC2FF, 0xFFFEC4EA, 0xFFFECCC5, 0xFFF7D8A5, 0xFFE4E594, 0xFFCFEF96, 0xFFBDF4AB, 0xFFB3F3CC, 0xFFB5EBF2, 0xFFB8B8B8, 0xFF000000, 0xFF000000 };
+		[ObservableProperty] public partial Int32 InputScanline { get; set; } = 241;
+		[ObservableProperty] public partial UInt32[] UserPalette { get; set; } = new UInt32[64] { 0xFF666666, 0xFF002A88, 0xFF1412A7, 0xFF3B00A4, 0xFF5C007E, 0xFF6E0040, 0xFF6C0600, 0xFF561D00, 0xFF333500, 0xFF0B4800, 0xFF005200, 0xFF004F08, 0xFF00404D, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFADADAD, 0xFF155FD9, 0xFF4240FF, 0xFF7527FE, 0xFFA01ACC, 0xFFB71E7B, 0xFFB53120, 0xFF994E00, 0xFF6B6D00, 0xFF388700, 0xFF0C9300, 0xFF008F32, 0xFF007C8D, 0xFF000000, 0xFF000000, 0xFF000000, 0xFFFFFEFF, 0xFF64B0FF, 0xFF9290FF, 0xFFC676FF, 0xFFF36AFF, 0xFFFE6ECC, 0xFFFE8170, 0xFFEA9E22, 0xFFBCBE00, 0xFF88D800, 0xFF5CE430, 0xFF45E082, 0xFF48CDDE, 0xFF4F4F4F, 0xFF000000, 0xFF000000, 0xFFFFFEFF, 0xFFC0DFFF, 0xFFD3D2FF, 0xFFE8C8FF, 0xFFFBC2FF, 0xFFFEC4EA, 0xFFFECCC5, 0xFFF7D8A5, 0xFFE4E594, 0xFFCFEF96, 0xFFBDF4AB, 0xFFB3F3CC, 0xFFB5EBF2, 0xFFB8B8B8, 0xFF000000, 0xFF000000 };
 
 		public void ApplyConfig()
 		{

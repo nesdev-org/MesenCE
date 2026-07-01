@@ -1,30 +1,29 @@
-﻿using Mesen.Config;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using HarfBuzzSharp;
+using Mesen.Config;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
-using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
-	public class ConfigViewModel : DisposableViewModel
+	public partial class ConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public AudioConfigViewModel? Audio { get; set; }
-		[Reactive] public InputConfigViewModel? Input { get; set; }
-		[Reactive] public VideoConfigViewModel? Video { get; set; }
-		[Reactive] public PreferencesConfigViewModel? Preferences { get; set; }
-		[Reactive] public EmulationConfigViewModel? Emulation { get; set; }
+		[ObservableProperty] public partial AudioConfigViewModel? Audio { get; set; }
+		[ObservableProperty] public partial InputConfigViewModel? Input { get; set; }
+		[ObservableProperty] public partial VideoConfigViewModel? Video { get; set; }
+		[ObservableProperty] public partial PreferencesConfigViewModel? Preferences { get; set; }
+		[ObservableProperty] public partial EmulationConfigViewModel? Emulation { get; set; }
 
-		[Reactive] public SnesConfigViewModel? Snes { get; set; }
-		[Reactive] public NesConfigViewModel? Nes { get; set; }
-		[Reactive] public GameboyConfigViewModel? Gameboy { get; set; }
-		[Reactive] public GbaConfigViewModel? Gba { get; set; }
-		[Reactive] public PceConfigViewModel? PcEngine { get; set; }
-		[Reactive] public SmsConfigViewModel? Sms { get; set; }
-		[Reactive] public WsConfigViewModel? Ws { get; set; }
-		[Reactive] public OtherConsolesConfigViewModel? OtherConsoles { get; set; }
+		[ObservableProperty] public partial SnesConfigViewModel? Snes { get; set; }
+		[ObservableProperty] public partial NesConfigViewModel? Nes { get; set; }
+		[ObservableProperty] public partial GameboyConfigViewModel? Gameboy { get; set; }
+		[ObservableProperty] public partial GbaConfigViewModel? Gba { get; set; }
+		[ObservableProperty] public partial PceConfigViewModel? PcEngine { get; set; }
+		[ObservableProperty] public partial SmsConfigViewModel? Sms { get; set; }
+		[ObservableProperty] public partial WsConfigViewModel? Ws { get; set; }
+		[ObservableProperty] public partial OtherConsolesConfigViewModel? OtherConsoles { get; set; }
 
-		[Reactive] public ConfigWindowTab SelectedIndex { get; set; }
+		[ObservableProperty] public partial ConfigWindowTab SelectedIndex { get; set; }
 		public bool AlwaysOnTop { get; }
 
 		[Obsolete("For designer only")]
@@ -33,11 +32,12 @@ namespace Mesen.ViewModels
 		public ConfigViewModel(ConfigWindowTab selectedTab)
 		{
 			AlwaysOnTop = ConfigManager.Config.Preferences.AlwaysOnTop;
-			SelectedIndex = selectedTab;
+			SelectTab(selectedTab);
+		}
 
-			AddDisposable(this.WhenAnyValue(x => x.SelectedIndex).Subscribe((tab) => {
-				this.SelectTab(tab);
-			}));
+		partial void OnSelectedIndexChanged(ConfigWindowTab value)
+		{
+			SelectTab(value);
 		}
 
 		public void SelectTab(ConfigWindowTab tab)

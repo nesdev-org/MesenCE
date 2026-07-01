@@ -5,17 +5,15 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.GUI.Utilities;
 using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 
 namespace Mesen.Windows
@@ -28,9 +26,6 @@ namespace Mesen.Windows
 		public SelectRomWindow()
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_searchBox = this.GetControl<TextBox>("Search");
 			_listBox = this.GetControl<ListBox>("ListBox");
@@ -143,27 +138,30 @@ namespace Mesen.Windows
 		}
 	}
 
-	public class SelectRomViewModel : DisposableViewModel
+	public partial class SelectRomViewModel : DisposableViewModel
 	{
 		private readonly List<ArchiveRomEntry> _entries;
-		[Reactive] public IEnumerable<ArchiveRomEntry> FilteredEntries { get; set; }
-		[Reactive] public string SearchString { get; set; } = "";
-		[Reactive] public ArchiveRomEntry? SelectedEntry { get; set; }
-		[Reactive] public bool Cancelled { get; set; } = true;
+		[ObservableProperty] public partial IEnumerable<ArchiveRomEntry> FilteredEntries { get; set; }
+		[ObservableProperty] public partial string SearchString { get; set; } = "";
+		[ObservableProperty] public partial ArchiveRomEntry? SelectedEntry { get; set; }
+		[ObservableProperty] public partial bool Cancelled { get; set; } = true;
 
 		public SelectRomViewModel(List<ArchiveRomEntry> entries)
 		{
 			_entries = entries;
 			FilteredEntries = entries;
-			AddDisposable(this.WhenAnyValue(x => x.SearchString).Subscribe(x => {
-				if(string.IsNullOrWhiteSpace(x)) {
-					FilteredEntries = _entries;
-				} else {
-					FilteredEntries = _entries.Where(e => e.Filename.Contains(x, StringComparison.OrdinalIgnoreCase));
-				}
+			SelectedEntry = FilteredEntries.FirstOrDefault();
+		}
 
-				SelectedEntry = FilteredEntries.FirstOrDefault();
-			}));
+		partial void OnSearchStringChanged(string value)
+		{
+			if(string.IsNullOrWhiteSpace(value)) {
+				FilteredEntries = _entries;
+			} else {
+				FilteredEntries = _entries.Where(e => e.Filename.Contains(value, StringComparison.OrdinalIgnoreCase));
+			}
+
+			SelectedEntry = FilteredEntries.FirstOrDefault();
 		}
 	}
 }

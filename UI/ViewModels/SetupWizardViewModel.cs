@@ -1,53 +1,51 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Diagnostics;
 using System.IO;
 
 namespace Mesen.ViewModels
 {
-	public class SetupWizardViewModel : ViewModelBase
+	public partial class SetupWizardViewModel : ViewModelBase
 	{
-		[Reactive] public bool StoreInUserProfile { get; set; } = true;
+		[ObservableProperty] public partial bool StoreInUserProfile { get; set; } = true;
 
-		[Reactive] public bool EnableXboxMappings { get; set; } = true;
-		[Reactive] public bool EnablePsMappings { get; set; }
-		[Reactive] public bool EnableWasdMappings { get; set; }
-		[Reactive] public bool EnableArrowMappings { get; set; } = true;
+		[ObservableProperty] public partial bool EnableXboxMappings { get; set; } = true;
+		[ObservableProperty] public partial bool EnablePsMappings { get; set; }
+		[ObservableProperty] public partial bool EnableWasdMappings { get; set; }
+		[ObservableProperty] public partial bool EnableArrowMappings { get; set; } = true;
 
-		[Reactive] public string InstallLocation { get; set; }
+		[ObservableProperty] public partial string InstallLocation { get; set; }
 
-		[Reactive] public bool CreateShortcut { get; set; } = true;
-		[Reactive] public bool CheckForUpdates { get; set; } = true;
-		[Reactive] public bool IsOsx { get; set; } = OperatingSystem.IsMacOS();
+		[ObservableProperty] public partial bool CreateShortcut { get; set; } = true;
+		[ObservableProperty] public partial bool CheckForUpdates { get; set; } = true;
+		[ObservableProperty] public partial bool IsOsx { get; set; } = OperatingSystem.IsMacOS();
 
 		public SetupWizardViewModel()
 		{
 			InstallLocation = ConfigManager.DefaultDocumentsFolder;
+		}
 
-			this.WhenAnyValue(x => x.StoreInUserProfile).Subscribe(x => {
-				if(StoreInUserProfile) {
-					InstallLocation = ConfigManager.DefaultDocumentsFolder;
-				} else {
-					InstallLocation = ConfigManager.DefaultPortableFolder;
-				}
-			});
+		partial void OnEnableWasdMappingsChanged(bool value)
+		{
+			if(value) {
+				EnableArrowMappings = false;
+			}
+		}
 
-			this.WhenAnyValue(x => x.EnableWasdMappings).Subscribe(x => {
-				if(x) {
-					EnableArrowMappings = false;
-				}
-			});
+		partial void OnEnableArrowMappingsChanged(bool value)
+		{
+			if(value) {
+				EnableWasdMappings = false;
+			}
+		}
 
-			this.WhenAnyValue(x => x.EnableArrowMappings).Subscribe(x => {
-				if(x) {
-					EnableWasdMappings = false;
-				}
-			});
+		partial void OnStoreInUserProfileChanged(bool value)
+		{
+			InstallLocation = StoreInUserProfile ? ConfigManager.DefaultDocumentsFolder : ConfigManager.DefaultPortableFolder;
 		}
 
 		public bool Confirm(Window parent)

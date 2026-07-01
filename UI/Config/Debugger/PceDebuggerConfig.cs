@@ -1,18 +1,16 @@
 ﻿using Avalonia;
 using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Debugger;
 using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
-using System.Reactive;
-using System.Reactive.Linq;
 
 namespace Mesen.Config
 {
-	public class PceDebuggerConfig : ViewModelBase
+	public partial class PceDebuggerConfig : ViewModelBase
 	{
-		[Reactive] public bool BreakOnBrk { get; set; } = false;
-		[Reactive] public bool BreakOnUnofficialOpCode { get; set; } = false;
-		[Reactive] public bool BreakOnInvalidVramAddress { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnBrk { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnUnofficialOpCode { get; set; } = false;
+		[ObservableProperty] public partial bool BreakOnInvalidVramAddress { get; set; } = false;
 	}
 }

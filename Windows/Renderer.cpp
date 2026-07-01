@@ -13,6 +13,15 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
+#ifdef _DEBUG
+static UINT createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+#else
+static UINT createDeviceFlags = 0;
+#endif
+
+static D3D_DRIVER_TYPE driverTypes[] = { D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP, D3D_DRIVER_TYPE_REFERENCE };
+static UINT numDriverTypes = ARRAYSIZE(driverTypes);
+
 Renderer::Renderer(Emulator* emu, HWND hWnd)
 {
 	_emu = emu;
@@ -83,7 +92,7 @@ void Renderer::SetScreenSize(uint32_t width, uint32_t height)
 			if(_pSwapChain && _fullscreen == FullscreenMode::Exclusive && _newFullscreen != FullscreenMode::Exclusive) {
 				HRESULT hr = _pSwapChain->SetFullscreenState(FALSE, NULL);
 				if(FAILED(hr)) {
-					MessageManager::Log("SetFullscreenState(FALSE) failed - Error:" + std::to_string(hr));
+					LogError("SetFullscreenState(FALSE) failed.", hr);
 				}
 			}
 
@@ -231,7 +240,7 @@ HRESULT Renderer::CreateRenderTargetView()
 	ID3D11Texture2D* pBackBuffer = nullptr;
 	HRESULT hr = _pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 	if(FAILED(hr)) {
-		MessageManager::Log("SwapChain::GetBuffer() failed - Error:" + std::to_string(hr));
+		LogError("SwapChain::GetBuffer() failed.", hr);
 		return hr;
 	}
 
@@ -243,7 +252,7 @@ HRESULT Renderer::CreateRenderTargetView()
 	hr = _pd3dDevice->CreateRenderTargetView(pBackBuffer, &desc, &_pRenderTargetView);
 	pBackBuffer->Release();
 	if(FAILED(hr)) {
-		MessageManager::Log("D3DDevice::CreateRenderTargetView() failed - Error:" + std::to_string(hr));
+		LogError("D3DDevice::CreateRenderTargetView() failed.", hr);
 		return hr;
 	}
 
@@ -278,44 +287,80 @@ HRESULT Renderer::CreateEmuTextureBuffers()
 		return S_FALSE;
 	}
 
-	////////////////////////////////////////////////////////////////////////////
 	_spriteBatch.reset(new SpriteBatch(_pDeviceContext));
 
 	return S_OK;
 }
 
-//--------------------------------------------------------------------------------------
-// Create Direct3D device and swap chain
-//--------------------------------------------------------------------------------------
+void Renderer::LogError(const char* msg, HRESULT hr)
+{
+	LPSTR messageBuffer = nullptr;
+	size_t size = FormatMessageA(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		hr,
+		LANG_USER_DEFAULT,
+		(LPSTR)&messageBuffer,
+		0,
+		NULL);
+
+	string errorMsg(messageBuffer, size);
+	LocalFree(messageBuffer);
+	MessageManager::Log(string(msg) + " Error: " + errorMsg + " (" + std::to_string(hr) + ")");
+}
+
+HRESULT Renderer::InitDeviceLegacy()
+{
+	//Used for Windows 7, when the "Platform Update" (KB2670838) isn't installed
+	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
+	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
+
+	DXGI_SWAP_CHAIN_DESC sd = {};
+	sd.BufferCount = 1;
+	sd.BufferDesc.Width = _realScreenWidth;
+	sd.BufferDesc.Height = _realScreenHeight;
+	sd.BufferDesc.Format = GetTextureFormat();
+	sd.BufferDesc.RefreshRate.Numerator = _fullscreenRefreshRate;
+	sd.BufferDesc.RefreshRate.Denominator = 1;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.Flags = _fullscreen == FullscreenMode::Exclusive ? DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH : 0;
+	sd.OutputWindow = _hWnd;
+	sd.SampleDesc.Count = 1;
+	sd.SampleDesc.Quality = 0;
+	sd.Windowed = TRUE;
+
+	HRESULT hr = S_OK;
+	D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_NULL;
+	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+	for(UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++) {
+		driverType = driverTypes[driverTypeIndex];
+		hr = D3D11CreateDeviceAndSwapChain(nullptr, driverType, nullptr, createDeviceFlags, featureLevels, numFeatureLevels, D3D11_SDK_VERSION, &sd, &_pSwapChain, &_pd3dDevice, &featureLevel, &_pDeviceContext);
+		if(SUCCEEDED(hr)) {
+			break;
+		}
+	}
+
+	if(FAILED(hr)) {
+		LogError("D3D11CreateDeviceAndSwapChain() failed.", hr);
+		return hr;
+	}
+
+	return InitDeviceCommon();
+}
+
 HRESULT Renderer::InitDevice()
 {
 	HRESULT hr = S_OK;
 
-	UINT createDeviceFlags = 0;
-#ifdef _DEBUG
-	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-	D3D_DRIVER_TYPE driverTypes[] = {
-		D3D_DRIVER_TYPE_HARDWARE,
-		D3D_DRIVER_TYPE_WARP,
-		D3D_DRIVER_TYPE_REFERENCE,
-	};
-	UINT numDriverTypes = ARRAYSIZE(driverTypes);
-
-	D3D_FEATURE_LEVEL featureLevels[] = {
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0,
-	};
+	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 	UINT numFeatureLevels = ARRAYSIZE(featureLevels);
 
-	D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_NULL;
-	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_1;
-
 	ComPtr<IDXGIFactory2> factory;
-	CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+	hr = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+	if(FAILED(hr)) {
+		MessageManager::Log("DX11.1 runtime not found, attempting to use DX11.0...");
+		return InitDeviceLegacy();
+	}
 
 	VideoConfig& cfg = _emu->GetSettings()->GetVideoConfig();
 	bool enableFlipSwap = false;
@@ -330,7 +375,7 @@ HRESULT Renderer::InitDevice()
 			hr = factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &tearingSupported, sizeof(tearingSupported));
 			allowTearing = tearingSupported;
 			if(FAILED(hr)) {
-				MessageManager::Log("CheckFeatureSupport() failed - Error:" + std::to_string(hr));
+				LogError("CheckFeatureSupport() failed.", hr);
 			}
 		}
 	}
@@ -356,6 +401,8 @@ HRESULT Renderer::InitDevice()
 	sdFullscreen.RefreshRate.Denominator = 1;
 	sdFullscreen.Windowed = TRUE;
 
+	D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_NULL;
+	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_1;
 	for(UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++) {
 		driverType = driverTypes[driverTypeIndex];
 		featureLevel = D3D_FEATURE_LEVEL_11_1;
@@ -368,7 +415,7 @@ HRESULT Renderer::InitDevice()
 		}
 
 		if(FAILED(hr)) {
-			MessageManager::Log("D3D11CreateDevice() failed - Error:" + std::to_string(hr));
+			LogError("D3D11CreateDevice() failed.", hr);
 			continue;
 		} else {
 			break;
@@ -379,28 +426,34 @@ HRESULT Renderer::InitDevice()
 		return hr;
 	}
 
-	hr = factory->CreateSwapChainForHwnd(_pd3dDevice, _hWnd, &sd, _fullscreen == FullscreenMode::Exclusive ? &sdFullscreen : nullptr, nullptr, &_pSwapChain);
+	hr = factory->CreateSwapChainForHwnd(_pd3dDevice, _hWnd, &sd, _fullscreen == FullscreenMode::Exclusive ? &sdFullscreen : nullptr, nullptr, (IDXGISwapChain1**)&_pSwapChain);
 	if(hr == DXGI_ERROR_INVALID_CALL) {
 		//Retry with legacy swap effect
 		_allowTearing = false;
 		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		sd.Flags &= ~DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-		hr = factory->CreateSwapChainForHwnd(_pd3dDevice, _hWnd, &sd, _fullscreen == FullscreenMode::Exclusive ? &sdFullscreen : nullptr, nullptr, &_pSwapChain);
+		hr = factory->CreateSwapChainForHwnd(_pd3dDevice, _hWnd, &sd, _fullscreen == FullscreenMode::Exclusive ? &sdFullscreen : nullptr, nullptr, (IDXGISwapChain1**)&_pSwapChain);
 	}
 
 	if(FAILED(hr)) {
-		MessageManager::Log("CreateSwapChainForHwnd() failed - Error:" + std::to_string(hr));
+		LogError("CreateSwapChainForHwnd() failed.", hr);
 		return hr;
 	}
 
+	return InitDeviceCommon();
+}
+
+HRESULT Renderer::InitDeviceCommon()
+{
+	HRESULT hr = S_OK;
 	if(_fullscreen == FullscreenMode::Exclusive) {
 		hr = _pSwapChain->SetFullscreenState(TRUE, NULL);
 		if(FAILED(hr)) {
-			MessageManager::Log("SetFullscreenState(true) failed - Error:" + std::to_string(hr));
+			LogError("SetFullscreenState(true) failed.", hr);
 			MessageManager::Log("Switching back to windowed mode");
 			hr = _pSwapChain->SetFullscreenState(FALSE, NULL);
 			if(FAILED(hr)) {
-				MessageManager::Log("SetFullscreenState(false) failed - Error:" + std::to_string(hr));
+				LogError("SetFullscreenState(false) failed.", hr);
 				return hr;
 			}
 		} else {
@@ -459,7 +512,7 @@ ID3D11Texture2D* Renderer::CreateTexture(uint32_t width, uint32_t height)
 
 	HRESULT hr = _pd3dDevice->CreateTexture2D(&desc, nullptr, &texture);
 	if(FAILED(hr)) {
-		MessageManager::Log("D3DDevice::CreateTexture() failed - Error:" + std::to_string(hr));
+		LogError("D3DDevice::CreateTexture() failed.", hr);
 		return nullptr;
 	}
 	return texture;
@@ -470,7 +523,7 @@ ID3D11ShaderResourceView* Renderer::GetShaderResourceView(ID3D11Texture2D* textu
 	ID3D11ShaderResourceView* shaderResourceView = nullptr;
 	HRESULT hr = _pd3dDevice->CreateShaderResourceView(texture, nullptr, &shaderResourceView);
 	if(FAILED(hr)) {
-		MessageManager::Log("D3DDevice::CreateShaderResourceView() failed - Error:" + std::to_string(hr));
+		LogError("D3DDevice::CreateShaderResourceView() failed.", hr);
 		return nullptr;
 	}
 
@@ -523,7 +576,7 @@ void Renderer::DrawScreen()
 	D3D11_MAPPED_SUBRESOURCE dd;
 	HRESULT hr = _pDeviceContext->Map(_pTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &dd);
 	if(FAILED(hr)) {
-		MessageManager::Log("DeviceContext::Map() failed - Error:" + std::to_string(hr));
+		LogError("DeviceContext::Map() failed.", hr);
 		return;
 	}
 	uint8_t* surfacePointer = (uint8_t*)dd.pData;
@@ -598,7 +651,7 @@ void Renderer::DrawHud(HudRenderInfo& hud, RenderSurfaceInfo& hudSurface)
 		D3D11_MAPPED_SUBRESOURCE dd;
 		HRESULT hr = _pDeviceContext->Map(hud.Texture, 0, D3D11_MAP_WRITE_DISCARD, 0, &dd);
 		if(FAILED(hr)) {
-			MessageManager::Log("DeviceContext::Map() failed - Error:" + std::to_string(hr));
+			LogError("DeviceContext::Map() failed.", hr);
 			return;
 		}
 		uint8_t* surfacePointer = (uint8_t*)dd.pData;
@@ -662,7 +715,7 @@ void Renderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud)
 	// Present the information rendered to the back buffer to the front buffer (the screen)
 	HRESULT hr = _pSwapChain->Present((cfg.VerticalSync && !_allowTearing) ? 1 : 0, _allowTearing ? DXGI_PRESENT_ALLOW_TEARING : 0);
 	if(FAILED(hr)) {
-		MessageManager::Log("SwapChain::Present() failed - Error:" + std::to_string(hr));
+		LogError("SwapChain::Present() failed.", hr);
 		if(hr == DXGI_ERROR_DEVICE_REMOVED) {
 			MessageManager::Log("D3DDevice: GetDeviceRemovedReason: " + std::to_string(_pd3dDevice->GetDeviceRemovedReason()));
 		}

@@ -12,7 +12,15 @@ namespace Mesen.Utilities
 	{
 		public static bool IsParentWindowFocused(this Control ctrl)
 		{
-			return (ctrl.GetVisualRoot() as WindowBase)?.IsKeyboardFocusWithin == true;
+			return ctrl.GetWindow()?.IsKeyboardFocusWithin == true;
+		}
+
+		public static Window? GetWindow(this Control ctrl)
+		{
+			if(ctrl.GetPresentationSource()?.RootVisual?.Parent is Window wnd) {
+				return wnd;
+			}
+			return null;
 		}
 	}
 }

@@ -39,7 +39,12 @@
 								<c:EnumComboBox SelectedItem="{Binding Config.AspectRatio}" MinWidth="230" />
 							</StackPanel>
 
-							<StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" IsVisible="{Binding ShowCustomRatio}">
+							<StackPanel
+								Grid.Row="2"
+								Grid.Column="1"
+								Orientation="Horizontal" 
+								IsVisible="{Binding Config.AspectRatio, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:VideoAspectRatio.Custom}}"
+							>
 								<TextBlock Text="{l:Translate lblCustomRatio}" VerticalAlignment="Center" />
 								<c:MesenNumericUpDown
 									Value="{Binding Config.CustomAspectRatio}"
@@ -52,11 +57,10 @@
 							</StackPanel>
 						</Grid>
 						
-						<StackPanel Orientation="Horizontal">
+						<StackPanel Orientation="Horizontal" IsVisible="{Binding IsWindows10}">
 							<CheckBox
 								Content="{l:Translate chkEnableVariableRefreshRate}"
 								IsChecked="{Binding Config.EnableVariableRefreshRate}"
-								IsVisible="{Binding IsWindows}"
 							/>
 							<c:HelpTooltip Text="{l:Translate chkEnableVariableRefreshRateHint}" />
 						</StackPanel>
@@ -152,7 +156,10 @@
 								<c:EnumComboBox Grid.Column="1" SelectedItem="{Binding Config.VideoFilter}" />
 							</Grid>
 
-							<c:OptionSection Header="{l:Translate lblNtscBlarggSettings}" IsVisible="{Binding ShowNtscBlarggSettings}">
+							<c:OptionSection
+								Header="{l:Translate lblNtscBlarggSettings}"
+								IsVisible="{Binding Config.VideoFilter, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:VideoFilterType.NtscBlargg}}"
+							>
 								<c:MesenSlider Value="{Binding Config.NtscArtifacts}" Text="{l:Translate trkArtifacts}" />
 								<c:MesenSlider Value="{Binding Config.NtscBleed}" Text="{l:Translate trkBleed}" />
 								<c:MesenSlider Value="{Binding Config.NtscFringing}" Text="{l:Translate trkFringing}" />
@@ -162,7 +169,10 @@
 								<CheckBox IsChecked="{Binding Config.NtscMergeFields}" Content="{l:Translate chkMergeFields}" />
 							</c:OptionSection>
 
-							<c:OptionSection Header="{l:Translate lblNtscBisqwitSettings}" IsVisible="{Binding ShowNtscBisqwitSettings}">
+							<c:OptionSection
+								Header="{l:Translate lblNtscBisqwitSettings}"
+								IsVisible="{Binding Config.VideoFilter, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:VideoFilterType.NtscBisqwit}}"
+							>
 								<Grid ColumnDefinitions="Auto,*">
 									<TextBlock Text="{l:Translate lblNtscFilterScale}" VerticalAlignment="Center" />
 									<c:EnumComboBox Grid.Column="1" SelectedItem="{Binding Config.NtscScale}" />
@@ -173,7 +183,10 @@
 								<c:MesenSlider Value="{Binding Config.NtscQFilterLength}" Text="{l:Translate trkNtscQFilterLength}" Minimum="0" Maximum="400" TickFrequency="20" />
 							</c:OptionSection>
 
-							<c:OptionSection Header="{l:Translate lblLcdGridSettings}" IsVisible="{Binding ShowLcdGridSettings}">
+							<c:OptionSection
+								Header="{l:Translate lblLcdGridSettings}"
+								IsVisible="{Binding Config.VideoFilter, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static cfg:VideoFilterType.LcdGrid}}"
+							>
 								<c:MesenSlider Value="{Binding Config.LcdGridTopLeftBrightness}" Text="{l:Translate trkLcdGridTopLeftBrightness}" Minimum="0" Maximum="100" TickFrequency="10" />
 								<c:MesenSlider Value="{Binding Config.LcdGridTopRightBrightness}" Text="{l:Translate trkLcdGridTopRightBrightness}" Minimum="0" Maximum="100" TickFrequency="10" />
 								<c:MesenSlider Value="{Binding Config.LcdGridBottomLeftBrightness}" Text="{l:Translate trkLcdGridBottomLeftBrightness}" Minimum="0" Maximum="100" TickFrequency="10" />

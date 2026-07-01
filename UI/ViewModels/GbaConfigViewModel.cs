@@ -1,31 +1,29 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mesen.Config;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
-using System.Reactive;
 
 namespace Mesen.ViewModels
 {
-	public class GbaConfigViewModel : DisposableViewModel
+	public partial class GbaConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public GbaConfig Config { get; set; }
-		[Reactive] public GbaConfig OriginalConfig { get; set; }
-		[Reactive] public GbaConfigTab SelectedTab { get; set; } = 0;
+		[ObservableProperty] public partial GbaConfig Config { get; set; }
+		[ObservableProperty] public partial GbaConfig OriginalConfig { get; set; }
+		[ObservableProperty] public partial GbaConfigTab SelectedTab { get; set; } = 0;
 
-		public ReactiveCommand<Button, Unit> SetupPlayer { get; }
+		public IRelayCommand SetupPlayer { get; }
 
 		public GbaConfigViewModel()
 		{
 			Config = ConfigManager.Config.Gba;
 			OriginalConfig = Config.Clone();
 
-			IObservable<bool> button1Enabled = this.WhenAnyValue(x => x.Config.Controller.Type, x => x.CanConfigure());
-			SetupPlayer = ReactiveCommand.Create<Button>(btn => this.OpenSetup(btn, 0), button1Enabled);
+			SetupPlayer = new RelayCommand<Button>(btn => this.OpenSetup(btn!, 0));
 
 			if(Design.IsDesignMode) {
 				return;
@@ -41,7 +39,7 @@ namespace Mesen.ViewModels
 			ControllerConfig cfg = Config.Controller.Clone();
 			wnd.DataContext = new ControllerConfigViewModel(ControllerType.GbaController, cfg, Config.Controller, 0);
 
-			if(await wnd.ShowDialogAtPosition<bool>(btn.GetVisualRoot() as Visual, startPosition)) {
+			if(await wnd.ShowDialogAtPosition<bool>(btn.GetWindow(), startPosition)) {
 				Config.Controller = cfg;
 			}
 		}

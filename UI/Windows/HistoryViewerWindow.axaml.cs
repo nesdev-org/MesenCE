@@ -43,9 +43,6 @@ namespace Mesen.Windows
 			DataContext = _model;
 
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			_renderer = this.GetControl<NativeRenderer>("Renderer");
 			_softwareRenderer = this.GetControl<SoftwareRendererView>("SoftwareRenderer");
@@ -188,7 +185,7 @@ namespace Mesen.Windows
 				height = width / aspectRatio;
 			}
 
-			if(ConfigManager.Config.Video.FullscreenForceIntegerScale && VisualRoot is Window wnd && (wnd.WindowState == WindowState.FullScreen || wnd.WindowState == WindowState.Maximized)) {
+			if(ConfigManager.Config.Video.FullscreenForceIntegerScale && this.GetWindow() is Window wnd && (wnd.WindowState == WindowState.FullScreen || wnd.WindowState == WindowState.Maximized)) {
 				FrameInfo baseSize = EmuApi.GetBaseScreenSize();
 				double scale = height * dpiScale / baseSize.Height;
 				if(scale != Math.Floor(scale)) {

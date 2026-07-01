@@ -7,13 +7,12 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
-using Splat.ModeDetection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,12 +84,12 @@ namespace Mesen.Controls
 		}
 	}
 
-	public class SoftwareRendererViewModel : ViewModelBase
+	public partial class SoftwareRendererViewModel : ViewModelBase
 	{
-		[Reactive] public DynamicBitmap? FrameSurface { get; set; }
-		[Reactive] public DynamicBitmap? EmuHudSurface { get; set; }
-		[Reactive] public DynamicBitmap? ScriptHudSurface { get; set; }
-		[Reactive] public double Width { get; set; }
-		[Reactive] public double Height { get; set; }
+		[ObservableProperty] public partial DynamicBitmap? FrameSurface { get; set; }
+		[ObservableProperty] public partial DynamicBitmap? EmuHudSurface { get; set; }
+		[ObservableProperty] public partial DynamicBitmap? ScriptHudSurface { get; set; }
+		[ObservableProperty] public partial double Width { get; set; }
+		[ObservableProperty] public partial double Height { get; set; }
 	}
 }

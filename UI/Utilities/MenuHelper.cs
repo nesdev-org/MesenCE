@@ -22,7 +22,7 @@ namespace Mesen.Utilities
 						if(IsPointerInItem(subItem)) {
 							return true;
 						} else if(checkPopup) {
-							if(subItem.GetVisualRoot() is PopupRoot root) {
+							if(subItem.GetPresentationSource()?.RootVisual?.Parent is PopupRoot root) {
 								if(root.IsPointerOver) {
 									return true;
 								}
@@ -64,7 +64,7 @@ namespace Mesen.Utilities
 						if(IsFocusInItem(subItem)) {
 							return true;
 						} else if(checkPopup) {
-							if(subItem.GetVisualRoot() is PopupRoot root) {
+							if(subItem.GetPresentationSource()?.RootVisual?.Parent is PopupRoot root) {
 								if(root.IsKeyboardFocusWithin) {
 									return true;
 								}

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Utilities;
@@ -10,26 +11,22 @@ using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class TileEditorViewModel : DisposableViewModel
+public partial class TileEditorViewModel : DisposableViewModel
 {
-	[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
+	[ObservableProperty] public partial DynamicBitmap ViewerBitmap { get; private set; }
 
-	[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
-	[Reactive] public UInt32[] RawPalette { get; set; } = Array.Empty<UInt32>();
-	[Reactive] public RawPaletteFormat RawFormat { get; set; }
-	[Reactive] public int PaletteColumnCount { get; private set; } = 16;
-	[Reactive] public int SelectedColor { get; set; } = 0;
-	[Reactive] public List<GridDefinition>? CustomGrids { get; set; } = null;
+	[ObservableProperty] public partial UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
+	[ObservableProperty] public partial UInt32[] RawPalette { get; set; } = Array.Empty<UInt32>();
+	[ObservableProperty] public partial RawPaletteFormat RawFormat { get; set; }
+	[ObservableProperty] public partial int PaletteColumnCount { get; private set; } = 16;
+	[ObservableProperty] public partial int SelectedColor { get; set; } = 0;
+	[ObservableProperty] public partial List<GridDefinition>? CustomGrids { get; set; } = null;
 
 	public TileEditorConfig Config { get; }
 
@@ -66,9 +63,9 @@ public class TileEditorViewModel : DisposableViewModel
 			return;
 		}
 
-		AddDisposable(this.WhenAnyValue(x => x.Config.Background).Subscribe(x => RefreshViewer()));
-		AddDisposable(this.WhenAnyValue(x => x.SelectedColor).Subscribe(x => RefreshViewer()));
-		AddDisposable(this.WhenAnyValue(x => x.Config.ShowGrid).Subscribe(x => {
+		AddDisposable(Config.ObserveProp(nameof(Config.Background), RefreshViewer));
+		AddDisposable(this.ObserveProp(nameof(SelectedColor), RefreshViewer));
+		AddDisposable(Config.ObserveProp(nameof(Config.ShowGrid), () => {
 			if(Config.ShowGrid) {
 				PixelSize tileSize = _tileFormat.GetTileSize();
 				CustomGrids = new List<GridDefinition>() { new GridDefinition() {
@@ -80,7 +77,7 @@ public class TileEditorViewModel : DisposableViewModel
 				CustomGrids = null;
 			}
 		}));
-		AddDisposable(this.WhenAnyValue(x => x.Config.ImageScale).Subscribe(x => {
+		AddDisposable(Config.ObserveProp(nameof(Config.ImageScale), () => {
 			if(Config.ImageScale < 4) {
 				Config.ImageScale = 4;
 			}

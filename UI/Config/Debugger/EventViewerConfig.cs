@@ -1,31 +1,31 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 
 namespace Mesen.Config
 {
-	public class EventViewerConfig : BaseWindowConfig<EventViewerConfig>
+	public partial class EventViewerConfig : BaseWindowConfig<EventViewerConfig>
 	{
-		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
+		[ObservableProperty] public partial bool ShowSettingsPanel { get; set; } = true;
 
-		[Reactive] public double ImageScale { get; set; } = 1;
+		[ObservableProperty] public partial double ImageScale { get; set; } = 1;
 
-		[Reactive] public bool RefreshOnBreakPause { get; set; } = true;
-		[Reactive] public bool AutoRefresh { get; set; } = true;
-		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
+		[ObservableProperty] public partial bool RefreshOnBreakPause { get; set; } = true;
+		[ObservableProperty] public partial bool AutoRefresh { get; set; } = true;
+		[ObservableProperty] public partial RefreshTimingConfig RefreshTiming { get; set; } = new();
 
-		[Reactive] public List<int> ColumnWidths { get; set; } = new();
+		[ObservableProperty] public partial List<int> ColumnWidths { get; set; } = new();
 
-		[Reactive] public bool ShowToolbar { get; set; } = true;
+		[ObservableProperty] public partial bool ShowToolbar { get; set; } = true;
 
-		[Reactive] public bool ShowListView { get; set; } = true;
-		[Reactive] public double ListViewHeight { get; set; } = 200;
+		[ObservableProperty] public partial bool ShowListView { get; set; } = true;
+		[ObservableProperty] public partial double ListViewHeight { get; set; } = 200;
 
-		[Reactive] public SnesEventViewerConfig SnesConfig { get; set; } = new SnesEventViewerConfig();
-		[Reactive] public NesEventViewerConfig NesConfig { get; set; } = new NesEventViewerConfig();
-		[Reactive] public GbEventViewerConfig GbConfig { get; set; } = new GbEventViewerConfig();
-		[Reactive] public GbaEventViewerConfig GbaConfig { get; set; } = new GbaEventViewerConfig();
-		[Reactive] public PceEventViewerConfig PceConfig { get; set; } = new PceEventViewerConfig();
-		[Reactive] public SmsEventViewerConfig SmsConfig { get; set; } = new SmsEventViewerConfig();
-		[Reactive] public WsEventViewerConfig WsConfig { get; set; } = new WsEventViewerConfig();
+		[ObservableProperty] public partial SnesEventViewerConfig SnesConfig { get; set; } = new SnesEventViewerConfig();
+		[ObservableProperty] public partial NesEventViewerConfig NesConfig { get; set; } = new NesEventViewerConfig();
+		[ObservableProperty] public partial GbEventViewerConfig GbConfig { get; set; } = new GbEventViewerConfig();
+		[ObservableProperty] public partial GbaEventViewerConfig GbaConfig { get; set; } = new GbaEventViewerConfig();
+		[ObservableProperty] public partial PceEventViewerConfig PceConfig { get; set; } = new PceEventViewerConfig();
+		[ObservableProperty] public partial SmsEventViewerConfig SmsConfig { get; set; } = new SmsEventViewerConfig();
+		[ObservableProperty] public partial WsEventViewerConfig WsConfig { get; set; } = new WsEventViewerConfig();
 	}
 }

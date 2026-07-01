@@ -1,13 +1,15 @@
-﻿using Dock.Model.Mvvm.Controls;
+﻿using Dock.Controls.DeferredContentControl;
+using Dock.Model.Mvvm.Controls;
 using Mesen.Debugger.Utilities;
-using ReactiveUI.Fody.Helpers;
 using System;
 
 namespace Mesen.Debugger.ViewModels.DebuggerDock
 {
-	public class BaseToolContainerViewModel : Tool
+	public class BaseToolContainerViewModel : Tool, IDeferredContentPresentation
 	{
 		public virtual object? HelpContent { get; } = null;
+
+		public bool DeferContentPresentation => false;
 
 		public event EventHandler? Selected;
 

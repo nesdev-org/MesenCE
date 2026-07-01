@@ -1,5 +1,5 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,38 +9,38 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class GameboyConfig : BaseConfig<GameboyConfig>
+	public partial class GameboyConfig : BaseConfig<GameboyConfig>
 	{
-		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
+		[ObservableProperty] public partial ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
-		[Reactive] public ControllerConfig Controller { get; set; } = new();
-		[Reactive] public ControllerConfig LinkedController { get; set; } = new();
+		[ObservableProperty] public partial ControllerConfig Controller { get; set; } = new();
+		[ObservableProperty] public partial ControllerConfig LinkedController { get; set; } = new();
 
-		[Reactive] public GameboyModel Model { get; set; } = GameboyModel.AutoFavorBest;
-		[Reactive] public bool UseSgb2 { get; set; } = true;
+		[ObservableProperty] public partial GameboyModel Model { get; set; } = GameboyModel.AutoFavorBest;
+		[ObservableProperty] public partial bool UseSgb2 { get; set; } = true;
 
-		[Reactive] public bool UseLocalLinkCable { get; set; } = false;
-		[Reactive] public GbLocalLinkOutputOption LocalLinkCableVideoOutput { get; set; } = GbLocalLinkOutputOption.Both;
-		[Reactive] public GbLocalLinkOutputOption LocalLinkCableAudioOutput { get; set; } = GbLocalLinkOutputOption.Both;
+		[ObservableProperty] public partial bool UseLocalLinkCable { get; set; } = false;
+		[ObservableProperty] public partial GbLocalLinkOutputOption LocalLinkCableVideoOutput { get; set; } = GbLocalLinkOutputOption.Both;
+		[ObservableProperty] public partial GbLocalLinkOutputOption LocalLinkCableAudioOutput { get; set; } = GbLocalLinkOutputOption.Both;
 
-		[Reactive] public bool BlendFrames { get; set; } = true;
-		[Reactive] public bool GbcAdjustColors { get; set; } = true;
+		[ObservableProperty] public partial bool BlendFrames { get; set; } = true;
+		[ObservableProperty] public partial bool GbcAdjustColors { get; set; } = true;
 
-		[Reactive] public bool DisableBackground { get; set; } = false;
-		[Reactive] public bool DisableSprites { get; set; } = false;
-		[Reactive] public bool HideSgbBorders { get; set; } = false;
+		[ObservableProperty] public partial bool DisableBackground { get; set; } = false;
+		[ObservableProperty] public partial bool DisableSprites { get; set; } = false;
+		[ObservableProperty] public partial bool HideSgbBorders { get; set; } = false;
 
-		[Reactive] public RamState RamPowerOnState { get; set; } = RamState.Random;
-		[Reactive] public bool AllowInvalidInput { get; set; } = false;
+		[ObservableProperty] public partial RamState RamPowerOnState { get; set; } = RamState.Random;
+		[ObservableProperty] public partial bool AllowInvalidInput { get; set; } = false;
 
-		[Reactive] public UInt32[] BgColors { get; set; } = new UInt32[] { 0xFFFFFFFF, 0xFFB0B0B0, 0xFF686868, 0xFF000000 };
-		[Reactive] public UInt32[] Obj0Colors { get; set; } = new UInt32[] { 0xFFFFFFFF, 0xFFB0B0B0, 0xFF686868, 0xFF000000 };
-		[Reactive] public UInt32[] Obj1Colors { get; set; } = new UInt32[] { 0xFFFFFFFF, 0xFFB0B0B0, 0xFF686868, 0xFF000000 };
+		[ObservableProperty] public partial UInt32[] BgColors { get; set; } = new UInt32[] { 0xFFFFFFFF, 0xFFB0B0B0, 0xFF686868, 0xFF000000 };
+		[ObservableProperty] public partial UInt32[] Obj0Colors { get; set; } = new UInt32[] { 0xFFFFFFFF, 0xFFB0B0B0, 0xFF686868, 0xFF000000 };
+		[ObservableProperty] public partial UInt32[] Obj1Colors { get; set; } = new UInt32[] { 0xFFFFFFFF, 0xFFB0B0B0, 0xFF686868, 0xFF000000 };
 
-		[Reactive][MinMax(0, 100)] public UInt32 Square1Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Square2Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 NoiseVol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 WaveVol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Square1Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Square2Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 NoiseVol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 WaveVol { get; set; } = 100;
 
 		public void ApplyConfig()
 		{

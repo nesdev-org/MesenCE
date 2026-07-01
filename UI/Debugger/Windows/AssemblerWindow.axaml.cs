@@ -41,9 +41,6 @@ namespace Mesen.Debugger.Windows
 		public AssemblerWindow(AssemblerWindowViewModel model)
 		{
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 
 			UpdateSyntaxDef();
 			_highlighting = HighlightingLoader.Load(_syntaxDef, HighlightingManager.Instance);
@@ -77,8 +74,7 @@ namespace Mesen.Debugger.Windows
 
 		public static void EditCode(CpuType cpuType, int address, string code, int byteCount)
 		{
-			AssemblerWindowViewModel model = new AssemblerWindowViewModel(cpuType);
-			model.InitEditCode(address, code, byteCount);
+			AssemblerWindowViewModel model = new AssemblerWindowViewModel(cpuType, address, code, byteCount);
 
 			DebugWindowManager.OpenDebugWindow(() => new AssemblerWindow(model));
 		}

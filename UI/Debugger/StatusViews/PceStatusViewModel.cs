@@ -1,57 +1,62 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
+using Mesen.Utilities;
 using System;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class PceStatusViewModel : BaseConsoleStatusViewModel
+	public partial class PceStatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public byte RegA { get; set; }
-		[Reactive] public byte RegX { get; set; }
-		[Reactive] public byte RegY { get; set; }
-		[Reactive] public byte RegSP { get; set; }
-		[Reactive] public UInt16 RegPC { get; set; }
-		[Reactive] public byte RegPS { get; set; }
+		[ObservableProperty] public partial byte RegA { get; set; }
+		[ObservableProperty] public partial byte RegX { get; set; }
+		[ObservableProperty] public partial byte RegY { get; set; }
+		[ObservableProperty] public partial byte RegSP { get; set; }
+		[ObservableProperty] public partial UInt16 RegPC { get; set; }
+		[ObservableProperty] public partial byte RegPS { get; set; }
 
-		[Reactive] public bool FlagN { get; set; }
-		[Reactive] public bool FlagV { get; set; }
-		[Reactive] public bool FlagD { get; set; }
-		[Reactive] public bool FlagI { get; set; }
-		[Reactive] public bool FlagZ { get; set; }
-		[Reactive] public bool FlagC { get; set; }
-		[Reactive] public bool FlagT { get; set; }
+		[ObservableProperty] public partial bool FlagN { get; set; }
+		[ObservableProperty] public partial bool FlagV { get; set; }
+		[ObservableProperty] public partial bool FlagD { get; set; }
+		[ObservableProperty] public partial bool FlagI { get; set; }
+		[ObservableProperty] public partial bool FlagZ { get; set; }
+		[ObservableProperty] public partial bool FlagC { get; set; }
+		[ObservableProperty] public partial bool FlagT { get; set; }
 
-		[Reactive] public UInt16 Cycle { get; private set; }
-		[Reactive] public UInt16 Scanline { get; private set; }
-		[Reactive] public UInt32 FrameCount { get; private set; }
+		[ObservableProperty] public partial UInt16 Cycle { get; private set; }
+		[ObservableProperty] public partial UInt16 Scanline { get; private set; }
+		[ObservableProperty] public partial UInt32 FrameCount { get; private set; }
 
-		[Reactive] public string StackPreview { get; private set; } = "";
+		[ObservableProperty] public partial string StackPreview { get; private set; } = "";
 
 		public PceStatusViewModel()
 		{
-			this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ, x => x.FlagT).Subscribe(x => {
-				RegPS = (byte)(
-					(FlagN ? (byte)PceCpuFlags.Negative : 0) |
-					(FlagV ? (byte)PceCpuFlags.Overflow : 0) |
-					(FlagT ? (byte)PceCpuFlags.Memory : 0) |
-					(FlagD ? (byte)PceCpuFlags.Decimal : 0) |
-					(FlagI ? (byte)PceCpuFlags.IrqDisable : 0) |
-					(FlagZ ? (byte)PceCpuFlags.Zero : 0) |
-					(FlagC ? (byte)PceCpuFlags.Carry : 0)
-				);
+			bool preventUpdate = false;
+
+			this.ObserveProp([nameof(FlagC), nameof(FlagD), nameof(FlagI), nameof(FlagN), nameof(FlagV), nameof(FlagZ), nameof(FlagT)], () => {
+				if(!preventUpdate) {
+					RegPS = (byte)(
+						(FlagN ? (byte)PceCpuFlags.Negative : 0) |
+						(FlagV ? (byte)PceCpuFlags.Overflow : 0) |
+						(FlagT ? (byte)PceCpuFlags.Memory : 0) |
+						(FlagD ? (byte)PceCpuFlags.Decimal : 0) |
+						(FlagI ? (byte)PceCpuFlags.IrqDisable : 0) |
+						(FlagZ ? (byte)PceCpuFlags.Zero : 0) |
+						(FlagC ? (byte)PceCpuFlags.Carry : 0)
+					);
+				}
 			});
 
-			this.WhenAnyValue(x => x.RegPS).Subscribe(x => {
-				using var delayNotifs = DelayChangeNotifications(); //don't reupdate PS while updating the flags
-				FlagN = (x & (byte)PceCpuFlags.Negative) != 0;
-				FlagV = (x & (byte)PceCpuFlags.Overflow) != 0;
-				FlagT = (x & (byte)PceCpuFlags.Memory) != 0;
-				FlagD = (x & (byte)PceCpuFlags.Decimal) != 0;
-				FlagI = (x & (byte)PceCpuFlags.IrqDisable) != 0;
-				FlagZ = (x & (byte)PceCpuFlags.Zero) != 0;
-				FlagC = (x & (byte)PceCpuFlags.Carry) != 0;
+			this.ObserveProp(nameof(RegPS), () => {
+				preventUpdate = true;
+				FlagN = (RegPS & (byte)PceCpuFlags.Negative) != 0;
+				FlagV = (RegPS & (byte)PceCpuFlags.Overflow) != 0;
+				FlagT = (RegPS & (byte)PceCpuFlags.Memory) != 0;
+				FlagD = (RegPS & (byte)PceCpuFlags.Decimal) != 0;
+				FlagI = (RegPS & (byte)PceCpuFlags.IrqDisable) != 0;
+				FlagZ = (RegPS & (byte)PceCpuFlags.Zero) != 0;
+				FlagC = (RegPS & (byte)PceCpuFlags.Carry) != 0;
+				preventUpdate = false;
 			});
 		}
 

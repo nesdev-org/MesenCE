@@ -2,10 +2,9 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +14,11 @@ using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class QuickSearchViewModel : ViewModelBase
+public partial class QuickSearchViewModel : ViewModelBase
 {
-	[Reactive] public bool IsSearchBoxVisible { get; set; }
-	[Reactive] public string SearchString { get; set; } = "";
-	[Reactive] public bool IsErrorVisible { get; set; } = false;
+	[ObservableProperty] public partial bool IsSearchBoxVisible { get; set; }
+	[ObservableProperty] public partial string SearchString { get; set; } = "";
+	[ObservableProperty] public partial bool IsErrorVisible { get; set; } = false;
 
 	public delegate void OnFindEventHandler(OnFindEventArgs e);
 	public event OnFindEventHandler? OnFind;
@@ -32,16 +31,18 @@ public class QuickSearchViewModel : ViewModelBase
 
 	public QuickSearchViewModel()
 	{
-		this.WhenAnyValue(x => x.SearchString).Subscribe(x => {
-			if(!string.IsNullOrWhiteSpace(x)) {
-				if(!string.IsNullOrEmpty(_noMatchSearch) && x.StartsWith(_noMatchSearch)) {
-					//Previous search gave no result, current search starts with the same string, so can't give results either, don't search
-					return;
-				}
+	}
 
-				Find(SearchDirection.Forward, false);
+	partial void OnSearchStringChanged(string value)
+	{
+		if(!string.IsNullOrWhiteSpace(value)) {
+			if(!string.IsNullOrEmpty(_noMatchSearch) && value.StartsWith(_noMatchSearch)) {
+				//Previous search gave no result, current search starts with the same string, so can't give results either, don't search
+				return;
 			}
-		});
+
+			Find(SearchDirection.Forward, false);
+		}
 	}
 
 	public void Open()

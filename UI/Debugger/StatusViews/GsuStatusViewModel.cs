@@ -1,72 +1,76 @@
 ﻿using Avalonia.Collections;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using Mesen.Utilities;
 using System;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class GsuStatusViewModel : BaseConsoleStatusViewModel
+	public partial class GsuStatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public UInt16 Reg0 { get; set; }
-		[Reactive] public UInt16 Reg1 { get; set; }
-		[Reactive] public UInt16 Reg2 { get; set; }
-		[Reactive] public UInt16 Reg3 { get; set; }
-		[Reactive] public UInt16 Reg4 { get; set; }
-		[Reactive] public UInt16 Reg5 { get; set; }
-		[Reactive] public UInt16 Reg6 { get; set; }
-		[Reactive] public UInt16 Reg7 { get; set; }
-		[Reactive] public UInt16 Reg8 { get; set; }
-		[Reactive] public UInt16 Reg9 { get; set; }
-		[Reactive] public UInt16 Reg10 { get; set; }
-		[Reactive] public UInt16 Reg11 { get; set; }
-		[Reactive] public UInt16 Reg12 { get; set; }
-		[Reactive] public UInt16 Reg13 { get; set; }
-		[Reactive] public UInt16 Reg14 { get; set; }
-		[Reactive] public UInt16 Reg15 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg0 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg1 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg2 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg3 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg4 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg5 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg6 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg7 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg8 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg9 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg10 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg11 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg12 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg13 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg14 { get; set; }
+		[ObservableProperty] public partial UInt16 Reg15 { get; set; }
 
-		[Reactive] public UInt16 RegSfr { get; set; }
-		[Reactive] public UInt16 RamAddrCache { get; set; }
+		[ObservableProperty] public partial UInt16 RegSfr { get; set; }
+		[ObservableProperty] public partial UInt16 RamAddrCache { get; set; }
 
-		[Reactive] public byte RegSrc { get; set; }
-		[Reactive] public byte RegDst { get; set; }
-		[Reactive] public byte RegColor { get; set; }
-		[Reactive] public byte RegPor { get; set; }
+		[ObservableProperty] public partial byte RegSrc { get; set; }
+		[ObservableProperty] public partial byte RegDst { get; set; }
+		[ObservableProperty] public partial byte RegColor { get; set; }
+		[ObservableProperty] public partial byte RegPor { get; set; }
 
-		[Reactive] public byte RegPbr { get; set; }
-		[Reactive] public byte RomBank { get; set; }
-		[Reactive] public byte RamBank { get; set; }
+		[ObservableProperty] public partial byte RegPbr { get; set; }
+		[ObservableProperty] public partial byte RomBank { get; set; }
+		[ObservableProperty] public partial byte RamBank { get; set; }
 
-		[Reactive] public bool FlagZero { get; set; }
-		[Reactive] public bool FlagCarry { get; set; }
-		[Reactive] public bool FlagSign { get; set; }
-		[Reactive] public bool FlagOverflow { get; set; }
+		[ObservableProperty] public partial bool FlagZero { get; set; }
+		[ObservableProperty] public partial bool FlagCarry { get; set; }
+		[ObservableProperty] public partial bool FlagSign { get; set; }
+		[ObservableProperty] public partial bool FlagOverflow { get; set; }
 
-		[Reactive] public bool FlagAlt1 { get; set; }
-		[Reactive] public bool FlagAlt2 { get; set; }
-		[Reactive] public bool FlagIrq { get; set; }
-		[Reactive] public bool FlagRomReadPending { get; set; }
+		[ObservableProperty] public partial bool FlagAlt1 { get; set; }
+		[ObservableProperty] public partial bool FlagAlt2 { get; set; }
+		[ObservableProperty] public partial bool FlagIrq { get; set; }
+		[ObservableProperty] public partial bool FlagRomReadPending { get; set; }
 
-		[Reactive] public bool FlagRunning { get; set; }
-		[Reactive] public bool FlagImmLow { get; set; }
-		[Reactive] public bool FlagImmHigh { get; set; }
-		[Reactive] public bool FlagPrefix { get; set; }
+		[ObservableProperty] public partial bool FlagRunning { get; set; }
+		[ObservableProperty] public partial bool FlagImmLow { get; set; }
+		[ObservableProperty] public partial bool FlagImmHigh { get; set; }
+		[ObservableProperty] public partial bool FlagPrefix { get; set; }
 
-		[Reactive] public bool FlagPlotTransparent { get; set; }
-		[Reactive] public bool FlagPlotDither { get; set; }
-		[Reactive] public bool FlagColorHighNibble { get; set; }
-		[Reactive] public bool FlagColorFreezeHigh { get; set; }
-		[Reactive] public bool FlagObjMode { get; set; }
+		[ObservableProperty] public partial bool FlagPlotTransparent { get; set; }
+		[ObservableProperty] public partial bool FlagPlotDither { get; set; }
+		[ObservableProperty] public partial bool FlagColorHighNibble { get; set; }
+		[ObservableProperty] public partial bool FlagColorFreezeHigh { get; set; }
+		[ObservableProperty] public partial bool FlagObjMode { get; set; }
 
 		public GsuStatusViewModel()
 		{
-			this.WhenAnyValue(x => x.FlagZero, x => x.FlagCarry, x => x.FlagSign, x => x.FlagOverflow).Subscribe(x => UpdateSfrValue());
-			this.WhenAnyValue(x => x.FlagAlt1, x => x.FlagAlt2, x => x.FlagIrq, x => x.FlagRomReadPending).Subscribe(x => UpdateSfrValue());
-			this.WhenAnyValue(x => x.FlagRunning, x => x.FlagImmLow, x => x.FlagImmHigh, x => x.FlagPrefix).Subscribe(x => UpdateSfrValue());
+			this.ObserveProp([
+				nameof(FlagZero), nameof(FlagCarry), nameof(FlagSign), nameof(FlagOverflow),
+				nameof(FlagAlt1), nameof(FlagAlt2), nameof(FlagIrq), nameof(FlagRomReadPending),
+				nameof(FlagRunning), nameof(FlagImmLow), nameof(FlagImmHigh), nameof(FlagPrefix)
+			], UpdateSfrValue);
 
-			this.WhenAnyValue(x => x.FlagPlotTransparent, x => x.FlagPlotDither, x => x.FlagColorHighNibble).Subscribe(x => UpdatePorValue());
-			this.WhenAnyValue(x => x.FlagColorFreezeHigh, x => x.FlagObjMode).Subscribe(x => UpdatePorValue());
+			this.ObserveProp([
+				nameof(FlagPlotTransparent), nameof(FlagPlotDither), nameof(FlagColorHighNibble),
+				nameof(FlagColorFreezeHigh), nameof(FlagObjMode)
+			], UpdatePorValue);
 		}
 
 		private void UpdateSfrValue()

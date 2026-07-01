@@ -33,7 +33,7 @@ private:
 
 	ID3D11Device* _pd3dDevice = nullptr;
 	ID3D11DeviceContext* _pDeviceContext = nullptr;
-	IDXGISwapChain1* _pSwapChain = nullptr;
+	IDXGISwapChain* _pSwapChain = nullptr;
 	ID3D11RenderTargetView* _pRenderTargetView = nullptr;
 
 	atomic<bool> _needFlip = false;
@@ -75,7 +75,12 @@ private:
 
 	atomic<int> _resetCounter = 0;
 
+	void LogError(const char* msg, HRESULT hr);
+
+	HRESULT InitDeviceLegacy();
 	HRESULT InitDevice();
+	HRESULT InitDeviceCommon();
+
 	void CleanupDevice();
 
 	void SetScreenSize(uint32_t width, uint32_t height);

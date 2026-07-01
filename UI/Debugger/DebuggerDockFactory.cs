@@ -71,7 +71,6 @@ namespace Mesen.Debugger
 					new ProportionalDock {
 						Proportion = 0.75,
 						Orientation = Orientation.Horizontal,
-						ActiveDockable = null,
 						VisibleDockables = CreateList<IDockable>(
 							new ToolDock {
 								Proportion = 0.60,
@@ -119,11 +118,13 @@ namespace Mesen.Debugger
 				)
 			};
 
-			var root = CreateRootDock();
-			root.ActiveDockable = mainLayout;
-			root.DefaultDockable = mainLayout;
+			IRootDock root = CreateRootDock();
 			root.VisibleDockables = CreateList<IDockable>(mainLayout);
+
+			//Ensure everything is marked as CanFloat = false, etc.
+			root = (IRootDock)FromDockDefinition(ToDockDefinition(root));
 			return root;
+
 		}
 
 		public override IProportionalDockSplitter CreateProportionalDockSplitter()
@@ -191,9 +192,9 @@ namespace Mesen.Debugger
 			return entry;
 		}
 
-		public IDockable? FromDockDefinition(DockEntryDefinition def)
+		public IDockable FromDockDefinition(DockEntryDefinition def)
 		{
-			IDockable? dockable = null;
+			IDockable dockable;
 			switch(def.Type) {
 				case DockEntryType.Splitter: return CreateProportionalDockSplitter();
 				case DockEntryType.Root: dockable = CreateRootDock(); break;
@@ -218,9 +219,14 @@ namespace Mesen.Debugger
 						case nameof(FunctionListViewModel): return FunctionListTool;
 						case nameof(FindResultListViewModel): return FindResultListTool;
 						case nameof(ControllerListViewModel): return ControllerListTool;
+						default: throw new Exception("Unexpected tool type name");
 					}
-					break;
+
+				default:
+					throw new Exception("Unexpected dock type");
 			}
+
+			dockable.CanFloat = false;
 
 			IDock? dock = dockable as IDock;
 			if(dock != null && def.Proportion != 0) {
@@ -267,4 +273,6 @@ namespace Mesen.Debugger
 public class MesenProportionalDockSplitter : DockBase, IProportionalDockSplitter
 {
 	//The regular ProportionalDockSplitter in Dock.Model.Mvvm.Controls inherits from DockableBase, which causes an exception when styles are applied
+	public bool CanResize { get; set; } = true;
+	public bool ResizePreview { get; set; } = false;
 }
