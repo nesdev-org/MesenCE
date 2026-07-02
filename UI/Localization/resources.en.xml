@@ -1809,6 +1809,8 @@ E
 		<Message ID="CannotWriteToFolder">The selected folder cannot be written to - please select another folder and try again.&#xA;&#xA;Details:&#xA;{0}</Message>
 		
 		<Message ID="EmptyState">&lt;empty&gt;</Message>
+		<Message ID="AutoStateSlot">Auto</Message>
+		<Message ID="DiskSideLabel">Disk {0} Side {1}</Message>
 		<Message ID="AutoUpdateNotSupported">The version of Mesen you're using does not support automatic updates. Please visit the website and manually download the latest release.</Message>
 		<Message ID="AutoUpdateInvalidFile">The downloaded file did not match the expected file.&#xA;&#xA;   Expected SHA256 signature: {0}&#xA;&#xA;   File SHA256 signature: {1}&#xA;&#xA;Please visit the website and manually download the latest release.</Message>
 		<Message ID="FileNotFound">File not found: {0}</Message>
@@ -2488,6 +2490,10 @@ E
 		<Enum ID="MesenTheme">
 			<Value ID="Light">Light</Value>
 			<Value ID="Dark">Dark</Value>
+		</Enum>
+		<Enum ID="DisplayLanguage">
+			<Value ID="English">English</Value>
+			<Value ID="SimplifiedChinese">简体中文</Value>
 		</Enum>
 		<Enum ID="SnesHighResBlendMode">
 			<Value ID="None">None (default)</Value>
