@@ -10,7 +10,7 @@ The latest stable version is available from the [releases page on GitHub](https:
 
 ## Development Builds
 
-[![Mesen](https://github.com/nesdev-org/MesenCE/actions/workflows/build.yml/badge.svg)](https://github.com/nesdev-org/MesenCE/actions/workflows/build.yml)
+[![Mesen](https://github.com/nesdev-org/MesenCE/actions/workflows/build.yml/badge.svg)](https://github.com/nesdev-org/MesenCE/actions/workflows/build.yml?query=branch%3Amaster)
 
 * [Windows](https://nightly.link/nesdev-org/MesenCE/workflows/build/master/Mesen%20%28Windows%20-%20net10.0%20-%20AoT%29.zip)
   * Windows 7 or higher is required. Windows 7 users must use SP1 and have all updates installed.
@@ -21,7 +21,7 @@ The latest stable version is available from the [releases page on GitHub](https:
 
 #### <ins>Notes</ins> ####
 
-* Other builds are also available in the [Actions](https://github.com/nesdev-org/MesenCE/actions) tab.
+* Other builds are also available in the [Actions](https://github.com/nesdev-org/MesenCE/actions/workflows/build.yml?query=branch%3Amaster) tab.
 * **macOS**: Builds are self-signed and will require approval via Gatekeeper before they are able to be run.  
 * **SteamOS**: See [SteamOS.md](SteamOS.md)  
 
