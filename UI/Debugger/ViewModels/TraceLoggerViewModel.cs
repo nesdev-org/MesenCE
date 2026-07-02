@@ -79,7 +79,10 @@ namespace Mesen.Debugger.ViewModels
 
 			UpdateAvailableTabs();
 
-			AddDisposable(this.ObserveProp(nameof(ScrollPosition), UpdateScrollPosition));
+			AddDisposable(this.ObserveProp(nameof(ScrollPosition), () => {
+				UpdateScrollPosition();
+				UpdateLog();
+			}));
 			AddDisposable(this.ObserveProp(nameof(MinScrollPosition), UpdateScrollPosition));
 			AddDisposable(this.ObserveProp(nameof(MaxScrollPosition), UpdateScrollPosition));
 

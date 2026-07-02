@@ -21,21 +21,27 @@ namespace Mesen.ViewModels
 
 		[ObservableProperty] public partial Enum[] AvailableCheatTypes { get; private set; } = Array.Empty<Enum>();
 
-		private MainWindowViewModel MainWndModel { get; }
-
 		[Obsolete("For designer only")]
-		public CheatEditWindowViewModel() : this(new CheatCode()) { }
+		public CheatEditWindowViewModel() : this(new CheatCode(), () => { }) { }
 
-		public CheatEditWindowViewModel(CheatCode cheat)
+		public CheatEditWindowViewModel(CheatCode cheat, Action closeWindow)
 		{
 			Cheat = cheat;
-			MainWndModel = MainWindowViewModel.Instance;
 
-			Cheat.PropertyChanged += (s, e) => {
-				if(e.PropertyName != nameof(CheatCode.Codes) && e.PropertyName != nameof(CheatCode.Type)) {
-					return;
+			AvailableCheatTypes = Enum.GetValues<CheatType>().Where(e => MainWindowViewModel.Instance.RomInfo.CpuTypes.Contains(e.ToCpuType())).Cast<Enum>().ToArray();
+			if(!AvailableCheatTypes.Contains(Cheat.Type)) {
+				Cheat.Type = (CheatType)AvailableCheatTypes[0];
+			}
+
+			//Close popup window if the loaded game changes
+			string romPath = MainWindowViewModel.Instance.RomInfo.RomPath;
+			AddDisposable(MainWindowViewModel.Instance.ObserveProp(nameof(RomInfo), () => {
+				if(romPath != MainWindowViewModel.Instance.RomInfo.RomPath) {
+					closeWindow();
 				}
+			}));
 
+			AddDisposable(Cheat.ObserveProp([nameof(CheatCode.Codes), nameof(CheatCode.Type)], () => {
 				string[] codes = cheat.Codes.Split(Environment.NewLine);
 				StringBuilder sb = new StringBuilder();
 				bool hasInvalidCode = false;
@@ -69,21 +75,7 @@ namespace Mesen.ViewModels
 				OkButtonEnabled = hasValidCode && !hasInvalidCode;
 
 				ConvertedCodes = sb.ToString();
-			};
-
-			if(Design.IsDesignMode) {
-				return;
-			}
-
-
-			MainWndModel.PropertyChanged += (s, e) => {
-				if(e.PropertyName == nameof(MainWindowViewModel.RomInfo)) {
-					AvailableCheatTypes = Enum.GetValues<CheatType>().Where(e => MainWndModel.RomInfo.CpuTypes.Contains(e.ToCpuType())).Cast<Enum>().ToArray();
-					if(!AvailableCheatTypes.Contains(Cheat.Type)) {
-						Cheat.Type = (CheatType)AvailableCheatTypes[0];
-					}
-				}
-			};
+			}));
 		}
 	}
 }

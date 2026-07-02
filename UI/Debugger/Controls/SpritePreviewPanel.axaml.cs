@@ -60,7 +60,7 @@ namespace Mesen.Debugger.Controls
 
 		private void UpdateFadePreviewFlag()
 		{
-			FadePreview = Model.FadePreview == true && Config.DimOffscreenSprites == true;
+			FadePreview = Model.FadePreview && Config.DimOffscreenSprites;
 		}
 
 		protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
