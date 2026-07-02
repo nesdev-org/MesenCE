@@ -191,9 +191,10 @@ public:
 	bool IsHaltOver();
 
 	uint32_t GetOpenBus();
-	void SetOpenBus(uint32_t value);
-
 	uint8_t GetOpenBus(uint32_t addr);
+
+	uint32_t ReadCoprocessor();
+	void WriteCoprocessor(uint32_t value);
 
 	uint32_t DebugCpuRead(GbaAccessModeVal mode, uint32_t addr);
 	uint8_t DebugRead(uint32_t addr);

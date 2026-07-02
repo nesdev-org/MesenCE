@@ -537,10 +537,9 @@ void GbaCpu::ArmCoprocessorTransfer()
 		_emu->BreakIfDebugging(CpuType::Gba, BreakSource::GbaInvalidOpCode);
 #endif
 	} else {
-		Idle();
 		if(load) {
-			//CPU gets the previous value on the bus (since nothing will actually put a value on the bus for CP14)
-			uint32_t value = _memoryManager->GetOpenBus();
+			//MRC (CPU gets the previous value on the bus - nothing will actually put a value on the bus for CP14)
+			uint32_t value = _memoryManager->ReadCoprocessor();
 			if(rd == 15) {
 				//Reg 15 does not get modified, and only these 4 flags are updated instead
 				_state.CPSR.Negative = (value & (1 << 31));
@@ -551,9 +550,10 @@ void GbaCpu::ArmCoprocessorTransfer()
 				_state.R[rd] = value;
 			}
 		} else {
-			//MCR updates the open bus value but doesn't do anything else?
-			_memoryManager->SetOpenBus(_state.R[rd]);
+			//MCR (Updates value on the bus)
+			_memoryManager->WriteCoprocessor(_state.R[rd]);
 		}
+		Idle();
 	}
 }
 
