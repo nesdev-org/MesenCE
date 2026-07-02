@@ -1,4 +1,5 @@
-﻿using Mesen.Interop;
+﻿using Avalonia.Controls;
+using Mesen.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +11,9 @@ namespace Mesen.Localization
 {
 	class ResourceHelper
 	{
+		private const string EnglishResource = "Mesen.Localization.resources.en.xml";
+		private const string SimplifiedChineseResource = "Mesen.Localization.resources.zh-Hans.xml";
+
 		private static XmlDocument _resources = new XmlDocument();
 
 		private static Dictionary<Enum, string> _enumLabelCache = new();
@@ -21,19 +25,64 @@ namespace Mesen.Localization
 			try {
 				Assembly assembly = Assembly.GetExecutingAssembly();
 
-				using(StreamReader reader = new StreamReader(assembly.GetManifestResourceStream("Mesen.Localization.resources.en.xml")!)) {
-					_resources.LoadXml(reader.ReadToEnd());
+				_resources = new XmlDocument();
+				_enumLabelCache.Clear();
+				_viewLabelCache.Clear();
+				_messageCache.Clear();
+
+				LoadResource(assembly, EnglishResource, true);
+
+				string localizedResource = GetResourceName(GetDisplayLanguage());
+				if(localizedResource != EnglishResource) {
+					LoadResource(assembly, localizedResource, false);
+				}
+			} catch {
+			}
+		}
+
+		private static DisplayLanguage GetDisplayLanguage()
+		{
+			if(Design.IsDesignMode || Mesen.App.ShowConfigWindow) {
+				return DisplayLanguage.English;
+			}
+
+			try {
+				return ConfigManager.Config.Preferences.DisplayLanguage;
+			} catch {
+				return DisplayLanguage.English;
+			}
+		}
+
+		private static string GetResourceName(DisplayLanguage language)
+		{
+			return language switch {
+				DisplayLanguage.SimplifiedChinese => SimplifiedChineseResource,
+				_ => EnglishResource
+			};
+		}
+
+		private static void LoadResource(Assembly assembly, string resourceName, bool isPrimaryResource)
+		{
+			using(Stream? stream = assembly.GetManifestResourceStream(resourceName)) {
+				if(stream == null) {
+					return;
 				}
 
-				foreach(XmlNode node in _resources.SelectNodes("/Resources/Messages/Message")!) {
+				XmlDocument resources = new XmlDocument();
+				resources.Load(stream);
+				if(isPrimaryResource) {
+					_resources = resources;
+				}
+
+				foreach(XmlNode node in resources.SelectNodes("/Resources/Messages/Message")!) {
 					_messageCache[node.Attributes!["ID"]!.Value] = node.InnerText;
 				}
 
 #pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-				Dictionary<string, Type> enumTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsEnum).ToDictionary(t => t.Name);
+				Dictionary<string, Type> enumTypes = assembly.GetTypes().Where(t => t.IsEnum).ToDictionary(t => t.Name);
 #pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 
-				foreach(XmlNode node in _resources.SelectNodes("/Resources/Enums/Enum")!) {
+				foreach(XmlNode node in resources.SelectNodes("/Resources/Enums/Enum")!) {
 					string enumName = node.Attributes!["ID"]!.Value;
 					if(enumTypes.TryGetValue(enumName, out Type? enumType)) {
 						foreach(XmlNode enumNode in node.ChildNodes) {
@@ -46,7 +95,7 @@ namespace Mesen.Localization
 					}
 				}
 
-				foreach(XmlNode node in _resources.SelectNodes("/Resources/Forms/Form")!) {
+				foreach(XmlNode node in resources.SelectNodes("/Resources/Forms/Form")!) {
 					string viewName = node.Attributes!["ID"]!.Value;
 					foreach(XmlNode formNode in node.ChildNodes) {
 						if(formNode is XmlElement elem) {
@@ -54,7 +103,6 @@ namespace Mesen.Localization
 						}
 					}
 				}
-			} catch {
 			}
 		}
 
