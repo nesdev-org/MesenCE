@@ -22,6 +22,7 @@ namespace Mesen.Config
 	public class PreferencesConfig : BaseConfig<PreferencesConfig>
 	{
 		[Reactive] public MesenTheme Theme { get; set; } = MesenTheme.Light;
+		[Reactive] public DisplayLanguage DisplayLanguage { get; set; } = DisplayLanguage.English;
 		[Reactive] public bool AutomaticallyCheckForUpdates { get; set; } = true;
 		[Reactive] public bool SingleInstance { get; set; } = true;
 		[Reactive] public bool AutoLoadPatches { get; set; } = true;
@@ -257,6 +258,12 @@ namespace Mesen.Config
 	{
 		Light = 0,
 		Dark = 1
+	}
+
+	public enum DisplayLanguage
+	{
+		English = 0,
+		SimplifiedChinese = 1
 	}
 
 	public enum FontAntialiasing

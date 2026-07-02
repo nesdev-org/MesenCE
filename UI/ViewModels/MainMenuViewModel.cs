@@ -189,7 +189,7 @@ namespace Mesen.ViewModels
 				ActionType = ActionType.Custom,
 				DynamicText = () => {
 					string statePath = Path.Combine(ConfigManager.SaveStateFolder, EmuApi.GetRomInfo().GetRomName() + "_" + slot + "." + FileDialogHelper.MesenSaveStateExt);
-					string slotName = isAutoSaveSlot ? "Auto" : slot.ToString();
+					string slotName = isAutoSaveSlot ? ResourceHelper.GetMessage("AutoStateSlot") : slot.ToString();
 
 					string header;
 					if(!File.Exists(statePath)) {
@@ -291,7 +291,7 @@ namespace Mesen.ViewModels
 		{
 			return new MainMenuAction(EmulatorShortcut.FdsInsertDiskNumber) {
 				ActionType = ActionType.Custom,
-				CustomText = "Disk " + ((diskSide / 2) + 1) + " Side " + ((diskSide % 2 == 0) ? "A" : "B"),
+				CustomText = ResourceHelper.GetMessage("DiskSideLabel", (diskSide / 2) + 1, (diskSide % 2 == 0) ? "A" : "B"),
 				ShortcutParam = (uint)diskSide,
 				IsVisible = () => EmuApi.IsShortcutAllowed(EmulatorShortcut.FdsInsertDiskNumber, (uint)diskSide)
 			};
