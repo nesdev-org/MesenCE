@@ -48,7 +48,7 @@ private:
 	uint8_t _spriteIndexes[32] = {};
 	uint8_t _spriteCount = 0;
 	uint8_t _spriteTileCount = 0;
-	bool _hasSpritePriority[4] = {};
+	uint8_t _orgSpriteCount = 0;
 
 	uint16_t _scanline = 0;
 	uint32_t _frameCount = 0;
@@ -211,6 +211,7 @@ private:
 	__forceinline void FetchSpritePosition(uint8_t oamAddress);
 	void FetchSpriteAttributes(uint16_t oamAddress);
 	void FetchSpriteTile(bool secondCycle);
+	void LoadExtraSprites();
 
 	void UpdateOamAddress();
 	uint16_t GetOamAddress();

@@ -282,6 +282,7 @@
 			<Control ID="lblOverscan">Overscan</Control>
 			<Control ID="chkDisableFrameSkipping">Disable frame skipping when fast forwarding</Control>
 			<Control ID="chkForceFixedResolution">Use fixed output resolution (2x scale, ≈512x478)</Control>
+			<Control ID="chkRemoveSpriteLimit">Remove sprite limit</Control>
 		</Form>
 		<Form ID="NesConfigView">
 			<Control ID="tpgGeneral">General</Control>

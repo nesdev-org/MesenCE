@@ -2,11 +2,9 @@
 #include "SNES/SnesPpu.h"
 #include "SNES/SnesConsole.h"
 #include "SNES/SnesMemoryManager.h"
-#include "SNES/SnesCpu.h"
 #include "SNES/Spc.h"
 #include "SNES/InternalRegisters.h"
 #include "SNES/SnesControlManager.h"
-#include "SNES/SnesDmaController.h"
 #include "SNES/Debugger/SnesPpuTools.h"
 #include "Debugger/Debugger.h"
 #include "Shared/Emulator.h"
@@ -452,14 +450,7 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock)
 			_spriteEvalEnd = 0;
 			_spriteFetchingDone = false;
 
-			memset(_hasSpritePriority, 0, sizeof(_hasSpritePriority));
 			memcpy(_spritePriority, _spritePriorityCopy, sizeof(_spritePriority));
-			for(int i = 0; i < 255; i++) {
-				if(_spritePriority[i] < 4) {
-					_hasSpritePriority[_spritePriority[i]] = true;
-				}
-			}
-
 			memcpy(_spritePalette, _spritePaletteCopy, sizeof(_spritePalette));
 			memcpy(_spriteColors, _spriteColorsCopy, sizeof(_spriteColors));
 
@@ -644,6 +635,7 @@ void SnesPpu::FetchSpriteData()
 	if(_fetchSpriteStart == 0) {
 		memset(_spritePriorityCopy, 0xFF, sizeof(_spritePriorityCopy));
 
+		_orgSpriteCount = _spriteCount;
 		_spriteTileCount = 0;
 		_currentSprite.Index = 0xFF;
 
@@ -679,6 +671,10 @@ void SnesPpu::FetchSpriteData()
 				FetchSpritePosition(_oamTimeIndex);
 			}
 		}
+	}
+
+	if(!_state.ForcedBlank && _fetchSpriteEnd >= 69 && _settings->GetSnesConfig().RemoveSpriteLimit) {
+		LoadExtraSprites();
 	}
 }
 
@@ -792,6 +788,43 @@ void SnesPpu::FetchSpriteTile(bool secondCycle)
 			}
 		}
 	}
+}
+
+void SnesPpu::LoadExtraSprites()
+{
+	//_timeOver can get set by calling FetchSpriteAttributes, keep a copy of its orignal value.
+	bool timeOver = _timeOver;
+
+	//Allow going over the 34 8px tile limit
+	if(!_spriteFetchingDone) {
+		FetchSpriteTile(false);
+		FetchSpriteTile(true);
+	}
+
+	while(_spriteCount > 0) {
+		uint8_t i = _spriteIndexes[_spriteCount - 1];
+		FetchSpritePosition(i);
+		FetchSpriteAttributes((i << 2) | 0x02);
+		FetchSpriteTile(false);
+		FetchSpriteTile(true);
+	}
+
+	if(_spriteFetchingDone && _orgSpriteCount == 32) {
+		//Allow going over the 32 sprite limit
+		uint8_t lastIndex = _spriteIndexes[31];
+		for(uint8_t i = lastIndex + 1; i < 0x80; i++) {
+			FetchSpritePosition(i);
+			if(_currentSprite.IsVisible(_scanline, _state.ObjInterlace)) {
+				while(_currentSprite.ColumnOffset > 0) {
+					FetchSpriteAttributes((i << 2) | 0x02);
+					FetchSpriteTile(false);
+					FetchSpriteTile(true);
+				}
+			}
+		}
+	}
+
+	_timeOver = timeOver;
 }
 
 void SnesPpu::RenderMode0()
@@ -2432,8 +2465,31 @@ void SnesPpu::Serialize(Serializer& s)
 		SV(_vOffset);
 		SV(_fetchBgStart);
 		SV(_fetchBgEnd);
+
+		SV(_currentSprite.X);
+		SV(_currentSprite.Y);
+		SV(_currentSprite.Index);
+		SV(_currentSprite.Width);
+		SV(_currentSprite.Height);
+		SV(_currentSprite.HorizontalMirror);
+		SV(_currentSprite.Priority);
+		SV(_currentSprite.Palette);
+		SV(_currentSprite.ColumnOffset);
+		SV(_currentSprite.DrawX);
+		SV(_currentSprite.FetchAddress);
+		SV(_currentSprite.ChrData[0]);
+		SV(_currentSprite.ChrData[1]);
+		SV(_oamEvaluationIndex);
+		SV(_oamTimeIndex);
 		SV(_fetchSpriteStart);
 		SV(_fetchSpriteEnd);
+		SV(_spriteEvalStart);
+		SV(_spriteEvalEnd);
+		SV(_spriteFetchingDone);
+		SVArray(_spriteIndexes, 32);
+		SV(_spriteCount);
+		SV(_orgSpriteCount);
+		SV(_spriteTileCount);
 	}
 
 	if(!s.IsSaving() && _interlacedFrame && _emu->GetRewindManager()->IsRewinding()) {

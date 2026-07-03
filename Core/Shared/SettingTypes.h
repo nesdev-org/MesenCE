@@ -591,6 +591,7 @@ struct SnesConfig
 	bool HideSprites = false;
 	bool DisableFrameSkipping = false;
 	bool ForceFixedResolution = false;
+	bool RemoveSpriteLimit = false;
 
 	OverscanDimensions Overscan = {};
 
