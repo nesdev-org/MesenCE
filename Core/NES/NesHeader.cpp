@@ -58,7 +58,6 @@ GameSystem NesHeader::GetGameSystem()
 					default:
 						MessageManager::Log("[iNes] Unsupported console type detected (using NES NTSC instead)");
 						return GameSystem::NesNtsc;
-
 				}
 				break;
 		}
@@ -100,7 +99,7 @@ uint32_t NesHeader::GetSizeValue(uint32_t exponent, uint32_t multiplier)
 	}
 
 	multiplier = multiplier * 2 + 1;
-	
+
 	uint64_t size = multiplier * (uint64_t)1 << exponent;
 	if(size >= ((uint64_t)1 << 32)) {
 		MessageManager::Log("[iNes] Unsupported size value.");

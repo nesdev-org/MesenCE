@@ -6,7 +6,7 @@
 #include "Gameboy/GbConstants.h"
 #include "Shared/ColorUtilities.h"
 
-GbPpuTools::GbPpuTools(Debugger* debugger, Emulator *emu) : PpuTools(debugger, emu)
+GbPpuTools::GbPpuTools(Debugger* debugger, Emulator* emu) : PpuTools(debugger, emu)
 {
 }
 
@@ -15,8 +15,6 @@ DebugTilemapInfo GbPpuTools::GetTilemap(GetTilemapOptions options, BaseState& ba
 	GbPpuState& state = (GbPpuState&)baseState;
 	uint32_t offset = options.Layer == 1 ? 0x1C00 : 0x1800;
 	bool isCgb = state.CgbEnabled;
-
-	uint16_t baseTile = state.BgTileSelect ? 0 : 0x1000;
 
 	std::fill(outBuffer, outBuffer + 256 * 256, 0xFFFFFFFF);
 
@@ -43,16 +41,12 @@ DebugTilemapInfo GbPpuTools::GetTilemap(GetTilemapOptions options, BaseState& ba
 			bool vMirror = (attributes & 0x40) != 0;
 			//bool bgPriority = (attributes & 0x80) != 0;
 
-			uint16_t tileStart = baseTile;
-			if(baseTile) {
-				//This is done manually to avoid a bug where MSVC calculates the tileStart value wrong.
-				//The issue doesn't seem to be caused by the technically undefined behavior of casting uint8_t to int8_t.
-				//Calculating the negative value manually works, so use that for now.
-				tileStart += (tileIndex >= 0x80 ? -(0x80 - (tileIndex & 0x7F)) : tileIndex) * 16;
+			uint16_t tileStart;
+			if(state.BgTileSelect) {
+				tileStart = tileIndex * 16;
 			} else {
-				tileStart += tileIndex * 16;
+				tileStart = 0x1000 + (int8_t)tileIndex * 16;
 			}
-
 			tileStart |= tileBank;
 
 			for(int y = 0; y < 8; y++) {
@@ -75,7 +69,7 @@ DebugTilemapInfo GbPpuTools::GetTilemap(GetTilemapOptions options, BaseState& ba
 	result.ColumnCount = 32;
 	result.RowCount = 32;
 	result.TilemapAddress = offset;
-	result.TilesetAddress = baseTile;
+	result.TilesetAddress = state.BgTileSelect ? 0 : 0x1000;
 	result.ScrollX = state.ScrollX;
 	result.ScrollY = state.ScrollY;
 	result.ScrollWidth = GbConstants::ScreenWidth;
@@ -140,9 +134,13 @@ DebugTilemapTileInfo GbPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uint
 
 	uint8_t attributes = isCgb ? vram[addr | 0x2000] : 0;
 
-	uint16_t baseTile = state.BgTileSelect ? 0 : 0x1000;
-	uint16_t tileStart = baseTile + (baseTile ? (int8_t)tileIndex * 16 : tileIndex * 16);
-	
+	uint16_t tileStart;
+	if(state.BgTileSelect) {
+		tileStart = tileIndex * 16;
+	} else {
+		tileStart = 0x1000 + (int8_t)tileIndex * 16;
+	}
+
 	uint16_t tileBank = (attributes & 0x08) ? 0x2000 : 0x0000;
 	tileStart |= tileBank;
 
@@ -152,7 +150,7 @@ DebugTilemapTileInfo GbPpuTools::GetTilemapTileInfo(uint32_t x, uint32_t y, uint
 	result.Width = 8;
 	result.TileMapAddress = addr;
 	result.TileIndex = tileIndex;
-	result.TileAddress = tileStart;
+	result.AddAddress(tileStart);
 
 	if(isCgb) {
 		result.PaletteIndex = (attributes & 0x07);
@@ -190,8 +188,8 @@ void GbPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview,
 	sprite.Format = TileFormat::Bpp2;
 	sprite.SpriteIndex = i;
 	sprite.UseExtendedVram = false;
-	
-	sprite.Y = oamRam[i*4];
+
+	sprite.Y = oamRam[i * 4];
 	sprite.X = oamRam[i * 4 + 1];
 	sprite.RawY = sprite.Y;
 	sprite.RawX = sprite.X;
@@ -210,7 +208,7 @@ void GbPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview,
 	sprite.Width = 8;
 	sprite.Height = state.LargeSprites ? 16 : 8;
 	sprite.Priority = (attributes & 0x80) ? DebugSpritePriority::Background : DebugSpritePriority::Foreground;
-	
+
 	uint8_t tileIndex = (uint8_t)sprite.TileIndex;
 	uint16_t tileBank = useSecondTable ? 0x2000 : 0x0000;
 	uint16_t tileStart;
@@ -280,8 +278,8 @@ DebugPaletteInfo GbPpuTools::GetPaletteInfo(GetPaletteInfoOptions options)
 			info.RgbPalette[i] = ColorUtilities::Rgb555ToArgb(state.CgbBgPalettes[i] & 0x7FFF);
 		}
 		for(int i = 0; i < 8 * 4; i++) {
-			info.RawPalette[i+32] = state.CgbObjPalettes[i];
-			info.RgbPalette[i+32] = ColorUtilities::Rgb555ToArgb(state.CgbObjPalettes[i] & 0x7FFF);
+			info.RawPalette[i + 32] = state.CgbObjPalettes[i];
+			info.RgbPalette[i + 32] = ColorUtilities::Rgb555ToArgb(state.CgbObjPalettes[i] & 0x7FFF);
 		}
 	} else {
 		info.RawFormat = RawPaletteFormat::Indexed;
@@ -302,7 +300,7 @@ DebugPaletteInfo GbPpuTools::GetPaletteInfo(GetPaletteInfoOptions options)
 
 			int objPal1Color = (state.ObjPalette1 >> (i * 2)) & 0x03;
 			info.RawPalette[i + 8] = objPal1Color;
-			info.RgbPalette[i + 8] = ColorUtilities::Rgb555ToArgb(state.CgbObjPalettes[objPal1Color+4]);
+			info.RgbPalette[i + 8] = ColorUtilities::Rgb555ToArgb(state.CgbObjPalettes[objPal1Color + 4]);
 		}
 	}
 
@@ -323,8 +321,8 @@ void GbPpuTools::SetPaletteColor(int32_t colorIndex, uint32_t color)
 
 		if(colorIndex < 4 * 8) {
 			state.CgbBgPalettes[colorIndex] = rgb555;
-		} else if(colorIndex < 12*8) {
-			state.CgbObjPalettes[colorIndex - 4*8] = rgb555;
+		} else if(colorIndex < 12 * 8) {
+			state.CgbObjPalettes[colorIndex - 4 * 8] = rgb555;
 		}
 	} else {
 		color &= 0x03;

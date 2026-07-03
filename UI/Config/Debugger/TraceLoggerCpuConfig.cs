@@ -10,7 +10,7 @@ namespace Mesen.Config
 		[Reactive] public bool ShowStatusFlags { get; set; } = true;
 		[Reactive] public StatusFlagFormat StatusFormat { get; set; } = StatusFlagFormat.Text;
 
-		[Reactive] public bool ShowEffectiveAddresses { get; set; } = true; 
+		[Reactive] public bool ShowEffectiveAddresses { get; set; } = true;
 		[Reactive] public bool ShowMemoryValues { get; set; } = true;
 		[Reactive] public bool ShowByteCode { get; set; } = false;
 

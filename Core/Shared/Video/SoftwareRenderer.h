@@ -11,10 +11,10 @@ private:
 
 	SimpleLock _frameLock;
 	SimpleLock _textureLock;
-	
+
 	uint32_t _frameWidth = 0;
 	uint32_t _frameHeight = 0;
-	
+
 	uint32_t* _textureBuffer[2] = { nullptr, nullptr };
 
 	atomic<bool> _needSwap = false;
@@ -29,5 +29,5 @@ public:
 	void ClearFrame() override;
 	void Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud) override;
 	void Reset() override;
-	void SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle) override;
+	void SetFullscreenMode(FullscreenSettings settings) override;
 };

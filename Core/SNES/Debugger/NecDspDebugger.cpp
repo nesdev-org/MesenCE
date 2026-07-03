@@ -79,6 +79,7 @@ void NecDspDebugger::ProcessInstruction()
 void NecDspDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationType type)
 {
 	if(type == MemoryOperationType::ExecOpCode) {
+		addr *= 3;
 		AddressInfo addressInfo = { (int32_t)addr, MemoryType::DspProgramRom };
 		MemoryOperationInfo operation(addr, value, MemoryOperationType::ExecOpCode, MemoryType::NecDspMemory);
 		InstructionProgress.LastMemOperation = operation;
@@ -87,6 +88,7 @@ void NecDspDebugger::ProcessRead(uint32_t addr, uint8_t value, MemoryOperationTy
 			DisassemblyInfo disInfo = _disassembler->GetDisassemblyInfo(addressInfo, addr, 0, CpuType::NecDsp);
 			_traceLogger->Log(_dsp->GetState(), disInfo, operation, addressInfo);
 		}
+		_memoryAccessCounter->ProcessMemoryExec<3>(addressInfo, _memoryManager->GetMasterClock());
 	} else {
 		MemoryType memType = (addr & NecDsp::DataRomReadFlag) ? MemoryType::DspDataRom : MemoryType::DspDataRam;
 		addr &= ~NecDsp::DataRomReadFlag;
@@ -126,7 +128,7 @@ void NecDspDebugger::Step(int32_t stepCount, StepType type)
 
 	switch(type) {
 		case StepType::Step: step.StepCount = stepCount; break;
-		
+
 		case StepType::StepOut:
 			step.BreakAddress = _callstackManager->GetReturnAddress();
 			step.BreakStackPointer = _callstackManager->GetReturnStackPointer();
@@ -206,4 +208,9 @@ BaseState& NecDspDebugger::GetState()
 ITraceLogger* NecDspDebugger::GetTraceLogger()
 {
 	return _traceLogger.get();
+}
+
+ISerializable* NecDspDebugger::GetSerializableCpu()
+{
+	return _dsp;
 }

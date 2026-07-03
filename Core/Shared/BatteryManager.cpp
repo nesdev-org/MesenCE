@@ -51,7 +51,7 @@ vector<uint8_t> BatteryManager::LoadBattery(string extension)
 	}
 
 	shared_ptr<IBatteryProvider> provider = _provider.lock();
-	
+
 	vector<uint8_t> batteryData;
 	if(provider) {
 		//Used by movie player to provider initial state of ram at startup

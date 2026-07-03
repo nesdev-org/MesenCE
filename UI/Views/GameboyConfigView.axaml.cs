@@ -2,17 +2,17 @@
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
+using Avalonia.Media;
+using Avalonia.VisualTree;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
+using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
 using System;
-using Avalonia.Media;
 using System.Threading.Tasks;
-using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 
 namespace Mesen.Views
 {
@@ -73,27 +73,27 @@ namespace Mesen.Views
 			_model.Config.Obj1Colors = colors;
 		}
 
-		private void btnSelectPreset_OnClick(object sender, RoutedEventArgs e)
+		private void BtnSelectPreset_OnClick(object sender, RoutedEventArgs e)
 		{
 			((Button)sender).ContextMenu?.Open();
 		}
 
-		private void mnuGrayscalePreset_Click(object sender, RoutedEventArgs e)
+		private void MnuGrayscalePreset_Click(object sender, RoutedEventArgs e)
 		{
 			SetPalette(Color.FromArgb(255, 232, 232, 232), Color.FromArgb(255, 160, 160, 160), Color.FromArgb(255, 88, 88, 88), Color.FromArgb(255, 16, 16, 16));
 		}
 
-		private void mnuGrayscaleHighContrastPreset_Click(object sender, RoutedEventArgs e)
+		private void MnuGrayscaleHighContrastPreset_Click(object sender, RoutedEventArgs e)
 		{
 			SetPalette(Color.FromArgb(255, 255, 255, 255), Color.FromArgb(255, 176, 176, 176), Color.FromArgb(255, 104, 104, 104), Color.FromArgb(255, 0, 0, 0));
 		}
 
-		private void mnuGreenPreset_Click(object sender, RoutedEventArgs e)
+		private void MnuGreenPreset_Click(object sender, RoutedEventArgs e)
 		{
 			SetPalette(Color.FromArgb(255, 224, 248, 208), Color.FromArgb(255, 136, 192, 112), Color.FromArgb(255, 52, 104, 86), Color.FromArgb(255, 8, 24, 32));
 		}
 
-		private void mnuBrownPreset_Click(object sender, RoutedEventArgs e)
+		private void MnuBrownPreset_Click(object sender, RoutedEventArgs e)
 		{
 			SetPalette(Color.FromArgb(255, 248, 224, 136), Color.FromArgb(255, 216, 176, 88), Color.FromArgb(255, 152, 120, 56), Color.FromArgb(255, 72, 56, 24));
 		}

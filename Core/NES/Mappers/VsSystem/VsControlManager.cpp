@@ -16,7 +16,7 @@ VsControlManager::VsControlManager(NesConsole* console) : NesControlManager(cons
 
 	if(_console->IsVsMainConsole()) {
 		_emu->GetNotificationManager()->RegisterNotificationListener(_input);
-	} else 	{
+	} else {
 		//Remove SystemActionManager (reset/power buttons) from sub console
 		_systemDevices.clear();
 	}
@@ -48,10 +48,12 @@ void VsControlManager::Reset(bool softReset)
 void VsControlManager::Serialize(Serializer& s)
 {
 	NesControlManager::Serialize(s);
-	SV(_prgChrSelectBit); SV(_protectionCounter); SV(_refreshState);
+	SV(_prgChrSelectBit);
+	SV(_protectionCounter);
+	SV(_refreshState);
 }
 
-void VsControlManager::GetMemoryRanges(MemoryRanges &ranges)
+void VsControlManager::GetMemoryRanges(MemoryRanges& ranges)
 {
 	NesControlManager::GetMemoryRanges(ranges);
 	ranges.AddHandler(MemoryOperation::Read, 0x4020, 0x5FFF);
@@ -178,7 +180,7 @@ void VsControlManager::WriteRam(uint16_t addr, uint8_t value)
 
 	if(addr == 0x4016) {
 		_prgChrSelectBit = (value >> 2) & 0x01;
-		
+
 		//Bit 2: DualSystem-only
 		uint8_t mainSubBit = (value & 0x02);
 		if(mainSubBit != _mainSubBit) {

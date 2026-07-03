@@ -23,9 +23,9 @@ protected:
 public:
 	NesNtscFilter(Emulator* emu);
 	virtual ~NesNtscFilter();
-	
+
 	OverscanDimensions GetOverscan() override;
 	HudScaleFactors GetScaleFactor() override;
 
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 };

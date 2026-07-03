@@ -1,8 +1,8 @@
 ﻿using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
-using Avalonia.VisualTree;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using DataBoxControl;
 using Mesen.Config;
 using Mesen.Debugger.Labels;
@@ -25,7 +25,7 @@ namespace Mesen.Debugger.ViewModels
 	{
 		[Reactive] public List<ProfilerTab> ProfilerTabs { get; set; } = new List<ProfilerTab>();
 		[Reactive] public ProfilerTab? SelectedTab { get; set; } = null;
-		
+
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
 
@@ -142,7 +142,7 @@ namespace Mesen.Debugger.ViewModels
 		public ProfilerConfig Config => ConfigManager.Config.Debug.Profiler;
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Profiler.ColumnWidths;
 
-		private object _updateLock = new();		
+		private object _updateLock = new();
 		private int _dataSize = 0;
 		private ProfiledFunction[] _coreProfilerData = new ProfiledFunction[100000];
 		private ProfiledFunction[] _profilerData = Array.Empty<ProfiledFunction>();

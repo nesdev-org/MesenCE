@@ -69,7 +69,7 @@ protected:
 				_reg[_regIndex] = value;
 				_regIndex = (_regIndex + 1) & 0x03;
 			}
-			
+
 			if(_reg[3] & 0x40) {
 				RemoveRegisterRange(0x6000, 0x7FFF);
 			}

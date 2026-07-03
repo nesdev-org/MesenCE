@@ -21,7 +21,7 @@ namespace Mesen.Debugger
 		private static Regex _arrayWatchRegex = new Regex(@"\[((\$[0-9A-Fa-f]+)|(\d+)|([@_a-zA-Z0-9]+))\s*,\s*(\d+)\]", RegexOptions.Compiled);
 
 		public event WatchChangedEventHandler? WatchChanged;
-		
+
 		private List<string> _watchEntries = new List<string>();
 		private CpuType _cpuType;
 
@@ -98,7 +98,7 @@ namespace Mesen.Debugger
 							newValue = FormatValue(result, style, byteLength);
 							break;
 
-						case EvalResultType.Boolean: newValue = result == 0 ? "false" : "true";	break;
+						case EvalResultType.Boolean: newValue = result == 0 ? "false" : "true"; break;
 						case EvalResultType.Invalid: newValue = "<invalid expression>"; forceHasChanged = true; break;
 						case EvalResultType.DivideBy0: newValue = "<division by zero>"; forceHasChanged = true; break;
 						case EvalResultType.OutOfScope: newValue = "<label out of scope>"; forceHasChanged = true; break;

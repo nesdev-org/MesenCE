@@ -18,14 +18,14 @@ private:
 		BaseMapper::SelectPrgPage(slot, (page & 0x1F) | ((_exReg & 0x02) << 4), memoryType);
 	}
 
-	void InitMapper() override 
+	void InitMapper() override
 	{
 		MMC3::InitMapper();
 
 		AddRegisterRange(0x6001, 0x6001, MemoryOperation::Write);
 	}
 
-	void Reset(bool softReset) override 
+	void Reset(bool softReset) override
 	{
 		BaseMapper::Reset(softReset);
 
@@ -34,7 +34,7 @@ private:
 			MMC3::UpdateState();
 		}
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		MMC3::Serialize(s);

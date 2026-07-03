@@ -52,7 +52,7 @@ void AluMulDiv::Run(bool isRead)
 			}
 		}
 	}
-	
+
 	_prevCpuCycle = cpuCycle;
 }
 
@@ -101,7 +101,7 @@ void AluMulDiv::Write(uint16_t addr, uint8_t value)
 
 		case 0x4204: _state.Dividend = (_state.Dividend & 0xFF00) | value; break;
 		case 0x4205: _state.Dividend = (_state.Dividend & 0xFF) | (value << 8); break;
-		
+
 		case 0x4206:
 			_state.MultOrRemainderResult = _state.Dividend;
 
@@ -121,8 +121,16 @@ AluState AluMulDiv::GetState()
 	return _state;
 }
 
-void AluMulDiv::Serialize(Serializer &s)
+void AluMulDiv::Serialize(Serializer& s)
 {
-	SV(_state.MultOperand1); SV(_state.MultOperand2); SV(_state.MultOrRemainderResult); SV(_state.Dividend); SV(_state.Divisor); SV(_state.DivResult);
-	SV(_divCounter); SV(_multCounter); SV(_shift); SV(_prevCpuCycle);
+	SV(_state.MultOperand1);
+	SV(_state.MultOperand2);
+	SV(_state.MultOrRemainderResult);
+	SV(_state.Dividend);
+	SV(_state.Divisor);
+	SV(_state.DivResult);
+	SV(_divCounter);
+	SV(_multCounter);
+	SV(_shift);
+	SV(_prevCpuCycle);
 }

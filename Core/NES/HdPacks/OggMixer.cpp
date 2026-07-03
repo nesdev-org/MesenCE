@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "NES/HdPacks/OggReader.h"
 #include "NES/HdPacks/OggMixer.h"
+#include "Shared/Emulator.h"
 
 enum class OggPlaybackOptions
 {
@@ -9,8 +10,9 @@ enum class OggPlaybackOptions
 	Loop = 0x01
 };
 
-OggMixer::OggMixer()
+OggMixer::OggMixer(Emulator* emu)
 {
+	_emu = emu;
 }
 
 void OggMixer::Reset(uint32_t sampleRate)
@@ -27,7 +29,7 @@ void OggMixer::Reset(uint32_t sampleRate)
 void OggMixer::SetPlaybackOptions(uint8_t options)
 {
 	_options = options;
-	
+
 	bool loop = (options & (int)OggPlaybackOptions::Loop) != 0;
 	if(_bgm) {
 		_bgm->SetLoopFlag(loop);
@@ -75,16 +77,26 @@ void OggMixer::SetSampleRate(int sampleRate)
 	if(_bgm) {
 		_bgm->SetSampleRate(sampleRate);
 	}
-	for(shared_ptr<OggReader> &sfx : _sfx) {
+	for(shared_ptr<OggReader>& sfx : _sfx) {
 		sfx->SetSampleRate(sampleRate);
 	}
 }
 
 bool OggMixer::Play(string filename, bool isSfx, uint32_t startOffset, uint32_t loopPosition)
 {
-	shared_ptr<OggReader> reader(new OggReader());
+	shared_ptr<OggReader> reader(new OggReader(_emu));
 	bool loop = !isSfx && (_options & (int)OggPlaybackOptions::Loop) != 0;
 	if(reader->Init(filename, loop, _sampleRate, startOffset, loopPosition)) {
+		if(_emu->IsRunAheadFrame()) {
+			//If this was done on runahead frames, SFX/BGM will attempt to start playing multiple times (once per runahead frame)
+			//This causes all sound effects to be duplicated.
+			//Skipping the processing on runahead here is an imperfect workaround - it allows 1 runahead frame to usually work properly
+			//but attempting to use over 1 frame of runahead will instead cause SFX to not play properly at times.
+			//Ideally, the exact state of the BGM/SFX (what is playing exactly, and at which part of their playback they are) should
+			//be part of the save state data and restored like any other state (but this isn't trivial to implement at the moment)
+			return true;
+		}
+
 		if(isSfx) {
 			_sfx.push_back(reader);
 		} else {

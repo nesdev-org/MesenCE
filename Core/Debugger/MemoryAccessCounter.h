@@ -39,7 +39,7 @@ private:
 	bool _enableBreakOnUninitRead = false;
 
 public:
-	MemoryAccessCounter(Debugger *debugger);
+	MemoryAccessCounter(Debugger* debugger);
 
 	template<uint8_t accessWidth = 1> ReadResult ProcessMemoryRead(AddressInfo& addressInfo, uint64_t masterClock);
 	template<uint8_t accessWidth = 1> void ProcessMemoryWrite(AddressInfo& addressInfo, uint64_t masterClock);

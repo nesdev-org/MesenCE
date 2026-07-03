@@ -50,7 +50,7 @@ RowDataType WsTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void WsTraceLogger::GetTraceRow(string &output, WsCpuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void WsTraceLogger::GetTraceRow(string& output, WsCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	for(RowPart& rowPart : _rowParts) {
 		switch(rowPart.DataType) {

@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "Shared/Interfaces/IRenderingDevice.h"
 #include "Shared/Video/VideoDecoder.h"
 #include "Shared/Video/VideoRenderer.h"
 #include "Shared/Video/BaseVideoFilter.h"
@@ -12,10 +11,7 @@
 #include "Shared/Video/RotateFilter.h"
 #include "Shared/Video/ScanlineFilter.h"
 #include "Shared/Video/DebugHud.h"
-#include "Shared/InputHud.h"
 #include "Shared/RenderedFrame.h"
-#include "Shared/Video/SystemHud.h"
-#include "SNES/CartTypes.h"
 
 VideoDecoder::VideoDecoder(Emulator* emu)
 {
@@ -110,7 +106,7 @@ void VideoDecoder::DecodeFrame(bool forRewind)
 	FrameInfo frameSize = _videoFilter->SendFrame((uint16_t*)_frame.FrameBuffer, _frame.FrameNumber, _frame.VideoPhase, _frame.Data);
 
 	uint32_t* outputBuffer = _videoFilter->GetOutputBuffer();
-	
+
 	OverscanDimensions overscan = _videoFilter->GetOverscan();
 
 	if(_rotateFilter && !isAudioPlayer) {
@@ -142,7 +138,7 @@ void VideoDecoder::DecodeFrame(bool forRewind)
 	}
 	_lastAspectRatio = aspectRatio;
 	_lastFrameSize = frameSize;
-	
+
 	//Rewind manager will take care of sending the correct frame to the video renderer
 	_emu->GetRewindManager()->SendFrame(convertedFrame, forRewind);
 
@@ -215,7 +211,7 @@ void VideoDecoder::StartThread()
 		_frameChanged = false;
 		_frameCount = 0;
 		_waitForFrame.Reset();
-		
+
 		_emu->GetVideoRenderer()->ClearFrame();
 
 		_decodeThread.reset(new thread(&VideoDecoder::DecodeThread, this));
@@ -242,14 +238,14 @@ bool VideoDecoder::IsRunning()
 	return _decodeThread != nullptr;
 }
 
-void VideoDecoder::TakeScreenshot()
+void VideoDecoder::TakeScreenshot(string romName)
 {
 	if(_videoFilter) {
-		_videoFilter->TakeScreenshot(_emu->GetRomInfo().RomFile.GetFileName(), _videoFilterType);
+		_videoFilter->TakeScreenshot(romName.empty() ? _emu->GetRomInfo().RomFile.GetFileName() : romName, _videoFilterType);
 	}
 }
 
-void VideoDecoder::TakeScreenshot(std::stringstream &stream)
+void VideoDecoder::TakeScreenshot(std::stringstream& stream)
 {
 	if(_videoFilter) {
 		_videoFilter->TakeScreenshot(_videoFilterType, "", &stream);

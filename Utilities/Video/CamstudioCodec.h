@@ -25,6 +25,6 @@ public:
 	virtual ~CamstudioCodec();
 
 	virtual bool SetupCompress(int width, int height, uint32_t compressionLevel) override;
-	virtual int CompressFrame(bool isKeyFrame, uint8_t *frameData, uint8_t** compressedData) override;
+	virtual int CompressFrame(bool isKeyFrame, uint8_t* frameData, uint8_t** compressedData) override;
 	virtual const char* GetFourCC() override;
 };

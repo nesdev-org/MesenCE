@@ -15,7 +15,7 @@ namespace Mesen.Debugger.Utilities
 		private ISelectableModel _model;
 		private LocationInfo? _mouseOverCodeLocation;
 		private LocationInfo? _contextMenuLocation;
-		
+
 		private bool _marginClicked = false;
 		private bool _allowMarginClick = false;
 		private Func<int, int, int> _getRowAddress;
@@ -143,8 +143,8 @@ namespace Mesen.Debugger.Utilities
 		public void Viewer_PointerWheelChanged(object? sender, PointerWheelEventArgs e)
 		{
 			_scrollAccumulator += -e.GetDeltaY() * 3;
-			_model.Scroll((int) _scrollAccumulator);
-			_scrollAccumulator -= (int) _scrollAccumulator;
+			_model.Scroll((int)_scrollAccumulator);
+			_scrollAccumulator -= (int)_scrollAccumulator;
 		}
 
 		private void Viewer_KeyDown(object? sender, KeyEventArgs e)
@@ -179,10 +179,10 @@ namespace Mesen.Debugger.Utilities
 		private LocationInfo GetSelectedRowLocation()
 		{
 			AddressInfo? rowAddress = _model.GetSelectedRowAddress();
-			
+
 			AddressInfo? relAddress = null;
 			AddressInfo? absAddress = null;
-			
+
 			if(rowAddress != null && rowAddress?.Address >= 0) {
 				if(rowAddress.Value.Type.IsRelativeMemory()) {
 					relAddress = rowAddress;
@@ -192,7 +192,7 @@ namespace Mesen.Debugger.Utilities
 					relAddress = DebugApi.GetRelativeAddress(absAddress.Value, absAddress.Value.Type.ToCpuType());
 				}
 			}
-			
+
 			return new LocationInfo() {
 				RelAddress = relAddress?.Address >= 0 ? relAddress : null,
 				AbsAddress = absAddress?.Address >= 0 ? absAddress : null

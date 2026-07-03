@@ -81,8 +81,10 @@ protected:
 				_prgReg = value & 0x0C;
 				_mirroring = value & 0x03;
 				break;
-			
-			case 0x9004: case 0x9008: case 0x900C:
+
+			case 0x9004:
+			case 0x9008:
+			case 0x900C:
 				if(addr & 0x800) {
 					_console->GetMemoryManager()->Write(0x4011, (value & 0x0F) << 3, MemoryOperationType::Write);
 				} else {
@@ -90,7 +92,10 @@ protected:
 				}
 				break;
 
-			case 0xC000: case 0xC004: case 0xC008: case 0xC00C:
+			case 0xC000:
+			case 0xC004:
+			case 0xC008:
+			case 0xC00C:
 				_prgMode = value & 0x01;
 				break;
 

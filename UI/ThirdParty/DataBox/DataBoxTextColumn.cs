@@ -20,7 +20,7 @@ public class DataBoxTextColumn : DataBoxBoundColumn
 	public DataBoxTextColumn()
 	{
 		CellTemplate = new FuncDataTemplate(
-			_=> true,
+			_ => true,
 			(_, _) => {
 				var textBlock = new TextBlock {
 					[!Layoutable.MarginProperty] = new DynamicResourceExtension("DataGridTextColumnCellTextBlockMargin"),

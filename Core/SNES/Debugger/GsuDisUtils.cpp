@@ -8,7 +8,7 @@
 #include "Utilities/HexUtilities.h"
 #include "Shared/MemoryType.h"
 
-void GsuDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t memoryAddr, LabelManager *labelManager, EmuSettings *settings)
+void GsuDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
 	constexpr const char* registerNames[16] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
 	bool alt1 = (info.GetFlags() & 0x01) != 0;
@@ -32,6 +32,7 @@ void GsuDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t me
 
 	const char* reg = registerNames[opCode & 0x0F];
 
+	// clang-format off
 	switch(opCode) {
 		case 0x00: str.Write("STOP"); break;
 		case 0x01: str.Write("NOP"); break;
@@ -208,7 +209,7 @@ void GsuDisUtils::GetDisassembly(DisassemblyInfo &info, string &out, uint32_t me
 			}
 			break;
 	}
-
+	// clang-format on
 	out += str.ToString();
 }
 
@@ -218,6 +219,7 @@ EffectiveAddressInfo GsuDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Sne
 	bool alt1 = (info.GetFlags() & 0x01) != 0;
 	bool alt2 = (info.GetFlags() & 0x02) != 0;
 
+	// clang-format off
 	switch(opCode) {
 		case 0xA0: case 0xA1: case 0xA2: case 0xA3: case 0xA4: case 0xA5: case 0xA6: case 0xA7:
 		case 0xA8: case 0xA9: case 0xAA: case 0xAB: case 0xAC: case 0xAD: case 0xAE: case 0xAF:
@@ -233,6 +235,7 @@ EffectiveAddressInfo GsuDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Sne
 			}
 			break;
 	}
+	// clang-format on
 
 	return {};
 }
@@ -296,8 +299,22 @@ bool GsuDisUtils::CanDisassembleNextOp(uint8_t opCode)
 void GsuDisUtils::UpdateCpuFlags(uint8_t opCode, uint8_t& cpuFlags)
 {
 	switch(opCode) {
-		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
-		case 0x28: case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F:
+		case 0x20:
+		case 0x21:
+		case 0x22:
+		case 0x23:
+		case 0x24:
+		case 0x25:
+		case 0x26:
+		case 0x27:
+		case 0x28:
+		case 0x29:
+		case 0x2A:
+		case 0x2B:
+		case 0x2C:
+		case 0x2D:
+		case 0x2E:
+		case 0x2F:
 			//WITH - Prefix
 			cpuFlags |= 0x10;
 			break;

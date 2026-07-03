@@ -1,6 +1,6 @@
 #pragma once
 #include "pch.h"
-#include "Shared/MessageManager.h"
+#include "Shared/EmuSettings.h"
 #include "Netplay/NetMessage.h"
 #include "Netplay/NetplayTypes.h"
 #include "Utilities/FolderUtilities.h"
@@ -12,24 +12,36 @@ private:
 	uint32_t _crc32 = 0;
 	NetplayControllerInfo _controller = {};
 	bool _paused = false;
+	EmuSettings* _settings = nullptr;
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
-		SV(_romFilename); SV(_crc32); SV(_controller.Port); SV(_controller.SubPort); SV(_paused);
+		if(_settings) {
+			SV(*_settings);
+		}
+		SV(_romFilename);
+		SV(_crc32);
+		SV(_controller.Port);
+		SV(_controller.SubPort);
+		SV(_paused);
 	}
 
 public:
-	GameInformationMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) { }
-
-	GameInformationMessage(string filepath, uint32_t crc32, NetplayControllerInfo controller, bool paused) : NetMessage(MessageType::GameInformation)
+	GameInformationMessage(EmuSettings* settings, void* buffer, uint32_t length) : NetMessage(buffer, length)
 	{
+		_settings = settings;
+	}
+
+	GameInformationMessage(EmuSettings* settings, string filepath, uint32_t crc32, NetplayControllerInfo controller, bool paused) : NetMessage(MessageType::GameInformation)
+	{
+		_settings = settings;
 		_romFilename = FolderUtilities::GetFilename(filepath, true);
 		_crc32 = crc32;
 		_controller = controller;
 		_paused = paused;
 	}
-	
+
 	NetplayControllerInfo GetPort()
 	{
 		return _controller;

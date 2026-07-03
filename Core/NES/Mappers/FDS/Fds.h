@@ -16,7 +16,7 @@ private:
 
 	unique_ptr<FdsAudio> _audio;
 	shared_ptr<FdsInputButtons> _input;
-	
+
 	NesConfig* _settings = nullptr;
 	NesCpu* _cpu = nullptr;
 	NesMemoryManager* _memoryManager = nullptr;
@@ -31,7 +31,9 @@ private:
 	bool _soundRegEnabled = true;
 
 	uint8_t _writeDataReg = 0;
-	
+
+	//TODO Change $4025.D0-D1 namings/meanings so we don't have to invert the read/write logic
+	// (_resetTransfer (bit 0) -> _scanMedia, _motorOn (bit 1) -> _stopMotor)
 	bool _motorOn = false;
 	bool _resetTransfer = false;
 	bool _readMode = false;
@@ -61,14 +63,14 @@ private:
 	//Internal values
 	uint32_t _diskNumber = Fds::NoDiskInserted;
 	uint32_t _diskPosition = 0;
-	uint32_t _delay = 0;	
+	uint32_t _delay = 0;
 	uint16_t _crcAccumulator = 0;
 	bool _previousCrcControlFlag = false;
 	bool _gapEnded = true;
 	bool _scanningDisk = false;
 	bool _transferComplete = false;
 	bool _useQdFormat = false;
-	
+
 	vector<uint8_t> _fdsRawData;
 	vector<vector<uint8_t>> _fdsDiskSides;
 	vector<vector<uint8_t>> _fdsDiskHeaders;
@@ -85,14 +87,14 @@ protected:
 	uint32_t GetWorkRamPageSize() override { return 0x8000; }
 	uint32_t GetWorkRamSize() override { return 0x8000; }
 	uint16_t RegisterStartAddress() override { return 0x4020; }
-	uint16_t RegisterEndAddress() override { return 0x4092; }
+	uint16_t RegisterEndAddress() override { return 0x4097; }
 	bool AllowRegisterRead() override { return true; }
 	bool EnableCpuClockHook() override { return true; }
+	bool EnableCustomRamRead() override { return true; }
 
 	void InitMapper() override;
-	void InitMapper(RomData &romData) override;
+	void InitMapper(RomData& romData) override;
 	void LoadDiskData(vector<uint8_t> ipsData = vector<uint8_t>());
-	vector<uint8_t> CreateIpsPatch();
 	void Reset(bool softReset) override;
 
 	uint32_t GetFdsDiskSideSize(uint8_t side);
@@ -102,7 +104,7 @@ protected:
 	void ProcessAutoDiskInsert();
 
 	void ClockIrq();
-	
+
 	void ProcessCpuClock() override;
 	void UpdateCrc(uint8_t value);
 
@@ -118,6 +120,7 @@ public:
 	~Fds();
 
 	void SaveBattery() override;
+	void EndFrame() override;
 
 	uint32_t GetSideCount();
 

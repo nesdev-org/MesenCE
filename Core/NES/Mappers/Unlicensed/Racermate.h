@@ -12,7 +12,7 @@ protected:
 	uint16_t GetChrPageSize() override { return 0x1000; }
 	uint32_t GetChrRamSize() override { return 0x10000; }
 	uint32_t GetSaveRamSize() override { return 0; }
-	bool ForceChrBattery() override { return true; }
+	bool ForceChrBattery() override { return !_romInfo.IsNes20Header; }
 	bool EnableCpuClockHook() override { return true; }
 
 	void InitMapper() override
@@ -43,16 +43,41 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0xC000) {
-			case 0x8000: 
+			case 0x8000:
 				SelectPrgPage(0, (value >> 6) & 0x03);
 				SelectChrPage(1, value & 0x0F);
 				break;
 
-			case 0xC000: 
+			case 0xC000:
 				_irqCounter = 1024;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
 		}
+	}
 
+	void LoadBattery() override
+	{
+		if(HasBattery() && _saveRamSize > 0) {
+			_emu->GetBatteryManager()->LoadBattery(".sav", _saveRam, _saveRamSize);
+		}
+
+		if(_hasChrBattery && _saveChrRamSize > 0) {
+			_emu->GetBatteryManager()->LoadBattery(".chr.sav", _chrRam + (_chrRamSize - _saveChrRamSize), _saveChrRamSize);
+		} else if(_hasChrBattery) {
+			_emu->GetBatteryManager()->LoadBattery(".chr.sav", _chrRam + (_chrRamSize / 2), _chrRamSize / 2);
+		}
+	}
+
+	void SaveBattery() override
+	{
+		if(HasBattery() && _saveRamSize > 0) {
+			_emu->GetBatteryManager()->LoadBattery(".sav", _saveRam, _saveRamSize);
+		}
+
+		if(_hasChrBattery && _saveChrRamSize > 0) {
+			_emu->GetBatteryManager()->SaveBattery(".chr.sav", _chrRam + (_chrRamSize - _saveChrRamSize), _saveChrRamSize);
+		} else if(_hasChrBattery) {
+			_emu->GetBatteryManager()->SaveBattery(".chr.sav", _chrRam + (_chrRamSize / 2), _chrRamSize / 2);
+		}
 	}
 };

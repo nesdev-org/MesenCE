@@ -88,7 +88,7 @@ public class FirmwareSelect : UserControl
 		}
 	}
 
-	private async void btnBrowse_OnClick(object sender, RoutedEventArgs e)
+	private async void BtnBrowse_OnClick(object sender, RoutedEventArgs e)
 	{
 		while(true) {
 			string? selectedFile = await FileDialogHelper.OpenFile(null, VisualRoot, FileDialogHelper.FirmwareExt);

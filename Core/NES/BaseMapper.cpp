@@ -9,7 +9,6 @@
 #include "NES/Epsm.h"
 #include "Debugger/DebugTypes.h"
 #include "Shared/MessageManager.h"
-#include "Shared/CheatManager.h"
 #include "Shared/BatteryManager.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/RomInfo.h"
@@ -20,28 +19,29 @@
 #include "Shared/MemoryOperationType.h"
 #include "Shared/FirmwareHelper.h"
 
-void BaseMapper::WriteRegister(uint16_t addr, uint8_t value) { }
-uint8_t BaseMapper::ReadRegister(uint16_t addr) { return 0; }
-void BaseMapper::InitMapper(RomData &romData) { }
-void BaseMapper::Reset(bool softReset) { }
+void BaseMapper::WriteRegister(uint16_t addr, uint8_t value)
+{
+}
+uint8_t BaseMapper::ReadRegister(uint16_t addr)
+{
+	return 0;
+}
+void BaseMapper::InitMapper(RomData& romData)
+{
+}
+void BaseMapper::Reset(bool softReset)
+{
+}
 
-//Make sure the page size is no bigger than the size of the ROM itself
-//Otherwise we will end up reading from unallocated memory
-uint16_t BaseMapper::InternalGetPrgPageSize() { return std::min((uint32_t)GetPrgPageSize(), _prgSize); }
-uint16_t BaseMapper::InternalGetSaveRamPageSize() { return std::min((uint32_t)GetSaveRamPageSize(), _saveRamSize); }
-uint16_t BaseMapper::InternalGetWorkRamPageSize() { return std::min((uint32_t)GetWorkRamPageSize(), _workRamSize); }
-uint16_t BaseMapper::InternalGetChrRomPageSize() { return std::min((uint32_t)GetChrPageSize(), _chrRomSize); }
-uint16_t BaseMapper::InternalGetChrRamPageSize() { return std::min((uint32_t)GetChrRamPageSize(), _chrRamSize); }
-	
 bool BaseMapper::ValidateAddressRange(uint16_t startAddr, uint16_t endAddr)
 {
 	if((startAddr & 0xFF) || (endAddr & 0xFF) != 0xFF) {
-		#ifdef _DEBUG
-			throw new std::runtime_error("Start/End address must be multiples of 256/0x100");
-		#else
-			//Ignore this request in release mode - granularity smaller than 256 bytes is not supported
-			return false;
-		#endif
+#ifdef _DEBUG
+		throw new std::runtime_error("Start/End address must be multiples of 256/0x100");
+#else
+		//Ignore this request in release mode - granularity smaller than 256 bytes is not supported
+		return false;
+#endif
 	}
 	return true;
 }
@@ -58,31 +58,31 @@ void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, int16
 	switch(type) {
 		case PrgMemoryType::PrgRom:
 			pageCount = GetPrgPageCount();
-			pageSize = InternalGetPrgPageSize();
+			pageSize = _prgRomPageSize;
 			break;
 		case PrgMemoryType::SaveRam:
-			pageSize = InternalGetSaveRamPageSize();
+			pageSize = _saveRamPageSize;
 			if(pageSize == 0) {
-				#ifdef _DEBUG
+#ifdef _DEBUG
 				MessageManager::DisplayMessage("Debug", "Tried to map undefined save ram.");
-				#endif
+#endif
 				return;
 			}
 			pageCount = _saveRamSize / pageSize;
-			
+
 			defaultAccessType |= MemoryAccessType::Write;
 			break;
 		case PrgMemoryType::WorkRam:
-			pageSize = InternalGetWorkRamPageSize();
+			pageSize = _workRamPageSize;
 			if(pageSize == 0) {
-				#ifdef _DEBUG
+#ifdef _DEBUG
 				MessageManager::DisplayMessage("Debug", "Tried to map undefined work ram.");
-				#endif
+#endif
 				return;
 			}
 
 			pageCount = _workRamSize / pageSize;
-			
+
 			defaultAccessType |= MemoryAccessType::Write;
 			break;
 		default:
@@ -90,13 +90,13 @@ void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, int16
 	}
 
 	if(pageCount == 0) {
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		MessageManager::DisplayMessage("Debug", "Tried to map undefined save/work ram.");
-		#endif
+#endif
 		return;
 	}
 
-	auto wrapPageNumber = [=](int16_t &page) -> void {
+	auto wrapPageNumber = [=](int16_t& page) -> void {
 		if(page < 0) {
 			//Can't use modulo for negative number because pageCount is sometimes not a power of 2.  (Fixes some Mapper 191 games)
 			page = pageCount + page;
@@ -105,17 +105,17 @@ void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, int16
 		}
 	};
 	wrapPageNumber(pageNumber);
-	
+
 	accessType = accessType != -1 ? accessType : defaultAccessType;
-	
+
 	if((uint16_t)(endAddr - startAddr) >= pageSize) {
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		uint16_t gap = endAddr - startAddr + 1;
 		if(gap % pageSize != 0) {
 			MessageManager::DisplayMessage("Debug", "Tried to map undefined prg - page size too small for selected range.");
 		}
-		#endif
-		
+#endif
+
 		//If range is bigger than a single page, keep going until we reach the last page
 		uint32_t addr = startAddr;
 		while(addr <= endAddr - pageSize + 1) {
@@ -135,10 +135,22 @@ void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, PrgMe
 	uint32_t sourceSize = 0;
 	switch(type) {
 		default:
-		case PrgMemoryType::PrgRom: source = _prgRom; sourceSize = _prgSize; break;
-		case PrgMemoryType::SaveRam: source = _saveRam; sourceSize = _saveRamSize; break;
-		case PrgMemoryType::WorkRam: source = _workRam; sourceSize = _workRamSize; break;
-		case PrgMemoryType::MapperRam: source = _mapperRam; sourceSize = _mapperRamSize; break;
+		case PrgMemoryType::PrgRom:
+			source = _prgRom;
+			sourceSize = _prgSize;
+			break;
+		case PrgMemoryType::SaveRam:
+			source = _saveRam;
+			sourceSize = _saveRamSize;
+			break;
+		case PrgMemoryType::WorkRam:
+			source = _workRam;
+			sourceSize = _workRamSize;
+			break;
+		case PrgMemoryType::MapperRam:
+			source = _mapperRam;
+			sourceSize = _mapperRamSize;
+			break;
 	}
 
 	int firstSlot = startAddr >> 8;
@@ -161,7 +173,7 @@ void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, PrgMe
 	SetCpuMemoryMapping(startAddr, endAddr, source, sourceOffset, sourceSize, accessType);
 }
 
-void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint8_t *source, uint32_t sourceOffset, uint32_t sourceSize, int8_t accessType)
+void BaseMapper::SetCpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint8_t* source, uint32_t sourceOffset, uint32_t sourceSize, int8_t accessType)
 {
 	if(!ValidateAddressRange(startAddr, endAddr)) {
 		return;
@@ -216,22 +228,22 @@ void BaseMapper::SetPpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint1
 	switch(type) {
 		case ChrMemoryType::Default:
 		case ChrMemoryType::ChrRom:
-			pageSize = InternalGetChrRomPageSize();
+			pageSize = _chrRomPageSize;
 			if(pageSize == 0) {
-				#ifdef _DEBUG
+#ifdef _DEBUG
 				MessageManager::DisplayMessage("Debug", "Tried to map undefined chr rom.");
-				#endif
+#endif
 				return;
 			}
 			pageCount = GetChrRomPageCount();
 			break;
 
 		case ChrMemoryType::ChrRam:
-			pageSize = InternalGetChrRamPageSize();
+			pageSize = _chrRamPageSize;
 			if(pageSize == 0) {
-				#ifdef _DEBUG
+#ifdef _DEBUG
 				MessageManager::DisplayMessage("Debug", "Tried to map undefined chr ram.");
-				#endif
+#endif
 				return;
 			}
 			pageCount = _chrRamSize / pageSize;
@@ -249,18 +261,18 @@ void BaseMapper::SetPpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, uint1
 	}
 
 	if(pageCount == 0) {
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		MessageManager::DisplayMessage("Debug", "Tried to map undefined chr ram.");
-		#endif
+#endif
 		return;
 	}
 
 	pageNumber = pageNumber % pageCount;
 
 	if((uint16_t)(endAddr - startAddr) >= pageSize) {
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		MessageManager::DisplayMessage("Debug", "Tried to map undefined chr - page size too small for selected range.");
-		#endif
+#endif
 
 		uint32_t addr = startAddr;
 		while(addr <= endAddr - pageSize + 1) {
@@ -283,7 +295,7 @@ void BaseMapper::SetPpuMemoryMapping(uint16_t startAddr, uint16_t endAddr, ChrMe
 
 	uint32_t sourceSize = 0;
 	switch(type) {
-		case ChrMemoryType::Default: 
+		case ChrMemoryType::Default:
 		case ChrMemoryType::ChrRom:
 			sourceMemory = _chrRom;
 			sourceSize = _chrRomSize;
@@ -366,25 +378,25 @@ uint8_t BaseMapper::InternalReadRam(uint16_t addr)
 
 void BaseMapper::SelectPrgPage4x(uint16_t slot, uint16_t page, PrgMemoryType memoryType)
 {
-	BaseMapper::SelectPrgPage2x(slot*2, page, memoryType);
-	BaseMapper::SelectPrgPage2x(slot*2+1, page+2, memoryType);
+	BaseMapper::SelectPrgPage2x(slot * 2, page, memoryType);
+	BaseMapper::SelectPrgPage2x(slot * 2 + 1, page + 2, memoryType);
 }
 
 void BaseMapper::SelectPrgPage2x(uint16_t slot, uint16_t page, PrgMemoryType memoryType)
 {
-	BaseMapper::SelectPrgPage(slot*2, page, memoryType);
-	BaseMapper::SelectPrgPage(slot*2+1, page+1, memoryType);
+	BaseMapper::SelectPrgPage(slot * 2, page, memoryType);
+	BaseMapper::SelectPrgPage(slot * 2 + 1, page + 1, memoryType);
 }
 
 void BaseMapper::SelectPrgPage(uint16_t slot, uint16_t page, PrgMemoryType memoryType)
 {
 	if(_prgSize < 0x8000 && GetPrgPageSize() > _prgSize) {
-		//Total PRG size is smaller than available memory range, map the entire PRG to all slots
-		//i.e same logic as NROM (mapper 0) when PRG is 16kb
-		//Needed by "Pyramid" (mapper 79)
-		#ifdef _DEBUG
-			MessageManager::DisplayMessage("Debug", "PrgSizeWarning");
-		#endif
+//Total PRG size is smaller than available memory range, map the entire PRG to all slots
+//i.e same logic as NROM (mapper 0) when PRG is 16kb
+//Needed by "Pyramid" (mapper 79)
+#ifdef _DEBUG
+		MessageManager::DisplayMessage("Debug", "PrgSizeWarning");
+#endif
 
 		for(slot = 0; slot < 0x8000 / _prgSize; slot++) {
 			uint16_t startAddr = 0x8000 + slot * _prgSize;
@@ -392,8 +404,8 @@ void BaseMapper::SelectPrgPage(uint16_t slot, uint16_t page, PrgMemoryType memor
 			SetCpuMemoryMapping(startAddr, endAddr, 0, memoryType);
 		}
 	} else {
-		uint16_t startAddr = 0x8000 + slot * InternalGetPrgPageSize();
-		uint16_t endAddr = startAddr + InternalGetPrgPageSize() - 1;
+		uint16_t startAddr = 0x8000 + slot * _prgRomPageSize;
+		uint16_t endAddr = startAddr + _prgRomPageSize - 1;
 		SetCpuMemoryMapping(startAddr, endAddr, page, memoryType);
 	}
 }
@@ -401,19 +413,19 @@ void BaseMapper::SelectPrgPage(uint16_t slot, uint16_t page, PrgMemoryType memor
 void BaseMapper::SelectChrPage8x(uint16_t slot, uint16_t page, ChrMemoryType memoryType)
 {
 	BaseMapper::SelectChrPage4x(slot, page, memoryType);
-	BaseMapper::SelectChrPage4x(slot*2+1, page+4, memoryType);
+	BaseMapper::SelectChrPage4x(slot * 2 + 1, page + 4, memoryType);
 }
 
 void BaseMapper::SelectChrPage4x(uint16_t slot, uint16_t page, ChrMemoryType memoryType)
 {
-	BaseMapper::SelectChrPage2x(slot*2, page, memoryType);
-	BaseMapper::SelectChrPage2x(slot*2+1, page+2, memoryType);
+	BaseMapper::SelectChrPage2x(slot * 2, page, memoryType);
+	BaseMapper::SelectChrPage2x(slot * 2 + 1, page + 2, memoryType);
 }
 
 void BaseMapper::SelectChrPage2x(uint16_t slot, uint16_t page, ChrMemoryType memoryType)
 {
-	BaseMapper::SelectChrPage(slot*2, page, memoryType);
-	BaseMapper::SelectChrPage(slot*2+1, page+1, memoryType);
+	BaseMapper::SelectChrPage(slot * 2, page, memoryType);
+	BaseMapper::SelectChrPage(slot * 2 + 1, page + 1, memoryType);
 }
 
 void BaseMapper::SelectChrPage(uint16_t slot, uint16_t page, ChrMemoryType memoryType)
@@ -425,7 +437,7 @@ void BaseMapper::SelectChrPage(uint16_t slot, uint16_t page, ChrMemoryType memor
 		if(memoryType == ChrMemoryType::Default) {
 			memoryType = _chrRomSize > 0 ? ChrMemoryType::ChrRom : ChrMemoryType::ChrRam;
 		}
-		pageSize = memoryType == ChrMemoryType::ChrRam ? InternalGetChrRamPageSize() : InternalGetChrRomPageSize();
+		pageSize = memoryType == ChrMemoryType::ChrRam ? _chrRamPageSize : _chrRomPageSize;
 	}
 
 	uint16_t startAddr = slot * pageSize;
@@ -450,7 +462,7 @@ uint32_t BaseMapper::GetDipSwitches()
 	uint32_t mask = (1 << GetDipSwitchCount()) - 1;
 	return _emu->GetSettings()->GetGameConfig().DipSwitches & mask;
 }
-		
+
 bool BaseMapper::HasBattery()
 {
 	return _romInfo.HasBattery;
@@ -480,13 +492,13 @@ void BaseMapper::SaveBattery()
 
 uint32_t BaseMapper::GetPrgPageCount()
 {
-	uint16_t pageSize = InternalGetPrgPageSize();
+	uint16_t pageSize = _prgRomPageSize;
 	return pageSize ? (_prgSize / pageSize) : 0;
 }
 
 uint32_t BaseMapper::GetChrRomPageCount()
 {
-	uint16_t pageSize = InternalGetChrRomPageSize();
+	uint16_t pageSize = _chrRomPageSize;
 	return pageSize ? (_chrRomSize / pageSize) : 0;
 }
 
@@ -634,6 +646,7 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 	_hasCpuClockHook = EnableCpuClockHook();
 	_hasCustomReadVram = EnableCustomVramRead();
 	_hasVramAddressHook = EnableVramAddressHook();
+	_hasCustomReadRam = EnableCustomRamRead();
 
 	memset(_isReadRegisterAddr, 0, sizeof(_isReadRegisterAddr));
 	memset(_isWriteRegisterAddr, 0, sizeof(_isWriteRegisterAddr));
@@ -661,7 +674,7 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 		case BusConflictType::Default: _hasBusConflicts = HasBusConflicts(); break;
 		case BusConflictType::Yes: _hasBusConflicts = true; break;
 		case BusConflictType::No: _hasBusConflicts = false; break;
-	}	
+	}
 
 	if(_hasBusConflicts) {
 		MessageManager::Log("[iNes] Bus conflicts enabled");
@@ -670,7 +683,7 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 	_saveRam = new uint8_t[_saveRamSize];
 
 	_emu->RegisterMemory(MemoryType::NesSaveRam, _saveRam, _saveRamSize);
-	
+
 	_workRam = new uint8_t[_workRamSize];
 	_emu->RegisterMemory(MemoryType::NesWorkRam, _workRam, _workRamSize);
 
@@ -686,7 +699,7 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 	if(_nametableCount == 0) {
 		_nametableCount = romData.Info.Mirroring == MirroringType::FourScreens ? 4 : 2;
 	}
-	
+
 	_ntRamSize = _nametableCount * BaseMapper::NametableSize;
 	_nametableRam = new uint8_t[_ntRamSize];
 	_console->InitializeRam(_nametableRam, _ntRamSize);
@@ -698,24 +711,31 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 		_prgMemoryOffset[i] = -1;
 		_prgMemoryType[i] = PrgMemoryType::PrgRom;
 		_prgMemoryAccess[i] = MemoryAccessType::NoAccess;
+	}
 
+	for(int i = 0; i < 0x40; i++) {
 		_chrPages[i] = nullptr;
 		_chrMemoryOffset[i] = -1;
 		_chrMemoryType[i] = ChrMemoryType::Default;
 		_chrMemoryAccess[i] = MemoryAccessType::NoAccess;
 	}
 
+	//TODO This includes a hack to make CHR-NVRAM work for properly-specified headers that have just one
+	//type of CHR-RAM. Most correct would be another memory type for CHR-NVRAM, but that would basically
+	//just matter for RacerMate Challenge II, which uses a bike we don't currently support, anyway.
+	int32_t totalChrRam = -1;
+	if(romData.ChrRamSize >= 0 || romData.SaveChrRamSize >= 0) {
+		totalChrRam = (romData.ChrRamSize > 0 ? romData.ChrRamSize : 0) + (romData.SaveChrRamSize > 0 ? romData.SaveChrRamSize : 0);
+	}
 	if(_chrRomSize == 0) {
 		//Assume there is CHR RAM if no CHR ROM exists
-		InitializeChrRam(romData.ChrRamSize);
-
-		//Map CHR RAM to 0x0000-0x1FFF by default when no CHR ROM exists
-		SetPpuMemoryMapping(0x0000, 0x1FFF, 0, ChrMemoryType::ChrRam);
-	} else if(romData.ChrRamSize >= 0) {
-		InitializeChrRam(romData.ChrRamSize);
+		InitializeChrRam(totalChrRam);
+	} else if(totalChrRam >= 0) {
+		InitializeChrRam(totalChrRam);
 	} else if(GetChrRamSize()) {
 		InitializeChrRam();
 	}
+	_saveChrRamSize = romData.SaveChrRamSize > 0 ? romData.SaveChrRamSize : 0;
 
 	if(romData.Info.HasTrainer) {
 		if(_workRamSize >= 0x2000) {
@@ -725,10 +745,16 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 		}
 	}
 
+	UpdatePageSizes();
+
+	if(_chrRomSize == 0 && _chrRamSize > 0) {
+		//Map CHR RAM to 0x0000-0x1FFF by default when no CHR ROM exists
+		SetPpuMemoryMapping(0x0000, 0x1FFF, 0, ChrMemoryType::ChrRam);
+	}
+
 	SetupDefaultWorkRam();
 
 	SetMirroringType(romData.Info.Mirroring);
-
 
 	//Load battery data if present
 	LoadBattery();
@@ -741,6 +767,17 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 		_epsm.reset(new Epsm(_emu, _console, adpcmRom));
 		_hasCpuClockHook = true;
 	}
+}
+
+void BaseMapper::UpdatePageSizes()
+{
+	//Make sure the page size is no bigger than the size of the ROM itself
+	//Otherwise we will end up reading from unallocated memory
+	_prgRomPageSize = std::min((uint32_t)GetPrgPageSize(), _prgSize);
+	_saveRamPageSize = std::min((uint32_t)GetSaveRamPageSize(), _saveRamSize);
+	_workRamPageSize = std::min((uint32_t)GetWorkRamPageSize(), _workRamSize);
+	_chrRomPageSize = std::min((uint32_t)GetChrPageSize(), _chrRomSize);
+	_chrRamPageSize = std::min((uint32_t)GetChrRamPageSize(), _chrRamSize);
 }
 
 void BaseMapper::InitSpecificMapper(RomData& romData)
@@ -764,7 +801,7 @@ BaseMapper::~BaseMapper()
 	delete[] _nametableRam;
 }
 
-void BaseMapper::GetMemoryRanges(MemoryRanges &ranges)
+void BaseMapper::GetMemoryRanges(MemoryRanges& ranges)
 {
 	if(_romInfo.System == GameSystem::VsSystem) {
 		ranges.AddHandler(MemoryOperation::Read, 0x6000, 0xFFFF);
@@ -778,9 +815,9 @@ void BaseMapper::GetMemoryRanges(MemoryRanges &ranges)
 uint8_t* BaseMapper::GetNametable(uint8_t nametableIndex)
 {
 	if(nametableIndex >= _nametableCount) {
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		MessageManager::Log("Invalid nametable index");
-		#endif
+#endif
 		return _nametableRam;
 	}
 
@@ -790,14 +827,14 @@ uint8_t* BaseMapper::GetNametable(uint8_t nametableIndex)
 void BaseMapper::SetNametable(uint8_t index, uint8_t nametableIndex)
 {
 	if(nametableIndex >= _nametableCount) {
-		#ifdef _DEBUG
+#ifdef _DEBUG
 		MessageManager::Log("Invalid nametable index");
-		#endif
+#endif
 		return;
 	}
 
 	SetPpuMemoryMapping(0x2000 + index * 0x400, 0x2000 + (index + 1) * 0x400 - 1, nametableIndex, ChrMemoryType::NametableRam);
-	
+
 	//Mirror $2000-$2FFF to $3000-$3FFF, while keeping a distinction between the addresses
 	//Previously, $3000-$3FFF was being "redirected" to $2000-$2FFF to avoid MMC3 IRQ issues (which is incorrect)
 	//More info here: https://forums.nesdev.com/viewtopic.php?p=132145#p132145
@@ -818,9 +855,9 @@ void BaseMapper::SetMirroringType(MirroringType type)
 	switch(type) {
 		case MirroringType::Vertical: SetNametables(0, 1, 0, 1); break;
 		case MirroringType::Horizontal: SetNametables(0, 0, 1, 1); break;
-		case MirroringType::FourScreens:	SetNametables(0, 1, 2, 3); break;
-		case MirroringType::ScreenAOnly: SetNametables(0, 0, 0, 0);	break;
-		case MirroringType::ScreenBOnly: SetNametables(1, 1, 1, 1);	break;
+		case MirroringType::FourScreens: SetNametables(0, 1, 2, 3); break;
+		case MirroringType::ScreenAOnly: SetNametables(0, 0, 0, 0); break;
+		case MirroringType::ScreenBOnly: SetNametables(1, 1, 1, 1); break;
 	}
 }
 
@@ -850,17 +887,10 @@ MirroringType BaseMapper::GetMirroringType()
 {
 	return _mirroringType;
 }
-	
+
 uint8_t BaseMapper::ReadRam(uint16_t addr)
 {
-	if(_allowRegisterRead && _isReadRegisterAddr[addr]) {
-		return ReadRegister(addr);
-	} else if(_prgMemoryAccess[addr >> 8] & MemoryAccessType::Read) {
-		return _prgPages[addr >> 8][(uint8_t)addr];
-	} else {
-		//assert(false);
-	}
-	return _console->GetMemoryManager()->GetOpenBus();
+	return InternalRead(addr);
 }
 
 uint8_t BaseMapper::PeekRam(uint16_t addr)
@@ -876,7 +906,7 @@ uint8_t BaseMapper::DebugReadRam(uint16_t addr)
 	} else {
 		//assert(false);
 	}
-	
+
 	//Fake open bus
 	return addr >> 8;
 }
@@ -995,7 +1025,7 @@ bool BaseMapper::IsNes20()
 }
 
 //Debugger Helper Functions
-void BaseMapper::CopyChrTile(uint32_t address, uint8_t *dest)
+void BaseMapper::CopyChrTile(uint32_t address, uint8_t* dest)
 {
 	if(_chrRamSize > 0 && address <= _chrRamSize - 16) {
 		memcpy(dest, _chrRam + address, 16);
@@ -1011,7 +1041,7 @@ AddressInfo BaseMapper::GetAbsoluteAddress(uint16_t relativeAddr)
 		info.Address = relativeAddr & _internalRamMask;
 		info.Type = MemoryType::NesInternalRam;
 	} else {
-		uint8_t *addr = _prgPages[relativeAddr >> 8] + (uint8_t)relativeAddr;
+		uint8_t* addr = _prgPages[relativeAddr >> 8] + (uint8_t)relativeAddr;
 		if(addr >= _prgRom && addr < _prgRom + _prgSize) {
 			info.Address = (uint32_t)(addr - _prgRom);
 			info.Type = MemoryType::NesPrgRom;
@@ -1137,10 +1167,10 @@ CartridgeState BaseMapper::GetState()
 	state.ChrRamSize = _chrRamSize;
 
 	state.PrgPageCount = GetPrgPageCount();
-	state.PrgPageSize = InternalGetPrgPageSize();
+	state.PrgPageSize = _prgRomPageSize;
 	state.ChrPageCount = GetChrRomPageCount();
-	state.ChrPageSize = InternalGetChrRomPageSize();
-	state.ChrRamPageSize = InternalGetChrRamPageSize();
+	state.ChrPageSize = _chrRomPageSize;
+	state.ChrRamPageSize = _chrRamPageSize;
 	for(int i = 0; i < 0x100; i++) {
 		state.PrgMemoryOffset[i] = _prgMemoryOffset[i];
 		state.PrgType[i] = _prgMemoryType[i];
@@ -1161,18 +1191,18 @@ CartridgeState BaseMapper::GetState()
 	for(int i = 0; i < entries.size(); i++) {
 		state.CustomEntries[i] = entries[i];
 	}
-	
+
 	return state;
 }
 
-void BaseMapper::GetRomFileData(vector<uint8_t> &out, bool asIpsFile, uint8_t* header)
+void BaseMapper::GetRomFileData(vector<uint8_t>& out, bool asIpsFile, uint8_t* header)
 {
 	if(header) {
 		//Get original rom with edited header
 		vector<uint8_t> originalFile;
 		_emu->GetRomInfo().RomFile.ReadFile(originalFile);
 
-		out.insert(out.end(), header, header+sizeof(NesHeader));
+		out.insert(out.end(), header, header + sizeof(NesHeader));
 		if(_romInfo.IsHeaderlessRom) {
 			out.insert(out.end(), originalFile.begin(), originalFile.end());
 		} else {
@@ -1185,7 +1215,7 @@ void BaseMapper::GetRomFileData(vector<uint8_t> &out, bool asIpsFile, uint8_t* h
 		if(HasChrRom()) {
 			newFile.insert(newFile.end(), _chrRom, _chrRom + _chrRomSize);
 		}
-		
+
 		//Get edited rom
 		if(asIpsFile) {
 			vector<uint8_t> originalFile;
@@ -1208,7 +1238,7 @@ vector<uint8_t> BaseMapper::GetPrgChrCopy()
 	return data;
 }
 
-void BaseMapper::RestorePrgChrBackup(vector<uint8_t> &backupData)
+void BaseMapper::RestorePrgChrBackup(vector<uint8_t>& backupData)
 {
 	memcpy(_prgRom, backupData.data(), _prgSize);
 	memcpy(_chrRom, backupData.data() + _prgSize, _chrRomSize);

@@ -10,7 +10,8 @@
 extern unique_ptr<Emulator> _emu;
 extern unique_ptr<IAudioDevice> _soundManager;
 
-extern "C" {
+extern "C"
+{
 	DllExport void __stdcall SetVideoConfig(VideoConfig config)
 	{
 		_emu->GetSettings()->SetVideoConfig(config);
@@ -30,7 +31,7 @@ extern "C" {
 	{
 		_emu->GetSettings()->SetEmulationConfig(config);
 	}
-	
+
 	DllExport void __stdcall SetGameboyConfig(GameboyConfig config)
 	{
 		_emu->GetSettings()->SetGameboyConfig(config);

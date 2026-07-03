@@ -44,7 +44,7 @@ public:
 private:
 	Emulator* _emu = nullptr;
 	EmuSettings* _settings = nullptr;
-	
+
 	bool _hasHistory = false;
 
 	deque<RewindData> _history;
@@ -69,7 +69,7 @@ private:
 
 	void ProcessFrame(RenderedFrame& frame, bool forRewind);
 	bool ProcessAudio(int16_t* soundBuffer, uint32_t sampleCount);
-	
+
 	void ClearBuffer();
 
 public:
@@ -83,7 +83,7 @@ public:
 	void ProcessEndOfFrame();
 
 	void RecordInput(vector<shared_ptr<BaseControlDevice>> devices) override;
-	bool SetInput(BaseControlDevice *device) override;
+	bool SetInput(BaseControlDevice* device) override;
 
 	void StartRewinding(bool forDebugger = false);
 	void StopRewinding(bool forDebugger = false, bool deleteFutureData = false);
@@ -96,5 +96,5 @@ public:
 	RewindStats GetStats();
 
 	void SendFrame(RenderedFrame& frame, bool forRewind);
-	bool SendAudio(int16_t *soundBuffer, uint32_t sampleCount);
+	bool SendAudio(int16_t* soundBuffer, uint32_t sampleCount);
 };

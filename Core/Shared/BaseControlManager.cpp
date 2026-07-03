@@ -11,6 +11,7 @@
 #include "Shared/EventType.h"
 #include "Shared/MessageManager.h"
 #include "Utilities/Serializer.h"
+#include "Interfaces/IBattery.h"
 
 BaseControlManager::BaseControlManager(Emulator* emu, CpuType cpuType)
 {
@@ -62,11 +63,7 @@ vector<ControllerData> BaseControlManager::GetPortStates()
 {
 	vector<ControllerData> states;
 	for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
-		states.push_back({
-			device->GetControllerType(),
-			device->GetRawState(),
-			device->GetPort()
-		});
+		states.push_back({ device->GetControllerType(), device->GetRawState(), device->GetPort() });
 	}
 	return states;
 }
@@ -234,4 +231,14 @@ uint32_t BaseControlManager::GetPollCounter()
 void BaseControlManager::SetPollCounter(uint32_t value)
 {
 	_pollCounter = value;
+}
+
+void BaseControlManager::SaveBattery()
+{
+	for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
+		shared_ptr<IBattery> batteryDevice = std::dynamic_pointer_cast<IBattery>(device);
+		if(batteryDevice) {
+			batteryDevice->SaveBattery();
+		}
+	}
 }

@@ -103,7 +103,7 @@ ifeq ($(PGO),optimize)
 endif
 
 ifneq ($(STATICLINK),false)
-	LINKOPTIONS += -static-libgcc -static-libstdc++ 
+	LINKOPTIONS += -static-libgcc -static-libstdc++ -Wl,--export-dynamic,--exclude-libs=libstdc++.a
 endif
 
 ifeq ($(MESENOS),osx)

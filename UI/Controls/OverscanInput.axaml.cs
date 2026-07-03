@@ -1,14 +1,14 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
 using Mesen.Config;
 using Mesen.Localization;
-using Avalonia.Interactivity;
-using Avalonia.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Mesen.Controls
 {

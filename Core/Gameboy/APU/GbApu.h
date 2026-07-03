@@ -33,6 +33,7 @@ private:
 	int16_t* _soundBuffer = nullptr;
 	blip_t* _leftChannel = nullptr;
 	blip_t* _rightChannel = nullptr;
+	size_t _sampleCount = 0;
 
 	int16_t _prevLeftOutput = 0;
 	int16_t _prevRightOutput = 0;
@@ -64,7 +65,9 @@ public:
 
 	void PlayQueuedAudio();
 
-	void GetSoundSamples(int16_t* &samples, uint32_t& sampleCount);
+	void ProcessLinkCableAudio();
+
+	void GetSoundSamples(int16_t*& samples, uint32_t& sampleCount);
 
 	void ClockFrameSequencer();
 

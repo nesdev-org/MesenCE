@@ -4,7 +4,7 @@
 #include "Shared/DebuggerRequest.h"
 #include "Debugger/DebugBreakHelper.h"
 
-EmulatorLock::EmulatorLock(Emulator *emu, bool allowDebuggerLock)
+EmulatorLock::EmulatorLock(Emulator* emu, bool allowDebuggerLock)
 {
 	_emu = emu;
 

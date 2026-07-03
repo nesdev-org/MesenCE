@@ -11,13 +11,13 @@ class NesTraceLogger : public BaseTraceLogger<NesTraceLogger, NesCpuState>
 {
 private:
 	NesConsole* _console = nullptr;
-	
+
 protected:
 	RowDataType GetFormatTagType(string& tag) override;
 
 public:
 	NesTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, NesConsole* console);
-	
+
 	void GetTraceRow(string& output, NesCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
 

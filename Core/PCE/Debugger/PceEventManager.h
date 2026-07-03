@@ -79,12 +79,12 @@ protected:
 	bool ShowPreviousFrameEvents() override;
 
 public:
-	PceEventManager(Debugger *debugger, PceConsole *console);
+	PceEventManager(Debugger* debugger, PceConsole* console);
 	~PceEventManager();
 
-	void AddEvent(DebugEventType type, MemoryOperationInfo &operation, int32_t breakpointId = -1) override;
+	void AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId = -1) override;
 	void AddEvent(DebugEventType type) override;
-	
+
 	EventViewerCategoryCfg GetEventConfig(DebugEventInfo& evt) override;
 
 	uint32_t TakeEventSnapshot(bool forAutoRefresh) override;

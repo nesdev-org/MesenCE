@@ -13,7 +13,6 @@
 #include "Shared/CheatManager.h"
 #include "Utilities/ZipReader.h"
 #include "Utilities/StringUtilities.h"
-#include "Utilities/HexUtilities.h"
 #include "Utilities/VirtualFile.h"
 #include "Utilities/magic_enum.hpp"
 #include "Utilities/Serializer.h"
@@ -56,7 +55,7 @@ void MesenMovie::Stop()
 	_controlManager = nullptr;
 }
 
-bool MesenMovie::SetInput(BaseControlDevice *device)
+bool MesenMovie::SetInput(BaseControlDevice* device)
 {
 	uint32_t inputRowIndex = _controlManager->GetPollCounter();
 
@@ -95,16 +94,40 @@ vector<uint8_t> MesenMovie::LoadBattery(string extension)
 
 void MesenMovie::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
-	if(type == ConsoleNotificationType::GameLoaded) {
+	if(type == ConsoleNotificationType::AfterInitConsole) {
+		_controlManager = _emu->GetConsole()->GetControlManager();
+
 		_emu->RegisterInputProvider(this);
 		shared_ptr<IConsole> console = _emu->GetConsole();
 		if(console) {
-			console->GetControlManager()->SetPollCounter(_lastPollCounter);
+			_controlManager->SetPollCounter(_lastPollCounter + 1);
+		}
+
+		//Re-apply settings - power cycling can alter some (e.g auto-configure input types, etc.)
+		ApplySettings(_settingsData);
+
+		_originalCheats = _emu->GetCheatManager()->GetCheats();
+
+		LoadCheats();
+
+		if(!_playing) {
+			stringstream saveStateData;
+			if(_reader->GetStream("SaveState.mss", saveStateData)) {
+				if(!_emu->GetSaveStateManager()->LoadState(saveStateData)) {
+					_loadFailure = true;
+				}
+			}
+		}
+
+		_controlManager->UpdateControlDevices();
+
+		if(!_playing) {
+			_controlManager->SetPollCounter(0);
 		}
 	}
 }
 
-bool MesenMovie::Play(VirtualFile &file)
+bool MesenMovie::Play(VirtualFile& file)
 {
 	_movieFile = file;
 
@@ -114,8 +137,10 @@ bool MesenMovie::Play(VirtualFile &file)
 	_reader.reset(new ZipReader());
 	_reader->LoadArchive(ss);
 
-	stringstream settingsData, inputData;
-	if(!_reader->GetStream("GameSettings.txt", settingsData)) {
+	_hasSaveState = _reader->CheckFile("SaveState.mss");
+
+	stringstream inputData;
+	if(!_reader->GetStream("GameSettings.txt", _settingsData)) {
 		MessageManager::Log("[Movie] File not found: GameSettings.txt");
 		return false;
 	}
@@ -124,18 +149,8 @@ bool MesenMovie::Play(VirtualFile &file)
 		return false;
 	}
 
-	while(inputData) {
-		string line;
-		std::getline(inputData, line);
-		if(line.substr(0, 1) == "|") {
-			_inputData.push_back(StringUtilities::Split(line.substr(1), '|'));
-		}
-	}
+	ParseSettings(_settingsData);
 
-	_deviceIndex = 0;
-
-	ParseSettings(settingsData);
-	
 	string version = LoadString(_settings, MovieKeys::MesenVersion);
 	if(version.size() < 2 || version.substr(0, 2) == "0." || version.substr(0, 2) == "1.") {
 		//Prevent loading movies from Mesen/Mesen-S version 0.x.x or 1.x.x
@@ -143,47 +158,49 @@ bool MesenMovie::Play(VirtualFile &file)
 		return false;
 	}
 
-	if(LoadInt(_settings, MovieKeys::MovieFormatVersion, 0) < 2) {
+	uint32_t movieVersion = LoadInt(_settings, MovieKeys::MovieFormatVersion, 0);
+	if(movieVersion < 2) {
 		MessageManager::DisplayMessage("Movies", "MovieIncompatibleVersion");
 		return false;
 	}
 
-	auto emuLock = _emu->AcquireLock(false);
-
-	if(!ApplySettings(settingsData)) {
-		return false;
-	}
-	
-	_emu->GetBatteryManager()->SetBatteryProvider(shared_from_this());
-	_emu->GetNotificationManager()->RegisterNotificationListener(shared_from_this());
-
-	_emu->PowerCycle();
-
-	//Re-apply settings - power cycling can alter some (e.g auto-configure input types, etc.)
-	ApplySettings(settingsData);
-
-	_originalCheats = _emu->GetCheatManager()->GetCheats();
-
-	_controlManager = _emu->GetConsole()->GetControlManager();
-
-	LoadCheats();	
-
-	stringstream saveStateData;
-	if(_reader->GetStream("SaveState.mss", saveStateData)) {
-		if(!_emu->GetSaveStateManager()->LoadState(saveStateData)) {
-			return false;
+	while(inputData) {
+		string line;
+		std::getline(inputData, line);
+		if(line.substr(0, 1) == "|") {
+			vector<string> lineInputData = StringUtilities::Split(line.substr(1), '|');
+			if(movieVersion == 2 && _inputData.empty() && !_hasSaveState) {
+				//Version 2 of movies incorrectly skipped the first frame after recording from power on
+				//When playing back an old movie, add an extra frame of input at the start (no buttons pressed)
+				//to allow playback to match what it was before this bug was fixed.
+				_inputData.push_back(vector<string>(lineInputData.size(), ""));
+			}
+			_inputData.push_back(lineInputData);
 		}
 	}
 
-	_controlManager->UpdateControlDevices();
-	_controlManager->SetPollCounter(0);
-	_playing = true;
+	_deviceIndex = 0;
 
-	return true;
+	auto emuLock = _emu->AcquireLock(false);
+
+	if(!ApplySettings(_settingsData)) {
+		return false;
+	}
+
+	_emu->GetBatteryManager()->SetBatteryProvider(shared_from_this());
+	_emu->GetNotificationManager()->RegisterNotificationListener(shared_from_this());
+	_emu->PowerCycle();
+	_emu->GetBatteryManager()->SetBatteryProvider(nullptr);
+	if(_hasSaveState) {
+		_controlManager->SetPollCounter(0);
+	}
+
+	_playing = !_loadFailure;
+	return _playing;
 }
 
 template<typename T>
-T FromString(string name, const vector<string> &enumNames, T defaultValue)
+T FromString(string name, const vector<string>& enumNames, T defaultValue)
 {
 	for(size_t i = 0; i < enumNames.size(); i++) {
 		if(name == enumNames[i]) {
@@ -193,7 +210,7 @@ T FromString(string name, const vector<string> &enumNames, T defaultValue)
 	return defaultValue;
 }
 
-void MesenMovie::ParseSettings(stringstream &data)
+void MesenMovie::ParseSettings(stringstream& data)
 {
 	while(!data.eof()) {
 		string line;
@@ -218,7 +235,7 @@ void MesenMovie::ParseSettings(stringstream &data)
 bool MesenMovie::ApplySettings(istream& settingsData)
 {
 	EmuSettings* settings = _emu->GetSettings();
-	
+
 	settingsData.clear();
 	settingsData.seekg(0, std::ios::beg);
 	Serializer s(0, false, SerializeFormat::Text);
@@ -242,7 +259,7 @@ bool MesenMovie::ApplySettings(istream& settingsData)
 	return true;
 }
 
-uint32_t MesenMovie::LoadInt(std::unordered_map<string, string> &settings, string name, uint32_t defaultValue)
+uint32_t MesenMovie::LoadInt(std::unordered_map<string, string>& settings, string name, uint32_t defaultValue)
 {
 	auto result = settings.find(name);
 	if(result != settings.end()) {
@@ -257,7 +274,7 @@ uint32_t MesenMovie::LoadInt(std::unordered_map<string, string> &settings, strin
 	}
 }
 
-bool MesenMovie::LoadBool(std::unordered_map<string, string> &settings, string name)
+bool MesenMovie::LoadBool(std::unordered_map<string, string>& settings, string name)
 {
 	auto result = settings.find(name);
 	if(result != settings.end()) {
@@ -265,7 +282,7 @@ bool MesenMovie::LoadBool(std::unordered_map<string, string> &settings, string n
 			return true;
 		} else if(result->second == "false") {
 			return false;
-		} else {			
+		} else {
 			MessageManager::Log("[Movies] Invalid value for tag: " + name);
 			return false;
 		}
@@ -274,7 +291,7 @@ bool MesenMovie::LoadBool(std::unordered_map<string, string> &settings, string n
 	}
 }
 
-string MesenMovie::LoadString(std::unordered_map<string, string> &settings, string name)
+string MesenMovie::LoadString(std::unordered_map<string, string>& settings, string name)
 {
 	auto result = settings.find(name);
 	if(result != settings.end()) {
@@ -296,7 +313,7 @@ void MesenMovie::LoadCheats()
 	_emu->GetCheatManager()->SetCheats(cheats);
 }
 
-bool MesenMovie::LoadCheat(string cheatData, CheatCode &code)
+bool MesenMovie::LoadCheat(string cheatData, CheatCode& code)
 {
 	vector<string> data = StringUtilities::Split(cheatData, ' ');
 
@@ -308,7 +325,7 @@ bool MesenMovie::LoadCheat(string cheatData, CheatCode &code)
 			return true;
 		}
 	}
-	
+
 	MessageManager::Log("[Movie] Invalid cheat definition: " + cheatData);
 	return false;
 }

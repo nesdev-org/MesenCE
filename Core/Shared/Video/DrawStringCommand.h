@@ -14,6 +14,7 @@ private:
 
 	static unordered_map<int, char const*> _jpFont;
 
+	// clang-format off
 	static constexpr uint8_t _font[792] = {
 		6,  0,  0,  0,  0,  0,  0,  0,	// 0x20 - Spacebar
 		2,128,128,128,128,128,  0,128,
@@ -112,6 +113,7 @@ private:
 		6,  0,104,176,  0,  0,  0,  0,
 		5,  0,  0,113, 80,113,  0,  0,
 	};
+	// clang-format off
 
 	static int GetCharNumber(char ch)
 	{

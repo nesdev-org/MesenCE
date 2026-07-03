@@ -28,7 +28,7 @@ public class BassLabelFile
 			}
 
 			UInt32 address;
-			
+
 			if(!UInt32.TryParse(lineData.Substring(0, splitIndex), NumberStyles.HexNumber, null, out address)) {
 				errorCount++;
 				continue;

@@ -212,11 +212,11 @@ public struct WsMemoryManagerState
 	[MarshalAs(UnmanagedType.I1)] public bool ColorEnabled;
 	[MarshalAs(UnmanagedType.I1)] public bool Enable4bpp;
 	[MarshalAs(UnmanagedType.I1)] public bool Enable4bppPacked;
-	
+
 	[MarshalAs(UnmanagedType.I1)] public bool BootRomDisabled;
 	[MarshalAs(UnmanagedType.I1)] public bool CartWordBus;
 	[MarshalAs(UnmanagedType.I1)] public bool SlowRom;
-	
+
 	[MarshalAs(UnmanagedType.I1)] public bool SlowSram;
 	[MarshalAs(UnmanagedType.I1)] public bool SlowPort;
 	[MarshalAs(UnmanagedType.I1)] public bool EnableLowBatteryNmi;
@@ -361,7 +361,7 @@ public struct WsApuHyperVoiceState
 {
 	public Int16 LeftOutput;
 	public Int16 RightOutput;
-	
+
 	[MarshalAs(UnmanagedType.I1)] public bool Enabled;
 
 	public byte LeftSample;
@@ -398,7 +398,7 @@ public struct WsApuState
 	[MarshalAs(UnmanagedType.I1)] public bool ForceOutput2;
 	[MarshalAs(UnmanagedType.I1)] public bool ForceOutput4;
 	[MarshalAs(UnmanagedType.I1)] public bool ForceOutputCh2Voice;
-	
+
 	public byte SoundTest;
 };
 
@@ -442,8 +442,17 @@ public struct WsEepromState
 
 public struct WsCartState
 {
+	[MarshalAs(UnmanagedType.I1)] public bool HasRtc;
 	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
 	public byte[] SelectedBanks;
+}
+
+public struct WsRtcState
+{
+	public byte Data;
+	public byte Command;
+	[MarshalAs(UnmanagedType.I1)] public bool Ready;
+	[MarshalAs(UnmanagedType.I1)] public bool Busy;
 }
 
 public struct WsState : BaseState
@@ -459,5 +468,6 @@ public struct WsState : BaseState
 	public WsEepromState InternalEeprom;
 	public WsCartState Cart;
 	public WsEepromState CartEeprom;
+	public WsRtcState CartRtc;
 	public WsModel Model;
 }

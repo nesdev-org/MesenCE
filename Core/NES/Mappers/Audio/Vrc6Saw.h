@@ -16,7 +16,13 @@ private:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_accumulatorRate); SV(_accumulator); SV(_frequency); SV(_enabled); SV(_timer); SV(_step); SV(_frequencyShift);
+		SV(_accumulatorRate);
+		SV(_accumulator);
+		SV(_frequency);
+		SV(_enabled);
+		SV(_timer);
+		SV(_step);
+		SV(_frequencyShift);
 	}
 
 public:
@@ -37,14 +43,14 @@ public:
 				if(!_enabled) {
 					//If E is clear, the accumulator is forced to zero until E is again set.
 					_accumulator = 0;
-					
+
 					//"The phase of the saw generator can be mostly reset by clearing and immediately setting E. Clearing E does not reset the frequency divider, however."
 					_step = 0;
 				}
 				break;
 		}
 	}
-	
+
 	void SetFrequencyShift(uint8_t shift)
 	{
 		_frequencyShift = shift;

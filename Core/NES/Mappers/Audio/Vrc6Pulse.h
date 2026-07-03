@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "Utilities/Serializer.h"
 
-class Vrc6Pulse: public ISerializable
+class Vrc6Pulse : public ISerializable
 {
 private:
 	uint8_t _volume = 0;
@@ -17,7 +17,14 @@ private:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_volume); SV(_dutyCycle); SV(_ignoreDuty); SV(_frequency); SV(_enabled); SV(_timer); SV(_step); SV(_frequencyShift);
+		SV(_volume);
+		SV(_dutyCycle);
+		SV(_ignoreDuty);
+		SV(_frequency);
+		SV(_enabled);
+		SV(_timer);
+		SV(_step);
+		SV(_frequencyShift);
 	}
 
 public:

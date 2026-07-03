@@ -28,7 +28,7 @@ namespace Mesen
 			} else {
 				RequestedThemeVariant = ConfigManager.Config.Preferences.Theme == MesenTheme.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
 			}
-			
+
 			Dispatcher.UIThread.UnhandledException += (s, e) => {
 				MesenMsgBox.ShowException(e.Exception);
 				e.Handled = true;
@@ -57,7 +57,7 @@ namespace Mesen
 						} else {
 							errorMessage = ResourceHelper.GetMessage("UnableToStartMissingDependencies", ex.Message + Environment.NewLine + ex.StackTrace);
 						}
-						MessageBox.Show(null, errorMessage, "Mesen", MessageBoxButtons.OK, MessageBoxIcon.Error, out MessageBox msgbox);
+						MessageBox.Show(null, errorMessage, "MesenCE", MessageBoxButtons.OK, MessageBoxIcon.Error, out MessageBox msgbox);
 						desktop.MainWindow = msgbox;
 						base.OnFrameworkInitializationCompleted();
 						return;

@@ -15,6 +15,7 @@ public class WsConfig : BaseConfig<WsConfig>
 
 	[Reactive] public ControllerConfig ControllerHorizontal { get; set; } = new();
 	[Reactive] public ControllerConfig ControllerVertical { get; set; } = new();
+	[Reactive] public ControllerConfig ControllerPcv2 { get; set; } = new();
 
 	[Reactive] public WsModel Model { get; set; } = WsModel.Auto;
 	[Reactive] public bool UseBootRom { get; set; } = false;
@@ -40,17 +41,19 @@ public class WsConfig : BaseConfig<WsConfig>
 	{
 		ControllerHorizontal.Type = ControllerType.WsController;
 		ControllerVertical.Type = ControllerType.WsControllerVertical;
+		ControllerPcv2.Type = ControllerType.Pcv2Controller;
 
 		ConfigManager.Config.Video.ApplyConfig();
 
 		ConfigApi.SetWsConfig(new InteropWsConfig() {
 			ControllerHorizontal = ControllerHorizontal.ToInterop(),
 			ControllerVertical = ControllerVertical.ToInterop(),
+			ControllerPcv2 = ControllerPcv2.ToInterop(),
 
 			Model = Model,
 			UseBootRom = UseBootRom,
-			
-			AutoRotate= AutoRotate,
+
+			AutoRotate = AutoRotate,
 
 			BlendFrames = BlendFrames,
 			LcdAdjustColors = LcdAdjustColors,
@@ -73,6 +76,7 @@ public class WsConfig : BaseConfig<WsConfig>
 	{
 		ControllerHorizontal.InitDefaults(defaultMappings, ControllerType.WsController);
 		ControllerVertical.InitDefaults(defaultMappings, ControllerType.WsControllerVertical);
+		ControllerPcv2.InitDefaults(defaultMappings, ControllerType.Pcv2Controller);
 	}
 }
 
@@ -81,6 +85,7 @@ public struct InteropWsConfig
 {
 	public InteropControllerConfig ControllerHorizontal;
 	public InteropControllerConfig ControllerVertical;
+	public InteropControllerConfig ControllerPcv2;
 
 	public WsModel Model;
 	[MarshalAs(UnmanagedType.I1)] public bool UseBootRom;
@@ -90,7 +95,7 @@ public struct InteropWsConfig
 	[MarshalAs(UnmanagedType.I1)] public bool BlendFrames;
 	[MarshalAs(UnmanagedType.I1)] public bool LcdAdjustColors;
 	[MarshalAs(UnmanagedType.I1)] public bool LcdShowIcons;
-	
+
 	[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer1;
 	[MarshalAs(UnmanagedType.I1)] public bool HideBgLayer2;
 	[MarshalAs(UnmanagedType.I1)] public bool DisableSprites;
@@ -108,7 +113,8 @@ public enum WsModel : byte
 	Auto,
 	Monochrome,
 	Color,
-	SwanCrystal
+	SwanCrystal,
+	PocketChallenge
 }
 
 public enum WsAudioMode : byte

@@ -6,7 +6,7 @@ namespace Mesen.Debugger.Integration
 	public static class DbgReader
 	{
 		public delegate void ReadEntryCallback(ref ReadOnlySpan<char> name, ref ReadOnlySpan<char> data);
-		
+
 		public static void ReadEntry(string row, ReadEntryCallback callback)
 		{
 			bool readingTag = false;

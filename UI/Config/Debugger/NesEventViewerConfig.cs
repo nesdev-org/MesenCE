@@ -9,10 +9,10 @@ namespace Mesen.Config
 	{
 		[Reactive] public EventViewerCategoryCfg MapperRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x00, 0x6E, 0x8E));
 		[Reactive] public EventViewerCategoryCfg MapperRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x78, 0xA5, 0xB2));
-		
+
 		[Reactive] public EventViewerCategoryCfg ApuRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x97, 0x75, 0x00));
 		[Reactive] public EventViewerCategoryCfg ApuRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xB7, 0xAA, 0x7B));
-		
+
 		[Reactive] public EventViewerCategoryCfg ControlRegisterWrites { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x06, 0xDA, 0xDF));
 		[Reactive] public EventViewerCategoryCfg ControlRegisterReads { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x9B, 0xFF, 0xDE));
 
@@ -34,7 +34,7 @@ namespace Mesen.Config
 
 		[Reactive] public EventViewerCategoryCfg Nmi { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xAB, 0xAD, 0xAC));
 		[Reactive] public EventViewerCategoryCfg Irq { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xC4, 0xF4, 0x7A));
-	
+
 		[Reactive] public EventViewerCategoryCfg MarkedBreakpoints { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0xE4));
 
 		[Reactive] public bool ShowPreviousFrameEvents { get; set; } = true;
@@ -63,7 +63,7 @@ namespace Mesen.Config
 				DmcDmaReads = this.DmcDmaReads,
 				OtherDmaReads = this.OtherDmaReads,
 				SpriteZeroHit = this.SpriteZeroHit,
-				
+
 				Nmi = this.Nmi,
 				Irq = this.Irq,
 				MarkedBreakpoints = this.MarkedBreakpoints,

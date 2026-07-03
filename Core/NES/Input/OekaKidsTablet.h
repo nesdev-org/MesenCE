@@ -12,7 +12,11 @@ private:
 	uint32_t _stateBuffer = 0;
 
 protected:
-	enum Buttons { Click, Touch };
+	enum Buttons
+	{
+		Click,
+		Touch
+	};
 	bool HasCoordinates() override { return true; }
 
 	string GetKeyNames() override
@@ -25,7 +29,7 @@ protected:
 		MousePosition pos = KeyManager::GetMousePosition();
 		for(KeyMapping& keyMapping : _keyMappings) {
 			SetPressedState(Buttons::Click, KeyManager::IsKeyPressed(keyMapping.CustomKeys[0]));
-			SetPressedState(Buttons::Touch, KeyManager::IsKeyPressed(keyMapping.CustomKeys[0]));			
+			SetPressedState(Buttons::Touch, KeyManager::IsKeyPressed(keyMapping.CustomKeys[0]));
 		}
 		SetPressedState(Buttons::Touch, pos.Y >= 48);
 		SetCoordinates(pos);
@@ -34,7 +38,8 @@ protected:
 	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_shift); SV(_stateBuffer);
+		SV(_shift);
+		SV(_stateBuffer);
 	}
 
 public:

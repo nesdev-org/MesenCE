@@ -8,17 +8,24 @@
 class SuperScope : public BaseControlDevice
 {
 private:
-	enum Buttons { Fire = 0, Cursor = 1, Turbo = 2, Pause = 3 };
+	enum Buttons
+	{
+		Fire = 0,
+		Cursor = 1,
+		Turbo = 2,
+		Pause = 3
+	};
+
 	uint32_t _stateBuffer = 0;
 	bool _prevFireButton = false;
 	bool _prevTurboButton = false;
 	bool _prevPauseButton = false;
 	bool _turbo = false;
-	SnesPpu *_ppu;
+	SnesPpu* _ppu;
 
 protected:
 	bool HasCoordinates() override { return true; }
-	
+
 	string GetKeyNames() override
 	{
 		return "FCTP";
@@ -47,10 +54,14 @@ protected:
 		}
 	}
 
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
 		BaseControlDevice::Serialize(s);
-		SV(_stateBuffer); SV(_prevTurboButton); SV(_prevFireButton); SV(_prevPauseButton); SV(_turbo);
+		SV(_stateBuffer);
+		SV(_prevTurboButton);
+		SV(_prevFireButton);
+		SV(_prevPauseButton);
+		SV(_turbo);
 	}
 
 	void RefreshStateBuffer() override

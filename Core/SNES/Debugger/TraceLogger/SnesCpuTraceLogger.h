@@ -13,14 +13,14 @@ class SnesCpuTraceLogger : public BaseTraceLogger<SnesCpuTraceLogger, SnesCpuSta
 private:
 	SnesPpu* _ppu = nullptr;
 	SnesMemoryManager* _memoryManager = nullptr;
-	
+
 protected:
 	RowDataType GetFormatTagType(string& tag) override;
 
 public:
 	SnesCpuTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, CpuType cpuType, SnesPpu* ppu, SnesMemoryManager* memoryManager);
-	
-	void GetTraceRow(string &output, SnesCpuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo);
+
+	void GetTraceRow(string& output, SnesCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
 
 	__forceinline uint32_t GetProgramCounter(SnesCpuState& state) { return (state.K << 16) | state.PC; }

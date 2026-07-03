@@ -17,8 +17,7 @@ protected:
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	};
 
-	static constexpr uint8_t _lutAddr[8][8] =
-	{
+	static constexpr uint8_t _lutAddr[8][8] = {
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
 		{ 3, 2, 0, 4, 1, 5, 6, 7 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -99,8 +98,16 @@ protected:
 	{
 		if(addr < 0x8000) {
 			switch(addr) {
-				case 0x5000: _exRegs[0] = value; UpdateState(); break;
-				case 0x5001: _exRegs[1] = value; UpdateState(); break;
+				case 0x5000:
+					_exRegs[0] = value;
+					UpdateState();
+					break;
+
+				case 0x5001:
+					_exRegs[1] = value;
+					UpdateState();
+					break;
+
 				case 0x5007: _exRegs[2] = value; break;
 			}
 		} else {

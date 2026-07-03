@@ -14,7 +14,10 @@ class WsMemoryManager;
 class WsControlManager;
 class WsDmaController;
 class WsEeprom;
+class WsRtc;
+
 enum class WsModel : uint8_t;
+enum class WsAudioMode : uint8_t;
 
 class WsConsole final : public IConsole
 {
@@ -31,6 +34,7 @@ private:
 	unique_ptr<WsDmaController> _dmaController;
 	unique_ptr<WsEeprom> _internalEeprom;
 	unique_ptr<WsEeprom> _cartEeprom;
+	unique_ptr<WsRtc> _cartRtc;
 
 	uint8_t* _workRam = nullptr;
 	uint32_t _workRamSize = 0;
@@ -51,24 +55,28 @@ private:
 	uint32_t _cartEepromSize = 0;
 
 	WsModel _model = {};
+	bool _colorModel = false;
 	bool _verticalMode = false;
-	
+
 	void InitPostBootRomState();
 
 public:
 	WsConsole(Emulator* emu);
 	~WsConsole();
 
-	static vector<string> GetSupportedExtensions() { return { ".ws", ".wsc" }; }
-	static vector<string> GetSupportedSignatures() { return { }; }
+	static vector<string> GetSupportedExtensions() { return { ".ws", ".wsc", ".pc2" }; }
+	static vector<string> GetSupportedSignatures() { return {}; }
 
 	LoadRomResult LoadRom(VirtualFile& romFile) override;
 	void RunFrame() override;
 
 	void GetScreenRotationOverride(uint32_t& rotation) override;
 	bool IsColorMode();
+	bool IsColorModel();
 	bool IsPowerOff();
 	bool IsVerticalMode();
+	bool HasBootRom() { return _bootRom != nullptr; }
+	WsAudioMode GetAudioMode();
 	WsModel GetModel();
 
 	void ProcessEndOfFrame();
@@ -81,18 +89,20 @@ public:
 	ConsoleRegion GetRegion() override;
 	ConsoleType GetConsoleType() override;
 	vector<CpuType> GetCpuTypes() override;
+	uint64_t GetCartridgeClock();
 	uint64_t GetMasterClock() override;
 	uint32_t GetMasterClockRate() override;
 	double GetFps() override;
 	BaseVideoFilter* GetVideoFilter(bool getDefaultFilter) override;
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
 	RomFormat GetRomFormat() override;
 	AudioTrackInfo GetAudioTrackInfo() override;
 	void ProcessAudioPlayerAction(AudioPlayerActionParams p) override;
 	AddressInfo GetAbsoluteAddress(uint32_t relAddr);
 	AddressInfo GetAbsoluteAddress(AddressInfo& relAddress) override;
 	AddressInfo GetRelativeAddress(AddressInfo& absAddress, CpuType cpuType) override;
-	
+
 	WsState GetState();
 	void GetConsoleState(BaseState& state, ConsoleType consoleType) override;
 

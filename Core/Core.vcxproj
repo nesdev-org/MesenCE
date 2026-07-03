@@ -29,6 +29,11 @@
     <ClInclude Include="NES\Mappers\Nintendo\CnromProtect.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper487.h" />
     <ClInclude Include="NES\OpnInterface.h" />
+    <ClInclude Include="Shared\Utilities\S3511ARtc.h" />
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinStf.h" />
+    <ClInclude Include="SNES\Input\AsciiTurboFileTwinTf2.h" />
+    <ClInclude Include="Shared\Utilities\AvMergeUtilities.h" />
+    <ClInclude Include="SNES\Input\SnesNttDataKeypad.h" />
     <ClInclude Include="SMS\Input\ColecoVisionController.h" />
     <ClInclude Include="Debugger\AddressInfo.h" />
     <ClInclude Include="Debugger\Base6502Assembler.h" />
@@ -224,7 +229,6 @@
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper120.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper15.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper170.h" />
-    <ClInclude Include="NES\Mappers\Unlicensed\Mapper183.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper200.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper202.h" />
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper203.h" />
@@ -488,6 +492,7 @@
     <ClInclude Include="NES\Input\KonamiHyperShot.h" />
     <ClInclude Include="NES\Input\OekaKidsTablet.h" />
     <ClInclude Include="NES\Input\PachinkoController.h" />
+    <ClInclude Include="NES\Input\FcnsController.h" />
     <ClInclude Include="NES\Input\PartyTap.h" />
     <ClInclude Include="NES\Input\PowerPad.h" />
     <ClInclude Include="NES\Input\SuborKeyboard.h" />
@@ -502,7 +507,6 @@
     <ClInclude Include="NES\Loaders\NsfeLoader.h" />
     <ClInclude Include="NES\Loaders\NsfLoader.h" />
     <ClInclude Include="NES\Loaders\RomLoader.h" />
-    <ClInclude Include="NES\APU\BaseExpansionAudio.h" />
     <ClInclude Include="NES\Mappers\A12Watcher.h" />
     <ClInclude Include="NES\Mappers\Audio\Mmc5Audio.h" />
     <ClInclude Include="NES\Mappers\Audio\Namco163Audio.h" />
@@ -781,6 +785,7 @@
     <ClInclude Include="WS\APU\WsApuCh4.h" />
     <ClInclude Include="WS\APU\WsHyperVoice.h" />
     <ClInclude Include="WS\Carts\WsCart.h" />
+    <ClInclude Include="WS\Carts\WsRtc.h" />
     <ClInclude Include="WS\Debugger\DummyWsCpu.h" />
     <ClInclude Include="WS\Debugger\WsAssembler.h" />
     <ClInclude Include="WS\Debugger\WsDebugger.h" />
@@ -789,8 +794,9 @@
     <ClInclude Include="WS\Debugger\WsPpuTools.h" />
     <ClInclude Include="WS\Debugger\WsTraceLogger.h" />
     <ClInclude Include="WS\APU\WsApu.h" />
+    <ClInclude Include="WS\Input\Pcv2Controller.h" />
     <ClInclude Include="WS\WsConsole.h" />
-    <ClInclude Include="WS\WsController.h" />
+    <ClInclude Include="WS\Input\WsController.h" />
     <ClInclude Include="WS\WsControlManager.h" />
     <ClInclude Include="WS\WsCpu.h" />
     <ClInclude Include="WS\WsCpuPrefetch.h" />
@@ -869,10 +875,10 @@
     <ClCompile Include="NES\Loaders\iNesLoader.cpp" />
     <ClCompile Include="NES\Loaders\NsfLoader.cpp" />
     <ClCompile Include="NES\Loaders\RomLoader.cpp" />
-    <ClCompile Include="NES\APU\BaseExpansionAudio.cpp" />
     <ClCompile Include="NES\Loaders\StudyBoxLoader.cpp" />
     <ClCompile Include="NES\Loaders\UnifLoader.cpp" />
     <ClCompile Include="NES\Mappers\Homebrew\Rainbow.cpp" />
+    <ClCompile Include="SNES\Input\SnesNttDataKeypad.cpp" />
     <ClCompile Include="Shared\Utilities\emu2413.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PGO Profile|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -931,6 +937,7 @@
     <ClCompile Include="Shared\CdReader.cpp" />
     <ClCompile Include="Shared\DebuggerRequest.cpp" />
     <ClCompile Include="Shared\HistoryViewer.cpp" />
+    <ClCompile Include="Shared\Utilities\S3511ARtc.cpp" />
     <ClCompile Include="Shared\Video\DrawStringCommand.cpp" />
     <ClCompile Include="Shared\Video\RotateFilter.cpp" />
     <ClCompile Include="Shared\Video\SoftwareRenderer.cpp" />
@@ -1093,6 +1100,7 @@
     <ClCompile Include="Shared\Audio\WaveRecorder.cpp" />
     <ClCompile Include="WS\APU\WsApu.cpp" />
     <ClCompile Include="WS\Carts\WsCart.cpp" />
+    <ClCompile Include="WS\Carts\WsRtc.cpp" />
     <ClCompile Include="WS\Debugger\DummyWsCpu.cpp" />
     <ClCompile Include="WS\Debugger\WsDebugger.cpp" />
     <ClCompile Include="WS\Debugger\WsDisUtils.cpp" />
@@ -1221,6 +1229,7 @@
       </ShowIncludes>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -1257,6 +1266,7 @@
       </RuntimeTypeInfo>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -1289,6 +1299,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -1321,6 +1332,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -53,7 +53,7 @@ public:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0x6000) {
-			case 0x0000: 
+			case 0x0000:
 				if(_locked) {
 					_ramEnabled = ((value & 0x0F) == 0x0A);
 				} else {

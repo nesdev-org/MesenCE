@@ -29,16 +29,16 @@ private:
 	uint16_t _subScreenBuffer[256 * 239] = {};
 
 	void GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview, uint16_t spriteIndex, GetSpritePreviewOptions& options, SnesPpuState& state, uint8_t* vram, uint8_t* oamRam, uint32_t* palette);
-	
+
 	template<TileFormat format> void RenderMode7Tilemap(GetTilemapOptions& options, uint8_t* vram, uint32_t* outBuffer, const uint32_t* palette);
 	template<TileFormat format> void RenderTilemap(GetTilemapOptions& options, int rowCount, LayerConfig& layer, int columnCount, uint8_t* vram, int tileHeight, int tileWidth, bool largeTileHeight, bool largeTileWidth, uint8_t bpp, uint32_t* outBuffer, FrameInfo outputSize, const uint32_t* palette, uint16_t basePaletteOffset);
 	template<TileFormat format, bool largeTileHeight, bool largeTileWidth> void RenderTilemap(GetTilemapOptions& options, int rowCount, LayerConfig& layer, int columnCount, uint8_t* vram, int tileHeight, int tileWidth, uint8_t bpp, uint32_t* outBuffer, FrameInfo outputSize, const uint32_t* palette, uint16_t basePaletteOffset);
-	
+
 	DebugTilemapInfo RenderScreenView(uint8_t layer, uint32_t* outBuffer);
 	void GetSpritePreview(GetSpritePreviewOptions options, BaseState& state, BaseState& ppuToolsState, DebugSpriteInfo* sprites, uint32_t* spritePreviews, uint32_t* palette, uint32_t* outBuffer);
 
 public:
-	SnesPpuTools(Debugger* debugger, Emulator *emu);
+	SnesPpuTools(Debugger* debugger, Emulator* emu);
 
 	void GetPpuToolsState(BaseState& state) override;
 

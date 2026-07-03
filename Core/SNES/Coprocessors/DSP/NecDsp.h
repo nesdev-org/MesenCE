@@ -24,10 +24,10 @@ private:
 
 	double _frequency = 7600000;
 	uint32_t _opCode = 0;
-	uint8_t *_progRom = nullptr;
-	uint32_t *_prgCache = nullptr;
-	uint16_t *_dataRom = nullptr;
-	uint16_t *_ram = nullptr;
+	uint8_t* _progRom = nullptr;
+	uint32_t* _prgCache = nullptr;
+	uint16_t* _dataRom = nullptr;
+	uint16_t* _ram = nullptr;
 	uint16_t _stack[16];
 
 	uint32_t _progSize = 0;
@@ -56,16 +56,16 @@ private:
 	uint16_t GetSourceValue(uint8_t source);
 
 	uint16_t ReadRom(uint32_t addr);
-	
+
 	uint16_t ReadRam(uint32_t addr);
 	void WriteRam(uint32_t addr, uint16_t value);
 
-	NecDsp(CoprocessorType type, SnesConsole* console, vector<uint8_t> &programRom, vector<uint8_t> &dataRom);
+	NecDsp(CoprocessorType type, SnesConsole* console, vector<uint8_t>& programRom, vector<uint8_t>& dataRom);
 
 public:
 	virtual ~NecDsp();
 
-	static NecDsp* InitCoprocessor(CoprocessorType type, SnesConsole* console, vector<uint8_t> &embeddedFirmware);
+	static NecDsp* InitCoprocessor(CoprocessorType type, SnesConsole* console, vector<uint8_t>& embeddedFirmware);
 
 	void Reset() override;
 	void Run() override;
@@ -74,14 +74,14 @@ public:
 	void SaveBattery() override;
 
 	void BuildProgramCache();
-	
+
 	uint8_t Read(uint32_t addr) override;
 	void Write(uint32_t addr, uint8_t value) override;
 
 	uint32_t GetOpCode(uint32_t addr);
-	
+
 	uint8_t Peek(uint32_t addr) override;
-	void PeekBlock(uint32_t addr, uint8_t * output) override;
+	void PeekBlock(uint32_t addr, uint8_t* output) override;
 	AddressInfo GetAbsoluteAddress(uint32_t address) override;
 
 	uint8_t* DebugGetProgramRom();
@@ -92,5 +92,5 @@ public:
 	uint32_t DebugGetDataRamSize();
 	NecDspState& GetState();
 
-	void Serialize(Serializer &s) override;
+	void Serialize(Serializer& s) override;
 };

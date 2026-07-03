@@ -1,14 +1,14 @@
 ﻿using Avalonia.Media;
-using Mesen.Debugger.Controls;
 using Mesen.Config;
 using Mesen.Debugger;
+using Mesen.Debugger.Controls;
+using Mesen.Interop;
+using Mesen.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Interop;
-using Mesen.Utilities;
 
 namespace Mesen.Debugger.Disassembly
 {
@@ -90,7 +90,7 @@ namespace Mesen.Debugger.Disassembly
 
 			props.IsSelectedRow = IsLineSelected(lineData, lineIndex);
 			props.IsActiveRow = IsLineFocused(lineData, lineIndex);
-			
+
 			if(lineData.Flags.HasFlag(LineFlags.PrgRom)) {
 				props.AddressColor = Colors.Gray;
 			} else if(lineData.Flags.HasFlag(LineFlags.WorkRam)) {

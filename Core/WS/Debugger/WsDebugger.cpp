@@ -6,7 +6,8 @@
 #include "WS/Debugger/WsEventManager.h"
 #include "WS/Debugger/WsTraceLogger.h"
 #include "WS/Debugger/WsPpuTools.h"
-#include "WS/WsController.h"
+#include "WS/Input/WsController.h"
+#include "WS/Input/Pcv2Controller.h"
 #include "WS/WsCpu.h"
 #include "WS/WsPpu.h"
 #include "WS/WsConsole.h"
@@ -18,7 +19,6 @@
 #include "Debugger/BreakpointManager.h"
 #include "Debugger/Debugger.h"
 #include "Debugger/MemoryAccessCounter.h"
-#include "Debugger/ExpressionEvaluator.h"
 #include "Debugger/CodeDataLogger.h"
 #include "Debugger/BaseEventManager.h"
 #include "Debugger/StepBackManager.h"
@@ -39,13 +39,13 @@ WsDebugger::WsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator())
 	_memoryAccessCounter = debugger->GetMemoryAccessCounter();
 
 	_console = ((WsConsole*)debugger->GetConsole());
-	
+
 	_cpu = _console->GetCpu();
 	_ppu = _console->GetPpu();
 	_memoryManager = _console->GetMemoryManager();
 
 	_settings = debugger->GetEmulator()->GetSettings();
-	
+
 	_codeDataLogger.reset(new CodeDataLogger(debugger, MemoryType::WsPrgRom, _emu->GetMemory(MemoryType::WsPrgRom).Size, CpuType::Ws, _emu->GetCrc32()));
 	_cdlFile = _codeDataLogger->GetCdlFilePath(_emu->GetRomInfo().RomFile.GetFileName());
 	_codeDataLogger->LoadCdlFile(_cdlFile, _settings->GetDebugConfig().AutoResetCdl);
@@ -59,7 +59,7 @@ WsDebugger::WsDebugger(Debugger* debugger) : IDebugger(debugger->GetEmulator())
 	_breakpointManager.reset(new BreakpointManager(debugger, this, CpuType::Ws, _eventManager.get()));
 	_step.reset(new StepRequest());
 	_assembler.reset(new WsAssembler(debugger->GetLabelManager()));
-	
+
 	_dummyCpu.reset(new DummyWsCpu(_emu, _console, _memoryManager));
 
 	ResetPrevOpCode();
@@ -329,10 +329,7 @@ void WsDebugger::ProcessInterrupt(uint32_t originalPc, uint32_t currentPc, bool 
 	ProcessCallStackUpdates(ret, originalPc, originalSp);
 	ResetPrevOpCode();
 
-	_debugger->InternalProcessInterrupt(
-		CpuType::Ws, *this, *_step.get(), 
-		ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi
-	);
+	_debugger->InternalProcessInterrupt(CpuType::Ws, *this, *_step.get(), ret, originalPc, dest, currentPc, ret, originalPc, originalSp, forNmi);
 }
 
 void WsDebugger::ProcessPpuCycle()
@@ -370,7 +367,7 @@ DebuggerFeatures WsDebugger::GetSupportedFeatures()
 	features.CpuVectors[2] = { "INT3", 3 * 4, VectorType::x86 };
 	features.CpuVectors[3] = { "INTO", 4 * 4, VectorType::x86 };
 	features.CpuVectors[4] = { "BOUND", 5 * 4, VectorType::x86 };
-	
+
 	features.IrqVectorOffset = _memoryManager->GetState().IrqVectorOffset;
 	features.CpuVectors[5] = { "UART Send", 0, VectorType::x86WithOffset };
 	features.CpuVectors[6] = { "Key Pressed", 1, VectorType::x86WithOffset };
@@ -459,6 +456,11 @@ PpuTools* WsDebugger::GetPpuTools()
 	return _ppuTools.get();
 }
 
+ISerializable* WsDebugger::GetSerializableCpu()
+{
+	return _cpu;
+}
+
 bool WsDebugger::SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption)
 {
 	vector<uint8_t> output;
@@ -495,20 +497,33 @@ void WsDebugger::ProcessInputOverrides(DebugControllerState inputOverrides[8])
 {
 	BaseControlManager* controlManager = _console->GetControlManager();
 	for(int i = 0; i < 8; i++) {
-		shared_ptr<WsController> controller = std::dynamic_pointer_cast<WsController>(controlManager->GetControlDeviceByIndex(i));
-		if(controller && inputOverrides[i].HasPressedButton()) {
-			controller->SetBitValue(WsController::Buttons::A, inputOverrides[i].A);
-			controller->SetBitValue(WsController::Buttons::B, inputOverrides[i].B);
-			controller->SetBitValue(WsController::Buttons::Start, inputOverrides[i].Start);
-			controller->SetBitValue(WsController::Buttons::Sound, inputOverrides[i].Select);
-			controller->SetBitValue(WsController::Buttons::Up, inputOverrides[i].Up);
-			controller->SetBitValue(WsController::Buttons::Down, inputOverrides[i].Down);
-			controller->SetBitValue(WsController::Buttons::Left, inputOverrides[i].Left);
-			controller->SetBitValue(WsController::Buttons::Right, inputOverrides[i].Right);
-			controller->SetBitValue(WsController::Buttons::Up2, inputOverrides[i].U);
-			controller->SetBitValue(WsController::Buttons::Down2, inputOverrides[i].D);
-			controller->SetBitValue(WsController::Buttons::Left2, inputOverrides[i].L);
-			controller->SetBitValue(WsController::Buttons::Right2, inputOverrides[i].R);
+		shared_ptr<WsController> wsController = std::dynamic_pointer_cast<WsController>(controlManager->GetControlDeviceByIndex(i));
+		if(wsController && inputOverrides[i].HasPressedButton()) {
+			wsController->SetBitValue(WsController::Buttons::A, inputOverrides[i].A);
+			wsController->SetBitValue(WsController::Buttons::B, inputOverrides[i].B);
+			wsController->SetBitValue(WsController::Buttons::Start, inputOverrides[i].Start);
+			wsController->SetBitValue(WsController::Buttons::Sound, inputOverrides[i].Select);
+			wsController->SetBitValue(WsController::Buttons::Up, inputOverrides[i].Up);
+			wsController->SetBitValue(WsController::Buttons::Down, inputOverrides[i].Down);
+			wsController->SetBitValue(WsController::Buttons::Left, inputOverrides[i].Left);
+			wsController->SetBitValue(WsController::Buttons::Right, inputOverrides[i].Right);
+			wsController->SetBitValue(WsController::Buttons::Up2, inputOverrides[i].U);
+			wsController->SetBitValue(WsController::Buttons::Down2, inputOverrides[i].D);
+			wsController->SetBitValue(WsController::Buttons::Left2, inputOverrides[i].L);
+			wsController->SetBitValue(WsController::Buttons::Right2, inputOverrides[i].R);
+		}
+
+		shared_ptr<Pcv2Controller> pcv2Controller = std::dynamic_pointer_cast<Pcv2Controller>(controlManager->GetControlDeviceByIndex(i));
+		if(pcv2Controller && inputOverrides[i].HasPressedButton()) {
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Up, inputOverrides[i].Up);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Down, inputOverrides[i].Down);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Left, inputOverrides[i].Left);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Right, inputOverrides[i].Right);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Clear, inputOverrides[i].A);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Circle, inputOverrides[i].B);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Pass, inputOverrides[i].D);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::Esc, inputOverrides[i].Select);
+			pcv2Controller->SetBitValue(Pcv2Controller::Buttons::View, inputOverrides[i].Start);
 		}
 	}
 	controlManager->RefreshHubState();

@@ -56,7 +56,7 @@ private:
 	void ProcessVsDualSystemAudio();
 
 	void UpdateRates(bool forceUpdate);
-	
+
 public:
 	NesSoundMixer(NesConsole* console);
 	virtual ~NesSoundMixer();

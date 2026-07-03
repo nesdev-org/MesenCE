@@ -14,7 +14,7 @@ void WsDmaController::Init(WsMemoryManager* memoryManager, WsApu* apu)
 void WsDmaController::RunGeneralDma()
 {
 	int offset = (_state.GdmaControl & 0x40) ? -2 : 2;
-	
+
 	if(_state.GdmaLength == 0 || _memoryManager->GetWaitStates(_state.GdmaSrc) > 1 || !_memoryManager->IsWordBus(_state.GdmaSrc)) {
 		//When length is 0, or if transfer has an invalid source address, stop processing immediately
 		//The 5 cycles of setup time aren't executed in this scenario
@@ -51,7 +51,7 @@ void WsDmaController::ProcessSoundDma()
 
 	if(_state.SdmaTimer == 0) {
 		_state.SdmaTimer = _state.SdmaFrequency;
-		
+
 		//Sound DMA steals 6 cycles + N access cycles to run
 		//4 cycles at the start + N read cycles + 1 dma write cycle
 		_memoryManager->Exec();
@@ -112,7 +112,7 @@ uint8_t WsDmaController::ReadPort(uint16_t port)
 		case 0x4F: return BitUtilities::GetBits<8>(_state.SdmaLength);
 		case 0x50: return BitUtilities::GetBits<16>(_state.SdmaLength);
 		case 0x51: return 0;
-		
+
 		case 0x52: return _state.SdmaControl;
 		case 0x53: return 0;
 	}
@@ -147,7 +147,7 @@ void WsDmaController::WritePort(uint16_t port, uint8_t value)
 			BitUtilities::SetBits<8>(_state.SdmaSrc, value);
 			BitUtilities::SetBits<8>(_state.SdmaSrcReloadValue, value);
 			break;
-		
+
 		case 0x4C:
 			BitUtilities::SetBits<16>(_state.SdmaSrc, value & 0x0F);
 			BitUtilities::SetBits<16>(_state.SdmaSrcReloadValue, value & 0x0F);
@@ -183,7 +183,7 @@ void WsDmaController::WritePort(uint16_t port, uint8_t value)
 				case 2: _state.SdmaFrequency = 1; break;
 				case 3: _state.SdmaFrequency = 0; break;
 			}
-		
+
 			_state.SdmaHold = value & 0x04;
 			_state.SdmaRepeat = value & 0x08;
 			_state.SdmaHyperVoice = value & 0x10;

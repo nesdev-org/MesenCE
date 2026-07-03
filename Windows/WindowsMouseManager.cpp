@@ -7,14 +7,16 @@ WindowsMouseManager::WindowsMouseManager()
 	_crossCursor = LoadCursor(nullptr, IDC_CROSS);
 }
 
-WindowsMouseManager::~WindowsMouseManager() {}
+WindowsMouseManager::~WindowsMouseManager()
+{
+}
 
 SystemMouseState WindowsMouseManager::GetSystemMouseState(void* rendererHandle)
 {
 	SystemMouseState state = {};
 	POINT point;
 	GetCursorPos(&point);
-	if(rendererHandle != nullptr && WindowFromPoint(point) != (HWND) rendererHandle) {
+	if(rendererHandle != nullptr && WindowFromPoint(point) != (HWND)rendererHandle) {
 		//Mouse is over another window
 		state.XPosition = -1;
 		state.YPosition = -1;
@@ -60,8 +62,8 @@ void WindowsMouseManager::SetCursorImage(CursorImage cursor)
 {
 	switch(cursor) {
 		case CursorImage::Hidden: SetCursor(nullptr); break;
-		case CursorImage::Arrow: SetCursor((HCURSOR) _arrowCursor); break;
-		case CursorImage::Cross: SetCursor((HCURSOR) _crossCursor); break;
+		case CursorImage::Arrow: SetCursor((HCURSOR)_arrowCursor); break;
+		case CursorImage::Cross: SetCursor((HCURSOR)_crossCursor); break;
 	}
 }
 

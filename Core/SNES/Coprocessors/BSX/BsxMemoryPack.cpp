@@ -42,7 +42,7 @@ void BsxMemoryPack::Serialize(Serializer& s)
 	SV(_enableVendorInfo);
 	SV(_writeByte);
 	SV(_command);
-	
+
 	if(s.IsSaving()) {
 		//Save content of memory pack as an IPS patch
 		vector<uint8_t> newData(_data, _data + _dataSize);
@@ -144,7 +144,7 @@ uint8_t BsxMemoryPack::BsxMemoryPackHandler::Read(uint32_t addr)
 			case 0x05: return 0x00;
 			case 0x06: return 0x10 | _memPack->_calculatedSize; //Memory Pack Type 1
 			case 0x07: return 0x00;
-			default:   return 0x00;
+			default: return 0x00;
 		}
 	}
 

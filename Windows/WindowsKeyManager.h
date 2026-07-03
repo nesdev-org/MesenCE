@@ -17,7 +17,7 @@ private:
 
 	HWND _hWnd;
 	Emulator* _emu;
-	
+
 	vector<KeyDefinition> _keyDefinitions;
 
 	bool _keyState[0x205];

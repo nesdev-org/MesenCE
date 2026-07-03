@@ -10,7 +10,7 @@ class AviRecorder final : public IVideoRecorder
 {
 private:
 	std::thread _aviWriterThread;
-	
+
 	unique_ptr<AviWriter> _aviWriter;
 
 	string _outputFile;

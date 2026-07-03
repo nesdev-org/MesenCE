@@ -44,9 +44,20 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0xE000) {
-			case 0xA000: _regs[0] = value; UpdateState(); break;
-			case 0xC000: _regs[1] = value; UpdateState(); break;
-			case 0xE000: _mode = value & 0x0F; UpdateState(); break;
+			case 0xA000:
+				_regs[0] = value;
+				UpdateState();
+				break;
+
+			case 0xC000:
+				_regs[1] = value;
+				UpdateState();
+				break;
+
+			case 0xE000:
+				_mode = value & 0x0F;
+				UpdateState();
+				break;
 		}
 	}
 };

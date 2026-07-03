@@ -11,7 +11,7 @@ protected:
 	uint32_t GetDipSwitchCount() override { return 4; }
 	uint16_t GetPrgPageSize() override { return 0x4000; }
 	uint16_t GetChrPageSize() override { return 0x2000; }
-	bool AllowRegisterRead() override {	return true; }
+	bool AllowRegisterRead() override { return true; }
 
 	void InitMapper() override
 	{

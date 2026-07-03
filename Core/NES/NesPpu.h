@@ -1,11 +1,8 @@
 #pragma once
 
 #include "pch.h"
-#include "Utilities/ISerializable.h"
 #include "NES/NesTypes.h"
 #include "NES/BaseNesPpu.h"
-#include "NES/BaseMapper.h"
-#include "NES/NesTypes.h"
 #include "NES/INesMemoryHandler.h"
 #include "Shared/MemoryOperationType.h"
 
@@ -15,6 +12,7 @@ class Emulator;
 class SnesControlManager;
 class NesConsole;
 class EmuSettings;
+struct RenderedFrame;
 
 enum PpuRegisters
 {
@@ -33,10 +31,9 @@ template<class T>
 class NesPpu : public BaseNesPpu
 {
 private:
-	static constexpr int32_t OamDecayCycleCount = 3000;
+	static constexpr int32_t OamDecayCycleCount = 4500; //About 40 scanlines.
 
 protected:
-	
 	void UpdateStatusFlag();
 
 	void SetControlRegister(uint8_t value);
@@ -56,15 +53,20 @@ protected:
 	__forceinline uint16_t GetAttributeAddr();
 
 	void ProcessScanlineFirstCycle();
+	__noinline void ProcessRenderingDisabledPixel();
+
 	__forceinline void ProcessScanlineImpl();
+	__forceinline void UpdateProcessSpritesFlag();
 	__forceinline void ProcessSpriteEvaluation();
 	__noinline void ProcessSpriteEvaluationStart();
-	__noinline void ProcessSpriteEvaluationEnd();
+
+	__forceinline void ProcessSpriteShifters();
 
 	void BeginVBlank();
 	void TriggerNmi();
 
 	__forceinline void LoadTileInfo();
+
 	void LoadSprite(uint8_t spriteY, uint8_t tileIndex, uint8_t attributes, uint8_t spriteX, bool extraSprite);
 	void LoadSpriteTileInfo();
 	void LoadExtraSprites();
@@ -73,14 +75,13 @@ protected:
 	__forceinline uint8_t ReadSpriteRam(uint8_t addr);
 	__forceinline void WriteSpriteRam(uint8_t addr, uint8_t value);
 
-	void SetOamCorruptionFlags();
-	void ProcessOamCorruption();
+	__forceinline void CorruptOamRow(uint8_t sourceRow, uint8_t destRow);
 
 	__forceinline uint8_t GetPixelColor();
 
 	void SendFrame();
 
-	void SendFrameVsDualSystem();
+	void SendFrameVsDualSystem(RenderedFrame& frame);
 
 	void UpdateState();
 
@@ -110,7 +111,7 @@ public:
 	uint16_t* GetScreenBuffer(bool previousBuffer, bool processGrayscaleEmphasisBits = false) override;
 	void DebugCopyOutputBuffer(uint16_t* target);
 	void DebugUpdateFrameBuffer(bool toGrayscale);
-	
+
 	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		ranges.AddHandler(MemoryOperation::Read, 0x2000, 0x3FFF);

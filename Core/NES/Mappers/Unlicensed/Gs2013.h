@@ -18,7 +18,7 @@ protected:
 		SetCpuMemoryMapping(0x6000, 0x7FFF, 0x1F, PrgMemoryType::PrgRom);
 		SelectPrgPage4x(0, 0x0F << 2);
 	}
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		SelectPrgPage4x(0, (value & 0x0F) << 2);

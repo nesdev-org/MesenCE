@@ -112,14 +112,14 @@ struct VideoConfig
 	double NtscIFilterLength = 1.0;
 	double NtscQFilterLength = 1.0;
 
+	bool EnableVariableRefreshRate = false;
 	bool FullscreenForceIntegerScale = false;
 	bool UseExclusiveFullscreen = false;
 	uint32_t ExclusiveFullscreenRefreshRateNtsc = 60;
 	uint32_t ExclusiveFullscreenRefreshRatePal = 50;
-	uint32_t FullscreenResWidth = 0;
-	uint32_t FullscreenResHeight = 0;
 
 	uint32_t ScreenRotation = 0;
+	bool DisableHighPrecisionFramePacing = false;
 };
 
 struct AudioConfig
@@ -182,6 +182,9 @@ enum class ControllerType
 	SuperScope,
 	Multitap,
 	SnesRumbleController,
+	SnesNttDataKeypad,
+	AsciiTurboFileTwinTf2,
+	AsciiTurboFileTwinStf,
 
 	//NES controllers
 	NesController,
@@ -207,6 +210,7 @@ enum class ControllerType
 	FamilyBasicKeyboard,
 	PartyTap,
 	Pachinko,
+	FcnsController,
 	ExcitingBoxing,
 	JissenMahjong,
 	SuborKeyboard,
@@ -239,7 +243,8 @@ enum class ControllerType
 
 	//WS
 	WsController,
-	WsControllerVertical
+	WsControllerVertical,
+	Pcv2Controller
 };
 
 struct KeyMapping
@@ -267,7 +272,7 @@ struct KeyMapping
 	uint16_t TurboR = 0;
 	uint16_t TurboSelect = 0;
 	uint16_t TurboStart = 0;
-	
+
 	uint16_t GenericKey1 = 0;
 
 	uint16_t CustomKeys[100] = {};
@@ -333,7 +338,7 @@ struct InputConfig
 	uint32_t MouseSensitivity = 1;
 
 	InputDisplayPosition DisplayInputPosition = InputDisplayPosition::TopLeft;
-	bool DisplayInputPort[8] = { };
+	bool DisplayInputPort[8] = {};
 	bool DisplayInputHorizontally = true;
 
 	double ForceFeedbackIntensity = 1.0;
@@ -368,6 +373,7 @@ enum class ConsoleType
 
 enum class GameboyModel
 {
+	AutoFavorBest,
 	AutoFavorGbc,
 	AutoFavorSgb,
 	AutoFavorGb,
@@ -401,16 +407,28 @@ struct GameConfig
 	OverscanDimensions Overscan = {};
 };
 
+enum class GbLocalLinkOutputOption
+{
+	Both = 0,
+	MainSystemOnly = 1,
+	SubSystemOnly = 2
+};
+
 struct GameboyConfig
 {
 	ControllerConfig Controller;
+	ControllerConfig LinkedController;
 
 	GameboyModel Model = GameboyModel::AutoFavorGbc;
 	bool UseSgb2 = true;
 
+	bool UseLocalLinkCable = false;
+	GbLocalLinkOutputOption LocalLinkCableVideoOutput = GbLocalLinkOutputOption::Both;
+	GbLocalLinkOutputOption LocalLinkCableAudioOutput = GbLocalLinkOutputOption::Both;
+
 	bool BlendFrames = true;
 	bool GbcAdjustColors = true;
-	
+
 	bool DisableBackground = false;
 	bool DisableSprites = false;
 	bool HideSgbBorders = false;
@@ -465,7 +483,7 @@ struct GbaConfig
 
 	bool HideBgLayers[4] = {};
 	bool DisableSprites = false;
-	
+
 	uint32_t OverclockScanlineCount = 0;
 
 	RamState RamPowerOnState = RamState::AllZeros;
@@ -528,7 +546,7 @@ struct PcEngineConfig
 
 	OverscanDimensions Overscan = {};
 
-	uint32_t Palette[512] = { };
+	uint32_t Palette[512] = {};
 };
 
 enum class DspInterpolationType
@@ -537,6 +555,13 @@ enum class DspInterpolationType
 	Cubic,
 	Sinc,
 	None
+};
+
+enum class SnesHighResBlendMode
+{
+	None,
+	BlendAll,
+	BlendEvenOdd
 };
 
 struct SnesConfig
@@ -550,7 +575,7 @@ struct SnesConfig
 	ConsoleRegion Region = ConsoleRegion::Auto;
 
 	bool AllowInvalidInput = false;
-	bool BlendHighResolutionModes = false;
+	SnesHighResBlendMode HighResBlendMode = SnesHighResBlendMode::None;
 	bool HideBgLayer1 = false;
 	bool HideBgLayer2 = false;
 	bool HideBgLayer3 = false;
@@ -629,9 +654,9 @@ struct NesConfig
 	bool RemoveSpriteLimit = false;
 	bool AdaptiveSpriteLimit = false;
 	bool EnablePalBorders = false;
-	
+
 	bool UseCustomVsPalette = false;
-	
+
 	OverscanDimensions NtscOverscan = {};
 	OverscanDimensions PalOverscan = {};
 
@@ -672,7 +697,7 @@ struct NesConfig
 	int32_t InputScanline = 241;
 
 	bool IsFullColorPalette = false;
-	uint32_t UserPalette[512] = { };
+	uint32_t UserPalette[512] = {};
 
 	uint32_t ChannelVolumes[11] = {};
 	uint32_t EpsmVolume = 100;
@@ -696,7 +721,7 @@ struct SmsConfig
 {
 	ControllerConfig Port1;
 	ControllerConfig Port2;
-	
+
 	ConsoleRegion Region = ConsoleRegion::Auto;
 	ConsoleRegion GameGearRegion = ConsoleRegion::Auto;
 	RamState RamPowerOnState = RamState::Random;
@@ -739,7 +764,8 @@ enum class WsModel : uint8_t
 	Auto,
 	Monochrome,
 	Color,
-	SwanCrystal
+	SwanCrystal,
+	PocketChallenge
 };
 
 enum class WsAudioMode : uint8_t
@@ -752,6 +778,7 @@ struct WsConfig
 {
 	ControllerConfig ControllerHorizontal;
 	ControllerConfig ControllerVertical;
+	ControllerConfig ControllerPcv2;
 
 	WsModel Model = WsModel::Auto;
 	bool UseBootRom = false;
@@ -849,7 +876,7 @@ struct DebugConfig
 	bool GbaBreakOnInvalidOpCode = false;
 	bool GbaBreakOnUnalignedMemAccess = false;
 	GbaDisassemblyMode GbaDisMode;
-	
+
 	bool WsBreakOnInvalidOpCode = false;
 
 	bool ScriptAllowIoOsAccess = false;
@@ -967,7 +994,7 @@ enum class EmulatorShortcut
 	ToggleOsd,
 	ToggleAlwaysOnTop,
 	ToggleDebugInfo,
-	
+
 	ToggleAudio,
 	IncreaseVolume,
 	DecreaseVolume,

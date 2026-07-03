@@ -3,7 +3,7 @@
 #include "SNES/IMemoryHandler.h"
 #include "Shared/MemoryType.h"
 
-void MemoryMappings::RegisterHandler(uint8_t startBank, uint8_t endBank, uint16_t startPage, uint16_t endPage, vector<unique_ptr<IMemoryHandler>> &handlers, uint16_t pageIncrement, uint16_t startPageNumber)
+void MemoryMappings::RegisterHandler(uint8_t startBank, uint8_t endBank, uint16_t startPage, uint16_t endPage, vector<unique_ptr<IMemoryHandler>>& handlers, uint16_t pageIncrement, uint16_t startPageNumber)
 {
 	if(handlers.empty()) {
 		return;
@@ -100,7 +100,7 @@ uint16_t MemoryMappings::PeekWord(uint32_t addr)
 	return (msb << 8) | lsb;
 }
 
-void MemoryMappings::PeekBlock(uint32_t addr, uint8_t *dest)
+void MemoryMappings::PeekBlock(uint32_t addr, uint8_t* dest)
 {
 	IMemoryHandler* handler = GetHandler(addr);
 	if(handler) {

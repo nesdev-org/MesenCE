@@ -8,6 +8,7 @@
 	xmlns:c="using:Mesen.Controls"
 	xmlns:cfg="using:Mesen.Config"
 	mc:Ignorable="d" d:DesignWidth="610" d:DesignHeight="230"
+	x:Name="root"
 	x:DataType="vm:KeyMappingViewModel"
 	x:Class="Mesen.Views.DefaultControllerView"
 >
@@ -15,19 +16,32 @@
 		<vm:KeyMappingViewModel />
 	</Design.DataContext>
 
-	<Border MaxWidth="500" MaxHeight="300" BorderBrush="Gray" BorderThickness="1" Margin="5">
+	<Border
+		MaxWidth="{Binding MaxWidth, ElementName=root}"
+		MaxHeight="300"
+		BorderBrush="{StaticResource MesenGrayBorderColor}"
+		BorderThickness="1"
+		Margin="{Binding Margin, ElementName=root}"
+	>
 		<ScrollViewer>
 			<ItemsControl ItemsSource="{Binding CustomKeys}">
+				<ItemsControl.Styles>
+					<Style Selector="ContentPresenter > Border">
+						<Setter Property="BorderThickness" Value="0 0 0 1" />
+					</Style>
+					<Style Selector="ContentPresenter:nth-last-child(1) > Border">
+						<Setter Property="BorderThickness" Value="0" />
+					</Style>
+				</ItemsControl.Styles>
+
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<StackPanel>
-							<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Margin="0 -1 0 0">
-								<Grid ColumnDefinitions="3*, 1*" Margin="5 0 5 0">
-									<TextBlock Grid.Column="0" Text="{Binding Name}}" />
-									<c:KeyBindingButton Grid.Column="1" KeyBinding="{Binding KeyMapping}" HorizontalAlignment="Stretch" />
-								</Grid>
-							</Border>
-						</StackPanel>
+						<Border BorderBrush="{StaticResource MesenGrayBorderColor}">
+							<Grid ColumnDefinitions="3*, 1*" Margin="5 0 5 0">
+								<TextBlock Grid.Column="0" Text="{Binding Name}" />
+								<c:KeyBindingButton Grid.Column="1" KeyBinding="{Binding KeyMapping}" HorizontalAlignment="Stretch" />
+							</Grid>
+						</Border>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>

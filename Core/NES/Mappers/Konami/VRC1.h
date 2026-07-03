@@ -6,7 +6,7 @@ class VRC1 : public BaseMapper
 {
 private:
 	uint8_t _chrBanks[2] = {};
-	
+
 	void UpdateChrBanks()
 	{
 		SelectChrPage(0, _chrBanks[0]);
@@ -37,7 +37,7 @@ protected:
 
 		switch(addr & 0xF000) {
 			case 0x8000: SelectPrgPage(0, value & prgMask); break;
-			
+
 			case 0x9000:
 				if(GetMirroringType() != MirroringType::FourScreens) {
 					//"The mirroring bit is ignored if the cartridge is wired for 4-screen VRAM, as is typical for Vs. System games using the VRC1."

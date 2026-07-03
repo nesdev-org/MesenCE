@@ -11,7 +11,8 @@ using namespace DirectX;
 
 class Emulator;
 
-namespace DirectX {
+namespace DirectX
+{
 	class SpriteBatch;
 }
 
@@ -32,7 +33,7 @@ private:
 
 	ID3D11Device* _pd3dDevice = nullptr;
 	ID3D11DeviceContext* _pDeviceContext = nullptr;
-	IDXGISwapChain* _pSwapChain = nullptr;
+	IDXGISwapChain1* _pSwapChain = nullptr;
 	ID3D11RenderTargetView* _pRenderTargetView = nullptr;
 
 	atomic<bool> _needFlip = false;
@@ -52,10 +53,12 @@ private:
 	const uint32_t _bytesPerPixel = 4;
 	uint32_t _screenBufferSize = 0;
 
-	bool _newFullscreen = false;
-	bool _fullscreen = false;
+	FullscreenMode _newFullscreen = FullscreenMode::Disabled;
+	FullscreenMode _fullscreen = FullscreenMode::Disabled;
 	uint32_t _fullscreenRefreshRate = 60;
 	bool _useSrgbTextureFormat = false;
+	bool _allowTearing = false;
+	uint32_t _bufferCount = 1;
 
 	uint32_t _screenWidth = 0;
 	uint32_t _screenHeight = 0;
@@ -83,19 +86,19 @@ private:
 
 	bool CreateHudTexture(HudRenderInfo& hud, uint32_t newWidth, uint32_t newHeight);
 	void DrawHud(HudRenderInfo& hud, RenderSurfaceInfo& hudSurface);
-		
+
 	HRESULT CreateRenderTargetView();
 	void ReleaseRenderTargetView();
 	HRESULT CreateEmuTextureBuffers();
 	void ResetTextureBuffers();
-	
+
 	DXGI_FORMAT GetTextureFormat();
 
 public:
 	Renderer(Emulator* emu, HWND hWnd);
 	~Renderer();
 
-	void SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle) override;
+	void SetFullscreenMode(FullscreenSettings settings) override;
 
 	void Reset() override;
 	void Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud) override;

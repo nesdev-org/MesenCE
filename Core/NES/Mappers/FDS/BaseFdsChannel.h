@@ -19,7 +19,13 @@ protected:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_speed); SV(_gain); SV(_envelopeOff); SV(_volumeIncrease); SV(_frequency); SV(_timer); SV(_masterSpeed);
+		SV(_speed);
+		SV(_gain);
+		SV(_envelopeOff);
+		SV(_volumeIncrease);
+		SV(_frequency);
+		SV(_timer);
+		SV(_masterSpeed);
 	}
 
 public:
@@ -33,8 +39,8 @@ public:
 		switch(addr & 0x03) {
 			case 0:
 				_speed = value & 0x3F;
-				_volumeIncrease = (value & 0x40) == 0x40;
-				_envelopeOff = (value & 0x80) == 0x80;
+				_volumeIncrease = value & 0x40;
+				_envelopeOff = value & 0x80;
 
 				//"Writing to this register immediately resets the clock timer that ticks the volume envelope (delaying the next tick slightly)."
 				ResetTimer();
@@ -82,7 +88,7 @@ public:
 	{
 		return _gain;
 	}
-	
+
 	uint8_t GetMasterSpeed()
 	{
 		return _masterSpeed;
@@ -105,6 +111,6 @@ public:
 
 	void ResetTimer()
 	{
-		_timer = 8 * (_speed + 1) * _masterSpeed;
+		_timer = 8 * (_speed + 1) * (_masterSpeed + 1);
 	}
 };

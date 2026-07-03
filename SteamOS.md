@@ -2,7 +2,7 @@ Running Mesen through the Steam Deck's _Game Mode_ is possible with some caveats
 Due to Gamescope (SteamOS' compositor) not handling Avalonia UI's popups very well (a [solution](https://github.com/AvaloniaUI/Avalonia/pull/14366) is available but [has been reverted due to other issues](https://github.com/AvaloniaUI/Avalonia/pull/14573)), Mesen's menus for settings are not working through Gamescope unless running Mesen [through running KDE Plasma's Desktop through a script](https://www.reddit.com/r/SteamDeck/comments/zqgx9g/desktop_mode_within_gaming_mode_updated_for_new/).
 
  Installation instructions:
- * Download the **[Linux - AppImage](https://nightly.link/SourMesen/Mesen2/workflows/build/master/Mesen%20(Linux%20x64%20-%20AppImage).zip)** nightly build.
+ * Download the **[Linux - AppImage](https://nightly.link/nesdev-org/MesenCE/workflows/build/master/Mesen%20(Linux%20x64%20-%20AppImage).zip)** nightly build.
  * **Mark the AppImage as executable.** (right click > Properties > Permissions > Is executable)
  * Add the application as a non-Steam shortcut to be able to run it through Steam on both _Desktop Mode_ and _Game Mode_. (right click > Add to Steam)
  * Customise the non-Steam shortcut through Steam to your desire. (in Steam: search the AppImage's filename, right click > Properties; from there you can change the icon, shortcut name and launch options)

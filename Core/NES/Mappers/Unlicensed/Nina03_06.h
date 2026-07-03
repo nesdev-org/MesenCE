@@ -4,7 +4,7 @@
 
 class Nina03_06 : public BaseMapper
 {
-private: 
+private:
 	bool _multicartMode = false;
 
 protected:

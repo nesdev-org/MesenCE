@@ -18,7 +18,7 @@ struct HesFileData;
 struct DiscInfo;
 enum class PceConsoleType;
 
-class PceConsole final: public IConsole
+class PceConsole final : public IConsole
 {
 private:
 	Emulator* _emu;
@@ -38,6 +38,7 @@ private:
 	RomFormat _romFormat = RomFormat::Pce;
 
 	static bool IsPopulousCard(uint32_t crc32);
+	static bool IsSuperGrafxCd(DiscInfo& disc);
 	static bool IsSuperGrafxCard(uint32_t crc32);
 
 	bool LoadHesFile(VirtualFile& hesFile);
@@ -46,7 +47,7 @@ private:
 public:
 	PceConsole(Emulator* emu);
 	virtual ~PceConsole();
-	
+
 	static vector<string> GetSupportedExtensions() { return { ".pce", ".cue", ".sgx", ".hes" }; }
 	static vector<string> GetSupportedSignatures() { return { "HESM" }; }
 
@@ -55,7 +56,7 @@ public:
 	void InitializeRam(void* data, uint32_t length);
 
 	void Reset() override;
-	
+
 	LoadRomResult LoadRom(VirtualFile& romFile) override;
 
 	void RunFrame() override;
@@ -77,7 +78,7 @@ public:
 	PceMemoryManager* GetMemoryManager();
 
 	bool IsSuperGrafx() { return _vdc2 != nullptr; }
-	
+
 	uint64_t GetMasterClock() override;
 	uint32_t GetMasterClockRate() override;
 	double GetFps() override;
@@ -85,6 +86,8 @@ public:
 	BaseVideoFilter* GetVideoFilter(bool getDefaultFilter) override;
 
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
+
 	RomFormat GetRomFormat() override;
 
 	void InitHesPlayback(uint8_t selectedTrack);

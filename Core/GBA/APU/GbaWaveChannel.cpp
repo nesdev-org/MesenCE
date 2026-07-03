@@ -83,7 +83,7 @@ void GbaWaveChannel::Exec(uint32_t clocksToRun)
 	if(!_state.Enabled) {
 		return;
 	}
-	
+
 	bool needUpdate = false;
 	do {
 		uint32_t minTimer = std::min<uint32_t>(clocksToRun, _state.Timer);
@@ -105,7 +105,7 @@ void GbaWaveChannel::Exec(uint32_t clocksToRun)
 				_state.SampleBuffer = _state.Ram[bank | (_state.Position >> 1)] >> 4;
 			}
 
-			//The DAC receives the current value from the upper/lower nibble of the sample buffer, shifted right by the volume control. 
+			//The DAC receives the current value from the upper/lower nibble of the sample buffer, shifted right by the volume control.
 			needUpdate = true;
 		}
 		clocksToRun -= minTimer;
@@ -122,13 +122,11 @@ uint8_t GbaWaveChannel::Read(uint16_t addr)
 		case 0: return (
 			(_state.DacEnabled ? 0x80 : 0) |
 			(_state.SelectedBank ? 0x40 : 0) |
-			(_state.DoubleLength ? 0x20 : 0)
-		);
+			(_state.DoubleLength ? 0x20 : 0));
 
 		case 2: return (
 			(_state.OverrideVolume ? 0x80 : 0) |
-			(_state.Volume << 5)
-		);
+			(_state.Volume << 5));
 
 		case 4: return _state.LengthEnabled ? 0x40 : 0;
 	}
@@ -172,7 +170,7 @@ void GbaWaveChannel::Write(uint16_t addr, uint8_t value)
 				//Channel is enabled, if DAC is enabled
 				_state.Enabled = _state.DacEnabled;
 				_apu->UpdateEnabledChannels();
-				
+
 				if(_state.Enabled) {
 					UpdateOutput();
 				}
@@ -217,8 +215,16 @@ uint8_t GbaWaveChannel::ReadRam(uint16_t addr)
 
 void GbaWaveChannel::Serialize(Serializer& s)
 {
-	SV(_state.DacEnabled); SV(_state.SampleBuffer); SV(_state.Position); SV(_state.Volume); SV(_state.Frequency);
-	SV(_state.Length); SV(_state.LengthEnabled); SV(_state.Enabled); SV(_state.Timer); SV(_state.Output);
+	SV(_state.DacEnabled);
+	SV(_state.SampleBuffer);
+	SV(_state.Position);
+	SV(_state.Volume);
+	SV(_state.Frequency);
+	SV(_state.Length);
+	SV(_state.LengthEnabled);
+	SV(_state.Enabled);
+	SV(_state.Timer);
+	SV(_state.Output);
 	SVArray(_state.Ram, 0x20);
 	SV(_state.DoubleLength);
 	SV(_state.SelectedBank);

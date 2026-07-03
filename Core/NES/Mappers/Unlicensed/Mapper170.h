@@ -37,7 +37,7 @@ protected:
 		BaseMapper::Serialize(s);
 		SV(_reg);
 	}
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		_reg = (value << 1) & 0x80;

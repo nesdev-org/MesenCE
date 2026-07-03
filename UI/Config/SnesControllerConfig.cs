@@ -27,12 +27,14 @@ namespace Mesen.Config
 	{
 		public UInt16[]? MouseButtons { get; set; } = null;
 		public UInt16[]? SuperScopeButtons { get; set; } = null;
+		public UInt16[]? NttDataKeypadButtons { get; set; } = null;
 
 		protected override UInt16[]? GetCustomButtons(ControllerType type)
 		{
 			return type switch {
 				ControllerType.SnesMouse => MouseButtons,
 				ControllerType.SuperScope => SuperScopeButtons,
+				ControllerType.SnesNttDataKeypad => NttDataKeypadButtons,
 				_ => null
 			};
 		}
@@ -58,6 +60,7 @@ namespace Mesen.Config
 			List<CustomKeyMapping> keys = type switch {
 				ControllerType.SnesMouse => Enum.GetValues<GenericMouseButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
 				ControllerType.SuperScope => Enum.GetValues<SnesSuperScopeButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
+				ControllerType.SnesNttDataKeypad => Enum.GetValues<SnesNttDataKeypadButtons>().Select(val => new CustomKeyMapping(ResourceHelper.GetEnumText(val), buttonMappings, (int)val)).ToList(),
 				_ => new()
 			};
 
@@ -75,6 +78,11 @@ namespace Mesen.Config
 
 				case ControllerType.SuperScope:
 					SuperScopeButtons = new UInt16[4];
+					break;
+
+				case ControllerType.SnesNttDataKeypad:
+					NttDataKeypadButtons = new UInt16[15];
+					base.ClearKeys(type);
 					break;
 
 				case ControllerType.SnesController:
@@ -101,6 +109,25 @@ namespace Mesen.Config
 						InputApi.GetKeyCode("Enter"),
 					};
 
+				case ControllerType.SnesNttDataKeypad:
+					return new UInt16[15] {
+						InputApi.GetKeyCode("Numpad 0"),
+						InputApi.GetKeyCode("Numpad 1"),
+						InputApi.GetKeyCode("Numpad 2"),
+						InputApi.GetKeyCode("Numpad 3"),
+						InputApi.GetKeyCode("Numpad 4"),
+						InputApi.GetKeyCode("Numpad 5"),
+						InputApi.GetKeyCode("Numpad 6"),
+						InputApi.GetKeyCode("Numpad 7"),
+						InputApi.GetKeyCode("Numpad 8"),
+						InputApi.GetKeyCode("Numpad 9"),
+						InputApi.GetKeyCode("Numpad *"),
+						InputApi.GetKeyCode("Numpad +"),
+						InputApi.GetKeyCode("Numpad ."),
+						InputApi.GetKeyCode("Numpad -"),
+						InputApi.GetKeyCode("Numpad /"),
+					};
+
 				default:
 					return null;
 			}
@@ -112,6 +139,11 @@ namespace Mesen.Config
 				case ControllerType.SnesMouse: MouseButtons = GetDefaultCustomKeys(type, preset); break;
 				case ControllerType.SuperScope: SuperScopeButtons = GetDefaultCustomKeys(type, preset); break;
 
+				case ControllerType.SnesNttDataKeypad:
+					base.SetDefaultKeys(type, preset);
+					NttDataKeypadButtons = GetDefaultCustomKeys(type, preset);
+					break;
+
 				default:
 					base.SetDefaultKeys(type, preset);
 					break;
@@ -120,4 +152,5 @@ namespace Mesen.Config
 	}
 
 	public enum SnesSuperScopeButtons { Fire, Cursor, Turbo, Pause };
+	public enum SnesNttDataKeypadButtons { Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9, Star, Pound, Period, C, EndComunication };
 }

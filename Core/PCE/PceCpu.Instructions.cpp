@@ -64,12 +64,16 @@ void PceCpu::ADD(uint8_t value)
 		}
 
 		result = (uint16_t)(source & 0x0F) + (uint16_t)(value & 0x0F) + (_state.PS & PceCpuFlags::Carry);
-		if(result > 0x09) result += 0x06;
+		if(result > 0x09) {
+			result += 0x06;
+		}
 		result = (uint16_t)(source & 0xF0) + (uint16_t)(value & 0xF0) + (result > 0x0F ? 0x10 : 0) + (result & 0x0F);
-		if(result > 0x9F) result += 0x60;
+		if(result > 0x9F) {
+			result += 0x60;
+		}
 	} else {
 		result = (uint16_t)source + (uint16_t)value + (CheckFlag(PceCpuFlags::Carry) ? PceCpuFlags::Carry : 0x00);
-		
+
 		if(~(source ^ value) & (source ^ result) & 0x80) {
 			SetFlags(PceCpuFlags::Overflow);
 		} else {
@@ -102,9 +106,13 @@ void PceCpu::SUB(uint8_t value)
 		}
 
 		result = (A() & 0x0F) + (value & 0x0F) + (_state.PS & PceCpuFlags::Carry);
-		if(result <= 0x0F) result -= 0x06;
+		if(result <= 0x0F) {
+			result -= 0x06;
+		}
 		result = (A() & 0xF0) + (value & 0xF0) + (result > 0x0F ? 0x10 : 0) + (result & 0x0F);
-		if(result <= 0xFF) result -= 0x60;
+		if(result <= 0xFF) {
+			result -= 0x60;
+		}
 	} else {
 		result = (uint16_t)A() + (uint16_t)value + (_state.PS & PceCpuFlags::Carry);
 
@@ -152,9 +160,20 @@ void PceCpu::CMP(uint8_t reg, uint8_t value)
 	}
 }
 
-void PceCpu::CPA() { CMP(A(), GetOperandValue()); }
-void PceCpu::CPX() { CMP(X(), GetOperandValue()); }
-void PceCpu::CPY() { CMP(Y(), GetOperandValue()); }
+void PceCpu::CPA()
+{
+	CMP(A(), GetOperandValue());
+}
+
+void PceCpu::CPX()
+{
+	CMP(X(), GetOperandValue());
+}
+
+void PceCpu::CPY()
+{
+	CMP(Y(), GetOperandValue());
+}
 
 void PceCpu::INC()
 {
@@ -375,25 +394,85 @@ void PceCpu::CSH()
 }
 
 //OP Codes
-void PceCpu::LDA() { SetA(GetOperandValue()); }
-void PceCpu::LDX() { SetX(GetOperandValue()); }
-void PceCpu::LDY() { SetY(GetOperandValue()); }
+void PceCpu::LDA()
+{
+	SetA(GetOperandValue());
+}
 
-void PceCpu::STA() { MemoryWrite(GetOperand(), A()); }
-void PceCpu::STX() { MemoryWrite(GetOperand(), X()); }
-void PceCpu::STY() { MemoryWrite(GetOperand(), Y()); }
-void PceCpu::STZ() { MemoryWrite(GetOperand(), 0); }
+void PceCpu::LDX()
+{
+	SetX(GetOperandValue());
+}
 
-void PceCpu::TAX() { SetX(A()); }
-void PceCpu::TAY() { SetY(A()); }
-void PceCpu::TSX() { SetX(SP()); }
-void PceCpu::TXA() { SetA(X()); }
-void PceCpu::TXS() { SetSP(X()); }
-void PceCpu::TYA() { SetA(Y()); }
+void PceCpu::LDY()
+{
+	SetY(GetOperandValue());
+}
 
-void PceCpu::PHA() { Push(A()); }
-void PceCpu::PHX() { Push(X()); }
-void PceCpu::PHY() { Push(Y()); }
+void PceCpu::STA()
+{
+	MemoryWrite(GetOperand(), A());
+}
+
+void PceCpu::STX()
+{
+	MemoryWrite(GetOperand(), X());
+}
+
+void PceCpu::STY()
+{
+	MemoryWrite(GetOperand(), Y());
+}
+
+void PceCpu::STZ()
+{
+	MemoryWrite(GetOperand(), 0);
+}
+
+void PceCpu::TAX()
+{
+	SetX(A());
+}
+
+void PceCpu::TAY()
+{
+	SetY(A());
+}
+
+void PceCpu::TSX()
+{
+	SetX(SP());
+}
+
+void PceCpu::TXA()
+{
+	SetA(X());
+}
+
+void PceCpu::TXS()
+{
+	SetSP(X());
+}
+
+void PceCpu::TYA()
+{
+	SetA(Y());
+}
+
+void PceCpu::PHA()
+{
+	Push(A());
+}
+
+void PceCpu::PHX()
+{
+	Push(X());
+}
+
+void PceCpu::PHY()
+{
+	Push(Y());
+}
 
 void PceCpu::PHP()
 {
@@ -425,25 +504,75 @@ void PceCpu::PLY()
 	SetY(Pop());
 }
 
-void PceCpu::INC_Acc() { SetA(A() + 1); }
-void PceCpu::INX() { SetX(X() + 1); }
-void PceCpu::INY() { SetY(Y() + 1); }
+void PceCpu::INC_Acc()
+{
+	SetA(A() + 1);
+}
 
-void PceCpu::DEC_Acc() { SetA(A() - 1); }
-void PceCpu::DEX() { SetX(X() - 1); }
-void PceCpu::DEY() { SetY(Y() - 1); }
+void PceCpu::INX()
+{
+	SetX(X() + 1);
+}
 
-void PceCpu::ASL_Acc() { SetA(ASL(A())); }
-void PceCpu::ASL_Memory() { ASLAddr(); }
+void PceCpu::INY()
+{
+	SetY(Y() + 1);
+}
 
-void PceCpu::LSR_Acc() { SetA(LSR(A())); }
-void PceCpu::LSR_Memory() { LSRAddr(); }
+void PceCpu::DEC_Acc()
+{
+	SetA(A() - 1);
+}
 
-void PceCpu::ROL_Acc() { SetA(ROL(A())); }
-void PceCpu::ROL_Memory() { ROLAddr(); }
+void PceCpu::DEX()
+{
+	SetX(X() - 1);
+}
 
-void PceCpu::ROR_Acc() { SetA(ROR(A())); }
-void PceCpu::ROR_Memory() { RORAddr(); }
+void PceCpu::DEY()
+{
+	SetY(Y() - 1);
+}
+
+void PceCpu::ASL_Acc()
+{
+	SetA(ASL(A()));
+}
+
+void PceCpu::ASL_Memory()
+{
+	ASLAddr();
+}
+
+void PceCpu::LSR_Acc()
+{
+	SetA(LSR(A()));
+}
+
+void PceCpu::LSR_Memory()
+{
+	LSRAddr();
+}
+
+void PceCpu::ROL_Acc()
+{
+	SetA(ROL(A()));
+}
+
+void PceCpu::ROL_Memory()
+{
+	ROLAddr();
+}
+
+void PceCpu::ROR_Acc()
+{
+	SetA(ROR(A()));
+}
+
+void PceCpu::ROR_Memory()
+{
+	RORAddr();
+}
 
 void PceCpu::JMP_Abs()
 {
@@ -523,14 +652,45 @@ void PceCpu::BVS()
 	BranchRelative(CheckFlag(PceCpuFlags::Overflow));
 }
 
-void PceCpu::CLC() { ClearFlags(PceCpuFlags::Carry); }
-void PceCpu::CLD() { ClearFlags(PceCpuFlags::Decimal); }
-void PceCpu::CLI() { ClearFlags(PceCpuFlags::Interrupt); }
-void PceCpu::CLV() { ClearFlags(PceCpuFlags::Overflow); }
-void PceCpu::SEC() { SetFlags(PceCpuFlags::Carry); }
-void PceCpu::SED() { SetFlags(PceCpuFlags::Decimal); }
-void PceCpu::SEI() { SetFlags(PceCpuFlags::Interrupt); }
-void PceCpu::SET() { SetFlags(PceCpuFlags::Memory); }
+void PceCpu::CLC()
+{
+	ClearFlags(PceCpuFlags::Carry);
+}
+
+void PceCpu::CLD()
+{
+	ClearFlags(PceCpuFlags::Decimal);
+}
+
+void PceCpu::CLI()
+{
+	ClearFlags(PceCpuFlags::Interrupt);
+}
+
+void PceCpu::CLV()
+{
+	ClearFlags(PceCpuFlags::Overflow);
+}
+
+void PceCpu::SEC()
+{
+	SetFlags(PceCpuFlags::Carry);
+}
+
+void PceCpu::SED()
+{
+	SetFlags(PceCpuFlags::Decimal);
+}
+
+void PceCpu::SEI()
+{
+	SetFlags(PceCpuFlags::Interrupt);
+}
+
+void PceCpu::SET()
+{
+	SetFlags(PceCpuFlags::Memory);
+}
 
 void PceCpu::BRK()
 {

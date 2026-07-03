@@ -46,14 +46,14 @@ namespace Mesen.Windows
 			}
 		}
 
-		private void btnOk_OnClick(object? sender, RoutedEventArgs e)
+		private void BtnOk_OnClick(object? sender, RoutedEventArgs e)
 		{
 			if(_model.Confirm(this)) {
 				Close();
 			}
 		}
 
-		private void lblCancel_Tapped(object? sender, TappedEventArgs e)
+		private void LblCancel_Tapped(object? sender, TappedEventArgs e)
 		{
 			Close();
 		}

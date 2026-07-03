@@ -15,7 +15,7 @@ void GbCpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 
 	_ppu = gameboy->GetPpu();
 	_memoryManager = memoryManager;
-	
+
 	_state = {};
 
 	_state.PC = 0;
@@ -71,7 +71,7 @@ void GbCpu::Exec()
 			PushByte((uint8_t)_state.PC);
 
 			ExecCpuCycle();
-			
+
 			switch(irqVector) {
 				case 0:
 					//IRQ request bit is no longer set, jump to $0000 (ie_push test)
@@ -139,7 +139,7 @@ void GbCpu::ProcessNextCycleStart()
 {
 	if(_state.HaltCounter) {
 		//When halted, the timing at which the CPU checks the IRQ state seems
-		//to differ from the timing for other instructions. 
+		//to differ from the timing for other instructions.
 		//This is needed to make various tests pass.
 		if(_gameboy->IsCgb()) {
 			//On CGB, it looks like the IRQ is checked slightly earlier?
@@ -223,7 +223,10 @@ void GbCpu::ExecOpCode(uint8_t opCode)
 		case 0x1F: RRA(); break;
 		case 0x20: JR((_state.Flags & GbCpuFlags::Zero) == 0, ReadCode()); break;
 		case 0x21: LD(_regHL, ReadCodeWord()); break;
-		case 0x22: LD_Indirect(_regHL, _state.A); _regHL.Inc(); break;
+		case 0x22:
+			LD_Indirect(_regHL, _state.A);
+			_regHL.Inc();
+			break;
 		case 0x23: INC(_regHL); break;
 		case 0x24: INC(_state.H); break;
 		case 0x25: DEC(_state.H); break;
@@ -231,7 +234,10 @@ void GbCpu::ExecOpCode(uint8_t opCode)
 		case 0x27: DAA(); break;
 		case 0x28: JR((_state.Flags & GbCpuFlags::Zero) != 0, ReadCode()); break;
 		case 0x29: ADD(_regHL, _regHL); break;
-		case 0x2A: LD(_state.A, Read<GbOamCorruptionType::ReadIncDec>(_regHL)); _regHL.Inc(); break;
+		case 0x2A:
+			LD(_state.A, Read<GbOamCorruptionType::ReadIncDec>(_regHL));
+			_regHL.Inc();
+			break;
 		case 0x2B: DEC(_regHL); break;
 		case 0x2C: INC(_state.L); break;
 		case 0x2D: DEC(_state.L); break;
@@ -239,7 +245,10 @@ void GbCpu::ExecOpCode(uint8_t opCode)
 		case 0x2F: CPL(); break;
 		case 0x30: JR((_state.Flags & GbCpuFlags::Carry) == 0, ReadCode()); break;
 		case 0x31: LD(_state.SP, ReadCodeWord()); break;
-		case 0x32: LD_Indirect(_regHL, _state.A); _regHL.Dec(); break;
+		case 0x32:
+			LD_Indirect(_regHL, _state.A);
+			_regHL.Dec();
+			break;
 		case 0x33: INC_SP(); break;
 		case 0x34: INC_Indirect(_regHL); break;
 		case 0x35: DEC_Indirect(_regHL); break;
@@ -247,7 +256,10 @@ void GbCpu::ExecOpCode(uint8_t opCode)
 		case 0x37: SCF(); break;
 		case 0x38: JR((_state.Flags & GbCpuFlags::Carry) != 0, ReadCode()); break;
 		case 0x39: ADD(_regHL, _state.SP); break;
-		case 0x3A: LD(_state.A, Read<GbOamCorruptionType::ReadIncDec>(_regHL)); _regHL.Dec(); break;
+		case 0x3A:
+			LD(_state.A, Read<GbOamCorruptionType::ReadIncDec>(_regHL));
+			_regHL.Dec();
+			break;
 		case 0x3B: DEC_SP(); break;
 		case 0x3C: INC(_state.A); break;
 		case 0x3D: DEC(_state.A); break;
@@ -438,7 +450,10 @@ void GbCpu::ExecOpCode(uint8_t opCode)
 		case 0xF6: OR(ReadCode()); break;
 		case 0xF7: RST(0x30); break;
 		case 0xF8: LD_HL(ReadCode()); break;
-		case 0xF9: LD(_state.SP, _regHL); ExecCpuCycle(); break;
+		case 0xF9:
+			LD(_state.SP, _regHL);
+			ExecCpuCycle();
+			break;
 		case 0xFA: LD(_state.A, Read(ReadCodeWord())); break;
 		case 0xFB: EI(); break;
 		case 0xFC: InvalidOp(); break;
@@ -848,7 +863,6 @@ void GbCpu::CP(uint8_t value)
 
 void GbCpu::NOP()
 {
-
 }
 
 void GbCpu::InvalidOp()
@@ -1002,7 +1016,7 @@ void GbCpu::RLCA()
 	ClearFlag(GbCpuFlags::Zero);
 }
 
-//rla            17           4 000c rotate akku left through carry 
+//rla            17           4 000c rotate akku left through carry
 void GbCpu::RLA()
 {
 	RL(_state.A);
@@ -1174,7 +1188,7 @@ void GbCpu::JR(int8_t offset)
 	ExecCpuCycle();
 }
 
-//jr   f,PC+dd   xx dd     12;8 ---- conditional relative jump if nz,z,nc,c 
+//jr   f,PC+dd   xx dd     12;8 ---- conditional relative jump if nz,z,nc,c
 void GbCpu::JR(bool condition, int8_t offset)
 {
 	if(condition) {
@@ -1250,7 +1264,7 @@ void GbCpu::POP_AF()
 	_regAF.Write(PopWord() & 0xFFF0);
 }
 
-//scf            37           4 -001 cy=1 
+//scf            37           4 -001 cy=1
 void GbCpu::SCF()
 {
 	SetFlag(GbCpuFlags::Carry);
@@ -1540,8 +1554,18 @@ void GbCpu::PREFIX()
 
 void GbCpu::Serialize(Serializer& s)
 {
-	SV(_state.PC); SV(_state.SP); SV(_state.A); SV(_state.Flags); SV(_state.B);
-	SV(_state.C); SV(_state.D); SV(_state.E); SV(_state.H); SV(_state.L); SV(_state.IME); SV(_state.HaltCounter);
+	SV(_state.PC);
+	SV(_state.SP);
+	SV(_state.A);
+	SV(_state.Flags);
+	SV(_state.B);
+	SV(_state.C);
+	SV(_state.D);
+	SV(_state.E);
+	SV(_state.H);
+	SV(_state.L);
+	SV(_state.IME);
+	SV(_state.HaltCounter);
 	SV(_state.EiPending);
 	SV(_state.CycleCount);
 	SV(_state.HaltBug);

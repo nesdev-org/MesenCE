@@ -1,18 +1,18 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using Mesen.Config;
+using Mesen.Controls;
+using Mesen.Interop;
+using Mesen.Utilities;
+using Mesen.ViewModels;
 using System;
 using System.ComponentModel;
-using Avalonia.Data;
-using Mesen.Interop;
-using Mesen.ViewModels;
-using Avalonia.Layout;
-using Mesen.Utilities;
-using Mesen.Config;
 using System.Runtime.InteropServices;
-using Mesen.Controls;
 
 namespace Mesen.Windows
 {
@@ -118,7 +118,7 @@ namespace Mesen.Windows
 			_model.InitActions(this);
 			_timer.Start();
 			_mouseTimer.Start();
-			
+
 			_listener = new NotificationListener(forHistoryViewer: true);
 			_listener.OnNotification += OnNotification;
 		}

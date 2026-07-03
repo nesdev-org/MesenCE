@@ -101,7 +101,7 @@ public:
 	static uint32_t GetSaveRamSize(vector<uint8_t>& cart)
 	{
 		auto checkMarker = [&](string marker) {
-			return std::search((char*)cart.data(), (char*)cart.data()+cart.size(), marker.c_str(), marker.c_str()+marker.size()) != (char*)cart.data() + cart.size();
+			return std::search((char*)cart.data(), (char*)cart.data() + cart.size(), marker.c_str(), marker.c_str() + marker.size()) != (char*)cart.data() + cart.size();
 		};
 
 		if(checkMarker("POIPOI.Ver") || checkMarker("SDBATTLE ")) {
@@ -138,7 +138,7 @@ public:
 			_emu->GetBatteryManager()->SaveBattery(_cartName + ".srm", _cartRam, _cartRamSize);
 		}
 	}
-	
+
 	~SufamiTurbo()
 	{
 		delete[] _firmware;

@@ -1,0 +1,41 @@
+<Window
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:m="clr-namespace:Mesen"
+	xmlns:c="using:Mesen.Controls"
+	xmlns:vm="using:Mesen.ViewModels"
+	xmlns:v="using:Mesen.Views"
+	xmlns:l="using:Mesen.Localization"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	x:Class="Mesen.Windows.SaveSpcFileWindow"
+   x:Name="root"
+	Width="300" Height="160"
+	x:DataType="vm:SaveSpcFileViewModel"
+	Title="{l:Translate wndTitle}"  
+>
+	<Design.DataContext>
+		<vm:SaveSpcFileViewModel />
+	</Design.DataContext>
+
+	<DockPanel Margin="5">
+		<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+			<Button MinWidth="70" HorizontalContentAlignment="Center" Click="Ok_OnClick" Content="{l:Translate btnOK}" />
+			<Button MinWidth="70" HorizontalContentAlignment="Center" IsCancel="True" Click="Cancel_OnClick" Content="{l:Translate btnCancel}" />
+		</StackPanel>
+		
+		<StackPanel Orientation="Vertical" HorizontalAlignment="Left">
+			<c:OptionSection Header="{l:Translate grpTags}" Margin="0">
+				<Grid ColumnDefinitions="Auto,1*" RowDefinitions="Auto,Auto,Auto">
+					<TextBlock Grid.Row="0" Text="{l:Translate lblGameTitle}" VerticalAlignment="Center" />
+					<TextBox Grid.Row="0" Grid.Column="1" Text="{Binding GameTitle}" MaxLength="32" Width="200"/>
+					<TextBlock Grid.Row="1" Text="{l:Translate lblSongTitle}" VerticalAlignment="Center" />
+					<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SongTitle}" MaxLength="32" Width="200" />
+					<TextBlock Grid.Row="2" Text="{l:Translate lblSongArtist}" VerticalAlignment="Center" />
+					<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SongArtist}" MaxLength="32" Width="200"/>
+				</Grid>
+			</c:OptionSection>
+		</StackPanel>
+	</DockPanel>
+</Window>

@@ -104,7 +104,7 @@ void GbaDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	}
 
 	if(_applyNtscFilter) {
-		_ntscFilter.ApplyFilter(out, GbaConstants::ScreenWidth, GbaConstants::ScreenHeight, 0);
+		_ntscFilter.ApplyFilter(out, GbaConstants::ScreenWidth, GbaConstants::ScreenHeight, IsOddFrame());
 	}
 }
 

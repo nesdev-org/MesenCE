@@ -20,6 +20,7 @@ struct Cx4Suspend
 struct Cx4Cache
 {
 	bool Enabled;
+	bool Preload;
 	uint8_t Page;
 	bool Lock[2];
 	uint32_t Address[2];
@@ -49,7 +50,7 @@ struct Cx4State : BaseState
 	uint8_t PC;
 
 	//Accumulator
-	uint32_t A; 
+	uint32_t A;
 
 	//Page register
 	uint16_t P;
@@ -77,7 +78,7 @@ struct Cx4State : BaseState
 	bool Stopped;
 	bool Locked;
 	bool IrqDisabled;
-	
+
 	bool SingleRom;
 
 	uint8_t RomAccessDelay;

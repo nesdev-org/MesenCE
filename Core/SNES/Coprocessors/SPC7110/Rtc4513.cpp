@@ -6,6 +6,7 @@
 #include "Shared/BatteryManager.h"
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Serializer.h"
+#include "Utilities/TimeUtilities.h"
 
 //TODO: Partial implementation
 //Missing stuff: most flags e.g: 30ADJ, 24/12, CAL/HW, WRAP, etc.
@@ -22,7 +23,7 @@ Rtc4513::~Rtc4513()
 void Rtc4513::LoadBattery()
 {
 	vector<uint8_t> rtcData = _emu->GetBatteryManager()->LoadBattery(".rtc");
-	
+
 	if(rtcData.size() == sizeof(_regs) + sizeof(uint64_t)) {
 		memcpy(_regs, rtcData.data(), sizeof(_regs));
 		uint64_t time = 0;
@@ -70,7 +71,7 @@ void Rtc4513::UpdateTime()
 		return;
 	}
 
-	std::tm tm = { };
+	std::tm tm = {};
 	tm.tm_sec = GetSeconds();
 	tm.tm_min = GetMinutes();
 	tm.tm_hour = GetHours();
@@ -78,7 +79,7 @@ void Rtc4513::UpdateTime()
 	tm.tm_mon = GetMonth() - 1;
 	tm.tm_year = (GetYear() >= 90 ? 0 : 100) + GetYear();
 
-	std::time_t tt = mktime(&tm);
+	std::time_t tt = TimeUtilities::TmToUtc(&tm);
 	if(tt == -1 || GetMonth() == 0) {
 		_lastTime = currentTime;
 		return;
@@ -97,9 +98,9 @@ void Rtc4513::UpdateTime()
 	std::time_t newTime = system_clock::to_time_t(timePoint);
 	std::tm newTm;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-	localtime_s(&newTm, &newTime);
+	gmtime_s(&newTm, &newTime);
 #else
-	localtime_r(&newTime, &newTm);
+	gmtime_r(&newTime, &newTm);
 #endif
 
 	_regs[0] = newTm.tm_sec % 10;
@@ -122,7 +123,7 @@ void Rtc4513::UpdateTime()
 
 	_regs[10] = year % 10;
 	_regs[11] = year / 10;
-	
+
 	int dow = newTm.tm_wday - dowGap;
 	_regs[12] = dow < 0 ? (dow + 7) : (dow % 7);
 
@@ -135,17 +136,17 @@ uint8_t Rtc4513::Read(uint16_t addr)
 
 	switch(addr) {
 		case 0x4840: break;
-		
-		case 0x4841: 
+
+		case 0x4841:
 			if(_mode == 0x0C) {
 				//Read mode
 				//LogDebug("Read: " + HexUtilities::ToHex(_index) + " = " + HexUtilities::ToHex(_regs[_index]));
 				uint8_t index = _index;
 				_index = (_index + 1) & 0x0F;
 				return _regs[index];
-			} 
+			}
 			break;
-		
+
 		case 0x4842:
 			//Ready
 			return 0x80;
@@ -159,8 +160,8 @@ void Rtc4513::Write(uint16_t addr, uint8_t value)
 	UpdateTime();
 
 	switch(addr) {
-		case 0x4840: 
-			_enabled = value; 
+		case 0x4840:
+			_enabled = value;
 			if(!(_enabled & 0x01)) {
 				_mode = -1;
 				_index = -1;
@@ -183,7 +184,7 @@ void Rtc4513::Write(uint16_t addr, uint8_t value)
 				_regs[index] = value & 0x0F;
 			}
 			break;
-		
+
 		case 0x4842: break;
 	}
 }
@@ -191,5 +192,8 @@ void Rtc4513::Write(uint16_t addr, uint8_t value)
 void Rtc4513::Serialize(Serializer& s)
 {
 	SVArray(_regs, 0x10);
-	SV(_lastTime); SV(_enabled); SV(_mode); SV(_index);
+	SV(_lastTime);
+	SV(_enabled);
+	SV(_mode);
+	SV(_index);
 }

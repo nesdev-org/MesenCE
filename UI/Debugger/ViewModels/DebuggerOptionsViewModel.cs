@@ -16,7 +16,7 @@ namespace Mesen.Debugger.ViewModels
 		public bool IsSms { get; }
 		public bool IsGba { get; }
 		public bool IsWs { get; }
-		
+
 		public bool HasSpecificBreakOptions { get; }
 
 		public DebuggerOptionsViewModel() : this(new DebuggerConfig(), CpuType.Snes) { }

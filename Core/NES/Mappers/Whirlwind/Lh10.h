@@ -11,7 +11,7 @@ private:
 protected:
 	uint16_t GetPrgPageSize() override { return 0x2000; }
 	uint16_t GetChrPageSize() override { return 0x2000; }
-	
+
 	void InitMapper() override
 	{
 		memset(_regs, 0, sizeof(_regs));
@@ -28,7 +28,7 @@ protected:
 		BaseMapper::Serialize(s);
 		SVArray(_regs, 8);
 		SV(_currentRegister);
-		
+
 		if(!s.IsSaving()) {
 			UpdateState();
 		}
@@ -46,8 +46,14 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0xE001) {
-			case 0x8000: _currentRegister = value & 0x07; break;
-			case 0x8001: _regs[_currentRegister] = value; UpdateState(); break;
+			case 0x8000:
+				_currentRegister = value & 0x07;
+				break;
+
+			case 0x8001:
+				_regs[_currentRegister] = value;
+				UpdateState();
+				break;
 		}
 	}
 };

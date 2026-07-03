@@ -19,10 +19,23 @@ namespace PSFlags
 
 enum class NesAddrMode
 {
-	None, Acc, Imp, Imm, Rel,
-	Zero, Abs, ZeroX, ZeroY,
-	Ind, IndX, IndY, IndYW,
-	AbsX, AbsXW, AbsY, AbsYW,
+	None,
+	Acc,
+	Imp,
+	Imm,
+	Rel,
+	Zero,
+	Abs,
+	ZeroX,
+	ZeroY,
+	Ind,
+	IndX,
+	IndY,
+	IndYW,
+	AbsX,
+	AbsXW,
+	AbsY,
+	AbsYW,
 	Other
 };
 
@@ -40,6 +53,13 @@ enum class MemoryOperation
 	Read = 1,
 	Write = 2,
 	Any = 3
+};
+
+enum NesCpuBusType
+{
+	Internal,
+	External,
+	Both
 };
 
 struct NesCpuState : BaseState
@@ -103,7 +123,7 @@ enum class MapperStateValueType
 struct MapperStateEntry
 {
 	static constexpr int MaxLength = 40;
-	
+
 	int64_t RawValue = INT64_MIN;
 	MapperStateValueType Type = MapperStateValueType::Number8;
 	uint8_t Address[MapperStateEntry::MaxLength] = {};
@@ -210,7 +230,6 @@ struct TileInfo
 
 struct NesSpriteInfo
 {
-	bool HorizontalMirror;
 	bool BackgroundPriority;
 	uint8_t SpriteX;
 	uint8_t LowByte;
@@ -232,12 +251,13 @@ struct NesPpuState : public BaseState
 	uint32_t SafeOamScanline;
 	uint16_t BusAddress;
 	uint8_t MemoryReadBuffer;
-	
+
 	uint16_t VideoRamAddr;
 	uint16_t TmpVideoRamAddr;
 	uint8_t ScrollX;
 	bool WriteToggle;
 	uint8_t SpriteRamAddr;
+	uint8_t SecondaryOamAddr;
 };
 
 struct ApuLengthCounterState
@@ -428,6 +448,20 @@ enum class GameInputType
 	SnesControllers = 0x2B,
 	RacermateBicycle = 0x2C, //not supported yet
 	UForce = 0x2D, //not supported yet
+	RobStackUp = 0x2E, //not supported yet
+	CityPatrolmanLightgun = 0x2F, //not supported yet
+	SharpC1CassetteInterface = 0x30, //not supported yet
+	StandardControllerWithSwappedButtons = 0x31, //not supported yet
+	ExcaliburSudokuPad = 0x32, //not supported yet
+	AblPinball = 0x33, //not supported yet
+	GoldenNuggetCasino = 0x34, //not supported yet
+	KedaKeyboard = 0x35, //not supported yet
+	SuborKeyboardMouse3 = 0x36, //not supported yet (note: mouse on $4017)
+	PortTestController = 0x37, //not supported yet
+	BandaiMultiGamePlayer = 0x38, //not supported yet
+	VenomTVDance = 0x39, //not supported yet
+	LgTvRemote = 0x3A, //not supported yet
+	FcnsController = 0x3B,
 	LastEntry
 };
 

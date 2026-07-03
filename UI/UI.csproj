@@ -8,9 +8,9 @@
     <AssemblyName>Mesen</AssemblyName>
     <RootNamespace>Mesen</RootNamespace>
     <StartupObject>Mesen.Program</StartupObject>
-    <Version>2.1.1</Version>
-    <FileVersion>2.1.1</FileVersion>
-    <Copyright>(C) 2014-2025 Sour</Copyright>
+    <Version>2.2.1</Version>
+    <FileVersion>2.2.1</FileVersion>
+    <Copyright>(C) 2014-2026 Sour</Copyright>
   </PropertyGroup>
 	<PropertyGroup>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -20,11 +20,17 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<IsAotCompatible>true</IsAotCompatible>
 		<JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
 		<SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
 		<AvaloniaNameGeneratorIsEnabled>false</AvaloniaNameGeneratorIsEnabled>
 		<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<CheckEolTargetFramework>false</CheckEolTargetFramework>
+		<SelfContained>false</SelfContained>
+		<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'!='net6.0'">
+		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='osx-x64' Or '$(RuntimeIdentifier)'=='osx-arm64' Or '$(RuntimeIdentifier)'=='linux-x64' Or '$(RuntimeIdentifier)'=='linux-arm64'">
 		<SolutionDir>..</SolutionDir>
@@ -107,13 +113,13 @@
 		<TrimmerRootAssembly Include="Dock.Settings" />
 	</ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.3.1" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.3.1" />
-    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.1" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.1" Condition="'$(OptimizeUi)'!='true'" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.1" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.1" />
+    <PackageReference Include="Avalonia" Version="11.3.14" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.4.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.14" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.14" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.14" Condition="'$(OptimizeUi)'!='true'" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.8" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.14" />
     <PackageReference Include="Dock.Avalonia" Version="11.3.0.2" />
     <PackageReference Include="Dock.Model.Mvvm" Version="11.3.0.2" />
     <PackageReference Include="Dotnet.Bundle" Version="*" />
@@ -133,6 +139,9 @@
     <Compile Update="Controls\FirmwareSelect.axaml.cs">
       <SubType>Code</SubType>
       <DependentUpon>FirmwareSelect.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\HelpTooltip.axaml.cs">
+      <DependentUpon>HelpTooltip.axaml</DependentUpon>
     </Compile>
     <Compile Update="Controls\SoftwareRendererView.axaml.cs">
       <DependentUpon>SoftwareRendererView.axaml</DependentUpon>
@@ -281,6 +290,9 @@
     <Compile Update="Views\WsControllerVerticalView.axaml.cs">
       <DependentUpon>WsControllerVerticalView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\WsPcv2ControllerView.axaml.cs">
+      <DependentUpon>WsPcv2ControllerView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\WsControllerView.axaml.cs">
       <DependentUpon>WsControllerView.axaml</DependentUpon>
     </Compile>
@@ -395,7 +407,7 @@
     <Compile Update="Debugger\Windows\MemoryToolsWindow.axaml.cs">
       <DependentUpon>MemoryToolsWindow.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\BandaiHypershotControllerView.axaml.cs">
+    <Compile Update="Views\NesCustomControllerView.axaml.cs">
       <DependentUpon>BandaiHypershotControllerView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\GbaConfigView.axaml.cs">
@@ -613,9 +625,6 @@
     <AvaloniaResource Include="ThirdParty\DataBox\Themes\Fluent.axaml" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\NesIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Debugger\Documentation\WsDocumentation.json" />
     <EmbeddedResource Include="Debugger\Documentation\SmsDocumentation.json" />
     <EmbeddedResource Include="Debugger\Documentation\GbaDocumentation.json" />
@@ -649,16 +658,38 @@
     </AvaloniaXaml>
   </ItemGroup>
 
-  <Target Name="PreBuildWindows" BeforeTargets="PreBuildEvent" Condition="'$(RuntimeIdentifier)'=='win-x64'">
-    <Exec Command="cd $(OutDir)&#xD;&#xA;rd Dependencies /s /q&#xD;&#xA;md Dependencies&#xD;&#xA;xcopy /s $(ProjectDir)Dependencies\* Dependencies&#xD;&#xA;copy libHarfBuzzSharp.dll Dependencies&#xD;&#xA;copy libSkiaSharp.dll Dependencies&#xD;&#xA;copy MesenCore.dll Dependencies&#xD;&#xA;cd Dependencies&#xD;&#xA;del ..\Dependencies.zip&#xD;&#xA;powershell Compress-Archive -Path * -DestinationPath '..\Dependencies.zip' -Force&#xD;&#xA;copy ..\Dependencies.zip $(ProjectDir)" />
-  </Target>
+	<PropertyGroup>
+		<DllExtension>dll</DllExtension>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='linux-x64' Or '$(RuntimeIdentifier)'=='linux-arm64'">
+		<DllExtension>so</DllExtension>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(RuntimeIdentifier)'=='osx-x64' Or '$(RuntimeIdentifier)'=='osx-arm64'">
+		<DllExtension>dylib</DllExtension>
+	</PropertyGroup>
+	<ItemGroup>
+		<DependencyFiles Include="$(ProjectDir)Dependencies/**/*" />
+		
+		<!-- Only include the core DLL into the zip file for "release" builds (when OptimizeUi is true) -->
+		<DependencyFiles Condition="'$(OptimizeUi)'=='true'" Include="$(OutDir)MesenCore.$(DllExtension)" />
 
-	<Target Name="PreBuildLinux" BeforeTargets="PreBuildEvent" Condition="'$(RuntimeIdentifier)'=='linux-x64' Or '$(RuntimeIdentifier)'=='linux-arm64'">
-    <Exec Command="cd $(OutDir)&#xD;&#xA;rm -rf Dependencies&#xD;&#xA;mkdir Dependencies&#xD;&#xA;cp -R $(ProjectDir)/Dependencies/* Dependencies&#xD;&#xA;cp libHarfBuzzSharp.so Dependencies&#xD;&#xA;cp libSkiaSharp.so Dependencies&#xD;&#xA;cp MesenCore.so Dependencies&#xD;&#xA;cd Dependencies&#xD;&#xA;rm ../Dependencies.zip&#xD;&#xA;zip -r ../Dependencies.zip *&#xD;&#xA;cp ../Dependencies.zip $(ProjectDir)" />
-  </Target>
-  
-	<Target Name="PreBuildOsx" BeforeTargets="PreBuildEvent" Condition="'$(RuntimeIdentifier)'=='osx-x64' Or '$(RuntimeIdentifier)'=='osx-arm64'">
-    <Exec Command="cp ./Assets/MesenIcon.icns $(OutDir)&#xD;&#xA;cd $(OutDir)&#xD;&#xA;rm -R Dependencies&#xD;&#xA;mkdir Dependencies&#xD;&#xA;cp -R $(ProjectDir)/Dependencies/* Dependencies&#xD;&#xA;cp libHarfBuzzSharp.dylib Dependencies&#xD;&#xA;cp libSkiaSharp.dylib Dependencies&#xD;&#xA;cp MesenCore.dylib Dependencies&#xD;&#xA;cd Dependencies&#xD;&#xA;rm ../Dependencies.zip&#xD;&#xA;zip -r ../Dependencies.zip *&#xD;&#xA;cp ../Dependencies.zip $(ProjectDir)" />
-  </Target>
+		<NugetDependencyFiles Include="$(OutDir)libHarfBuzzSharp.$(DllExtension)" />
+		<NugetDependencyFiles Include="$(OutDir)libSkiaSharp.$(DllExtension)" />
+	</ItemGroup>
 
+	<Target Name="ZipDependencies" BeforeTargets="PreBuildEvent" AfterTargets="Restore" Inputs="@(DependencyFiles);@(NugetDependencyFiles);$(OutDir)NugetTimestamp.txt" Outputs="$(ProjectDir)Dependencies.zip">
+		<RemoveDir Directories="$(OutDir)Dependencies" />
+		<Copy SourceFiles="@(DependencyFiles)" DestinationFolder="$(OutDir)Dependencies/%(RecursiveDir)" />
+
+		<Copy SourceFiles="@(NugetDependencyFiles)" DestinationFolder="$(OutDir)Dependencies" ContinueOnError="WarnAndContinue" />
+		<Touch Files="$(OutDir)NugetTimestamp.txt" AlwaysCreate="True" Condition="'$(MSBuildLastTaskResult)' == 'true'" />
+
+		<Copy Condition="'$(RuntimeIdentifier)'=='osx-x64' Or '$(RuntimeIdentifier)'=='osx-arm64'" SourceFiles="./Assets/MesenIcon.icns" DestinationFolder="$(OutDir)" />
+		<ZipDirectory SourceDirectory="$(OutDir)Dependencies" DestinationFile="$(ProjectDir)Dependencies.zip" Overwrite="true" />
+	</Target>
+
+	<Target Name="CleanDependencies" AfterTargets="Clean">
+		<RemoveDir Directories="$(OutDir)Dependencies" />
+		<Delete Files="$(ProjectDir)Dependencies.zip" />
+	</Target>
 </Project>

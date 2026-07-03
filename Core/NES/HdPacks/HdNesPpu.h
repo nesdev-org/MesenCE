@@ -2,8 +2,6 @@
 #include "pch.h"
 #include "NES/NesPpu.h"
 #include "NES/NesConsole.h"
-#include "NES/HdPacks/HdPackConditions.h"
-#include "NES/NesMemoryManager.h"
 #include "NES/BaseMapper.h"
 #include "NES/HdPacks/HdData.h"
 
@@ -11,8 +9,11 @@ struct NesSpriteInfoEx
 {
 	uint32_t AbsoluteTileAddr;
 	uint16_t TileAddr;
+	bool HorizontalMirror;
 	bool VerticalMirror;
 	uint8_t OffsetY;
+	uint8_t LowByte;
+	uint8_t HighByte;
 };
 
 struct NesTileInfoEx
@@ -38,26 +39,32 @@ class HdNesPpu final : public NesPpu<HdNesPpu>
 public:
 	HdNesPpu(NesConsole* console, HdPackData* hdData);
 	virtual ~HdNesPpu();
-	
+
 	void* OnBeforeSendFrame();
 
 	__forceinline bool RemoveSpriteLimit() { return _forceRemoveSpriteLimit || _console->GetNesConfig().RemoveSpriteLimit; }
 	__forceinline bool UseAdaptiveSpriteLimit() { return _forceRemoveSpriteLimit || _console->GetNesConfig().AdaptiveSpriteLimit; }
 
-	__forceinline void StoreSpriteInformation(bool verticalMirror, uint16_t tileAddr, uint8_t lineOffset)
+	__forceinline void StoreSpriteInformation(bool horizontalMirror, bool verticalMirror, uint16_t tileAddr, uint8_t lineOffset, NesSpriteInfo& sprite)
 	{
 		NesSpriteInfoEx& info = _exSpriteInfo[_spriteIndex];
 		info.TileAddr = tileAddr;
 		info.AbsoluteTileAddr = _mapper->GetPpuAbsoluteAddress(info.TileAddr).Address;
+		info.HorizontalMirror = horizontalMirror;
 		info.VerticalMirror = verticalMirror;
 		info.OffsetY = lineOffset;
+		info.LowByte = sprite.LowByte;
+		info.HighByte = sprite.HighByte;
+	}
+
+	__forceinline void PushTileInformation()
+	{
+		_previousTileEx = _currentTileEx;
+		_currentTileEx = _nextTileEx;
 	}
 
 	__forceinline void StoreTileInformation()
 	{
-		_previousTileEx = _currentTileEx;
-		_currentTileEx = _nextTileEx;
-
 		uint8_t tileIndex = _mapper->DebugReadVram(GetNameTableAddr());
 		uint16_t tileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
 
@@ -127,16 +134,12 @@ public:
 						}
 
 						tileInfo.Sprite[j].OffsetX = shift;
-						tileInfo.Sprite[j].HorizontalMirroring = sprite.HorizontalMirror;
+						tileInfo.Sprite[j].HorizontalMirroring = spriteEx.HorizontalMirror;
 						tileInfo.Sprite[j].VerticalMirroring = spriteEx.VerticalMirror;
 						tileInfo.Sprite[j].BackgroundPriority = sprite.BackgroundPriority;
 						tileInfo.Sprite[j].PaletteOffset = sprite.PaletteOffset;
 
-						if(sprite.HorizontalMirror) {
-							tileInfo.Sprite[j].SpriteColorIndex = ((sprite.LowByte >> shift) & 0x01) | ((sprite.HighByte >> shift) & 0x01) << 1;
-						} else {
-							tileInfo.Sprite[j].SpriteColorIndex = ((sprite.LowByte << shift) & 0x80) >> 7 | ((sprite.HighByte << shift) & 0x80) >> 6;
-						}
+						tileInfo.Sprite[j].SpriteColorIndex = ((spriteEx.LowByte << shift) & 0x80) >> 7 | ((spriteEx.HighByte << shift) & 0x80) >> 6;
 
 						if(tileInfo.Sprite[j].SpriteColorIndex == 0) {
 							tileInfo.Sprite[j].SpriteColor = ReadPaletteRam(0);

@@ -7,6 +7,7 @@
 #include "Utilities/Serializer.h"
 #include "Utilities/RandomHelper.h"
 
+// clang-format off
 typedef PceCpu C;
 PceCpu::Func const PceCpu::_opTable[] = {
 	//	0		1			2			3			4			5			6						7				8			9			A					B			C					D			E						F
@@ -48,6 +49,7 @@ PceAddrMode const PceCpu::_addrMode[] = {
 	M::Imm,	M::IndX,		M::Imp,	M::Block,	M::Zero,		M::Zero,		M::Zero,		M::Zero,		M::Imp,	M::Imm,	M::Imp,	M::Imp,	M::Abs,		M::Abs,	M::Abs,	M::ZeroRel,	//E
 	M::Rel,	M::IndY,		M::ZInd,	M::Block,	M::Imp,		M::ZeroX,	M::ZeroX,	M::Zero,		M::Imp,	M::AbsY,	M::Imp,	M::Imp,	M::Imp,		M::AbsX,	M::AbsX,	M::ZeroRel,//F
 };
+// clang-format on
 
 #ifndef DUMMYCPU
 PceCpu::PceCpu(Emulator* emu, PceMemoryManager* memoryManager)
@@ -115,18 +117,49 @@ void PceCpu::FetchOperand()
 {
 	switch(_instAddrMode) {
 		case PceAddrMode::Acc:
-		case PceAddrMode::Imp: DummyRead(); _operand = 0; break;
+
+		case PceAddrMode::Imp:
+			DummyRead();
+			_operand = 0;
+			break;
+
 		case PceAddrMode::Imm:
 		case PceAddrMode::Rel: _operand = GetImmediate(); break;
-		case PceAddrMode::Zero: _operand = PceCpu::ZeroPage + GetZeroAddr(); Idle(); break;
-		case PceAddrMode::ZeroX: _operand = PceCpu::ZeroPage + GetZeroXAddr(); Idle(); break;
-		case PceAddrMode::ZeroY: _operand = PceCpu::ZeroPage + GetZeroYAddr(); Idle(); break;
+
+		case PceAddrMode::Zero:
+			_operand = PceCpu::ZeroPage + GetZeroAddr();
+			Idle();
+			break;
+
+		case PceAddrMode::ZeroX:
+			_operand = PceCpu::ZeroPage + GetZeroXAddr();
+			Idle();
+			break;
+
+		case PceAddrMode::ZeroY:
+			_operand = PceCpu::ZeroPage + GetZeroYAddr();
+			Idle();
+			break;
+
 		case PceAddrMode::Ind: _operand = GetIndAddr(); break;
 		case PceAddrMode::IndX: _operand = GetIndXAddr(); break;
 		case PceAddrMode::IndY: _operand = GetIndYAddr(); break;
-		case PceAddrMode::Abs: _operand = GetAbsAddr(); Idle(); break;
-		case PceAddrMode::AbsX: _operand = GetAbsXAddr(); Idle(); break;
-		case PceAddrMode::AbsY: _operand = GetAbsYAddr(); Idle(); break;
+
+		case PceAddrMode::Abs:
+			_operand = GetAbsAddr();
+			Idle();
+			break;
+
+		case PceAddrMode::AbsX:
+			_operand = GetAbsXAddr();
+			Idle();
+			break;
+
+		case PceAddrMode::AbsY:
+			_operand = GetAbsYAddr();
+			Idle();
+			break;
+
 		case PceAddrMode::ZeroRel: _operand = 0; break;
 
 		case PceAddrMode::Block: break;
@@ -427,8 +460,8 @@ void PceCpu::ProcessIrq(bool forBrk)
 #endif
 
 	if(!forBrk) {
-		DummyRead();  //fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
-		DummyRead();  //read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)
+		DummyRead(); //fetch opcode (and discard it - $00 (BRK) is forced into the opcode register instead)
+		DummyRead(); //read next instruction byte (actually the same as above, since PC increment is suppressed. Also discarded.)
 	}
 
 	Push((uint16_t)(PC()));

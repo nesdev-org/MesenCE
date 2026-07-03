@@ -1,14 +1,16 @@
 #pragma once
-#include "NES/APU/BaseExpansionAudio.h"
+#include "NES/APU/NesApu.h"
 #include "NES/Mappers/Audio/Vrc6Pulse.h"
 #include "NES/Mappers/Audio/Vrc6Saw.h"
-#include "NES/APU/NesApu.h"
 #include "NES/NesConsole.h"
 #include "Utilities/Serializer.h"
 
-class Vrc6Audio : public BaseExpansionAudio
+class Vrc6Audio : public ISerializable
 {
 private:
+	NesConsole* _console = nullptr;
+	NesApu* _apu = nullptr;
+
 	Vrc6Pulse _pulse1;
 	Vrc6Pulse _pulse2;
 	Vrc6Saw _saw;
@@ -16,7 +18,7 @@ private:
 	int32_t _lastOutput = 0;
 
 protected:
-	void Serialize(Serializer& s) override
+	void Serialize(Serializer& s)
 	{
 		SV(_pulse1);
 		SV(_pulse2);
@@ -24,9 +26,14 @@ protected:
 		SV(_lastOutput);
 		SV(_haltAudio);
 	}
-	
-	void ClockAudio() override
+
+public:
+	__forceinline void Clock()
 	{
+		if(!_apu->IsApuEnabled()) {
+			return;
+		}
+
 		if(!_haltAudio) {
 			_pulse1.Clock();
 			_pulse2.Clock();
@@ -38,9 +45,10 @@ protected:
 		_lastOutput = outputLevel;
 	}
 
-public:
-	Vrc6Audio(NesConsole* console) : BaseExpansionAudio(console)
+	Vrc6Audio(NesConsole* console)
 	{
+		_console = console;
+		_apu = console->GetApu();
 		Reset();
 	}
 
@@ -53,7 +61,9 @@ public:
 	void WriteRegister(uint16_t addr, uint8_t value)
 	{
 		switch(addr & 0xF003) {
-			case 0x9000: case 0x9001: case 0x9002:
+			case 0x9000:
+			case 0x9001:
+			case 0x9002:
 				_pulse1.WriteReg(addr, value);
 				break;
 
@@ -66,11 +76,15 @@ public:
 				break;
 			}
 
-			case 0xA000: case 0xA001: case 0xA002:
+			case 0xA000:
+			case 0xA001:
+			case 0xA002:
 				_pulse2.WriteReg(addr, value);
 				break;
 
-			case 0xB000: case 0xB001: case 0xB002:
+			case 0xB000:
+			case 0xB001:
+			case 0xB002:
 				_saw.WriteReg(addr, value);
 				break;
 		}

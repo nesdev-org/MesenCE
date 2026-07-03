@@ -9,7 +9,7 @@
 class Eeprom24C02 : public BaseEeprom24C0X
 {
 private:
-	void WriteBit(uint8_t &dest, uint8_t value)
+	void WriteBit(uint8_t& dest, uint8_t value)
 	{
 		if(_counter < 8) {
 			uint8_t mask = ~(1 << (7 - _counter));
@@ -83,7 +83,7 @@ public:
 							if(_chipAddress & 0x01) {
 								//"Current Address Read"
 								//"Upon receipt of the slave address with the R/W
-								//bit set to one, the X24C02 issues an acknowledge 
+								//bit set to one, the X24C02 issues an acknowledge
 								//and transmits the eight bit word during the next eight clock cycles"
 								_nextMode = Mode::Read;
 								_data = _romData[_address];

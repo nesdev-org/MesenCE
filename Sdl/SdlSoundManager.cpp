@@ -18,7 +18,7 @@ SdlSoundManager::~SdlSoundManager()
 	Release();
 }
 
-void SdlSoundManager::FillAudioBuffer(void *userData, uint8_t *stream, int len)
+void SdlSoundManager::FillAudioBuffer(void* userData, uint8_t* stream, int len)
 {
 	SdlSoundManager* soundManager = (SdlSoundManager*)userData;
 
@@ -71,7 +71,7 @@ bool SdlSoundManager::InitializeAudio(uint32_t sampleRate, bool isStereo)
 
 	_audioDeviceID = SDL_OpenAudioDevice(_deviceName.empty() ? nullptr : _deviceName.c_str(), isCapture, &audioSpec, &obtainedSpec, 0);
 	if(_audioDeviceID == 0 && !_deviceName.empty()) {
-		MessageManager::Log("[Audio] Failed opening audio device '" + _deviceName + "', will retry with default device.");  
+		MessageManager::Log("[Audio] Failed opening audio device '" + _deviceName + "', will retry with default device.");
 		_audioDeviceID = SDL_OpenAudioDevice(nullptr, isCapture, &audioSpec, &obtainedSpec, 0);
 	}
 
@@ -120,12 +120,12 @@ void SdlSoundManager::SetAudioDevice(string deviceName)
 void SdlSoundManager::ReadFromBuffer(uint8_t* output, uint32_t len)
 {
 	if(_readPosition + len < _bufferSize) {
-		memcpy(output, _buffer+_readPosition, len);
+		memcpy(output, _buffer + _readPosition, len);
 		_readPosition += len;
 	} else {
 		int remainingBytes = (_bufferSize - _readPosition);
-		memcpy(output, _buffer+_readPosition, remainingBytes);
-		memcpy(output+remainingBytes, _buffer, len - remainingBytes);
+		memcpy(output, _buffer + _readPosition, remainingBytes);
+		memcpy(output + remainingBytes, _buffer, len - remainingBytes);
 		_readPosition = len - remainingBytes;
 	}
 
@@ -137,16 +137,16 @@ void SdlSoundManager::ReadFromBuffer(uint8_t* output, uint32_t len)
 void SdlSoundManager::WriteToBuffer(uint8_t* input, uint32_t len)
 {
 	if(_writePosition + len < _bufferSize) {
-		memcpy(_buffer+_writePosition, input, len);
+		memcpy(_buffer + _writePosition, input, len);
 		_writePosition += len;
 	} else {
 		int remainingBytes = _bufferSize - _writePosition;
-		memcpy(_buffer+_writePosition, input, remainingBytes);
-		memcpy(_buffer, ((uint8_t*)input)+remainingBytes, len - remainingBytes);
+		memcpy(_buffer + _writePosition, input, remainingBytes);
+		memcpy(_buffer, ((uint8_t*)input) + remainingBytes, len - remainingBytes);
 		_writePosition = len - remainingBytes;
 	}
 }
-void SdlSoundManager::PlayBuffer(int16_t *soundBuffer, uint32_t sampleCount, uint32_t sampleRate, bool isStereo)
+void SdlSoundManager::PlayBuffer(int16_t* soundBuffer, uint32_t sampleCount, uint32_t sampleRate, bool isStereo)
 {
 	uint32_t bytesPerSample = 2 * (isStereo ? 2 : 1);
 	uint32_t latency = _emu->GetSettings()->GetAudioConfig().AudioLatency;

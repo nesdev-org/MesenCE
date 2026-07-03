@@ -40,7 +40,7 @@ void GbaEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operati
 	evt.Scanline = scanline;
 	evt.Cycle = cycle;
 	evt.BreakpointId = breakpointId;
-	
+
 	evt.DmaChannel = _dmaController->DebugGetActiveChannel();
 	if(evt.DmaChannel > 0) {
 		if(evt.Operation.Type == MemoryOperationType::Write) {
@@ -81,7 +81,7 @@ DebugEventInfo GbaEventManager::GetEvent(uint16_t y, uint16_t x)
 	}
 
 	//If no exact match, extend to the background color
-	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--){
+	for(int i = (int)_sentEvents.size() - 1; i >= 0; i--) {
 		DebugEventInfo& evt = _sentEvents[i];
 		if(std::abs((int)evt.Cycle - (int)x) <= 1 && std::abs((int)evt.Scanline - (int)y) <= 1) {
 			return evt;
@@ -140,7 +140,6 @@ EventViewerCategoryCfg GbaEventManager::GetEventConfig(DebugEventInfo& evt)
 				case 7: return isWrite ? _config.OamWrites : _config.OamReads;
 				default: return {};
 			}
-
 	}
 }
 
@@ -185,9 +184,9 @@ FrameInfo GbaEventManager::GetDisplayBufferSize()
 
 void GbaEventManager::DrawScreen(uint32_t* buffer)
 {
-	uint16_t *src = _ppuBuffer;
-	for(uint32_t y = 0, len = GbaConstants::ScreenHeight*4; y < len; y++) {
-		for(uint32_t x = 0; x < 240*4; x+=4) {
+	uint16_t* src = _ppuBuffer;
+	for(uint32_t y = 0, len = GbaConstants::ScreenHeight * 4; y < len; y++) {
+		for(uint32_t x = 0; x < 240 * 4; x += 4) {
 			int srcOffset = (y >> 2) * 240 + (x >> 2);
 			uint32_t color = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
 			int dstOffset = y * GbaEventManager::ScanlineWidth;

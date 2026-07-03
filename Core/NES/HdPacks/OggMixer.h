@@ -3,6 +3,7 @@
 #include "Shared/Interfaces/IAudioProvider.h"
 
 class OggReader;
+class Emulator;
 
 class OggMixer : public IAudioProvider
 {
@@ -10,6 +11,7 @@ private:
 	shared_ptr<OggReader> _bgm;
 	vector<shared_ptr<OggReader>> _sfx;
 
+	Emulator* _emu = nullptr;
 	uint32_t _sampleRate = 0;
 	uint8_t _bgmVolume = 0;
 	uint8_t _sfxVolume = 0;
@@ -17,11 +19,11 @@ private:
 	bool _paused = false;
 
 public:
-	OggMixer();
+	OggMixer(Emulator* emu);
 	virtual ~OggMixer() = default;
 
 	void SetSampleRate(int sampleRate);
-	
+
 	void Reset(uint32_t sampleRate);
 	bool Play(string filename, bool isSfx, uint32_t startOffset, uint32_t loopPosition);
 	void SetPlaybackOptions(uint8_t options);

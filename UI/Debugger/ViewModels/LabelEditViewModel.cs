@@ -20,9 +20,9 @@ namespace Mesen.Debugger.ViewModels
 		[ObservableAsProperty] public bool OkEnabled { get; }
 		[ObservableAsProperty] public string MaxAddress { get; } = "";
 		[Reactive] public string ErrorMessage { get; private set; } = "";
-		
+
 		public bool AllowDelete { get; } = false;
-		
+
 		public Enum[] AvailableMemoryTypes { get; private set; } = Array.Empty<Enum>();
 		public CpuType CpuType { get; }
 
@@ -127,7 +127,7 @@ namespace Mesen.Debugger.ViewModels
 				Comment = label.Comment;
 				MemoryType = label.MemoryType;
 				Flags = label.Flags;
-				Length = label.Length;
+				Length = label.Length > LabelManager.MaxLength ? LabelManager.MaxLength : label.Length;
 			}
 
 			public void Commit()

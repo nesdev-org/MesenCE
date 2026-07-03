@@ -76,7 +76,7 @@ namespace Mesen.Controls
 			using var imgLock = EmptyImage.Lock();
 			unsafe {
 				UInt32* buffer = (UInt32*)imgLock.Address;
-				for(int i = 0; i < 256*240; i++) {
+				for(int i = 0; i < 256 * 240; i++) {
 					buffer[i] = 0xFF000000;
 				}
 			}

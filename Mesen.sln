@@ -9,21 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UI", "UI\UI.csproj", "{CF2D
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Core\Core.vcxproj", "{78FEF1A1-6DF1-4CBB-A373-AE6FA7CE5CE0}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B5330148-E8C7-46BA-B54E-69BE59EA337D} = {B5330148-E8C7-46BA-B54E-69BE59EA337D}
-		{B609E0A0-5050-4871-91D6-E760633BCDD1} = {B609E0A0-5050-4871-91D6-E760633BCDD1}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "Utilities\Utilities.vcxproj", "{B5330148-E8C7-46BA-B54E-69BE59EA337D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{52C4BA3A-E699-4305-B23F-C9083FD07AB6} = {52C4BA3A-E699-4305-B23F-C9083FD07AB6}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Windows", "Windows\Windows.vcxproj", "{7761E790-B42C-4179-8550-8365FF9EB23E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B5330148-E8C7-46BA-B54E-69BE59EA337D} = {B5330148-E8C7-46BA-B54E-69BE59EA337D}
-		{78FEF1A1-6DF1-4CBB-A373-AE6FA7CE5CE0} = {78FEF1A1-6DF1-4CBB-A373-AE6FA7CE5CE0}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InteropDLL", "InteropDLL\InteropDLL.vcxproj", "{37749BB2-FA78-4EC9-8990-5628FC0BBA19}"
 	ProjectSection(ProjectDependencies) = postProject

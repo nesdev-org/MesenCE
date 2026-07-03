@@ -73,7 +73,9 @@ private:
 	__forceinline static uint64_t sign_extend(uint64_t value, int from_size, int to_size)
 	{
 		bool negative = bit(value, from_size - 1);
-		if(negative) value |= mask(from_size, to_size);
+		if(negative) {
+			value |= mask(from_size, to_size);
+		}
 		return value;
 	};
 
@@ -102,9 +104,7 @@ private:
 			result.output = csa_output.output ^ recodedOutput ^ csa_output.carry;
 
 			// Inject the carry caused by booth recoding
-			result.carry = ((
-				(csa_output.output & recodedOutput) | (recodedOutput & csa_output.carry) | (csa_output.carry & csa_output.output)
-			) << 1) | (int)addends.carry;
+			result.carry = (((csa_output.output & recodedOutput) | (recodedOutput & csa_output.carry) | (csa_output.carry & csa_output.output)) << 1) | (int)addends.carry;
 
 			// Take the bottom two bits and inject them into the final output.
 			// The value of the bottom two bits will not be changed by future
@@ -139,14 +139,45 @@ private:
 	__forceinline static void booth_recode(BoothRecodingOutput& output, uint64_t input, uint8_t booth_chunk)
 	{
 		switch(booth_chunk) {
-			case 0: output.recoded_output = 0; output.carry = false; break;
-			case 1: output.recoded_output = input & 0x3FFFFFFFFULL; output.carry = 0; break;
-			case 2: output.recoded_output = input & 0x3FFFFFFFFULL; output.carry = 0; break;
-			case 3: output.recoded_output = (2 * input) & 0x3FFFFFFFFULL; output.carry = 0; break;
-			case 4: output.recoded_output = ~(2 * input) & 0x3FFFFFFFFULL; output.carry = 1; break;
-			case 5: output.recoded_output = ~input & 0x3FFFFFFFFULL; output.carry = 1; break;
-			case 6: output.recoded_output = ~input & 0x3FFFFFFFFULL; output.carry = 1; break;
-			case 7: output.recoded_output = 0; output.carry = 0; break;
+			case 0:
+				output.recoded_output = 0;
+				output.carry = false;
+				break;
+
+			case 1:
+				output.recoded_output = input & 0x3FFFFFFFFULL;
+				output.carry = 0;
+				break;
+
+			case 2:
+				output.recoded_output = input & 0x3FFFFFFFFULL;
+				output.carry = 0;
+				break;
+
+			case 3:
+				output.recoded_output = (2 * input) & 0x3FFFFFFFFULL;
+				output.carry = 0;
+				break;
+
+			case 4:
+				output.recoded_output = ~(2 * input) & 0x3FFFFFFFFULL;
+				output.carry = 1;
+				break;
+
+			case 5:
+				output.recoded_output = ~input & 0x3FFFFFFFFULL;
+				output.carry = 1;
+				break;
+
+			case 6:
+				output.recoded_output = ~input & 0x3FFFFFFFFULL;
+				output.carry = 1;
+				break;
+
+			case 7:
+				output.recoded_output = 0;
+				output.carry = 0;
+				break;
 		}
 	}
 
@@ -206,7 +237,7 @@ private:
 
 		csa_output.carry = (multiplier & 1) ? ~(multiplicand) : 0;
 		csa_output.output = accumulator;
-		
+
 		// contains the current high 31 bits of the acc. this is shifted by 2 after each CSA.
 		uint64_t acc_shift_register = accumulator >> 34;
 

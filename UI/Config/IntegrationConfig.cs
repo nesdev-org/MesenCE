@@ -26,7 +26,7 @@ namespace Mesen.Config
 		[Reactive] public bool ImportSaveRamLabels { get; set; } = true;
 		[Reactive] public bool ImportOtherLabels { get; set; } = true;
 		[Reactive] public bool ImportComments { get; set; } = true;
-		
+
 		[Reactive] public int TabSize { get; set; } = 4;
 
 		public bool IsMemoryTypeImportEnabled(MemoryType memType)
@@ -85,14 +85,14 @@ namespace Mesen.Config
 				case MemoryType.GbaBootRom:
 				case MemoryType.WsPrgRom:
 					return ImportPrgRomLabels;
-				
+
 				case MemoryType.SnesWorkRam:
 				case MemoryType.GbWorkRam:
 				case MemoryType.PceWorkRam:
 				case MemoryType.PceCdromRam:
 				case MemoryType.PceCardRam:
 				case MemoryType.PceAdpcmRam:
-				case MemoryType.PceArcadeCardRam: 
+				case MemoryType.PceArcadeCardRam:
 				case MemoryType.SpcRam:
 				case MemoryType.DspDataRam:
 				case MemoryType.Sa1InternalRam:

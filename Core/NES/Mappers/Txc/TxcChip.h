@@ -35,7 +35,7 @@ public:
 		SV(_increase);
 		SV(_yFlag);
 	}
-	
+
 	bool GetInvertFlag()
 	{
 		return _invert;
@@ -79,7 +79,7 @@ public:
 					_inverter = value & ~_mask;
 					break;
 
-				case 0x4103: 
+				case 0x4103:
 					_increase = (value & 0x01) != 0;
 					break;
 			}

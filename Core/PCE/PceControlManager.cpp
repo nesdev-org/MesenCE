@@ -20,7 +20,7 @@ shared_ptr<BaseControlDevice> PceControlManager::CreateControllerDevice(Controll
 {
 	PcEngineConfig& cfg = _emu->GetSettings()->GetPcEngineConfig();
 	shared_ptr<BaseControlDevice> device;
-	
+
 	switch(type) {
 		default:
 		case ControllerType::None: break;
@@ -31,7 +31,6 @@ shared_ptr<BaseControlDevice> PceControlManager::CreateControllerDevice(Controll
 		case ControllerType::PceTurboTap: {
 			ControllerConfig controllers[5];
 			std::copy(cfg.Port1SubPorts, cfg.Port1SubPorts + 5, controllers);
-			controllers[0].Keys = cfg.Port1.Keys;
 			device.reset(new PceTurboTap(_emu, port, controllers));
 			break;
 		}

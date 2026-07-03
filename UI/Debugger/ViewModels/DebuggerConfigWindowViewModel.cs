@@ -84,7 +84,7 @@ namespace Mesen.Debugger.ViewModels
 			RevertChanges(Debugger, _backupDebugger);
 			RevertChanges(Script, _backupScript);
 			RevertChanges(Integration, _backupIntegration);
-			
+
 			RevertChanges(Fonts.DisassemblyFont, _backupFont.DisassemblyFont);
 			RevertChanges(Fonts.AssemblerFont, _backupFont.AssemblerFont);
 			RevertChanges(Fonts.MemoryViewerFont, _backupFont.MemoryViewerFont);

@@ -10,7 +10,7 @@ public:
 	SdlSoundManager(Emulator* emu);
 	~SdlSoundManager();
 
-	void PlayBuffer(int16_t *soundBuffer, uint32_t bufferSize, uint32_t sampleRate, bool isStereo);
+	void PlayBuffer(int16_t* soundBuffer, uint32_t bufferSize, uint32_t sampleRate, bool isStereo);
 	void Pause();
 	void Stop();
 
@@ -24,7 +24,7 @@ private:
 	bool InitializeAudio(uint32_t sampleRate, bool isStereo);
 	void Release();
 
-	static void FillAudioBuffer(void *userData, uint8_t *stream, int len);
+	static void FillAudioBuffer(void* userData, uint8_t* stream, int len);
 
 	void ReadFromBuffer(uint8_t* output, uint32_t len);
 	void WriteToBuffer(uint8_t* output, uint32_t len);

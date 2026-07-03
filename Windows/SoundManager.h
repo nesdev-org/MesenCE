@@ -19,8 +19,8 @@ public:
 
 	void Release();
 	void ProcessEndOfFrame();
-	void PlayBuffer(int16_t *soundBuffer, uint32_t bufferSize, uint32_t sampleRate, bool isStereo);
-	void Play();	
+	void PlayBuffer(int16_t* soundBuffer, uint32_t bufferSize, uint32_t sampleRate, bool isStereo);
+	void Play();
 	void Pause();
 	void Stop();
 
@@ -32,7 +32,7 @@ private:
 	static bool CALLBACK DirectSoundEnumProc(LPGUID lpGUID, LPCWSTR lpszDesc, LPCSTR lpszDrvName, LPVOID lpContext);
 	bool InitializeDirectSound(uint32_t sampleRate, bool isStereo);
 	void ClearSecondaryBuffer();
-	void CopyToSecondaryBuffer(uint8_t *data, uint32_t size);
+	void CopyToSecondaryBuffer(uint8_t* data, uint32_t size);
 	void ValidateWriteCursor(DWORD safeWriteCursor);
 
 private:

@@ -17,7 +17,7 @@
 #include "Shared/NotificationManager.h"
 #include "Shared/RomFinder.h"
 
-GameClientConnection::GameClientConnection(Emulator* emu, unique_ptr<Socket> socket, ClientConnectionData &connectionData) : GameConnection(emu, std::move(socket))
+GameClientConnection::GameClientConnection(Emulator* emu, unique_ptr<Socket> socket, ClientConnectionData& connectionData) : GameConnection(emu, std::move(socket))
 {
 	_connectionData = connectionData;
 	_shutdown = false;
@@ -41,6 +41,7 @@ void GameClientConnection::Shutdown()
 
 		_emu->UnregisterInputProvider(this);
 
+		_emu->GetNotificationManager()->SendNotification(ConsoleNotificationType::NetplayStopped);
 		MessageManager::DisplayMessage("NetPlay", "ConnectionLost");
 		_emu->GetSettings()->ClearFlag(EmulationFlags::MaximumSpeed);
 	}
@@ -169,7 +170,7 @@ void GameClientConnection::DisableControllers()
 	}
 }
 
-bool GameClientConnection::SetInput(BaseControlDevice *device)
+bool GameClientConnection::SetInput(BaseControlDevice* device)
 {
 	if(_enableControllers) {
 		uint8_t port = device->GetPort();
@@ -225,9 +226,7 @@ void GameClientConnection::InitControlDevice()
 
 void GameClientConnection::ProcessNotification(ConsoleNotificationType type, void* parameter)
 {
-	if(type == ConsoleNotificationType::ConfigChanged) {
-		InitControlDevice();
-	} else if(type == ConsoleNotificationType::GameLoaded) {
+	if(type == ConsoleNotificationType::GameLoaded) {
 		_emu->RegisterInputProvider(this);
 	}
 }
@@ -249,7 +248,7 @@ void GameClientConnection::SendInput()
 			_controlDevice->SetStateFromInput();
 			inputState = _controlDevice->GetRawState();
 		}
-		
+
 		if(_lastInputSent != inputState) {
 			InputDataMessage message(inputState);
 			SendNetMessage(message);

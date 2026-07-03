@@ -13,7 +13,7 @@ namespace Mesen.ViewModels
 	{
 		[Reactive] public string SavePath { get; set; }
 		[Reactive] public MovieRecordConfig Config { get; set; }
-		
+
 		public MovieRecordConfigViewModel()
 		{
 			Config = ConfigManager.Config.MovieRecord.Clone();
@@ -25,5 +25,5 @@ namespace Mesen.ViewModels
 		{
 			ConfigManager.Config.MovieRecord = Config.Clone();
 		}
-   }
+	}
 }

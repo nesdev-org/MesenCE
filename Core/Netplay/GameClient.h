@@ -25,7 +25,7 @@ public:
 	virtual ~GameClient();
 
 	bool Connected();
-	void Connect(ClientConnectionData &connectionData);
+	void Connect(ClientConnectionData& connectionData);
 	void Disconnect();
 
 	void SelectController(NetplayControllerInfo controller);

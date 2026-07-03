@@ -17,7 +17,7 @@ struct GbCpuState : BaseState
 	uint8_t C;
 	uint8_t D;
 	uint8_t E;
-	
+
 	uint8_t H;
 	uint8_t L;
 
@@ -174,7 +174,7 @@ struct GbPpuState : public BaseState
 	PpuMode Mode;
 	PpuMode IrqMode;
 	bool StatIrqFlag;
-	
+
 	uint8_t Ly;
 	int16_t LyForCompare;
 
@@ -203,11 +203,11 @@ struct GbPpuState : public BaseState
 
 	bool CgbEnabled;
 	uint8_t CgbVramBank;
-	
+
 	uint8_t CgbBgPalPosition;
 	bool CgbBgPalAutoInc;
 	uint16_t CgbBgPalettes[4 * 8];
-	
+
 	uint8_t CgbObjPalPosition;
 	bool CgbObjPalAutoInc;
 	uint16_t CgbObjPalettes[4 * 8];
@@ -371,7 +371,7 @@ enum class GbMemoryType
 struct GbMemoryManagerState
 {
 	uint64_t ApuCycleCount;
-	
+
 	uint8_t CgbWorkRamBank;
 	bool CgbSwitchSpeedRequest;
 	bool CgbHighSpeed;
@@ -390,6 +390,7 @@ struct GbMemoryManagerState
 	uint8_t SerialData;
 	uint8_t SerialControl;
 	uint8_t SerialBitCount;
+	bool MostRecentSerialBit;
 
 	bool IsReadRegister[0x100];
 	bool IsWriteRegister[0x100];
@@ -414,7 +415,7 @@ struct GbState
 {
 	GbType Type;
 	GbCpuState Cpu;
-	GbPpuState Ppu;	
+	GbPpuState Ppu;
 	GbApuDebugState Apu;
 	GbMemoryManagerState MemoryManager;
 	GbTimerState Timer;

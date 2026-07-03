@@ -28,7 +28,7 @@ public:
 	void AddSamples(int16_t* buffer, size_t sampleCount)
 	{
 		for(size_t i = 0; i < sampleCount; i++) {
-			_samples.push_back(buffer[i*2]);
+			_samples.push_back(buffer[i * 2]);
 		}
 	}
 
@@ -38,7 +38,7 @@ public:
 			size_t samplesToInsert = std::min<size_t>(_samples.size() - _delay, sampleCount);
 
 			for(size_t j = sampleCount - samplesToInsert; j < sampleCount; j++) {
-				buffer[j*2] += (int16_t)((double)_samples.front() * _decay);
+				buffer[j * 2] += (int16_t)((double)_samples.front() * _decay);
 				_samples.pop_front();
 			}
 		}

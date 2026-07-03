@@ -25,7 +25,7 @@ namespace Mesen.Config
 		[Reactive] public bool AutoStartScriptOnLoad { get; set; } = true;
 		[Reactive] public bool AutoReloadScriptWhenFileChanges { get; set; } = true;
 		[Reactive] public bool AutoRestartScriptAfterPowerCycle { get; set; } = true;
-		
+
 		[Reactive] public bool AllowIoOsAccess { get; set; } = false;
 		[Reactive] public bool AllowNetworkAccess { get; set; } = false;
 

@@ -15,6 +15,7 @@ namespace Mesen.Debugger.Labels
 {
 	public class LabelManager
 	{
+		public const int MaxLength = 65536;
 		public static Regex LabelRegex { get; } = new Regex("^[@_a-zA-Z]+[@_a-zA-Z0-9]*$", RegexOptions.Compiled);
 		public static Regex InvalidLabelRegex { get; } = new Regex("[^@_a-zA-Z0-9]", RegexOptions.Compiled);
 		public static Regex AssertRegex { get; } = new Regex(@"assert\((.*)\)", RegexOptions.Compiled);
@@ -119,6 +120,10 @@ namespace Mesen.Debugger.Labels
 
 		public static bool SetLabel(CodeLabel label, bool raiseEvent)
 		{
+			if(label.Length > LabelManager.MaxLength) {
+				label.Length = LabelManager.MaxLength;
+			}
+
 			if(_reverseLookup.ContainsKey(label.Label)) {
 				//Another identical label exists, we need to remove it
 				DeleteLabel(_reverseLookup[label.Label], false);

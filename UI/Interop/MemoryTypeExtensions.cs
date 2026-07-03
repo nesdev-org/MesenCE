@@ -44,6 +44,8 @@ namespace Mesen.Interop
 				case MemoryType.GbBootRom:
 				case MemoryType.GbVideoRam:
 				case MemoryType.GbSpriteRam:
+				case MemoryType.GbBgPaletteRam:
+				case MemoryType.GbObjPaletteRam:
 				case MemoryType.GameboyMemory:
 					return CpuType.Gameboy;
 
@@ -134,9 +136,11 @@ namespace Mesen.Interop
 				case MemoryType.SnesVideoRam:
 				case MemoryType.SnesSpriteRam:
 				case MemoryType.SnesCgRam:
-				
+
 				case MemoryType.GbVideoRam:
 				case MemoryType.GbSpriteRam:
+				case MemoryType.GbBgPaletteRam:
+				case MemoryType.GbObjPaletteRam:
 
 				case MemoryType.NesPpuMemory:
 				case MemoryType.NesSecondarySpriteRam:
@@ -151,7 +155,7 @@ namespace Mesen.Interop
 				case MemoryType.PcePaletteRam:
 				case MemoryType.PceSpriteRam:
 				case MemoryType.PceSpriteRamVdc2:
-				
+
 				case MemoryType.SmsVideoRam:
 				case MemoryType.SmsPaletteRam:
 					return true;
@@ -188,6 +192,8 @@ namespace Mesen.Interop
 
 				case MemoryType.GbBootRom:
 				case MemoryType.GbSpriteRam:
+				case MemoryType.GbBgPaletteRam:
+				case MemoryType.GbObjPaletteRam:
 
 				case MemoryType.NesSecondarySpriteRam:
 				case MemoryType.NesSpriteRam:
@@ -198,11 +204,11 @@ namespace Mesen.Interop
 				case MemoryType.PceSpriteRam:
 				case MemoryType.PceSpriteRamVdc2:
 				case MemoryType.PcePaletteRam:
-				
+
 				case MemoryType.SmsBootRom:
 				case MemoryType.SmsPaletteRam:
 				case MemoryType.SmsPort:
-				
+
 				case MemoryType.GbaBootRom:
 				case MemoryType.GbaPaletteRam:
 				case MemoryType.GbaSpriteRam:
@@ -235,7 +241,7 @@ namespace Mesen.Interop
 			}
 			return false;
 		}
-		
+
 		public static bool IsRomMemory(this MemoryType memType)
 		{
 			switch(memType) {
@@ -273,6 +279,7 @@ namespace Mesen.Interop
 				case MemoryType.SpcRam:
 				case MemoryType.SpcRom:
 				case MemoryType.Sa1InternalRam:
+				case MemoryType.GsuWorkRam:
 				case MemoryType.St018Memory:
 				case MemoryType.St018PrgRom:
 				case MemoryType.St018DataRom:
@@ -469,7 +476,7 @@ namespace Mesen.Interop
 
 				MemoryType.BsxPsRam => "PSRAM",
 				MemoryType.BsxMemoryPack => "MPACK",
-				
+
 				MemoryType.SufamiTurboFirmware => "BOOT",
 				MemoryType.SufamiTurboSecondCart => "BPRG",
 				MemoryType.SufamiTurboSecondCartRam => "BRAM",
@@ -482,6 +489,8 @@ namespace Mesen.Interop
 				MemoryType.GbBootRom => "BOOT",
 				MemoryType.GbVideoRam => "VRAM",
 				MemoryType.GbSpriteRam => "OAM",
+				MemoryType.GbBgPaletteRam => "BG PAL",
+				MemoryType.GbObjPaletteRam => "OBJ PAL",
 
 				MemoryType.NesMemory => "CPU",
 				MemoryType.NesPpuMemory => "PPU",
@@ -511,7 +520,7 @@ namespace Mesen.Interop
 				MemoryType.PcePaletteRam => "PAL",
 				MemoryType.PceSpriteRam => "SPR",
 				MemoryType.PceSpriteRamVdc2 => "SPR2",
-				
+
 				MemoryType.SmsMemory => "CPU",
 				MemoryType.SmsPrgRom => "ROM",
 				MemoryType.SmsWorkRam => "WRAM",

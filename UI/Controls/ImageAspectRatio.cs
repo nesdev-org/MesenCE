@@ -7,7 +7,7 @@ namespace Mesen.Controls
 	public class ImageAspectRatio : Image
 	{
 		protected override Type StyleKeyOverride => typeof(Image);
-		
+
 		public static readonly StyledProperty<double> AspectRatioProperty = AvaloniaProperty.Register<StateGridEntry, double>(nameof(AspectRatio));
 
 		public ImageAspectRatio()

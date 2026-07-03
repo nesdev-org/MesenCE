@@ -18,7 +18,7 @@ HdAudioDevice::HdAudioDevice(Emulator* emu, HdPackData* hdData)
 	_sfxVolume = 128;
 	_bgmVolume = 128;
 
-	_oggMixer.reset(new OggMixer());
+	_oggMixer.reset(new OggMixer(emu));
 	_oggMixer->SetBgmVolume(_bgmVolume);
 	_oggMixer->SetSfxVolume(_sfxVolume);
 	_emu->GetSoundMixer()->RegisterAudioProvider(_oggMixer.get());
@@ -37,15 +37,28 @@ void HdAudioDevice::Serialize(Serializer& s)
 		if(trackOffset < 0) {
 			_lastBgmTrack = -1;
 		}
-		SV(_album); SV(_lastBgmTrack); SV(trackOffset); SV(_sfxVolume); SV(_bgmVolume); SV(_playbackOptions);
+		SV(_album);
+		SV(_lastBgmTrack);
+		SV(trackOffset);
+		SV(_sfxVolume);
+		SV(_bgmVolume);
+		SV(_playbackOptions);
 	} else {
-		SV(_album); SV(_lastBgmTrack); SV(trackOffset); SV(_sfxVolume); SV(_bgmVolume); SV(_playbackOptions);
-		if(_lastBgmTrack != -1 && trackOffset > 0) {
-			PlayBgmTrack(_lastBgmTrack, trackOffset);
+		SV(_album);
+		SV(_lastBgmTrack);
+		SV(trackOffset);
+		SV(_sfxVolume);
+		SV(_bgmVolume);
+		SV(_playbackOptions);
+
+		if(!_emu->IsRunAheadFrame()) {
+			if(_lastBgmTrack != -1 && trackOffset > 0) {
+				PlayBgmTrack(_lastBgmTrack, trackOffset);
+			}
+			_oggMixer->SetBgmVolume(_bgmVolume);
+			_oggMixer->SetSfxVolume(_sfxVolume);
+			_oggMixer->SetPlaybackOptions(_playbackOptions);
 		}
-		_oggMixer->SetBgmVolume(_bgmVolume);
-		_oggMixer->SetSfxVolume(_sfxVolume);
-		_oggMixer->SetPlaybackOptions(_playbackOptions);
 	}
 }
 
@@ -85,7 +98,7 @@ void HdAudioDevice::ProcessControlFlags(uint8_t flags)
 	}
 }
 
-void HdAudioDevice::GetMemoryRanges(MemoryRanges & ranges)
+void HdAudioDevice::GetMemoryRanges(MemoryRanges& ranges)
 {
 	bool useAlternateRegisters = (_hdData->OptionFlags & (int)HdPackOptions::AlternateRegisterRange) == (int)HdPackOptions::AlternateRegisterRange;
 	ranges.SetAllowOverride();
@@ -130,7 +143,7 @@ void HdAudioDevice::WriteRam(uint16_t addr, uint8_t value)
 
 		//BGM Volume: 0 = mute, 255 = max
 		//Also has an immediate effect on currently playing BGM
-		case 2: 
+		case 2:
 			_bgmVolume = value;
 			_oggMixer->SetBgmVolume(value);
 			break;
@@ -169,8 +182,7 @@ uint8_t HdAudioDevice::ReadRam(uint16_t addr)
 			return (
 				(_oggMixer->IsBgmPlaying() ? 1 : 0) |
 				(_oggMixer->IsSfxPlaying() ? 2 : 0) |
-				(_trackError ? 4 : 0)
-			);
+				(_trackError ? 4 : 0));
 
 		case 1: return 1; //Revision
 		case 2: return 'N'; //NES

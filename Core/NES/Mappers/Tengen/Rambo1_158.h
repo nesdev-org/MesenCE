@@ -8,8 +8,8 @@ class Rambo1_158 : public Rambo1
 	{
 		if((addr & 0xE001) == 0x8001) {
 			uint8_t nametable = value >> 7;
-
-			if(_currentRegister & 0x80) {
+			// note: registers 8 & 9 are not implemented
+			if(_chrMode == 1) {
 				switch(_currentRegister & 0x07) {
 					case 2: SetNametable(0, nametable); break;
 					case 3: SetNametable(1, nametable); break;

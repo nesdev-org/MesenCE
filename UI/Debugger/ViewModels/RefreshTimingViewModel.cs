@@ -11,7 +11,7 @@ namespace Mesen.Debugger.ViewModels
 	public class RefreshTimingViewModel : ViewModelBase
 	{
 		public RefreshTimingConfig Config { get; }
-
+		public RefreshTimingConsoleConfig ConsoleConfig { get; }
 		[Reactive] public int MinScanline { get; private set; }
 		[Reactive] public int MaxScanline { get; private set; }
 		[Reactive] public int MaxCycle { get; private set; }
@@ -26,15 +26,27 @@ namespace Mesen.Debugger.ViewModels
 		public RefreshTimingViewModel(RefreshTimingConfig config, CpuType cpuType)
 		{
 			Config = config;
+			ConsoleConfig = config.GetConsoleConfig(cpuType);
 			_cpuType = cpuType;
 
 			UpdateMinMaxValues(_cpuType);
 			ResetCommand = ReactiveCommand.Create(Reset);
+
+			ConsoleConfig.WhenAnyValue(x => x.RefreshScanline, x => x.RefreshCycle).Subscribe(x => UpdateMinMax());
+		}
+
+		private void UpdateMinMax()
+		{
+			//Manually enforce min/max to avoid issues when switching from one console type to another where the UI
+			//could end up setting the new console's scanline value to the max scanline value of the previous console
+			//(presumably due to the order in which the property bindings were processed)
+			ConsoleConfig.RefreshScanline = Math.Max(MinScanline, Math.Min(MaxScanline, ConsoleConfig.RefreshScanline));
+			ConsoleConfig.RefreshCycle = Math.Max(0, Math.Min(MaxCycle, ConsoleConfig.RefreshCycle));
 		}
 
 		public void Reset()
 		{
-			Config.RefreshScanline = _cpuType.GetConsoleType() switch {
+			ConsoleConfig.RefreshScanline = _cpuType.GetConsoleType() switch {
 				ConsoleType.Snes => 240,
 				ConsoleType.Nes => 241,
 				ConsoleType.Gameboy => 144,
@@ -45,10 +57,10 @@ namespace Mesen.Debugger.ViewModels
 				_ => throw new Exception("Invalid console type")
 			};
 
-			Config.RefreshCycle = 0;
+			ConsoleConfig.RefreshCycle = 0;
 		}
 
-		public void UpdateMinMaxValues(CpuType cpuType)
+		private void UpdateMinMaxValues(CpuType cpuType)
 		{
 			_cpuType = cpuType;
 			TimingInfo timing = EmuApi.GetTimingInfo(_cpuType);
@@ -56,7 +68,7 @@ namespace Mesen.Debugger.ViewModels
 			MaxScanline = (int)timing.ScanlineCount + timing.FirstScanline - 1;
 			MaxCycle = (int)timing.CycleCount - 1;
 
-			if(Config.RefreshScanline < MinScanline || Config.RefreshScanline > MaxScanline || Config.RefreshCycle > MaxCycle) {
+			if(ConsoleConfig.RefreshScanline < MinScanline || ConsoleConfig.RefreshScanline > MaxScanline || ConsoleConfig.RefreshCycle > MaxCycle) {
 				Reset();
 			}
 		}

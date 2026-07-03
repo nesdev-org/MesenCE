@@ -13,7 +13,7 @@ protected:
 		_exRegs[0] = _exRegs[1] = 0;
 		AddRegisterRange(0x6000, 0x6FFF, MemoryOperation::Write);
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		MMC3::Serialize(s);
@@ -31,7 +31,7 @@ protected:
 		}
 	}
 
-	void WriteRegister(uint16_t addr, uint8_t value) override 
+	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		if(addr < 0x8000) {
 			_exRegs[0] = 1;

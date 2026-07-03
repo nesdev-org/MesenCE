@@ -39,7 +39,7 @@ RowDataType GbTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void GbTraceLogger::GetTraceRow(string &output, GbCpuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void GbTraceLogger::GetTraceRow(string& output, GbCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	constexpr char activeStatusLetters[4] = { 'Z', 'N', 'H', 'C' };
 	constexpr char inactiveStatusLetters[4] = { 'z', 'n', 'h', 'c' };

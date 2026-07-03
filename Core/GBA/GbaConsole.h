@@ -33,7 +33,6 @@ public:
 	static constexpr int ExtWorkRamSize = 0x40000;
 
 private:
-
 	Emulator* _emu = nullptr;
 
 	unique_ptr<GbaCpu> _cpu;
@@ -74,7 +73,7 @@ public:
 	~GbaConsole();
 
 	static vector<string> GetSupportedExtensions() { return { ".gba" }; }
-	static vector<string> GetSupportedSignatures() { return { }; }
+	static vector<string> GetSupportedSignatures() { return {}; }
 
 	void LoadBattery();
 	void SaveBattery() override;
@@ -103,6 +102,7 @@ public:
 	ConsoleType GetConsoleType() override;
 	double GetFps() override;
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
 	vector<CpuType> GetCpuTypes() override;
 
 	AddressInfo GetAbsoluteAddress(AddressInfo& relAddress) override;

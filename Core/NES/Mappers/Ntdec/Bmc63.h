@@ -29,7 +29,7 @@ protected:
 			RemoveCpuMemoryMapping(0x8000, 0xBFFF);
 		}
 	}
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		_openBus = ((addr & 0x0300) == 0x0300);

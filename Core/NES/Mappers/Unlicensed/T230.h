@@ -63,7 +63,6 @@ protected:
 		}
 		SelectPrgPage(1, _prgReg1);
 		SelectPrgPage(3, -1);
-
 	}
 
 	void WriteRegister(uint16_t addr, uint8_t value) override
@@ -92,10 +91,10 @@ protected:
 					//The other reg contains the low 4 bits
 					_loCHRRegs[regNumber] = value & 0x0F;
 				} else {
-					//One reg contains the high 5 bits 
+					//One reg contains the high 5 bits
 					_hiCHRRegs[regNumber] = value & 0x1F;
 				}
-			}			
+			}
 		} else if(addr == 0xF000) {
 			_irq->SetReloadValueNibble(value, false);
 		} else if(addr == 0xF001) {

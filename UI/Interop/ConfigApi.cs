@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Mesen.Config;
+using Mesen.Config.Shortcuts;
+using Mesen.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -6,9 +9,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using Mesen.Config;
-using Mesen.Config.Shortcuts;
-using Mesen.Utilities;
 
 namespace Mesen.Interop
 {
@@ -20,7 +20,7 @@ namespace Mesen.Interop
 		[DllImport(DllPath)] public static extern void SetAudioConfig(InteropAudioConfig config);
 		[DllImport(DllPath)] public static extern void SetInputConfig(InteropInputConfig config);
 		[DllImport(DllPath)] public static extern void SetEmulationConfig(InteropEmulationConfig config);
-		
+
 		[DllImport(DllPath)] public static extern void SetGameboyConfig(InteropGameboyConfig config);
 		[DllImport(DllPath)] public static extern void SetGbaConfig(InteropGbaConfig config);
 		[DllImport(DllPath)] public static extern void SetPcEngineConfig(InteropPcEngineConfig config);
@@ -34,7 +34,7 @@ namespace Mesen.Interop
 
 		[DllImport(DllPath)] public static extern void SetPreferences(InteropPreferencesConfig config);
 		[DllImport(DllPath)] public static extern void SetAudioPlayerConfig(InteropAudioPlayerConfig config);
-		[DllImport(DllPath)] public static extern void SetShortcutKeys([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]InteropShortcutKeyInfo[] shortcuts, UInt32 count);
+		[DllImport(DllPath)] public static extern void SetShortcutKeys([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] InteropShortcutKeyInfo[] shortcuts, UInt32 count);
 
 		[DllImport(DllPath)] public static extern void SetDebugConfig(InteropDebugConfig config);
 

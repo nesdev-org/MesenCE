@@ -11,13 +11,13 @@ class WsTraceLogger : public BaseTraceLogger<WsTraceLogger, WsCpuState>
 {
 private:
 	WsPpu* _ppu = nullptr;
-	
+
 protected:
 	RowDataType GetFormatTagType(string& tag) override;
 
 public:
 	WsTraceLogger(Debugger* debugger, IDebugger* cpuDebugger, WsPpu* ppu);
-	
+
 	void GetTraceRow(string& output, WsCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo);
 	void LogPpuState();
 

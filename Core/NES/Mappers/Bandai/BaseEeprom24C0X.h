@@ -51,7 +51,7 @@ public:
 
 	virtual void Write(uint8_t scl, uint8_t sda) = 0;
 	virtual void SaveBattery() = 0;
-	
+
 	uint8_t Read()
 	{
 		return _output;

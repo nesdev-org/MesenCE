@@ -133,7 +133,7 @@ struct SmsVdpState : public BaseState
 	bool M3_Use240LineMode;
 	bool UseLargeSprites;
 	bool EnableDoubleSpriteSize;
-	
+
 	uint16_t NametableAddress;
 	uint16_t EffectiveNametableAddress;
 	uint16_t NametableAddressMask;

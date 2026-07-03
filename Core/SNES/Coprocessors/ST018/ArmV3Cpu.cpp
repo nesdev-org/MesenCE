@@ -115,7 +115,7 @@ uint32_t ArmV3Cpu::ReadCode(ArmV3AccessModeVal mode, uint32_t addr)
 {
 #ifndef DUMMYCPU
 	//Next access should be sequential
-	//This is done before the call to Read() because e.g if DMA pauses the CPU and 
+	//This is done before the call to Read() because e.g if DMA pauses the CPU and
 	//runs, the next access will not be sequential (force-nseq-access test)
 	_state.Pipeline.Mode |= ArmV3AccessMode::Sequential;
 	return _st018->ReadCpu(mode, addr);

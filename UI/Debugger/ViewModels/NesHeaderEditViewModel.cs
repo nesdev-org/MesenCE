@@ -21,7 +21,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 	[Reactive] public bool IsBatteryCheckboxEnabled { get; private set; }
 	[Reactive] public bool IsVsSystemVisible { get; private set; }
 	[Reactive] public bool IsNes20 { get; private set; }
-	
+
 	[Reactive] public Enum[]? AvailableSystemTypes { get; private set; } = null;
 	[Reactive] public Enum[]? AvailableTimings { get; private set; } = null;
 
@@ -29,12 +29,16 @@ public class NesHeaderEditViewModel : DisposableViewModel
 	[Reactive] public string ErrorMessage { get; private set; } = "";
 
 	private RomInfo _romInfo;
+	private byte[] _prgRom;
+	private byte[] _chrRom;
 
 	public NesHeaderEditViewModel()
 	{
 		bool releaseDebugger = !DebugWindowManager.HasOpenedDebugWindows();
 		bool paused = EmuApi.IsPaused();
 		byte[] headerBytes = DebugApi.GetRomHeader();
+		_prgRom = DebugApi.GetMemoryState(MemoryType.NesPrgRom);
+		_chrRom = DebugApi.GetMemoryState(MemoryType.NesChrRom);
 		if(releaseDebugger) {
 			//GetRomHeader will initialize the debugger - stop the debugger if no other debug window is opened
 			DebugApi.ReleaseDebugger();
@@ -51,7 +55,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		Header = NesHeader.FromBytes(headerBytes);
 
 		AddDisposable(this.WhenAnyValue(x => x.Header.SaveRam, x => x.Header.ChrRamBattery).Subscribe(x => {
-			IsBatteryCheckboxEnabled = Header.SaveRam == MemorySizes.None  && Header.ChrRamBattery == MemorySizes.None;
+			IsBatteryCheckboxEnabled = Header.SaveRam == MemorySizes.None && Header.ChrRamBattery == MemorySizes.None;
 			if(!IsBatteryCheckboxEnabled) {
 				Header.HasBattery = true;
 			}
@@ -112,36 +116,34 @@ public class NesHeaderEditViewModel : DisposableViewModel
 
 	private string GetErrorMessage()
 	{
-		bool isValidPrgSize = Header.FileType == NesFileType.Nes2_0 && NesHeader.IsValidSize(Header.PrgRom);
-		bool isValidChrSize = Header.FileType == NesFileType.Nes2_0 && NesHeader.IsValidSize(Header.ChrRom);
-		if(!isValidPrgSize && (Header.PrgRom % 16) != 0) {
-			return "Error: PRG ROM size must be a multiple of 16 KB";
-		} if(!isValidChrSize && (Header.ChrRom % 8) != 0) {
-			return "Error: CHR ROM size must be a multiple of 8 KB";
+		if(Header.PrgRom <= 0) {
+			return "Error: PRG ROM size cannot be 0";
 		}
 
 		if(Header.FileType == NesFileType.Nes2_0) {
+			bool isValidPrgSize = NesHeader.IsValidSize(Header.PrgRom);
+			bool isValidChrSize = NesHeader.IsValidSize(Header.ChrRom);
+
 			if(Header.MapperId >= 4096) {
 				return "Error: Mapper ID must be lower than 4096";
-			}
-			if(Header.SubmapperId >= 16) {
+			} else if(Header.SubmapperId >= 16) {
 				return "Error: Submapper ID must be lower than 16";
-			}
-			if(!isValidChrSize && Header.ChrRom >= 16384) {
-				return "Error: CHR ROM size must be lower than 16384 KB";
-			}
-			if(!isValidPrgSize && Header.PrgRom >= 32768) {
-				return "Error: PRG ROM size must be lower than 32768 KB";
+			} else if(!isValidPrgSize && (Header.GetPrgSize() > 61424 * 1024 || (Header.GetPrgSize() % (16 * 1024)) != 0)) {
+				return "Error: PRG ROM must be <= 61424 KB and a multiple of 16 KB (or a valid exponent-multiplier value)";
+			} else if(!isValidChrSize && (Header.GetChrSize() > 30712 * 1024 || (Header.GetChrSize() % (8 * 1024)) != 0)) {
+				return "Error: CHR ROM must be <= 30712 KB and a multiple of 8 KB (or a valid exponent-multiplier value)";
 			}
 		} else {
 			if(Header.MapperId >= 256) {
-				return "Error: Mapper ID must be lower than 256 ";
-			}
-			if(Header.ChrRom >= 2048) {
-				return "Error: CHR ROM size must be lower than 2048 KB";
-			}
-			if(Header.PrgRom >= 4096) {
-				return "Error: PRG ROM size must be lower than 4096 KB";
+				return "Error: Mapper ID must be lower than 256";
+			} else if(Header.PrgRom > 4096) {
+				return "Error: PRG ROM size must be lower than or equal to 4096 KB";
+			} else if(Header.ChrRom > 2040) {
+				return "Error: CHR ROM size must be lower than or equal to 2040 KB";
+			} else if((Header.PrgRom % 16) != 0) {
+				return "Error: PRG ROM size must be a multiple of 16 KB";
+			} else if((Header.ChrRom % 8) != 0) {
+				return "Error: CHR ROM size must be a multiple of 8 KB";
 			}
 		}
 
@@ -150,18 +152,23 @@ public class NesHeaderEditViewModel : DisposableViewModel
 
 	public async Task<bool> Save(Window wnd)
 	{
-		string? filepath = await FileDialogHelper.SaveFile(Path.GetDirectoryName(_romInfo.RomPath), Path.GetFileName(_romInfo.RomPath), wnd, FileDialogHelper.NesExt);
+		string? filepath = await FileDialogHelper.SaveFile(Path.GetDirectoryName(_romInfo.RomPath), _romInfo.GetRomName(), wnd, FileDialogHelper.NesExt);
 		if(filepath != null) {
-			byte[]? data = FileHelper.ReadAllBytes(_romInfo.RomPath);
-			if(data != null) {
-				byte[] header = Header.ToBytes();
-				for(int i = 0; i < 16; i++) {
-					data[i] = header[i];
-				}
-				return FileHelper.WriteAllBytes(filepath, data);
-			}
+			byte[] data = new byte[_prgRom.Length + _chrRom.Length + 16];
+			byte[] header = Header.ToBytes();
+			Array.Copy(header, data, 16);
+			Array.Copy(_prgRom, 0, data, 16, _prgRom.Length);
+			Array.Copy(_chrRom, 0, data, 16 + _prgRom.Length, _chrRom.Length);
+			return FileHelper.WriteAllBytes(filepath, data);
 		}
 		return false;
+	}
+
+	public enum RomSizeUnit
+	{
+		Bytes,
+		KB,
+		MB
 	}
 
 	public class NesHeader : ViewModelBase
@@ -174,9 +181,11 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		[Reactive] public uint SubmapperId { get; set; }
 
 		[Reactive] public UInt64 PrgRom { get; set; }
+		[Reactive] public RomSizeUnit PrgRomUnit { get; set; }
 		[Reactive] public UInt64 ChrRom { get; set; }
+		[Reactive] public RomSizeUnit ChrRomUnit { get; set; }
 
-		[Reactive] public iNesMirroringType Mirroring { get; set; }
+		[Reactive] public MirroringType Mirroring { get; set; }
 
 		[Reactive] public FrameTiming Timing { get; set; }
 		[Reactive] public TvSystem System { get; set; }
@@ -196,7 +205,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 			_validSizeValues = new Dictionary<UInt64, int>();
 			for(int i = 0; i < 256; i++) {
 				int multiplier = (i & 0x03) * 2 + 1;
-				UInt64 value = ((UInt64)1 << (i >> 2)) / 1024;
+				UInt64 value = ((UInt64)1 << (i >> 2));
 				_validSizeValues[(UInt64)multiplier * value] = i;
 			}
 		}
@@ -209,21 +218,23 @@ public class NesHeaderEditViewModel : DisposableViewModel
 			header[2] = 0x53;
 			header[3] = 0x1A;
 
-			UInt64 prgRomValue = PrgRom / 16;
-			UInt64 chrRomValue = ChrRom / 8;
+			UInt64 prgRomSize = GetPrgSize();
+			UInt64 chrRomSize = GetChrSize();
+			UInt64 prgRomValue = prgRomSize / (16 * 1024);
+			UInt64 chrRomValue = chrRomSize / (8 * 1024);
 
 			if(FileType == NesFileType.Nes2_0) {
-				if((PrgRom % 16) != 0 || PrgRom >= 32768) {
-					if(_validSizeValues.ContainsKey(PrgRom)) {
+				if((prgRomSize % 16384) != 0 || prgRomSize > 61424 * 1024) {
+					if(_validSizeValues.ContainsKey(prgRomSize)) {
 						//This value is a valid exponent+multiplier combo (NES 2.0 only)
-						prgRomValue = ((uint)_validSizeValues[PrgRom] & 0xFF) | 0xF00;
+						prgRomValue = ((uint)_validSizeValues[prgRomSize] & 0xFF) | 0xF00;
 					}
 				}
 
-				if((ChrRom % 8) != 0 || ChrRom >= 16384) {
-					if(_validSizeValues.ContainsKey(ChrRom)) {
+				if((chrRomSize % 8192) != 0 || chrRomSize > 30712 * 1024) {
+					if(_validSizeValues.ContainsKey(chrRomSize)) {
 						//This value is a valid exponent+multiplier combo (NES 2.0 only)
-						chrRomValue = ((uint)_validSizeValues[ChrRom] & 0xFF) | 0xF00;
+						chrRomValue = ((uint)_validSizeValues[chrRomSize] & 0xFF) | 0xF00;
 					}
 				}
 
@@ -301,7 +312,23 @@ public class NesHeaderEditViewModel : DisposableViewModel
 			NesHeader header = new NesHeader();
 			header.FileType = binHeader.GetRomHeaderVersion() == RomHeaderVersion.Nes2_0 ? NesFileType.Nes2_0 : NesFileType.iNes;
 			header.PrgRom = (uint)(binHeader.GetPrgSize());
+			if(header.PrgRom > 0 && header.PrgRom % 1024 == 0) {
+				header.PrgRomUnit = RomSizeUnit.KB;
+				header.PrgRom /= 1024;
+				if(header.PrgRom % 1024 == 0) {
+					header.PrgRomUnit = RomSizeUnit.MB;
+					header.PrgRom /= 1024;
+				}
+			}
 			header.ChrRom = (uint)(binHeader.GetChrSize());
+			if(header.ChrRom > 0 && header.ChrRom % 1024 == 0) {
+				header.ChrRomUnit = RomSizeUnit.KB;
+				header.ChrRom /= 1024;
+				if(header.ChrRom % 1024 == 0) {
+					header.ChrRomUnit = RomSizeUnit.MB;
+					header.ChrRom /= 1024;
+				}
+			}
 			header.HasTrainer = binHeader.HasTrainer();
 			header.HasBattery = binHeader.HasBattery();
 
@@ -326,19 +353,39 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		{
 			return _validSizeValues.ContainsKey(size);
 		}
+
+		private UInt64 GetSize(UInt64 size, RomSizeUnit unit)
+		{
+			switch(unit) {
+				case RomSizeUnit.Bytes: return size;
+				case RomSizeUnit.KB: return size * 1024;
+				case RomSizeUnit.MB: return size * 1024 * 1024;
+				default: throw new Exception("Unsupported value");
+			}
+		}
+
+		public UInt64 GetPrgSize()
+		{
+			return GetSize(PrgRom, PrgRomUnit);
+		}
+
+		public UInt64 GetChrSize()
+		{
+			return GetSize(ChrRom, ChrRomUnit);
+		}
 	}
 
 	private class BinaryHeader
 	{
 		private byte[] _bytes;
-		private byte PrgCount;
-		private byte ChrCount;
+		private byte _prgCount;
+		private byte _chrCount;
 
 		public BinaryHeader(byte[] bytes)
 		{
 			_bytes = bytes;
-			PrgCount = bytes[4];
-			ChrCount = bytes[5];
+			_prgCount = bytes[4];
+			_chrCount = bytes[5];
 		}
 
 		public RomHeaderVersion GetRomHeaderVersion()
@@ -407,22 +454,22 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		private UInt64 GetSizeValue(int exponent, int multiplier)
 		{
 			multiplier = multiplier * 2 + 1;
-			return (UInt64)multiplier * (((UInt64)1 << exponent) / 1024);
+			return (UInt64)multiplier * ((UInt64)1 << exponent);
 		}
 
 		public UInt64 GetPrgSize()
 		{
 			if(GetRomHeaderVersion() == RomHeaderVersion.Nes2_0) {
 				if((_bytes[9] & 0x0F) == 0x0F) {
-					return GetSizeValue(PrgCount >> 2, PrgCount & 0x03);
+					return GetSizeValue(_prgCount >> 2, _prgCount & 0x03);
 				} else {
-					return (UInt64)(((_bytes[9] & 0x0F) << 8) | PrgCount) * 16;
+					return (UInt64)(((_bytes[9] & 0x0F) << 8) | _prgCount) * 16 * 1024;
 				}
 			} else {
-				if(PrgCount == 0) {
-					return 256 * 16; //0 is a special value and means 256
+				if(_prgCount == 0) {
+					return 256 * 16 * 1024; //0 is a special value and means 256
 				} else {
-					return (UInt64)PrgCount * 16;
+					return (UInt64)_prgCount * 16 * 1024;
 				}
 			}
 		}
@@ -431,12 +478,12 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		{
 			if(GetRomHeaderVersion() == RomHeaderVersion.Nes2_0) {
 				if((_bytes[9] & 0xF0) == 0xF0) {
-					return GetSizeValue(ChrCount >> 2, ChrCount & 0x03);
+					return GetSizeValue(_chrCount >> 2, _chrCount & 0x03);
 				} else {
-					return (UInt64)(((_bytes[9] & 0xF0) << 4) | ChrCount) * 8;
+					return (UInt64)(((_bytes[9] & 0xF0) << 4) | _chrCount) * 8 * 1024;
 				}
 			} else {
-				return (UInt64)ChrCount * 8;
+				return (UInt64)_chrCount * 8 * 1024;
 			}
 		}
 
@@ -485,12 +532,12 @@ public class NesHeaderEditViewModel : DisposableViewModel
 			}
 		}
 
-		public iNesMirroringType GetMirroringType()
+		public MirroringType GetMirroringType()
 		{
 			if((_bytes[6] & 0x08) != 0) {
-				return iNesMirroringType.FourScreens;
+				return MirroringType.FourScreens;
 			} else {
-				return (_bytes[6] & 0x01) != 0 ? iNesMirroringType.Vertical : iNesMirroringType.Horizontal;
+				return (_bytes[6] & 0x01) != 0 ? MirroringType.Vertical : MirroringType.Horizontal;
 			}
 		}
 
@@ -530,7 +577,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		Nes2_0 = 1
 	}
 
-	public enum iNesMirroringType
+	public enum MirroringType
 	{
 		Horizontal = 0,
 		Vertical = 1,
@@ -668,8 +715,15 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		CityPatrolmanLightgun = 0x2F, //not supported yet
 		SharpC1CassetteInterface = 0x30, //not supported yet
 		StandardControllerWithSwappedButtons = 0x31, //not supported yet
-		ExcaliborSudokuPad = 0x32, //not supported yet
+		ExcaliburSudokuPad = 0x32, //not supported yet
 		AblPinball = 0x33, //not supported yet
-		GoldenNuggetCasino = 0x34 //not supported yet
+		GoldenNuggetCasino = 0x34, //not supported yet
+		KedaKeyboard = 0x35, //not supported yet
+		SuborKeyboardMouse3 = 0x36, //not supported yet (note: mouse on $4017)
+		PortTestController = 0x37, //not supported yet
+		BandaiMultiGamePlayer = 0x38, //not supported yet
+		VenomTVDance = 0x39, //not supported yet
+		LgTvRemote = 0x3A, //not supported yet
+		FcnsController = 0x3B
 	}
 }

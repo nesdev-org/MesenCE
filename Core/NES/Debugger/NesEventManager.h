@@ -32,7 +32,7 @@ struct NesEventViewerConfig : public BaseEventViewerConfig
 	EventViewerCategoryCfg Ppu2005Write;
 	EventViewerCategoryCfg Ppu2006Write;
 	EventViewerCategoryCfg Ppu2007Write;
-	
+
 	EventViewerCategoryCfg Ppu2002Read;
 	EventViewerCategoryCfg Ppu2004Read;
 	EventViewerCategoryCfg Ppu2007Read;
@@ -58,10 +58,10 @@ private:
 	uint32_t _palette[512] = {};
 
 	uint32_t _scanlineCount = 262;
-	uint16_t *_ppuBuffer = nullptr;
+	uint16_t* _ppuBuffer = nullptr;
 
-	void DrawNtscBorders(uint32_t *buffer);
-	void DrawPixel(uint32_t *buffer, int32_t x, uint32_t y, uint32_t color);
+	void DrawNtscBorders(uint32_t* buffer);
+	void DrawPixel(uint32_t* buffer, int32_t x, uint32_t y, uint32_t color);
 
 	void ProcessNtscBorderColorEvents(vector<DebugEventInfo>& events, vector<uint16_t>& bgColor, uint32_t& currentPos, uint16_t& currentColor);
 
@@ -73,7 +73,7 @@ protected:
 	int GetScanlineOffset() override { return 1; }
 
 public:
-	NesEventManager(Debugger *debugger, NesConsole* console);
+	NesEventManager(Debugger* debugger, NesConsole* console);
 	~NesEventManager();
 
 	void AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId = -1) override;

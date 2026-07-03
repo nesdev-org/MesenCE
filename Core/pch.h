@@ -1,14 +1,14 @@
 #pragma once
 
 #ifdef _MSC_VER
-#pragma warning( disable : 4100 ) //unreferenced formal parameter
-#pragma warning( disable : 4244 ) //conversion from 'x' to 'y', possible loss of data
-#pragma warning( disable : 4245 ) //conversion from 'x' to 'y', signed/unsigned mismatch
-#endif 
+	#pragma warning(disable : 4100) //unreferenced formal parameter
+	#pragma warning(disable : 4244) //conversion from 'x' to 'y', possible loss of data
+	#pragma warning(disable : 4245) //conversion from 'x' to 'y', signed/unsigned mismatch
+#endif
 
 #ifdef __clang__
-//TODO, fix warnings and remove this
-#pragma clang diagnostic ignored "-Wswitch"
+	//TODO, fix warnings and remove this
+	#pragma clang diagnostic ignored "-Wswitch"
 #endif
 
 #include <stdio.h>

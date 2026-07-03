@@ -4,17 +4,15 @@
 #include "SNES/SnesPpu.h"
 #include "SNES/Spc.h"
 #include "SNES/InternalRegisters.h"
+#include "SNES/RegisterHandlerB.h"
 #include "SNES/SnesControlManager.h"
 #include "SNES/SnesMemoryManager.h"
 #include "SNES/SnesDmaController.h"
 #include "SNES/BaseCartridge.h"
-#include "SNES/RamHandler.h"
-#include "SNES/CartTypes.h"
 #include "SNES/SpcFileData.h"
 #include "SNES/SnesDefaultVideoFilter.h"
 #include "SNES/SnesNtscFilter.h"
 #include "Gameboy/Gameboy.h"
-#include "Gameboy/GbPpu.h"
 #include "Debugger/Debugger.h"
 #include "Debugger/DebugTypes.h"
 #include "SNES/SnesState.h"
@@ -29,11 +27,8 @@
 #include "Shared/EmuSettings.h"
 #include "Shared/BaseControlManager.h"
 #include "Utilities/Serializer.h"
-#include "Utilities/Timer.h"
 #include "Utilities/VirtualFile.h"
-#include "Utilities/PlatformUtilities.h"
 #include "Utilities/FolderUtilities.h"
-#include "Shared/EventType.h"
 #include "SNES/RegisterHandlerA.h"
 #include "SNES/RegisterHandlerB.h"
 #include "Utilities/ArchiveReader.h"
@@ -75,7 +70,7 @@ void SnesConsole::ProcessEndOfFrame()
 	if(_cart->GetCoprocessor()) {
 		_cart->GetCoprocessor()->ProcessEndOfFrame();
 	}
-	
+
 	//Run the SPC at least once per frame to prevent issues (buffer overflow)
 	//when a very long DMA transfer is running across multiple frames.
 	//(RunFrame above can run more than one frame in this scenario, which could cause crashes)
@@ -91,6 +86,12 @@ void SnesConsole::ProcessEndOfFrame()
 
 void SnesConsole::Reset()
 {
+	if(_emu->GetRomInfo().Format == RomFormat::Spc) {
+		// For SPC files, reload the initial state that the SPC file started with
+		_emu->ReloadRom(true);
+		return;
+	}
+
 	_dmaController->Reset();
 	_internalRegisters->Reset();
 	_memoryManager->Reset();
@@ -114,7 +115,7 @@ LoadRomResult SnesConsole::LoadRom(VirtualFile& romFile)
 	unique_ptr<BaseCartridge> cart = BaseCartridge::CreateCartridge(this, romFile);
 	if(cart) {
 		_cart.swap(cart);
-		
+
 		UpdateRegion();
 
 		_internalRegisters.reset(new InternalRegisters());
@@ -138,7 +139,7 @@ LoadRomResult SnesConsole::LoadRom(VirtualFile& romFile)
 
 		_ppu->PowerOn();
 		_cpu->PowerOn();
-		
+
 		//After power on, run the PPU/etc ahead of the CPU (simulates delay CPU takes to get out of reset)
 		_memoryManager->IncMasterClockStartup();
 
@@ -232,6 +233,11 @@ PpuFrameInfo SnesConsole::GetPpuFrame()
 	return frame;
 }
 
+uint32_t SnesConsole::GetFrameCount()
+{
+	return _ppu->GetFrameCount();
+}
+
 TimingInfo SnesConsole::GetTimingInfo(CpuType cpuType)
 {
 	if(cpuType == CpuType::Gameboy && _cart->GetGameboy()) {
@@ -273,7 +279,7 @@ BaseVideoFilter* SnesConsole::GetVideoFilter(bool getDefaultFilter)
 	}
 
 	VideoFilterType filterType = _emu->GetSettings()->GetVideoConfig().VideoFilter;
-	
+
 	switch(filterType) {
 		case VideoFilterType::NtscBlargg:
 		case VideoFilterType::NtscBisqwit:
@@ -308,7 +314,6 @@ AudioTrackInfo SnesConsole::GetAudioTrackInfo()
 		track.FadeLength = spc->FadeLength / 1000.0;
 		track.TrackNumber = _spcTrackNumber + 1;
 		track.TrackCount = (uint32_t)_spcPlaylist.size();
-
 	}
 	return track;
 }
@@ -359,17 +364,20 @@ void SnesConsole::Serialize(Serializer& s)
 	SV(_controlManager);
 }
 
-SaveStateCompatInfo SnesConsole::ValidateSaveStateCompatibility(ConsoleType stateConsoleType)
+optional<SaveStateCompatInfo> SnesConsole::ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType)
 {
 	if(stateConsoleType == ConsoleType::Gameboy) {
-		return { true, "cart.gameboy.", "", {
-			//Keep all clock counters as-is when loading a GB/GBC state
-			//in a SGB core - this allows it to keep running in sync with
-			//the SNES core properly.
-			"apu.clockCounter", "apu.prevClockCount",
+		//Keep all clock counters as-is when loading a GB/GBC state
+		//in a SGB core - this allows it to keep running in sync with
+		//the SNES core properly.
+		vector<string> fieldsToRemove = {
+			"apu.clockCounter",
+			"apu.prevClockCount",
 			"cpu.cycleCount",
 			"memoryManager.apuCycleCount"
-		} };
+		};
+
+		return SaveStateCompatInfo { true, "cart.gameboy.", "", fieldsToRemove };
 	}
 
 	return {};
@@ -449,7 +457,7 @@ AddressInfo SnesConsole::GetAbsoluteAddress(AddressInfo& relAddress)
 			} else {
 				return _memoryManager->GetMemoryMappings()->GetAbsoluteAddress(relAddress.Address);
 			}
-		
+
 		case MemoryType::SpcMemory: return _spc->GetAbsoluteAddress(relAddress.Address);
 		case MemoryType::Sa1Memory: return _cart->GetSa1() ? _cart->GetSa1()->GetMemoryMappings()->GetAbsoluteAddress(relAddress.Address) : unmapped;
 		case MemoryType::GsuMemory: return _cart->GetGsu() ? _cart->GetGsu()->GetMemoryMappings()->GetAbsoluteAddress(relAddress.Address) : unmapped;
@@ -482,8 +490,8 @@ AddressInfo SnesConsole::GetRelativeAddress(AddressInfo& absAddress, CpuType cpu
 		case MemoryType::SnesPrgRom:
 		case MemoryType::SnesWorkRam:
 		case MemoryType::SnesSaveRam:
-		case MemoryType::SufamiTurboFirmware:
-		{
+		case MemoryType::GsuWorkRam:
+		case MemoryType::SufamiTurboFirmware: {
 			if(!mappings) {
 				return unmapped;
 			}

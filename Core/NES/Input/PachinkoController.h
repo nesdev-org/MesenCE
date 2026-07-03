@@ -9,12 +9,17 @@ private:
 	uint16_t _pachinkoState = 0;
 
 protected:
-	enum PachinkoButtons { Press = 8, Release = 9 };
-	
+	enum PachinkoButtons
+	{
+		Press = 8,
+		Release = 9
+	};
+
 	void Serialize(Serializer& s) override
 	{
 		NesController::Serialize(s);
-		SV(_pachinkoState); SV(_analogData);
+		SV(_pachinkoState);
+		SV(_analogData);
 	}
 
 	void InternalSetStateFromInput() override
@@ -28,7 +33,7 @@ protected:
 	}
 
 public:
-	PachinkoController(Emulator* emu, KeyMappingSet keyMappings) : NesController(emu, ControllerType::Pachinko, BaseControlDevice::ExpDevicePort, keyMappings)
+	PachinkoController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : NesController(emu, ControllerType::Pachinko, port, keyMappings)
 	{
 	}
 
@@ -37,7 +42,10 @@ public:
 		uint8_t output = 0;
 		if(addr == 0x4016) {
 			StrobeProcessRead();
-			output = (_pachinkoState & 0x01) << 1;
+			output = (_pachinkoState & 0x01);
+			if(_port >= 2) {
+				output <<= 1;
+			}
 			_pachinkoState >>= 1;
 		}
 		return output;

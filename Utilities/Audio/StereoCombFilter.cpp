@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "StereoCombFilter.h"
 
-void StereoCombFilter::ApplyFilter(int16_t * stereoBuffer, size_t sampleCount, uint32_t sampleRate, int32_t delay, uint32_t strength)
+void StereoCombFilter::ApplyFilter(int16_t* stereoBuffer, size_t sampleCount, uint32_t sampleRate, int32_t delay, uint32_t strength)
 {
 	size_t delaySampleCount = (int32_t)((double)delay / 1000 * sampleRate);
 	if(delaySampleCount != _lastDelay) {

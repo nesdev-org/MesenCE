@@ -30,7 +30,7 @@ namespace Mesen.Config
 					cheats = (CheatCodes?)JsonSerializer.Deserialize(File.ReadAllText(path), typeof(CheatCodes), MesenSerializerContext.Default) ?? new CheatCodes();
 				} catch { }
 			}
-			
+
 			return cheats;
 		}
 

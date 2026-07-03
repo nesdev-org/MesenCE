@@ -27,7 +27,7 @@ namespace Mesen.Debugger.Windows
 
 			_model = new ProfilerWindowViewModel(this);
 			DataContext = _model;
-			
+
 			if(Design.IsDesignMode) {
 				return;
 			}

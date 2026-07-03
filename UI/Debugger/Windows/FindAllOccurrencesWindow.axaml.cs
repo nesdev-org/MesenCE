@@ -11,9 +11,9 @@ namespace Mesen.Debugger.Windows
 {
 	public class FindAllOccurrencesWindow : MesenWindow
 	{
-		private static string _lastSearch { get; set; } = "";
-		private static bool _lastMatchCase { get; set; } = false;
-		private static bool _lastMatchWholeWord { get; set; } = false;
+		private static string _lastSearch = "";
+		private static bool _lastMatchCase = false;
+		private static bool _lastMatchWholeWord = false;
 
 		public string SearchString { get; set; }
 		public bool MatchCase { get; set; }

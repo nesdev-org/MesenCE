@@ -28,7 +28,7 @@ AviRecorder::~AviRecorder()
 bool AviRecorder::Init(string filename)
 {
 	_outputFile = filename;
-	
+
 	ofstream fileTest(filename, std::ios::out | std::ios::binary);
 	if(!fileTest) {
 		return false;

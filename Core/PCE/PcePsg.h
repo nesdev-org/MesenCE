@@ -32,7 +32,7 @@ private:
 	int16_t _prevRightOutput = 0;
 
 	uint32_t _clockCounter = 0;
-	
+
 	void UpdateOutput(PcEngineConfig& cfg);
 	void UpdateSoundOffset();
 

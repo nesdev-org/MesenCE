@@ -4,7 +4,7 @@
 #include "BpsPatcher.h"
 #include "CRC32.h"
 
-int64_t BpsPatcher::ReadBase128Number(std::istream &file)
+int64_t BpsPatcher::ReadBase128Number(std::istream& file)
 {
 	int64_t result = 0;
 	int shift = 0;
@@ -25,7 +25,7 @@ int64_t BpsPatcher::ReadBase128Number(std::istream &file)
 	return result;
 }
 
-bool BpsPatcher::PatchBuffer(string bpsFilepath, vector<uint8_t> &input, vector<uint8_t> &output)
+bool BpsPatcher::PatchBuffer(string bpsFilepath, vector<uint8_t>& input, vector<uint8_t>& output)
 {
 	ifstream bpsFile(bpsFilepath, std::ios::in | std::ios::binary);
 	if(bpsFile) {
@@ -34,7 +34,7 @@ bool BpsPatcher::PatchBuffer(string bpsFilepath, vector<uint8_t> &input, vector<
 	return false;
 }
 
-bool BpsPatcher::PatchBuffer(std::istream &bpsFile, vector<uint8_t> &input, vector<uint8_t> &output)
+bool BpsPatcher::PatchBuffer(std::istream& bpsFile, vector<uint8_t>& input, vector<uint8_t>& output)
 {
 	bpsFile.seekg(0, std::ios::end);
 	size_t fileSize = (size_t)bpsFile.tellg();
@@ -137,7 +137,7 @@ bool BpsPatcher::PatchBuffer(std::istream &bpsFile, vector<uint8_t> &input, vect
 				}
 				break;
 			}
-		}			
+		}
 	}
 
 	uint8_t inputChecksum[4];

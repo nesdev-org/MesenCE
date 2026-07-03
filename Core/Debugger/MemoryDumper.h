@@ -57,7 +57,7 @@ public:
 
 	uint8_t* GetMemoryBuffer(MemoryType type);
 	uint32_t GetMemorySize(MemoryType type);
-	void GetMemoryState(MemoryType type, uint8_t *buffer);
+	void GetMemoryState(MemoryType type, uint8_t* buffer);
 
 	uint8_t GetMemoryValue(MemoryType memoryType, uint32_t address, bool disableSideEffects = true);
 	void GetMemoryValues(MemoryType memoryType, uint32_t start, uint32_t end, uint8_t* output);
@@ -67,7 +67,7 @@ public:
 	void SetMemoryValue32(MemoryType memoryType, uint32_t address, uint32_t value, bool disableSideEffects);
 	void SetMemoryValue(MemoryType memoryType, uint32_t address, uint8_t value, bool disableSideEffects = true);
 	void SetMemoryValues(MemoryType memoryType, uint32_t address, uint8_t* data, uint32_t length);
-	void SetMemoryState(MemoryType type, uint8_t *buffer, uint32_t length);
+	void SetMemoryState(MemoryType type, uint8_t* buffer, uint32_t length);
 
 	bool HasUndoHistory();
 	void PerformUndo();

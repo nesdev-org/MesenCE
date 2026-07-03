@@ -14,9 +14,13 @@ protected:
 	{
 		return "RP";
 	}
-	
+
 public:
-	enum Buttons { ResetButton = 0, PowerButton = 1 };
+	enum Buttons
+	{
+		ResetButton = 0,
+		PowerButton = 1
+	};
 
 	SystemActionManager(Emulator* emu) : BaseControlDevice(emu, ControllerType::None, BaseControlDevice::ConsoleInputPort)
 	{

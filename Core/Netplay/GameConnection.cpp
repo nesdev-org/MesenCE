@@ -31,7 +31,7 @@ void GameConnection::ReadSocket()
 	}
 }
 
-bool GameConnection::ExtractMessage(void *buffer, uint32_t &messageLength)
+bool GameConnection::ExtractMessage(void* buffer, uint32_t& messageLength)
 {
 	messageLength = _readBuffer[0] | (_readBuffer[1] << 8) | (_readBuffer[2] << 16) | (_readBuffer[3] << 24);
 
@@ -44,7 +44,7 @@ bool GameConnection::ExtractMessage(void *buffer, uint32_t &messageLength)
 	int packetLength = messageLength + sizeof(messageLength);
 
 	if(_readPosition >= packetLength) {
-		memcpy(buffer, _readBuffer+sizeof(messageLength), messageLength);
+		memcpy(buffer, _readBuffer + sizeof(messageLength), messageLength);
 		memmove(_readBuffer, _readBuffer + packetLength, _readPosition - packetLength);
 		_readPosition -= packetLength;
 		return true;
@@ -64,7 +64,7 @@ NetMessage* GameConnection::ReadMessage()
 				case MessageType::SaveState: return new SaveStateMessage(_messageBuffer, messageLength);
 				case MessageType::InputData: return new InputDataMessage(_messageBuffer, messageLength);
 				case MessageType::MovieData: return new MovieDataMessage(_messageBuffer, messageLength);
-				case MessageType::GameInformation: return new GameInformationMessage(_messageBuffer, messageLength);
+				case MessageType::GameInformation: return new GameInformationMessage(_emu->GetSettings(), _messageBuffer, messageLength);
 				case MessageType::PlayerList: return new PlayerListMessage(_messageBuffer, messageLength);
 				case MessageType::SelectController: return new SelectControllerMessage(_messageBuffer, messageLength);
 				case MessageType::ForceDisconnect: return new ForceDisconnectMessage(_messageBuffer, messageLength);
@@ -75,7 +75,7 @@ NetMessage* GameConnection::ReadMessage()
 	return nullptr;
 }
 
-void GameConnection::SendNetMessage(NetMessage &message)
+void GameConnection::SendNetMessage(NetMessage& message)
 {
 	auto lock = _socketLock.AcquireSafe();
 	message.Send(*_socket.get());
@@ -95,10 +95,13 @@ bool GameConnection::ConnectionError()
 void GameConnection::ProcessMessages()
 {
 	NetMessage* message;
+
+	ProcessPendingEvents();
+
 	while((message = ReadMessage()) != nullptr) {
 		//Loop until all messages have been processed
 		message->Initialize();
 		ProcessMessage(message);
 		delete message;
-	}		
+	}
 }

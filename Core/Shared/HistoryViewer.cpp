@@ -43,12 +43,12 @@ bool HistoryViewer::Initialize(Emulator* mainEmu)
 
 	//Disable battery saving for this instance
 	_emu->GetBatteryManager()->Initialize("");
-	
+
 	_history = mainEmu->GetRewindManager()->GetHistory();
-	
+
 	_emu->UnregisterInputProvider(this);
 	_emu->RegisterInputProvider(this);
-	
+
 	SeekTo(0);
 
 	return true;
@@ -99,7 +99,7 @@ void HistoryViewer::SeekTo(uint32_t seekPosition)
 	seekPosition /= RewindManager::BufferSize;
 	if(seekPosition < _history.size()) {
 		auto lock = _emu->AcquireLock();
-		
+
 		_position = seekPosition;
 		RewindData rewindData = _history[_position];
 		rewindData.LoadState(_emu, _history, _position);
@@ -173,11 +173,11 @@ void HistoryViewer::ResumeGameplay(uint32_t resumePosition)
 	}
 }
 
-bool HistoryViewer::SetInput(BaseControlDevice *device)
+bool HistoryViewer::SetInput(BaseControlDevice* device)
 {
 	uint8_t port = device->GetPort();
 	if(_position < _history.size()) {
-		std::deque<ControlDeviceState> &stateData = _history[_position].InputLogs[port];
+		std::deque<ControlDeviceState>& stateData = _history[_position].InputLogs[port];
 		if(_pollCounter < stateData.size()) {
 			ControlDeviceState state = stateData[_pollCounter];
 			device->SetRawState(state);

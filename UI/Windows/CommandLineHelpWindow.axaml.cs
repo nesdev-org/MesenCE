@@ -1,15 +1,15 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using System;
-using System.ComponentModel;
-using Avalonia.Data;
 using Mesen.Interop;
-using System.Collections.Generic;
-using Avalonia.Input;
 using Mesen.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Mesen.Windows
 {
@@ -32,7 +32,7 @@ namespace Mesen.Windows
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void btnOk_OnClick(object? sender, RoutedEventArgs e)
+		private void BtnOk_OnClick(object? sender, RoutedEventArgs e)
 		{
 			Close();
 		}

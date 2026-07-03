@@ -39,7 +39,7 @@ protected:
 		SelectChrPage(0, _reg);
 		SelectPrgPage(0, _reg);
 		SelectPrgPage(1, _reg);
-		
+
 		return InternalReadRam(addr);
 	}
 

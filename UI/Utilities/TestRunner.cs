@@ -42,7 +42,8 @@ namespace Mesen.Utilities
 			foreach(string luaScript in commandLineHelper.LuaScriptsToLoad) {
 				try {
 					string script = File.ReadAllText(luaScript);
-					DebugApi.LoadScript(luaScript, Path.GetDirectoryName(luaScript) ?? Program.OriginalFolder, script);
+					string path = (Path.GetDirectoryName(luaScript) ?? Program.OriginalFolder) + Path.DirectorySeparatorChar;
+					int scriptId = DebugApi.LoadScript(luaScript, path, script);
 				} catch { }
 			}
 

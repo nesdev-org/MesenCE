@@ -53,7 +53,7 @@ void PcePsgChannel::Run(uint32_t clocks)
 	if(_chIndex >= 4) {
 		//Source: https://web.archive.org/web/20080311065543/http://cgfm2.emuviews.com:80/blog/index.php
 		//"I wanted to see which registers affected the LFSR, but as it turns out none of them do except for the LFSR frequency control.
-		//If the channel is turned on or off, noise is turned on or off, or if any other setting is adjusted, the LFSR always runs at 
+		//If the channel is turned on or off, noise is turned on or off, or if any other setting is adjusted, the LFSR always runs at
 		//the specified noise frequency. Apart from a reset, the LFSR state can't be changed."
 		if(_state.NoiseTimer <= clocks) {
 			_state.NoiseTimer = GetNoisePeriod();
@@ -96,7 +96,7 @@ void PcePsgChannel::Run(uint32_t clocks)
 int16_t PcePsgChannel::GetOutput(bool forLeftChannel, uint8_t masterVolume)
 {
 	//Sound reduction constants (in -1.5dB steps)
-	constexpr uint8_t volumeReduction[30] = { 255,214,180,151,127,107,90,76,64,53,45,38,32,27,22,19,16,13,11,9,8,6,5,4,4,3,2,2,2,1 };
+	constexpr uint8_t volumeReduction[30] = { 255, 214, 180, 151, 127, 107, 90, 76, 64, 53, 45, 38, 32, 27, 22, 19, 16, 13, 11, 9, 8, 6, 5, 4, 4, 3, 2, 2, 2, 1 };
 
 	uint8_t reductionFactor = (0xF - masterVolume) * 2 + (0x1F - _state.Amplitude) + (0xF - (forLeftChannel ? _state.LeftVolume : _state.RightVolume)) * 2;
 	if(reductionFactor >= 30) {
@@ -127,7 +127,7 @@ void PcePsgChannel::Write(uint16_t addr, uint8_t value)
 				_state.Timer = GetPeriod();
 				_state.Enabled = (value & 0x80) != 0;
 			}
-			
+
 			_state.DdaEnabled = (value & 0x40) != 0;
 			_state.Amplitude = (value & 0x1F);
 

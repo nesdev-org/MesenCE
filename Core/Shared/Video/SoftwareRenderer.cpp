@@ -71,7 +71,7 @@ struct SoftwareRendererFrame
 void SoftwareRenderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud)
 {
 	auto lock = _frameLock.AcquireSafe();
-	
+
 	if(_needSwap) {
 		_needSwap = false;
 		auto textureLock = _textureLock.AcquireSafe();
@@ -91,7 +91,7 @@ void SoftwareRenderer::Reset()
 {
 }
 
-void SoftwareRenderer::SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle)
+void SoftwareRenderer::SetFullscreenMode(FullscreenSettings settings)
 {
 	//not supported
 }

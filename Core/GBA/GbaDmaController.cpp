@@ -38,13 +38,22 @@ void GbaDmaController::TriggerDmaChannel(GbaDmaTrigger trigger, uint8_t channel,
 			ch.Repeat = false;
 		}
 
+		if(ch.Pending) {
+			//When a channel is already pending (or running) and gets triggered again, ignore the
+			//new trigger and run the channel at the timing determined on the first trigger.
+			//The dma-latch test triggers the DMA channel via a timer on every cycle,
+			//which caused the DMA to never actually start (its start clock was constantly
+			//getting pushed further into the future)
+			return;
+		}
+
 		ch.Pending = true;
 		_dmaPending = true;
 
 		uint8_t delay = 2;
 		if(trigger == GbaDmaTrigger::Special) {
 			if(channel < 3) {
-				//Audio DMA triggers slightly later (4 passes fifo_dma_2 test rom)
+				//Audio DMA triggers slightly later (3 passes fifo_2 test rom)
 				delay = 3;
 			} else {
 				//Video capture DMA
@@ -117,7 +126,7 @@ void GbaDmaController::RunPendingDma(bool allowStartDma)
 
 		do {
 			RunDma(_state.Ch[chIndex], chIndex);
-			
+
 			//Keep going so long as at least one DMA channel is ready to run
 			chIndex = GetPendingDmaIndex();
 		} while(chIndex >= 0);
@@ -178,7 +187,7 @@ void GbaDmaController::RunDma(GbaDmaChannel& ch, uint8_t chIndex)
 
 	_dmaActiveChannel = chIndex;
 
-	while(length-- > 0) {
+	while(length-- > 0 && ch.Enabled) {
 		uint32_t value;
 		if(srcAddr >= 0x2000000) {
 			if(!isRomSrc) {
@@ -269,7 +278,7 @@ void GbaDmaController::RunDma(GbaDmaChannel& ch, uint8_t chIndex)
 	ch.Active = false;
 	ch.Pending = false;
 	ch.StartClock = 0;
-	
+
 	_dmaPending = false;
 	for(int i = 0; i < 4; i++) {
 		_dmaPending |= _state.Ch[i].Pending;
@@ -279,6 +288,9 @@ void GbaDmaController::RunDma(GbaDmaChannel& ch, uint8_t chIndex)
 		ch.Enabled = false;
 		ch.Control &= ~0x8000;
 	} else {
+		//Length is reloaded from the register on each repeat
+		ch.LenLatch = ch.Length;
+
 		if(destMode == GbaDmaAddrMode::IncrementReload) {
 			ch.DestLatch = ch.Destination;
 		}
@@ -306,6 +318,7 @@ uint8_t GbaDmaController::ReadRegister(uint32_t addr)
 {
 	GbaDmaChannel& ch = _state.Ch[(addr - 0xB0) / 12];
 
+	// clang-format off
 	switch(addr) {
 		case 0xB8: case 0xC4: case 0xD0: case 0xDC:
 		case 0xB9: case 0xC5: case 0xD1: case 0xDD:
@@ -318,6 +331,7 @@ uint8_t GbaDmaController::ReadRegister(uint32_t addr)
 			//MessageManager::Log("Read unknown DMA register: " + HexUtilities::ToHex32(addr));
 			return _memoryManager->GetOpenBus(addr);
 	}
+	// clang-format on
 }
 
 void GbaDmaController::WriteRegister(uint32_t addr, uint8_t value)
@@ -325,6 +339,7 @@ void GbaDmaController::WriteRegister(uint32_t addr, uint8_t value)
 	uint8_t chIndex = (addr - 0xB0) / 12;
 	GbaDmaChannel& ch = _state.Ch[chIndex];
 
+	// clang-format off
 	switch(addr) {
 		case 0xB0: case 0xBC: case 0xC8: case 0xD4: BitUtilities::SetBits<0>(ch.Source, value); break;
 		case 0xB1: case 0xBD: case 0xC9: case 0xD5: BitUtilities::SetBits<8>(ch.Source, value); break;
@@ -378,6 +393,7 @@ void GbaDmaController::WriteRegister(uint32_t addr, uint8_t value)
 			MessageManager::Log("Write unknown DMA register: " + HexUtilities::ToHex32(addr) + " = " + HexUtilities::ToHex(value));
 			break;
 	}
+	// clang-format on
 }
 
 void GbaDmaController::Serialize(Serializer& s)

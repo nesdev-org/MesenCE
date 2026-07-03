@@ -1,9 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using Mesen.Utilities;
-using Mesen.Config;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
+using Mesen.Config;
+using Mesen.Utilities;
 
 namespace Mesen.Views
 {
@@ -19,7 +19,7 @@ namespace Mesen.Views
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void btnPreset_OnClick(object sender, RoutedEventArgs e)
+		private void BtnPreset_OnClick(object sender, RoutedEventArgs e)
 		{
 			((Button)sender).ContextMenu?.Open();
 		}

@@ -1,17 +1,19 @@
-#pragma once 
+#pragma once
 #include "pch.h"
-#include "NES/APU/BaseExpansionAudio.h"
 #include "NES/APU/NesApu.h"
 #include "NES/NesConsole.h"
 #include "Shared/Utilities/emu2413.h"
 #include "Shared/Utilities/Emu2413Serializer.h"
 #include "Utilities/Serializer.h"
 
-class Vrc7Audio : public BaseExpansionAudio
+class Vrc7Audio : public ISerializable
 {
 private:
 	static constexpr int OpllSampleRate = 49716;
 	static constexpr int OpllClockRate = Vrc7Audio::OpllSampleRate * 72;
+
+	NesConsole* _console = nullptr;
+	NesApu* _apu = nullptr;
 
 	OPLL* _opll = nullptr;
 	uint8_t _currentReg = 0;
@@ -20,8 +22,22 @@ private:
 	bool _muted = false;
 
 protected:
-	void ClockAudio() override
+	void Serialize(Serializer& s) override
 	{
+		SV(_currentReg);
+		SV(_previousOutput);
+		SV(_clockTimer);
+		SV(_muted);
+		Emu2413Serializer::Serialize(_opll, s);
+	}
+
+public:
+	__forceinline void Clock()
+	{
+		if(!_apu->IsApuEnabled()) {
+			return;
+		}
+
 		if(_clockTimer == 0) {
 			_clockTimer = ((double)_console->GetMasterClockRate()) / Vrc7Audio::OpllSampleRate;
 		}
@@ -35,22 +51,16 @@ protected:
 		}
 	}
 
-	void Serialize(Serializer& s) override
+	Vrc7Audio(NesConsole* console)
 	{
-		BaseExpansionAudio::Serialize(s);
+		_console = console;
+		_apu = console->GetApu();
 
-		SV(_currentReg); SV(_previousOutput); SV(_clockTimer); SV(_muted);
-		Emu2413Serializer::Serialize(_opll, s);
-	}
-
-public:
-	Vrc7Audio(NesConsole* console) : BaseExpansionAudio(console)
-	{
 		_previousOutput = 0;
 		_currentReg = 0;
 		_muted = false;
 		_clockTimer = 0;
-		
+
 		_opll = OPLL_new(Vrc7Audio::OpllClockRate, Vrc7Audio::OpllSampleRate);
 
 		//Set OPLL emulator to VRC7 mode

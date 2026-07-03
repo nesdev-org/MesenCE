@@ -94,7 +94,7 @@ namespace Mesen.Debugger.ViewModels
 				},
 
 				new ContextMenuSeparator(),
-		
+
 				new ContextMenuAction() {
 					ActionType = ActionType.FindOccurrences,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.FunctionList_FindOccurrences),
@@ -141,10 +141,10 @@ namespace Mesen.Debugger.ViewModels
 	public class FunctionViewModel : INotifyPropertyChanged
 	{
 		private string _format;
+		private CpuType _cpuType;
 
 		public AddressInfo FuncAddr { get; private set; }
-		public CpuType _cpuType;
-			
+
 		public string AbsAddressDisplay { get; }
 		public int AbsAddress => FuncAddr.Address;
 		public int RelAddress { get; private set; }

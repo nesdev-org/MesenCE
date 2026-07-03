@@ -13,8 +13,8 @@ namespace Mesen.Config
 {
 	public class InputConfig : BaseConfig<InputConfig>
 	{
-		[Reactive] [MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
-		[Reactive] [MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;
+		[Reactive][MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
+		[Reactive][MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;
 		[Reactive] public bool HidePointerForLightGuns { get; set; } = false;
 		[Reactive][MinMax(0, 10)] public UInt32 ForceFeedbackIntensity { get; set; } = 5;
 
@@ -259,15 +259,16 @@ namespace Mesen.Config
 			}
 		}
 
-		public InteropControllerConfig ToInterop()
+		public InteropControllerConfig ToInterop(ControllerType? type = null)
 		{
+			ControllerType effectiveType = type ?? this.Type;
 			return new InteropControllerConfig() {
-				Type = this.Type,
+				Type = effectiveType,
 				Keys = new InteropKeyMappingSet() {
-					Mapping1 = this.Mapping1.ToInterop(Type, 0),
-					Mapping2 = this.Mapping2.ToInterop(Type, 1),
-					Mapping3 = this.Mapping3.ToInterop(Type, 2),
-					Mapping4 = this.Mapping4.ToInterop(Type, 3),
+					Mapping1 = this.Mapping1.ToInterop(effectiveType, 0),
+					Mapping2 = this.Mapping2.ToInterop(effectiveType, 1),
+					Mapping3 = this.Mapping3.ToInterop(effectiveType, 2),
+					Mapping4 = this.Mapping4.ToInterop(effectiveType, 3),
 					TurboSpeed = this.TurboSpeed
 				}
 			};
@@ -320,7 +321,7 @@ namespace Mesen.Config
 		public UInt16 TurboR;
 		public UInt16 TurboSelect;
 		public UInt16 TurboStart;
-		
+
 		public UInt16 GenericKey1;
 
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 100)]
@@ -352,6 +353,9 @@ namespace Mesen.Config
 		SuperScope,
 		Multitap,
 		SnesRumbleController,
+		SnesNttDataKeypad,
+		AsciiTurboFileTwinTf2,
+		AsciiTurboFileTwinStf,
 
 		//NES controllers
 		NesController,
@@ -377,6 +381,7 @@ namespace Mesen.Config
 		FamilyBasicKeyboard,
 		PartyTap,
 		Pachinko,
+		FcnsController,
 		ExcitingBoxing,
 		JissenMahjong,
 		SuborKeyboard,
@@ -410,6 +415,7 @@ namespace Mesen.Config
 		//WonderSwan
 		WsController,
 		WsControllerVertical,
+		Pcv2Controller,
 	}
 
 	public static class ControllerTypeExtensions
@@ -419,6 +425,7 @@ namespace Mesen.Config
 			switch(type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
+				case ControllerType.SnesNttDataKeypad:
 				case ControllerType.NesController:
 				case ControllerType.FamicomController:
 				case ControllerType.FamicomControllerP2:
@@ -432,6 +439,9 @@ namespace Mesen.Config
 				case ControllerType.ColecoVisionController:
 				case ControllerType.WsController:
 				case ControllerType.WsControllerVertical:
+				case ControllerType.Pcv2Controller:
+				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 					return true;
 			}
 
@@ -443,6 +453,7 @@ namespace Mesen.Config
 			switch(type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
+				case ControllerType.SnesNttDataKeypad:
 				case ControllerType.NesController:
 				case ControllerType.FamicomController:
 				case ControllerType.FamicomControllerP2:
@@ -451,9 +462,13 @@ namespace Mesen.Config
 				case ControllerType.PceController:
 				case ControllerType.PceAvenuePad6:
 				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 				case ControllerType.HoriTrack:
 				case ControllerType.BandaiHyperShot:
 				case ControllerType.SmsController:
+				case ControllerType.WsController:
+				case ControllerType.WsControllerVertical:
+				case ControllerType.Pcv2Controller:
 					return true;
 			}
 
@@ -465,6 +480,7 @@ namespace Mesen.Config
 			switch(type) {
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
+				case ControllerType.SnesNttDataKeypad:
 				case ControllerType.NesController:
 				case ControllerType.FamicomController:
 				case ControllerType.FamicomControllerP2:
@@ -475,6 +491,7 @@ namespace Mesen.Config
 				case ControllerType.SuborKeyboard:
 				case ControllerType.FamilyBasicKeyboard:
 				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 				case ControllerType.PartyTap:
 				case ControllerType.VbController:
 				case ControllerType.JissenMahjong:
@@ -500,6 +517,7 @@ namespace Mesen.Config
 				case ControllerType.ColecoVisionController:
 				case ControllerType.WsController:
 				case ControllerType.WsControllerVertical:
+				case ControllerType.Pcv2Controller:
 					return true;
 			}
 

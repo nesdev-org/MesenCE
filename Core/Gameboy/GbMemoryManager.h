@@ -33,13 +33,16 @@ private:
 	GbDmaController* _dmaController = nullptr;
 
 	uint8_t* _highRam = nullptr;
-	
+
 	uint8_t* _reads[0x100] = {};
 	uint8_t* _writes[0x100] = {};
 
 	GbMemoryManagerState _state = {};
-	
+
 	__forceinline void ExecTimerDmaSerial();
+
+	void RunSerialTransfer();
+	bool ExchangeSerialBits(bool serialBit);
 
 public:
 	virtual ~GbMemoryManager();
@@ -82,7 +85,7 @@ public:
 	bool IsBootRomDisabled();
 
 	uint64_t GetApuCycleCount();
-	
+
 	uint8_t DebugRead(uint16_t addr);
 	void DebugWrite(uint16_t addr, uint8_t value);
 

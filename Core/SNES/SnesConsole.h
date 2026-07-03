@@ -1,12 +1,9 @@
 #pragma once
 #include "pch.h"
-#include "SNES/CartTypes.h"
 #include "Debugger/DebugTypes.h"
 #include "Debugger/Debugger.h"
 #include "Shared/Interfaces/IConsole.h"
-#include "Utilities/Timer.h"
 #include "Utilities/VirtualFile.h"
-#include "Utilities/SimpleLock.h"
 #include "Shared/RomInfo.h"
 
 class SnesCpu;
@@ -53,7 +50,7 @@ private:
 	unique_ptr<InternalRegisters> _internalRegisters;
 	unique_ptr<SnesControlManager> _controlManager;
 	unique_ptr<SnesDmaController> _dmaController;
-	
+
 	unique_ptr<Msu1> _msu1;
 	EmuSettings* _settings = nullptr;
 	Emulator* _emu = nullptr;
@@ -71,13 +68,13 @@ private:
 public:
 	SnesConsole(Emulator* emu);
 	~SnesConsole();
-	
+
 	static vector<string> GetSupportedExtensions() { return { ".sfc", ".swc", ".fig", ".smc", ".bs", ".gb", ".gbc", ".gbx", ".spc", ".st" }; }
 	static vector<string> GetSupportedSignatures() { return { "SNES-SPC700 Sound File Data" }; }
 
 	void Initialize();
 	void Release();
-	
+
 	void Reset() override;
 
 	void RunFrame() override;
@@ -92,7 +89,7 @@ public:
 	ConsoleType GetConsoleType() override;
 
 	void Serialize(Serializer& s) override;
-	SaveStateCompatInfo ValidateSaveStateCompatibility(ConsoleType stateConsoleType) override;
+	optional<SaveStateCompatInfo> ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType) override;
 
 	SnesCpu* GetCpu();
 	SnesPpu* GetPpu();
@@ -103,9 +100,9 @@ public:
 	BaseControlManager* GetControlManager() override;
 	SnesDmaController* GetDmaController();
 	Msu1* GetMsu1();
-	
+
 	Emulator* GetEmulator();
-	
+
 	bool IsRunning();
 
 	void RunAudio();
@@ -118,6 +115,7 @@ public:
 
 	double GetFps() override;
 	PpuFrameInfo GetPpuFrame() override;
+	uint32_t GetFrameCount() override;
 
 	TimingInfo GetTimingInfo(CpuType cpuType) override;
 

@@ -24,7 +24,7 @@ St018::St018(SnesConsole* console)
 
 	_prgRom = new uint8_t[St018::PrgRomSize];
 	_dataRom = new uint8_t[St018::DataRomSize];
-	
+
 	_workRam = new uint8_t[St018::WorkRamSize];
 	_console->InitializeRam(_workRam, St018::WorkRamSize);
 
@@ -118,7 +118,7 @@ void St018::Write(uint32_t addr, uint8_t value)
 	Run();
 
 	switch(addr & 0xFF06) {
-		case 0x3802: 
+		case 0x3802:
 			_state.DataArm = value;
 			_state.HasDataForArm = true;
 			break;
@@ -141,7 +141,7 @@ AddressInfo St018::GetArmAbsoluteAddress(uint32_t addr)
 {
 	switch(addr >> 28) {
 		case 0x00: return { (int)(addr & 0x1FFFF), MemoryType::St018PrgRom };
-		case 0x0A: return { (int)(addr & 0x7FFF), MemoryType::St018DataRom};
+		case 0x0A: return { (int)(addr & 0x7FFF), MemoryType::St018DataRom };
 		case 0x0E: return { (int)(addr & 0x3FFF), MemoryType::St018WorkRam };
 	}
 
@@ -203,7 +203,6 @@ uint8_t St018::ReadCpuByte(uint32_t addr)
 					return _state.DataArm;
 
 				case 0x20: return GetStatus();
-
 			}
 			return 0;
 
@@ -226,7 +225,7 @@ uint32_t St018::DebugCpuRead(ArmV3AccessModeVal mode, uint32_t addr)
 		uint8_t b1 = DebugRead((addr & ~0x03) | 1);
 		uint8_t b2 = DebugRead((addr & ~0x03) | 2);
 		uint8_t b3 = DebugRead(addr | 3);
-		return  b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
+		return b0 | (b1 << 8) | (b2 << 16) | (b3 << 24);
 	}
 }
 
@@ -258,7 +257,7 @@ void St018::DebugWrite(uint32_t addr, uint8_t value)
 void St018::WriteCpu(ArmV3AccessModeVal mode, uint32_t addr, uint32_t value)
 {
 	_cpu->GetState().CycleCount++;
-	
+
 	if(mode & ArmV3AccessMode::Word) {
 		if(_emu->ProcessMemoryWrite<CpuType::St018, 4>(addr & ~0x03, value, MemoryOperationType::Write)) {
 			WriteCpuByte((addr & ~0x03), (uint8_t)value);
@@ -317,8 +316,7 @@ uint8_t St018::GetStatus()
 		(_state.HasDataForSnes ? 0x01 : 0) |
 		(_state.Ack ? 0x04 : 0) |
 		(_state.HasDataForArm ? 0x08 : 0) |
-		(!_state.ArmReset ? 0x80 : 0)
-	);
+		(!_state.ArmReset ? 0x80 : 0));
 }
 
 void St018::Serialize(Serializer& s)

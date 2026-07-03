@@ -17,7 +17,7 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode("A");
 			m.Right = InputApi.GetKeyCode("D");
 
-			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController) {
+			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode(";");
 				m.Y = InputApi.GetKeyCode("M");
 				m.L = InputApi.GetKeyCode("U");
@@ -36,6 +36,10 @@ namespace Mesen.Config
 				m.R = InputApi.GetKeyCode("I");
 				m.Select = InputApi.GetKeyCode("O");
 				m.Start = InputApi.GetKeyCode("L");
+			} else if(type == ControllerType.Pcv2Controller) {
+				m.X = InputApi.GetKeyCode("H");
+				m.Select = InputApi.GetKeyCode("N");
+				m.Start = InputApi.GetKeyCode("M");
 			} else if(type == ControllerType.WsController) {
 				m.B = InputApi.GetKeyCode("Z");
 				m.A = InputApi.GetKeyCode("X");
@@ -50,7 +54,7 @@ namespace Mesen.Config
 				m.A = InputApi.GetKeyCode("Z");
 				m.GenericKey1 = InputApi.GetKeyCode("Q");
 				m.Start = InputApi.GetKeyCode("E");
-				
+
 				m.U = InputApi.GetKeyCode("A");
 				m.D = InputApi.GetKeyCode("D");
 				m.L = InputApi.GetKeyCode("S");
@@ -79,7 +83,7 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode("Left Arrow");
 			m.Right = InputApi.GetKeyCode("Right Arrow");
 
-			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController) {
+			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode("X");
 				m.Y = InputApi.GetKeyCode("Z");
 				m.L = InputApi.GetKeyCode("Q");
@@ -109,6 +113,12 @@ namespace Mesen.Config
 				m.D = InputApi.GetKeyCode("S");
 				m.L = InputApi.GetKeyCode("A");
 				m.R = InputApi.GetKeyCode("D");
+			} else if(type == ControllerType.Pcv2Controller) {
+				m.A = InputApi.GetKeyCode("D");
+				m.B = InputApi.GetKeyCode("S");
+				m.X = InputApi.GetKeyCode("A");
+				m.Select = InputApi.GetKeyCode("Q");
+				m.Start = InputApi.GetKeyCode("W");
 			} else if(type == ControllerType.WsControllerVertical) {
 				m.B = InputApi.GetKeyCode("X");
 				m.A = InputApi.GetKeyCode("Z");
@@ -145,7 +155,7 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode(prefix + "Left");
 			m.Right = InputApi.GetKeyCode(prefix + "Right");
 
-			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController) {
+			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode(prefix + "Y");
 				m.Y = InputApi.GetKeyCode(prefix + "X");
 				m.L = InputApi.GetKeyCode(prefix + "L1");
@@ -156,6 +166,8 @@ namespace Mesen.Config
 				m.D = InputApi.GetKeyCode(prefix + "RT Down");
 				m.L = InputApi.GetKeyCode(prefix + "RT Left");
 				m.R = InputApi.GetKeyCode(prefix + "RT Right");
+			} else if(type == ControllerType.Pcv2Controller) {
+				m.X = InputApi.GetKeyCode(prefix + "X");
 			} else if(type == ControllerType.WsControllerVertical) {
 				m.GenericKey1 = InputApi.GetKeyCode(prefix + "Back");
 
@@ -190,11 +202,13 @@ namespace Mesen.Config
 			m.Down = InputApi.GetKeyCode(prefix + "DPad Down");
 			m.Left = InputApi.GetKeyCode(prefix + "DPad Left");
 			m.Right = InputApi.GetKeyCode(prefix + "DPad Right");
-			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController) {
+			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode(prefix + "But4");
 				m.Y = InputApi.GetKeyCode(prefix + "But1");
 				m.L = InputApi.GetKeyCode(prefix + "But5");
 				m.R = InputApi.GetKeyCode(prefix + "But6");
+			} else if(type == ControllerType.Pcv2Controller) {
+				m.X = InputApi.GetKeyCode(prefix + "But4");
 			} else if(type == ControllerType.WsController) {
 				m.GenericKey1 = InputApi.GetKeyCode(prefix + "But9");
 				m.U = InputApi.GetKeyCode(prefix + "Y2+");

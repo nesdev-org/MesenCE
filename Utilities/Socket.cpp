@@ -6,7 +6,7 @@
 using namespace std;
 
 #ifdef _WIN32
-	#pragma comment(lib,"ws2_32.lib") //Winsock Library
+	#pragma comment(lib, "ws2_32.lib") //Winsock Library
 	#define WIN32_LEAN_AND_MEAN
 	#include <winsock2.h>
 	#include <Ws2tcpip.h>
@@ -36,15 +36,15 @@ using namespace std;
 
 Socket::Socket()
 {
-	#ifdef _WIN32	
-		WSADATA wsaDat;
-		if(WSAStartup(MAKEWORD(2, 2), &wsaDat) != 0) {
-			std::cout << "WSAStartup failed." << std::endl;
-			SetConnectionErrorFlag();
-			return;
-		}
-		_cleanupWSA = true;
-	#endif
+#ifdef _WIN32
+	WSADATA wsaDat;
+	if(WSAStartup(MAKEWORD(2, 2), &wsaDat) != 0) {
+		std::cout << "WSAStartup failed." << std::endl;
+		SetConnectionErrorFlag();
+		return;
+	}
+	_cleanupWSA = true;
+#endif
 
 	_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(_socket == INVALID_SOCKET) {
@@ -55,7 +55,7 @@ Socket::Socket()
 	}
 }
 
-Socket::Socket(uintptr_t socket) 
+Socket::Socket(uintptr_t socket)
 {
 	_socket = socket;
 
@@ -76,11 +76,11 @@ Socket::~Socket()
 		Close();
 	}
 
-	#ifdef _WIN32
-		if(_cleanupWSA) {
-			WSACleanup();
-		}
-	#endif
+#ifdef _WIN32
+	if(_cleanupWSA) {
+		WSACleanup();
+	}
+#endif
 }
 
 void Socket::SetSocketOptions()
@@ -88,7 +88,7 @@ void Socket::SetSocketOptions()
 	//Non-blocking mode
 	u_long iMode = 1;
 	ioctlsocket(_socket, FIONBIO, &iMode);
-		
+
 	//Set send/recv buffers to 256k
 	int bufferSize = 0x40000;
 	setsockopt(_socket, SOL_SOCKET, SO_RCVBUF, (char*)&bufferSize, sizeof(int));
@@ -96,7 +96,7 @@ void Socket::SetSocketOptions()
 
 	//Disable nagle's algorithm to improve latency
 	u_long value = 1;
-	setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&value, sizeof(value));	
+	setsockopt(_socket, IPPROTO_TCP, TCP_NODELAY, (char*)&value, sizeof(value));
 }
 
 void Socket::SetConnectionErrorFlag()
@@ -143,7 +143,7 @@ bool Socket::Connect(const char* hostname, uint16_t port)
 	hint.ai_family = AF_INET;
 	hint.ai_protocol = IPPROTO_TCP;
 	hint.ai_socktype = SOCK_STREAM;
-	addrinfo *addrInfo;
+	addrinfo* addrInfo;
 
 	if(getaddrinfo(hostname, std::to_string(port).c_str(), &hint, &addrInfo) != 0) {
 		std::cout << "Failed to resolve hostname." << std::endl;
@@ -157,13 +157,13 @@ bool Socket::Connect(const char* hostname, uint16_t port)
 		connect(_socket, addrInfo->ai_addr, (int)addrInfo->ai_addrlen);
 
 		fd_set writeSockets;
-		#ifdef _WIN32
-			writeSockets.fd_count = 1;
-			writeSockets.fd_array[0] = _socket;
-		#else		
-			FD_ZERO(&writeSockets);
-    		FD_SET(_socket, &writeSockets);
-		#endif		
+#ifdef _WIN32
+		writeSockets.fd_count = 1;
+		writeSockets.fd_array[0] = _socket;
+#else
+		FD_ZERO(&writeSockets);
+		FD_SET(_socket, &writeSockets);
+#endif
 
 		//Timeout after 3 seconds
 		TIMEVAL timeout;
@@ -171,18 +171,18 @@ bool Socket::Connect(const char* hostname, uint16_t port)
 		timeout.tv_usec = 0;
 
 		// check if the socket is ready
-		int returnVal = select((int)_socket+1, nullptr, &writeSockets, nullptr, &timeout);
+		int returnVal = select((int)_socket + 1, nullptr, &writeSockets, nullptr, &timeout);
 		if(returnVal > 0) {
 			result = true;
 		} else {
 			//Could not connect
 			if(returnVal == SOCKET_ERROR) {
-				//int nError = WSAGetLastError();				
-				//std::cout << "select failed: nError " << std::to_string(nError) << " returnVal" << std::to_string(returnVal) << std::endl;			
+				//int nError = WSAGetLastError();
+				//std::cout << "select failed: nError " << std::to_string(nError) << " returnVal" << std::to_string(returnVal) << std::endl;
 			}
 			SetConnectionErrorFlag();
 		}
-		
+
 		freeaddrinfo(addrInfo);
 	}
 
@@ -208,7 +208,7 @@ bool WouldBlock(int nError)
 	return nError == WSAEWOULDBLOCK || nError == EAGAIN;
 }
 
-int Socket::Send(char *buf, int len, int flags)
+int Socket::Send(char* buf, int len, int flags)
 {
 	int retryCount = 100;
 	int nError = 0;
@@ -234,24 +234,24 @@ int Socket::Send(char *buf, int len, int flags)
 						Close();
 						return 0;
 					}
-					
+
 					std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(20));
 				}
 			}
 		}
 	} while(WouldBlock(nError) && len > 0);
-		
+
 	return returnVal;
 }
 
-int Socket::Recv(char *buf, int len, int flags)
+int Socket::Recv(char* buf, int len, int flags)
 {
 	int returnVal = recv(_socket, buf, len, flags);
-	
+
 	if(returnVal == SOCKET_ERROR) {
 		int nError = WSAGetLastError();
 		if(nError && !WouldBlock(nError)) {
-			std::cout << "recv failed: nError " << std::to_string(nError) << " returnVal" << std::to_string(returnVal) << std::endl;			
+			std::cout << "recv failed: nError " << std::to_string(nError) << " returnVal" << std::to_string(returnVal) << std::endl;
 			SetConnectionErrorFlag();
 		}
 	} else if(returnVal == 0) {

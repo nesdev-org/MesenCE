@@ -41,7 +41,7 @@ namespace Mesen.Controls
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private async void btnBrowse_OnClick(object sender, RoutedEventArgs e)
+		private async void BtnBrowse_OnClick(object sender, RoutedEventArgs e)
 		{
 			string? folderName = await FileDialogHelper.OpenFolder(VisualRoot);
 			if(folderName?.Length > 0) {

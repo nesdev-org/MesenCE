@@ -23,6 +23,7 @@ class DummyNesCpu;
 class BaseNesPpu;
 class BaseMapper;
 class NesMemoryManager;
+class ISerializable;
 
 enum class MemoryOperationType;
 
@@ -93,6 +94,7 @@ public:
 	BreakpointManager* GetBreakpointManager() override;
 	ITraceLogger* GetTraceLogger() override;
 	PpuTools* GetPpuTools() override;
+	ISerializable* GetSerializableCpu() override;
 	bool SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption);
 	void GetRomHeader(uint8_t* headerData, uint32_t& size) override;
 	CallstackManager* GetCallstackManager() override;

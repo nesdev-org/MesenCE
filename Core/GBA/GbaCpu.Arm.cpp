@@ -36,7 +36,7 @@ void GbaCpu::ArmBranch()
 	int32_t offset = (((int32_t)_opCode << 8) >> 6); //sign extend + shift right by 2
 	if(withLink) {
 		_state.R[14] = _state.R[15] - 4;
-	} 
+	}
 
 	_state.R[15] += offset;
 	_state.Pipeline.ReloadRequested = true;
@@ -155,7 +155,7 @@ void GbaCpu::ArmDataProcessing()
 		} else {
 			shift = (_opCode >> 7) & 0x1F;
 		}
-		
+
 		switch(shiftType) {
 			case 0: op2 = ShiftLsl(op2, shift, carry); break;
 			case 1: op2 = ShiftLsr(op2, (useRegValue || shift) ? shift : 32, carry); break;
@@ -163,7 +163,7 @@ void GbaCpu::ArmDataProcessing()
 			case 3: op2 = (!useRegValue && shift == 0) ? ShiftRrx(op2, carry) : ShiftRor(op2, shift, carry); break;
 		}
 	}
-	
+
 	switch((ArmAluOperation)((_opCode >> 21) & 0x0F)) {
 		case ArmAluOperation::And: SetR(dstReg, LogicalOp(op1 & op2, carry, updateFlags)); break;
 		case ArmAluOperation::Eor: SetR(dstReg, LogicalOp(op1 ^ op2, carry, updateFlags)); break;
@@ -216,7 +216,7 @@ void GbaCpu::ArmMultiply()
 	if(rd != 15) {
 		SetR(rd, result);
 	}
-	
+
 	if(updateFlags) {
 		_state.CPSR.Carry = output.Carry;
 		_state.CPSR.Zero = result == 0;
@@ -232,7 +232,7 @@ void GbaCpu::ArmMultiplyLong()
 	uint8_t rl = (_opCode >> 12) & 0x0F;
 	uint8_t rs = (_opCode >> 8) & 0x0F;
 	uint8_t rm = _opCode & 0x0F;
-	
+
 	bool updateFlags = (_opCode & (1 << 20)) != 0;
 	bool multAndAcc = (_opCode & (1 << 21)) != 0;
 	bool sign = (_opCode & (1 << 22)) != 0;
@@ -301,9 +301,9 @@ void GbaCpu::ArmSingleDataTransfer()
 	bool load = (_opCode & (1 << 20)) != 0;
 	uint8_t rn = (_opCode >> 16) & 0x0F;
 	uint8_t rd = (_opCode >> 12) & 0x0F;
-	
+
 	uint32_t addr = R(rn);
-	
+
 	int32_t offset;
 	if(immediate) {
 		offset = _opCode & 0xFFF;
@@ -355,7 +355,7 @@ void GbaCpu::ArmSignedHalfDataTransfer()
 	bool load = (_opCode & (1 << 20)) != 0;
 	uint8_t rn = (_opCode >> 16) & 0x0F;
 	uint8_t rd = (_opCode >> 12) & 0x0F;
-	
+
 	bool sign = (_opCode & (1 << 6)) != 0;
 	bool half = (_opCode & (1 << 5)) != 0;
 
@@ -464,7 +464,7 @@ void GbaCpu::ArmBlockDataTransfer()
 				//LDM doesn't appear to be affected by the rotation that is usually applied to unaligned reads? based on gba-tests/arm test 508
 				SetR(i, Read(mode | GbaAccessMode::NoRotate, addr));
 			}
-			
+
 			mode |= GbaAccessMode::Sequential;
 			addr += 4;
 		}
@@ -505,8 +505,8 @@ void GbaCpu::ArmSingleDataSwap()
 #endif
 	uint32_t src = R(rn);
 	uint32_t val = Read(mode, src);
-	Idle();
 	Write(mode, src, rm == 15 ? (R(rm) + 4) : R(rm));
+	Idle();
 #ifndef DUMMYCPU
 	_memoryManager->UnlockBus();
 #endif
@@ -516,6 +516,45 @@ void GbaCpu::ArmSingleDataSwap()
 void GbaCpu::ArmSoftwareInterrupt()
 {
 	ProcessException(GbaCpuMode::Supervisor, GbaCpuVector::SoftwareIrq);
+}
+
+void GbaCpu::ArmCoprocessorTransfer()
+{
+	//MRC/MCR
+	//----_1110_oool_nnnn_dddd_pppp_rrr1_mmmm
+	bool load = _opCode & (1 << 20);
+	//uint8_t crn = (_opCode >> 16) & 0x0F;
+	uint8_t rd = (_opCode >> 12) & 0x0F;
+	//uint8_t crm = _opCode & 0x0F;
+	//uint8_t cpr = (_opCode >> 5) & 0x07;
+	uint8_t cp = (_opCode >> 8) & 0x0F;
+	//uint8_t cpOp = (_opCode >> 21) & 0x07;
+
+	if(cp != 14) {
+		//Any coprocessor except CP14 generates an undefined exception
+#ifndef DUMMYCPU
+		ProcessException(GbaCpuMode::Undefined, GbaCpuVector::Undefined);
+		_emu->BreakIfDebugging(CpuType::Gba, BreakSource::GbaInvalidOpCode);
+#endif
+	} else {
+		if(load) {
+			//MRC (CPU gets the previous value on the bus - nothing will actually put a value on the bus for CP14)
+			uint32_t value = _memoryManager->ReadCoprocessor();
+			if(rd == 15) {
+				//Reg 15 does not get modified, and only these 4 flags are updated instead
+				_state.CPSR.Negative = (value & (1 << 31));
+				_state.CPSR.Zero = (value & (1 << 30));
+				_state.CPSR.Carry = (value & (1 << 29));
+				_state.CPSR.Overflow = (value & (1 << 28));
+			} else {
+				_state.R[rd] = value;
+			}
+		} else {
+			//MCR (Updates value on the bus)
+			_memoryManager->WriteCoprocessor(_state.R[rd]);
+		}
+		Idle();
+	}
 }
 
 void GbaCpu::ArmInvalidOp()
@@ -604,5 +643,11 @@ void GbaCpu::InitArmOpTable()
 
 	for(int i = 0; i <= 0xFF; i++) {
 		addEntry(0xF00 + i, &GbaCpu::ArmSoftwareInterrupt, ArmOpCategory::SoftwareInterrupt);
+	}
+
+	//Coprocessor Register Transfers (MRC, MCR)
+	//----_1110_????_----_----_----_???1_----
+	for(int i = 0; i <= 0x7F; i++) {
+		addEntry(0xE01 | (i << 1), &GbaCpu::ArmCoprocessorTransfer, ArmOpCategory::CoprocessorTransfer);
 	}
 }

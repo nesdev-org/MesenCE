@@ -2,7 +2,6 @@
 #include <assert.h>
 #include "NES/NesConsole.h"
 #include "NES/NesCpu.h"
-#include "NES/NesPpu.h"
 #include "NES/NesMemoryManager.h"
 #include "NES/Mappers/FDS/Fds.h"
 #include "NES/Mappers/FDS/FdsAudio.h"
@@ -27,6 +26,7 @@ void Fds::InitMapper()
 		memset(_prgRom, 0, _prgSize);
 	}
 	_emu->RegisterMemory(MemoryType::NesPrgRom, _prgRom, _prgSize);
+	UpdatePageSizes();
 
 	_settings = &_console->GetNesConfig();
 	_cpu = _console->GetCpu();
@@ -42,7 +42,7 @@ void Fds::InitMapper()
 	SelectChrPage(0, 0);
 }
 
-void Fds::InitMapper(RomData &romData)
+void Fds::InitMapper(RomData& romData)
 {
 	_audio.reset(new FdsAudio(_console));
 	_fdsDiskSides = romData.FdsDiskData;
@@ -53,7 +53,7 @@ void Fds::InitMapper(RomData &romData)
 
 	FdsLoader loader(_useQdFormat);
 	loader.LoadDiskData(_fdsRawData, _orgDiskSides, _orgDiskHeaders);
-	
+
 	//Apply save data (saved as an IPS file), if found
 	vector<uint8_t> ipsData = _emu->GetBatteryManager()->LoadBattery(".ips");
 	LoadDiskData(ipsData);
@@ -70,7 +70,7 @@ void Fds::LoadDiskData(vector<uint8_t> ipsData)
 {
 	_fdsDiskSides.clear();
 	_fdsDiskHeaders.clear();
-	
+
 	FdsLoader loader(_useQdFormat);
 	if(_settings->OverwriteOriginalRom) {
 		loader.LoadDiskData(_fdsRawData, _fdsDiskSides, _fdsDiskHeaders);
@@ -152,7 +152,7 @@ void Fds::ClockIrq()
 
 uint8_t Fds::ReadRam(uint16_t addr)
 {
-	if(addr == 0xE18C && !_gameStarted && (_memoryManager->DebugRead(0x100) & 0xC0) != 0) {
+	if(addr == 0xE18C && !_gameStarted && (_memoryManager->DebugRead(0x100) & 0xC0)) {
 		//$E18B is the NMI entry point (using $E18C due to dummy reads)
 		//When NMI occurs while $100 & $C0 != 0, it typically means that the game is starting.
 		_gameStarted = true;
@@ -190,6 +190,7 @@ uint8_t Fds::ReadRam(uint16_t addr)
 		if(matchCount > 1) {
 			//More than 1 disk matches, can happen in unlicensed games - disable auto insert logic
 			_disableAutoInsertDisk = true;
+			MessageManager::Log("[FDS] Multiple disks match, auto-insert disabled.");
 		}
 
 		if(matchIndex >= 0) {
@@ -211,25 +212,24 @@ uint8_t Fds::ReadRam(uint16_t addr)
 		_restartAutoInsertCounter = -1;
 	}
 
-	return BaseMapper::ReadRam(addr);
+	return BaseMapper::InternalRead(addr);
 }
 
 void Fds::ProcessAutoDiskInsert()
 {
 	if(IsAutoInsertDiskEnabled()) {
-		bool fastForwardEnabled = _settings->FdsFastForwardOnLoad;
-		uint32_t currentFrame = _emu->GetFrameCount();
+		uint32_t currentFrame = _console->GetFrameCount();
 		if(_previousFrame != currentFrame) {
 			_previousFrame = currentFrame;
 			if(_autoDiskEjectCounter > 0) {
 				//After reading a disk, wait until this counter reaches 0 before
 				//automatically ejecting the disk the next time $4032 is read
 				_autoDiskEjectCounter--;
-				_emu->GetSettings()->SetFlagState(EmulationFlags::MaximumSpeed, fastForwardEnabled && _autoDiskEjectCounter != 0);
+				_emu->GetSettings()->SetFlagState(EmulationFlags::MaximumSpeed, _settings->FdsFastForwardOnLoad && _autoDiskEjectCounter != 0);
 			} else if(_autoDiskSwitchCounter > 0) {
 				//After ejecting the disk, wait a bit before we insert a new one
 				_autoDiskSwitchCounter--;
-				_emu->GetSettings()->SetFlagState(EmulationFlags::MaximumSpeed, fastForwardEnabled && _autoDiskSwitchCounter != 0);
+				_emu->GetSettings()->SetFlagState(EmulationFlags::MaximumSpeed, _settings->FdsFastForwardOnLoad && _autoDiskSwitchCounter != 0);
 				if(_autoDiskSwitchCounter == 0) {
 					//Insert a disk (real disk/side will be selected when game executes $E445
 					MessageManager::Log("[FDS] Auto-inserted dummy disk.");
@@ -241,7 +241,7 @@ void Fds::ProcessAutoDiskInsert()
 			} else if(_restartAutoInsertCounter > 0) {
 				//After ejecting the disk, wait a bit before we insert a new one
 				_restartAutoInsertCounter--;
-				_emu->GetSettings()->SetFlagState(EmulationFlags::MaximumSpeed, fastForwardEnabled && _restartAutoInsertCounter != 0);
+				_emu->GetSettings()->SetFlagState(EmulationFlags::MaximumSpeed, _settings->FdsFastForwardOnLoad && _restartAutoInsertCounter != 0);
 				if(_restartAutoInsertCounter == 0) {
 					//Wait a bit before ejecting the disk (eject in ~34 frames)
 					MessageManager::Log("[FDS] Game failed to load disk, try again.");
@@ -254,10 +254,8 @@ void Fds::ProcessAutoDiskInsert()
 	}
 }
 
-void Fds::ProcessCpuClock()
+void Fds::EndFrame()
 {
-	BaseProcessCpuClock();
-
 	if(_settings->FdsFastForwardOnLoad) {
 		_emu->GetSettings()->SetFlagState(EmulationFlags::MaximumSpeed, _scanningDisk || !_gameStarted);
 	} else {
@@ -265,6 +263,19 @@ void Fds::ProcessCpuClock()
 	}
 
 	ProcessAutoDiskInsert();
+}
+
+/**TODO:
+ - Proper byte transfer flag handling (set every 1792 master cycles, or 149+1/3 CPU cycles, under normal conditions)
+	- Should allow for accurate handling of level 2->3 load bug in Ai Senshi Nicol
+ - Proper CRC handling using $4025 bits 4 and 6
+ - Verify End of Head handling (may affect Kosodate Gokko and FMC Disk Card Checker)
+ - DRAM refresh watchdog implementation (must track PRG-RAM vs external access cycles...)
+ (Ongoing research, please consult TakuikaNinja for further details)
+**/
+void Fds::ProcessCpuClock()
+{
+	BaseProcessCpuClock();
 
 	ClockIrq();
 	_audio->Clock();
@@ -273,6 +284,13 @@ void Fds::ProcessCpuClock()
 		//Disk has been ejected
 		_endOfHead = true;
 		_scanningDisk = false;
+
+		//It appears the BIOS disk I/O routines can stop the motor well before the end of the disk
+		//(File transfer loop normally runs until accessed files == value in file amount block)
+		//Wait a bit before ejecting the disk (eject in ~77 frames)
+		if(_autoDiskEjectCounter < 0) {
+			_autoDiskEjectCounter = 77;
+		}
 		return;
 	}
 
@@ -391,7 +409,16 @@ void Fds::UpdateCrc(uint8_t value)
 
 void Fds::WriteRegister(uint16_t addr, uint8_t value)
 {
-	if((!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) || (!_soundRegEnabled && addr >= 0x4040)) {
+	if(!_diskRegEnabled && addr >= 0x4024 && addr <= 0x4026) {
+		return;
+	}
+
+	/**Only $4080 (volume envelope) seems to consistently deny writes during audio reset
+	TODO:
+	 - $4085 (mod counter) denies writes too, but there is an unknown delay before being forced to 0
+	 - Determine $4088 (mod table write) behaviour while in audio reset state
+	**/
+	if(!_soundRegEnabled && (addr == 0x4080 || addr == 0x4085 || addr == 0x4088)) {
 		return;
 	}
 
@@ -405,8 +432,8 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x4022:
-			_irqRepeatEnabled = (value & 0x01) == 0x01;
-			_irqEnabled = (value & 0x02) == 0x02 && _diskRegEnabled;
+			_irqRepeatEnabled = value & 0x01;
+			_irqEnabled = (value & 0x02) && _diskRegEnabled;
 
 			if(_irqEnabled) {
 				_irqCounter = _irqReloadValue;
@@ -416,13 +443,41 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x4023:
-			_diskRegEnabled = (value & 0x01) == 0x01;
-			_soundRegEnabled = (value & 0x02) == 0x02;
+			_diskRegEnabled = value & 0x01;
+			//TODO This is actually an audio reset, rename this variable in Fds.h
+			_soundRegEnabled = value & 0x02;
 
 			if(!_diskRegEnabled) {
 				_irqEnabled = false;
+
+				//Disabling disk registers forces $4025 = $06 (bit 3 reflected in $4030 reads)
+				_resetTransfer = true;
+				_motorOn = false;
+				_readMode = true;
+				SetMirroringType(MirroringType::Vertical);
+				_crcControl = false;
+				//TODO Set $4025 bit 5 = 0 here once implemented
+
+				_diskReady = false; //TODO $4025 bit 6 is CRC enable, not disk ready flag
+				_diskIrqEnabled = false;
+
+				//Disabling disk registers forces $4026 (external connector) = 0x7F
+				_extConWriteReg = 0x7F;
+
 				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
+			}
+
+			/**TODO Determine/implement audio reset behaviour, should probably go in FdsAudio:
+			 - Proper method of resetting modulation state ($4085 write below doesn't always work)
+			 - Reset wave accumulator to 0
+			 - Mod table appears to init with (or decay to) all 0s?
+			 - There seems to be some kind of analogue "resume" window?
+			(Ongoing research, please consult TakuikaNinja for further details)
+			**/
+			if(!_soundRegEnabled) {
+				_audio->WriteRegister(0x4080, 0x80); //Based on instant muting
+				_audio->WriteRegister(0x4085, 0x00); //Based on $4097 state
 			}
 			break;
 
@@ -430,27 +485,31 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			_writeDataReg = value;
 			_transferComplete = false;
 
-			//Unsure about clearing irq here: FCEUX/Nintendulator don't do this, puNES does.
+			//Needed by some Super Magic Card games, which use this IRQ for raster effects
 			_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			break;
 
 		case 0x4025:
-			_motorOn = (value & 0x01) == 0x01;
-			_resetTransfer = (value & 0x02) == 0x02;
-			_readMode = (value & 0x04) == 0x04;
+			//TODO D0 (_resetTransfer) can forcefully stop the drive motor during write mode, regardless of motor state?
+			_resetTransfer = !(value & 0x01); // 0 = reset transfer
+			_motorOn = !(value & 0x02); // 0 = start motor
+			_readMode = value & 0x04;
 			SetMirroringType(value & 0x08 ? MirroringType::Horizontal : MirroringType::Vertical);
-			_crcControl = (value & 0x10) == 0x10;
-			//Bit 6 is not used, always 1
-			_diskReady = (value & 0x40) == 0x40;
-			_diskIrqEnabled = (value & 0x80) == 0x80;
+			_crcControl = value & 0x10;
+			//TODO $4025 bit 5 is unknown, all known software sets it to 1
+
+			_diskReady = value & 0x40; //TODO $4025 bit 6 is CRC enable, not disk ready flag
+			_diskIrqEnabled = value & 0x80;
 
 			//Writing to $4025 clears IRQ according to FCEUX, puNES & Nintendulator
 			//Fixes issues in some unlicensed games (error $20 at power on)
+			//TODO This probably depends on the bits set?
 			_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			break;
 
 		case 0x4026:
-			_extConWriteReg = value;
+			//External connector only wires 7 bits
+			_extConWriteReg = value & 0x7F;
 			break;
 
 		default:
@@ -464,24 +523,25 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 uint8_t Fds::ReadRegister(uint16_t addr)
 {
 	uint8_t value = _memoryManager->GetOpenBus();
-	if(_soundRegEnabled && addr >= 0x4040) {
+	if(addr >= 0x4040) {
 		return _audio->ReadRegister(addr);
-	} else if(_diskRegEnabled && addr <= 0x4033) {
+	} else if(addr <= 0x4033) {
 		switch(addr) {
 			case 0x4030:
-				//These 3 pins are open bus
+				//These 2 pins are open bus
 				value &= 0x24;
-
+				/**TODO:
+				 - DRAM refresh watchdog IRQ status is returned in bit 1, needs implementation
+				 - End of Head is returned in bit 6, needs verification
+				**/
 				value |= _cpu->HasIrqSource(IRQSource::External) ? 0x01 : 0x00;
-				value |= _transferComplete ? 0x02 : 0x00;
-				value |= GetMirroringType() == MirroringType::Horizontal ? 0x08 : 0;
+				//value |= _transferComplete ? 0x02 : 0x00;
+				value |= GetMirroringType() == MirroringType::Horizontal ? 0x08 : 0x00;
 				value |= _useQdFormat && _badCrc ? 0x10 : 0x00;
 				//value |= _endOfHead ? 0x40 : 0x00;
-				//value |= _diskRegEnabled ? 0x80 : 0x00;
+				value |= _transferComplete ? 0x80 : 0x00;
 
-				_transferComplete = false;
 				_cpu->ClearIrqSource(IRQSource::External);
-				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 				return value;
 
 			case 0x4031:
@@ -493,17 +553,18 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				//These 5 pins are open bus
 				value &= 0xF8;
 
-				value |= !IsDiskInserted() ? 0x01 : 0x00;  //Disk not in drive
-				value |= (!IsDiskInserted() || !_scanningDisk) ? 0x02 : 0x00;  //Disk not ready
-				value |= !IsDiskInserted() ? 0x04 : 0x00;  //Disk not writable
+				value |= !IsDiskInserted() ? 0x01 : 0x00; //Disk not in drive
+				//TODO This should use _diskReady instead
+				value |= (!IsDiskInserted() || !_scanningDisk) ? 0x02 : 0x00; //Disk not ready
+				value |= !IsDiskInserted() ? 0x04 : 0x00; //Simulate inserted disks as always being writable
 
 				if(IsAutoInsertDiskEnabled()) {
-					if(_emu->GetFrameCount() - _lastDiskCheckFrame < 100) {
+					if(_console->GetFrameCount() - _lastDiskCheckFrame < 100) {
 						_successiveChecks++;
 					} else {
 						_successiveChecks = 0;
 					}
-					_lastDiskCheckFrame = _emu->GetFrameCount();
+					_lastDiskCheckFrame = _console->GetFrameCount();
 
 					if(_successiveChecks > 20 && _autoDiskEjectCounter == 0 && _autoDiskSwitchCounter == -1) {
 						//Game tried to check if a disk was inserted or not - this is usually done when the disk needs to be changed
@@ -520,8 +581,8 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				return value;
 
 			case 0x4033:
-				//Always return good battery
-				return _extConWriteReg;
+				//"The drive power/battery bit must be checked while the motor is on, otherwise it will always be read as 0."
+				return _motorOn ? _extConWriteReg | 0x80 : _extConWriteReg;
 		}
 	}
 
@@ -534,11 +595,40 @@ void Fds::Serialize(Serializer& s)
 
 	SV(_audio);
 
-	SV(_irqReloadValue); SV(_irqCounter); SV(_irqEnabled); SV(_irqRepeatEnabled); SV(_diskRegEnabled); SV(_soundRegEnabled); SV(_writeDataReg); SV(_motorOn); SV(_resetTransfer);
-	SV(_readMode); SV(_crcControl); SV(_diskReady); SV(_diskIrqEnabled); SV(_extConWriteReg); SV(_badCrc); SV(_endOfHead); SV(_readWriteEnabled); SV(_readDataReg); SV(_diskWriteProtected);
-	SV(_diskNumber); SV(_diskPosition); SV(_delay); SV(_previousCrcControlFlag); SV(_gapEnded); SV(_scanningDisk); SV(_transferComplete);
-	SV(_autoDiskEjectCounter); SV(_autoDiskSwitchCounter); SV(_restartAutoInsertCounter); SV(_previousFrame); SV(_lastDiskCheckFrame);
-	SV(_successiveChecks); SV(_previousDiskNumber); SV(_crcAccumulator);
+	SV(_irqReloadValue);
+	SV(_irqCounter);
+	SV(_irqEnabled);
+	SV(_irqRepeatEnabled);
+	SV(_diskRegEnabled);
+	SV(_soundRegEnabled);
+	SV(_writeDataReg);
+	SV(_motorOn);
+	SV(_resetTransfer);
+	SV(_readMode);
+	SV(_crcControl);
+	SV(_diskReady);
+	SV(_diskIrqEnabled);
+	SV(_extConWriteReg);
+	SV(_badCrc);
+	SV(_endOfHead);
+	SV(_readWriteEnabled);
+	SV(_readDataReg);
+	SV(_diskWriteProtected);
+	SV(_diskNumber);
+	SV(_diskPosition);
+	SV(_delay);
+	SV(_previousCrcControlFlag);
+	SV(_gapEnded);
+	SV(_scanningDisk);
+	SV(_transferComplete);
+	SV(_autoDiskEjectCounter);
+	SV(_autoDiskSwitchCounter);
+	SV(_restartAutoInsertCounter);
+	SV(_previousFrame);
+	SV(_lastDiskCheckFrame);
+	SV(_successiveChecks);
+	SV(_previousDiskNumber);
+	SV(_crcAccumulator);
 
 	if(s.IsSaving()) {
 		for(int i = 0; i < (int)_fdsDiskSides.size(); i++) {
@@ -602,19 +692,46 @@ vector<MapperStateEntry> Fds::GetMapperStateEntries()
 {
 	vector<MapperStateEntry> entries;
 
+	entries.push_back(MapperStateEntry("", "Timer IRQ"));
 	entries.push_back(MapperStateEntry("$4020/1", "IRQ Reload Value", _irqReloadValue, MapperStateValueType::Number16));
 	entries.push_back(MapperStateEntry("$4022.0", "IRQ Repeat", _irqRepeatEnabled, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4022.1", "IRQ Enabled", _irqEnabled, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("", "IRQ Counter", _irqCounter, MapperStateValueType::Number16));
 
+	entries.push_back(MapperStateEntry("", "I/O Control"));
 	entries.push_back(MapperStateEntry("$4023.0", "Disk Registers Enabled", _diskRegEnabled, MapperStateValueType::Bool));
-	entries.push_back(MapperStateEntry("$4023.1", "Sound Registers Enabled", _soundRegEnabled, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4023.1", "Audio Enabled", _soundRegEnabled, MapperStateValueType::Bool));
 
-	entries.push_back(MapperStateEntry("$4025.0", "Motor Enabled", _motorOn, MapperStateValueType::Bool));
-	entries.push_back(MapperStateEntry("$4025.1", "Reset Transfer", _resetTransfer, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("", "Disk Drive"));
+	entries.push_back(MapperStateEntry("$4025", "Drive Control"));
+	entries.push_back(MapperStateEntry("$4025.0", "Scan Disk", !_resetTransfer, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4025.1", "Stop Motor", !_motorOn, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4025.2", "Read Mode", _readMode, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4025.3", "Mirroring", GetMirroringType() == MirroringType::Horizontal ? "Horizontal" : "Vertical", GetMirroringType() == MirroringType::Horizontal ? 1 : 0));
+	entries.push_back(MapperStateEntry("$4025.4", "Transfer CRC", _crcControl, MapperStateValueType::Bool));
+	//entries.push_back(MapperStateEntry("$4025.6", "CRC Enabled", _crcEnabled, MapperStateValueType::Bool));
 	entries.push_back(MapperStateEntry("$4025.7", "Disk IRQ Enabled", _diskIrqEnabled, MapperStateValueType::Bool));
+
+	entries.push_back(MapperStateEntry("$4030", "Drive/IRQ Status"));
+	entries.push_back(MapperStateEntry("$4030.0", "Timer IRQ", _cpu->HasIrqSource(IRQSource::External), MapperStateValueType::Bool));
+	//entries.push_back(MapperStateEntry("$4030.1", "DRAM Refresh Watchdog IRQ", false, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4030.3", "Mirroring", GetMirroringType() == MirroringType::Horizontal ? "Horizontal" : "Vertical", GetMirroringType() == MirroringType::Horizontal ? 1 : 0));
+	entries.push_back(MapperStateEntry("$4030.5", "CRC Error", (_useQdFormat && _badCrc), MapperStateValueType::Bool));
+	//entries.push_back(MapperStateEntry("$4030.6", "End of Head", _endOfHead, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4030.7", "Byte Transferred", _transferComplete, MapperStateValueType::Bool));
+
+	entries.push_back(MapperStateEntry("$4024/$4031", "Disk Data"));
+	entries.push_back(MapperStateEntry("$4024", "Disk Data Output", _writeDataReg, MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4031", "Disk Data Input", _readDataReg, MapperStateValueType::Number8));
+
+	entries.push_back(MapperStateEntry("$4032", "Disk Status"));
+	entries.push_back(MapperStateEntry("$4032.0", "Disk Inserted", IsDiskInserted(), MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4032.1", "Disk Ready", (IsDiskInserted() & _scanningDisk), MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4032.2", "Write Enabled", IsDiskInserted(), MapperStateValueType::Bool));
+
+	entries.push_back(MapperStateEntry("", "External Connector"));
+	entries.push_back(MapperStateEntry("$4026/$4033.0-6", "External Connector Value", _extConWriteReg, MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4033.7", "Drive Powered", _motorOn, MapperStateValueType::Bool));
 
 	_audio->GetMapperStateEntries(entries);
 

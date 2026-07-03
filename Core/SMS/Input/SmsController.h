@@ -19,6 +19,8 @@ protected:
 
 	void InternalSetStateFromInput() override
 	{
+		bool turboOn = IsTurboOn(_turboSpeed);
+
 		for(KeyMapping& keyMapping : _keyMappings) {
 			SetPressedState(Buttons::A, keyMapping.A);
 			SetPressedState(Buttons::B, keyMapping.B);
@@ -26,11 +28,9 @@ protected:
 			SetPressedState(Buttons::Down, keyMapping.Down);
 			SetPressedState(Buttons::Left, keyMapping.Left);
 			SetPressedState(Buttons::Right, keyMapping.Right);
-			
+
 			SetPressedState(Buttons::Pause, keyMapping.Start);
 
-			uint8_t turboFreq = 1 << (4 - _turboSpeed);
-			bool turboOn = (uint8_t)(_emu->GetFrameCount() % turboFreq) < turboFreq / 2;
 			if(turboOn) {
 				SetPressedState(Buttons::A, keyMapping.TurboA);
 				SetPressedState(Buttons::B, keyMapping.TurboB);
@@ -55,7 +55,16 @@ protected:
 	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, B, A, Pause };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		B,
+		A,
+		Pause
+	};
 
 	SmsController(Emulator* emu, uint8_t port, KeyMappingSet keyMappings) : BaseControlDevice(emu, ControllerType::SmsController, port, keyMappings)
 	{

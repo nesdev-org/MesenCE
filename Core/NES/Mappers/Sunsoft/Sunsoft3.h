@@ -49,7 +49,7 @@ protected:
 			case 0x9800: SelectChrPage(1, value); break;
 			case 0xA800: SelectChrPage(2, value); break;
 			case 0xB800: SelectChrPage(3, value); break;
-			case 0xC800: 
+			case 0xC800:
 				_irqCounter &= _irqLatch ? 0xFF00 : 0x00FF;
 				_irqCounter |= _irqLatch ? value : (value << 8);
 				_irqLatch = !_irqLatch;

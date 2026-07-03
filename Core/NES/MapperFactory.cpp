@@ -213,7 +213,6 @@
 #include "NES/Mappers/Unlicensed/Mapper120.h"
 #include "NES/Mappers/Unlicensed/Mapper15.h"
 #include "NES/Mappers/Unlicensed/Mapper170.h"
-#include "NES/Mappers/Unlicensed/Mapper183.h"
 #include "NES/Mappers/Unlicensed/Mapper200.h"
 #include "NES/Mappers/Unlicensed/Mapper202.h"
 #include "NES/Mappers/Unlicensed/Mapper203.h"
@@ -276,8 +275,9 @@
 #include "NES/Mappers/Whirlwind/Mapper40.h"
 #include "NES/Mappers/Whirlwind/Smb2j.h"
 
-BaseMapper* MapperFactory::GetMapperFromID(RomData &romData)
+BaseMapper* MapperFactory::GetMapperFromID(RomData& romData)
 {
+	// clang-format off
 	switch(romData.Info.MapperID) {
 		case 0: return new NROM();
 		case 1: return new MMC1();
@@ -453,7 +453,7 @@ BaseMapper* MapperFactory::GetMapperFromID(RomData &romData)
 		case 179: return new Henggedianzi179();
 		case 180: return new UnRom_180();
 		case 182: return new MMC3_182();
-		case 183: return new Mapper183();
+		case 183: return new VRC2_4();
 		case 184: return new Sunsoft184();
 		case 185: return new CnromProtect();
 		case 186: break; //The study box is handled as a bios file, not a iNES rom
@@ -640,6 +640,7 @@ BaseMapper* MapperFactory::GetMapperFromID(RomData &romData)
 		case MapperFactory::NsfMapperID: return new NsfMapper();
 		case MapperFactory::FdsMapperID: return new Fds();
 	}
+	// clang-format on
 
 	if(romData.Info.MapperID != UnifBoards::UnknownBoard) {
 		MessageManager::DisplayMessage("Error", "UnsupportedMapper", "iNES #" + std::to_string(romData.Info.MapperID));
@@ -647,7 +648,7 @@ BaseMapper* MapperFactory::GetMapperFromID(RomData &romData)
 	return nullptr;
 }
 
-unique_ptr<BaseMapper> MapperFactory::InitializeFromFile(NesConsole* console, VirtualFile &romFile, RomData &romData, LoadRomResult& result)
+unique_ptr<BaseMapper> MapperFactory::InitializeFromFile(NesConsole* console, VirtualFile& romFile, RomData& romData, LoadRomResult& result)
 {
 	romData = {};
 	bool databaseEnabled = !console->GetNesConfig().DisableGameDatabase;

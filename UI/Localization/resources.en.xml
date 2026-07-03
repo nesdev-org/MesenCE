@@ -140,6 +140,8 @@
 			<Control ID="lblCustomRatio">Custom Ratio: </Control>
 			<Control ID="chkBilinearInterpolation">Use bilinear interpolation when scaling</Control>
 			<Control ID="chkUseSrgbTextureFormat">Use sRGB when applying interpolation</Control>
+			<Control ID="chkEnableVariableRefreshRate">Enable variable refresh rate (fullscreen only)</Control>
+			<Control ID="chkEnableVariableRefreshRateHint">When using a monitor that supports VRR (FreeSync, G-Sync), VRR will be enabled when running in borderless (not exclusive) fullscreen mode. This improves frame pacing and is recommended when supported.&#13;&#13;Warning: When enabled on a display that does not support VRR at all (or using a core that runs at an FPS outside of the monitor's supported VRR range), enabling this option will cause screen tearing when in fullscreen mode.</Control>
 			<Control ID="lblFullscreenResolution">Fullscreen Resolution:</Control>
 			<Control ID="chkFullscreenForceIntegerScale">Use integer scale values when entering fullscreen mode</Control>
 			<Control ID="chkUseExclusiveFullscreen">Use exclusive fullscreen mode</Control>
@@ -167,7 +169,7 @@
 			<Control ID="trkGamma">Gamma</Control>
 			<Control ID="trkResolution">Resolution</Control>
 			<Control ID="trkSharpness">Sharpness</Control>
-			<Control ID="chkMergeFields">Merge Fields</Control>
+			<Control ID="chkMergeFields">Remove artifact jitter</Control>
 			<Control ID="chkVerticalBlend">Apply Vertical Blending</Control>
 
 			<Control ID="lblNtscBisqwitSettings">NTSC settings (Bisqwit)</Control>
@@ -193,6 +195,7 @@
 			<Control ID="tpgAdvanced">Advanced</Control>
 			<Control ID="lblScreenRotation">Screen Rotation:</Control>
 			<Control ID="chkUseSoftwareRenderer">Use software renderer (requires restart)</Control>
+			<Control ID="chkDisableHighPrecisionFramePacing">Disable high precision frame pacing (may improve battery life)</Control>
 		</Form>
 		<Form ID="EmulationConfigView">
 			<Control ID="tpgGeneral">General</Control>
@@ -269,7 +272,7 @@
 			<Control ID="tpgVideo">Video</Control>
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
 
-			<Control ID="chkBlendHighResolutionModes">Blend high resolution modes</Control>
+			<Control ID="lblHighResBlendMode">High resolution blend mode: </Control>
 			<Control ID="chkHideBgLayer1">Hide background layer 1</Control>
 			<Control ID="chkHideBgLayer2">Hide background layer 2</Control>
 			<Control ID="chkHideBgLayer3">Hide background layer 3</Control>
@@ -342,13 +345,13 @@
 			<Control ID="chkMapperRandomPowerOnState">Randomize power-on state for mappers</Control>
 			<Control ID="chkRandomizeCpuPpuAlignment">Randomize power-on/reset CPU/PPU alignment</Control>
 			<Control ID="chkEnableOamDecay">Enable PPU OAM decay</Control>
-			<Control ID="chkEnablePpuOamRowCorruption">Enable PPU OAM row corruption emulation</Control>
+			<Control ID="chkEnablePpuOamRowCorruption">Enable PPU $2003/rendering-toggle OAM corruption</Control>
 			<Control ID="chkEnablePpu2006ScrollGlitch">Enable PPU $2006 scroll glitch emulation</Control>
 			<Control ID="chkEnablePpu2000ScrollGlitch">Enable PPU $2000/$2005/$2006 first-write scroll glitch emulation</Control>
 			<Control ID="chkRestrictPpuAccessOnFirstFrame">Clear PPU $2000/1/5/6/7 throughout first frame after reset/power on</Control>
 
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
-			<Control ID="chkDisableOamAddrBug">Disable PPU OAMADDR bug emulation</Control>
+			<Control ID="chkDisableOamAddrBug">Disable PPU frame-start OAM corruption (2C02D and earlier)</Control>
 			<Control ID="chkDisablePaletteRead">Disable PPU palette reads</Control>
 			<Control ID="chkDisablePpu2004Reads">Disable PPU $2004 reads</Control>
 			<Control ID="chkEnablePpuSpriteEvalBug">Enable erroneous sprite pixels at X=255 (2C02B and earlier)</Control>
@@ -402,7 +405,14 @@
 			<Control ID="tpgInput">Input</Control>
 			<Control ID="grpControllers">Controllers</Control>
 			<Control ID="lblPlayer1">Player 1</Control>
+			<Control ID="lblPlayer2">Player 2</Control>
+			<Control ID="lblPlayer2UsedForLink">(Used for link cable emulation)</Control>
 			<Control ID="btnSetup">Setup</Control>
+
+			<Control ID="chkLocalLinkCable">Emulate two linked Game Boy consoles</Control>
+			<Control ID="lblLocalLinkCable">Link cable emulation</Control>
+			<Control ID="lblLocalLinkCablePlayAudio">Play audio for:</Control>
+			<Control ID="lblLocalLinkCableShowVideo">Show video for:</Control>
 		</Form>
 		
 		<Form ID="GbaConfigView">
@@ -644,6 +654,7 @@
 			<Control ID="grpControllers">Controllers</Control>
 			<Control ID="lblPlayer1Horizontal">Controller (Horizontal)</Control>
 			<Control ID="lblPlayer1Vertical">Controller (Vertical)</Control>
+			<Control ID="lblPlayer1Pcv2">Controller (Pocket Challenge V2)</Control>
 			<Control ID="btnSetup">Setup</Control>
 		</Form>
 		
@@ -727,7 +738,7 @@
 			<Control ID="chkGameGearRomFiles">Game Gear roms: .gg</Control>
 			<Control ID="chkSgRomFiles">SG-1000 roms: .sg</Control>
 			<Control ID="chkCvRomFiles">ColecoVision roms: .col</Control>
-			<Control ID="chkWsRomFiles">WonderSwan roms: .ws, .wsc</Control>
+			<Control ID="chkWsRomFiles">WonderSwan roms: .ws, .wsc, .pc2</Control>
 
 			<Control ID="grpDataStorageLocation">Data Storage Folder</Control>
 			<Control ID="btnChangeStorageFolder">Change folder...</Control>
@@ -838,10 +849,10 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		<Form ID="AboutWindow">
-			<Control ID="wndTitle">About - Mesen</Control>
-			<Control ID="lblName">Mesen</Control>
+			<Control ID="wndTitle">About - MesenCE</Control>
+			<Control ID="lblName">Mesen Community Edition</Control>
 			<Control ID="lblWebsite">Website:</Control>
-			<Control ID="lblLink">www.mesen.ca</Control>
+			<Control ID="lblLink">github.com/nesdev-org/MesenCE</Control>
 			<Control ID="lblVersion">Version:</Control>
 			<Control ID="lblBuildDate">Build Date:</Control>
 			<Control ID="lblCommitId">Commit ID:</Control>
@@ -877,7 +888,7 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		<Form ID="UpdatePromptWindow">
-			<Control ID="wndTitle">Mesen Updater</Control>
+			<Control ID="wndTitle">MesenCE Updater</Control>
 			<Control ID="lblLatestVersion">Latest version:</Control>
 			<Control ID="lblInstalledVersion">Installed version:</Control>
 			<Control ID="lblNewVersionAvailable">A new version of Mesen is available</Control>
@@ -886,8 +897,8 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		<Form ID="SetupWizardWindow">
-			<Control ID="wndTitle">Mesen</Control>
-			<Control ID="lblMesen">Mesen - Emulator</Control>
+			<Control ID="wndTitle">MesenCE</Control>
+			<Control ID="lblMesen">MesenCE - Emulator</Control>
 			<Control ID="lblConfigWizard">Configuration</Control>
 			<Control ID="lblInitialSetup">Please take a moment to perform Mesen's initial setup.</Control>
 			<Control ID="lblStorageLocation">Data Storage Location</Control>
@@ -1013,6 +1024,18 @@
 			<Control ID="mnuPs4Layout2AltB">Controller #2 - X+Square layout</Control>
 
 			<Control ID="btnOK">OK</Control>
+			<Control ID="btnCancel">Cancel</Control>
+		</Form>
+		
+		<Form ID="SaveSpcFileWindow">
+			<Control ID="wndTitle">Save a .SPC file</Control>
+
+			<Control ID="grpTags">ID666 tags</Control>
+			<Control ID="lblSongTitle">Song title</Control>
+			<Control ID="lblGameTitle">Game title</Control>
+			<Control ID="lblSongArtist">Artist</Control>
+
+			<Control ID="btnOK">Save file</Control>
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 		
@@ -1605,6 +1628,7 @@
 		<Form ID="MemorySearchWindow">
 			<Control ID="wndTitle">Memory Search</Control>
 			<Control ID="btnApplyFilter">Apply filter</Control>
+			<Control ID="btnUpdateValues">Update values</Control>
 			<Control ID="btnReset">Reset</Control>
 			<Control ID="btnUndo">Undo</Control>
 
@@ -1762,8 +1786,6 @@
 		<Message ID="SetKeyHint">Press any key on your keyboard to set a new binding.</Message>
 		<Message ID="SetKeyMouseHint">Press any key on your keyboard, controller or mouse to set a new binding.</Message>
 
-		<Message ID="ClearHistory">Clear History</Message>
-
 		<Message ID="SpcClockSpeedMsg">= {0} Hz (default: 40)</Message>
 E
 		<Message ID="FirmwareNotFound">This game requires a firmware file for the: {0}&#xA;&#xA;  Filename: {1}&#xA;  Size: {2} bytes&#xA;&#xA;Would you like to select it now?</Message>
@@ -1771,29 +1793,8 @@ E
 		<Message ID="FirmwareFileWrongSize">The selected file does not match the required size ({0} bytes) and cannot be used.</Message>
 
 		<Message ID="MouseModeEnabled">Mouse enabled - pause to release cursor</Message>
-		<Message ID="BandaiMicrophone">Bandai Microphone</Message>
-		<Message ID="DatachBarcodeReader">Datach Barcode Reader</Message>
-
-		<Message ID="HelpFullscreen">/fullscreen - Start Mesen in fullscreen mode</Message>
-		<Message ID="HelpDoNotSaveSettings">/DoNotSaveSettings - Prevent settings from being saved to the disk (useful to prevent command line options from becoming the default settings)</Message>
-		<Message ID="HelpRecordMovie">/RecordMovie="filename.mmo" - Start recording a movie after the specified game is loaded.</Message>
-		<Message ID="HelpLoadLastSession">/LoadLastSession - Resumes the game in the state it was left in when it was last played.</Message>
 
 		<Message ID="RightClickToClearBinding">Right-click to clear binding</Message>
-
-		<Message ID="Resume">Resume</Message>
-		<Message ID="Pause">Pause</Message>
-		<Message ID="StartServer">Start Server</Message>
-		<Message ID="StopServer">Stop Server</Message>
-		<Message ID="ConnectToServer">Connect to Server</Message>
-		<Message ID="Disconnect">Disconnect</Message>
-		<Message ID="PlayerNumber">Player {0}</Message>
-		<Message ID="ExpansionDevice">Expansion Device</Message>
-
-		<Message ID="PressToExitFullscreen">Press {0} to exit fullscreen</Message>
-		<Message ID="DefaultResolution">Default</Message>
-
-		<Message ID="RomsFound">{0} roms found</Message>
 
 		<Message ID="ResetSettingsConfirmation">Warning: This will reset ALL settings and cannot be undone!&#xA;&#xA;Continue?</Message>
 
@@ -1802,25 +1803,13 @@ E
 		<Message ID="ImportLabelsWithErrors">Import completed: {0} labels imported (and {1} errors.)</Message>
 		<Message ID="ImportLabelsWithMissingFiles">Import completed: {0} labels imported.&#xA;&#xA;The following files could not be found:&#xA;{1}</Message>
 		<Message ID="ImportLabelsWithErrorsAndMissingFiles">Import completed: {0} labels imported (and {1} errors.)&#xA;&#xA;The following files could not be found:&#xA;{2}</Message>
-		<Message ID="RandomGameNoGameFound">Mesen could not find any games to load.</Message>
 
 		<Message ID="InvalidPaletteFile">Invalid palette file (too small or too large.)</Message>
 
 		<Message ID="CannotWriteToFolder">The selected folder cannot be written to - please select another folder and try again.&#xA;&#xA;Details:&#xA;{0}</Message>
-		<Message ID="InvalidPaths">The following path overrides are invalid:&#xA;&#xA;{0}&#xA;&#xA;Please use valid and writable folders and try again.</Message>
-		<Message ID="CopyMesenDataPrompt">All files will be copied from:&#xA;&#xA;{0}&#xA;to&#xA;{1}&#xA;&#xA;Once the copy is completed, Mesen will restart.&#xA;Continue?</Message>
-
-		<Message ID="CheatsFound">{0} games in database</Message>
-		<Message ID="CheatsImported">{0} cheats imported for {1}.</Message>
-
-		<Message ID="NsfNextTrack">Next Track (Hold to fast forward)</Message>
-		<Message ID="NsfUnnamedTrack">&lt;no name&gt;</Message>
-		<Message ID="NsfUnknownField">&lt;unknown&gt;</Message>
-
-		<Message ID="CouldNotInstallRuntime">The Visual Studio Runtime could not be installed properly.</Message>
+		
 		<Message ID="EmptyState">&lt;empty&gt;</Message>
 		<Message ID="AutoUpdateNotSupported">The version of Mesen you're using does not support automatic updates. Please visit the website and manually download the latest release.</Message>
-		<Message ID="ErrorWhileCheckingUpdates">An error has occurred while trying to check for updates. Check your internet connection and try again.&#xA;&#xA;Error details:&#xA;{0}</Message>
 		<Message ID="AutoUpdateInvalidFile">The downloaded file did not match the expected file.&#xA;&#xA;   Expected SHA256 signature: {0}&#xA;&#xA;   File SHA256 signature: {1}&#xA;&#xA;Please visit the website and manually download the latest release.</Message>
 		<Message ID="FileNotFound">File not found: {0}</Message>
 		<Message ID="InvalidArgument">Invalid argument: {0}</Message>
@@ -1828,19 +1817,10 @@ E
 		<Message ID="MesenUpToDate">You are running the latest version of Mesen.</Message>
 		<Message ID="PatchAndReset">Patch and reset the current game?</Message>
 		<Message ID="SelectRomIps">Please select a ROM for this patch file.</Message>
-		<Message ID="UnableToDownload">Unable to download file. Check your internet connection and try again.&#xA;&#xA;Details:&#xA;{0}</Message>
 		<Message ID="UnableToStartMissingSdl">Mesen could not launch because SDL2 could not be found. Install SDL2 using your package manager and try again.&#xA;&#xA;Error details:&#xA;{0}</Message>
 		<Message ID="UnableToStartMissingDependencies">Mesen could not launch because of missing dependencies.&#xA;&#xA;Error details:&#xA;{0}</Message>
-		<Message ID="UnableToStartMissingFiles">Mesen was unable to start due to missing files.&#xA;&#xA;Error: MesenCore.dll is missing.</Message>
 		<Message ID="UnexpectedError">An unexpected error has occurred.&#xA;&#xA;Error details:&#xA;{0}</Message>
 		<Message ID="UpdateDownloadFailed">Download failed - the file appears to be corrupted. Please visit the Mesen website to download the latest version manually.</Message>
-		<Message ID="UpgradeSuccess">Upgrade completed successfully.</Message>
-		<Message ID="UpdaterNotFound">The update process could not be started due to missing files.</Message>
-		<Message ID="Net45NotFound">The Microsoft .NET Framework 4.5 could not be found. Please download and install the latest version of the .NET Framework from Microsoft's website and try again.</Message>
-
-		<Message ID="InvalidCheatFile">The selected file ({0}) is not a valid cheat file.</Message>
-		<Message ID="InvalidXmlFile">The selected file ({0}) is not a valid XML file.</Message>
-		<Message ID="NoMatchingCheats">The selected cheat file ({0}) contains no cheats that match the selected game.</Message>
 
 		<Message ID="ConfirmReset">Are you sure you want to reset?</Message>
 		<Message ID="ConfirmPowerCycle">Are you sure you want to power cycle?</Message>
@@ -2006,6 +1986,9 @@ E
 			<Value ID="SnesMouse">SNES Mouse</Value>
 			<Value ID="SuperScope">Super Scope</Value>
 			<Value ID="Multitap">Super Multitap</Value>
+			<Value ID="SnesNttDataKeypad">SNES NTT Data Keypad</Value>
+			<Value ID="AsciiTurboFileTwinTf2">Turbo File Twin (TFII mode)</Value>
+			<Value ID="AsciiTurboFileTwinStf">Turbo File Twin (STF mode)</Value>
 
 			<Value ID="NesController">NES Controller</Value>
 			<Value ID="FamicomController">Famicom Controller</Value>
@@ -2030,6 +2013,7 @@ E
 			<Value ID="FamilyBasicKeyboard">Family Basic Keyboard</Value>
 			<Value ID="PartyTap">Partytap</Value>
 			<Value ID="Pachinko">Pachinko Controller</Value>
+			<Value ID="FcnsController">FCNS Controller</Value>
 			<Value ID="ExcitingBoxing">Exciting Boxing Punching Bag</Value>
 			<Value ID="JissenMahjong">Jissen Mahjong Controller</Value>
 			<Value ID="SuborKeyboard">Subor Keyboard</Value>
@@ -2078,6 +2062,23 @@ E
 		<Enum ID="NesPachinkoButtons">
 			<Value ID="Press">Press</Value>
 			<Value ID="Release">Release</Value>
+		</Enum>
+		<Enum ID="NesFcnsButtons">
+			<Value ID="Num0">Number 0</Value>
+			<Value ID="Num1">Number 1</Value>
+			<Value ID="Num2">Number 2</Value>
+			<Value ID="Num3">Number 3</Value>
+			<Value ID="Num4">Number 4</Value>
+			<Value ID="Num5">Number 5</Value>
+			<Value ID="Num6">Number 6</Value>
+			<Value ID="Num7">Number 7</Value>
+			<Value ID="Num8">Number 8</Value>
+			<Value ID="Num9">Number 9</Value>
+			<Value ID="Star">Star (*)</Value>
+			<Value ID="Pound">Pound (#)</Value>
+			<Value ID="Period">Period (.)</Value>
+			<Value ID="C">C</Value>
+			<Value ID="EndComunication">End communication</Value>
 		</Enum>
 		<Enum ID="NesPartyTapButtons">
 			<Value ID="B1">Button 1</Value>
@@ -2373,6 +2374,23 @@ E
 			<Value ID="R">Button - Right</Value>
 			<Value ID="L">Button - Left</Value>
 		</Enum>
+		<Enum ID="SnesNttDataKeypadButtons">
+			<Value ID="Num0">Number 0</Value>
+			<Value ID="Num1">Number 1</Value>
+			<Value ID="Num2">Number 2</Value>
+			<Value ID="Num3">Number 3</Value>
+			<Value ID="Num4">Number 4</Value>
+			<Value ID="Num5">Number 5</Value>
+			<Value ID="Num6">Number 6</Value>
+			<Value ID="Num7">Number 7</Value>
+			<Value ID="Num8">Number 8</Value>
+			<Value ID="Num9">Number 9</Value>
+			<Value ID="Star">Star (*)</Value>
+			<Value ID="Pound">Pound (#)</Value>
+			<Value ID="Period">Period (.)</Value>
+			<Value ID="C">C</Value>
+			<Value ID="EndComunication">End communication</Value>
+		</Enum>
 		<Enum ID="NesConsoleType">
 			<Value ID="Nes001">NES - Front loader (NES-001)</Value>
 			<Value ID="Nes101">NES - Top loader (NES-101)</Value>
@@ -2471,6 +2489,11 @@ E
 			<Value ID="Light">Light</Value>
 			<Value ID="Dark">Dark</Value>
 		</Enum>
+		<Enum ID="SnesHighResBlendMode">
+			<Value ID="None">None (default)</Value>
+			<Value ID="BlendAll">Blend entire screen</Value>
+			<Value ID="BlendEvenOdd">Blend even/odd columns (fake transparency)</Value>
+		</Enum>
 		<Enum ID="PceConsoleType">
 			<Value ID="Auto">Auto (recommended)</Value>
 			<Value ID="PcEngine">PC Engine (JP)</Value>
@@ -2516,6 +2539,11 @@ E
 			<Value ID="Delay">Delay</Value>
 			<Value ID="Panning">Panning</Value>
 			<Value ID="CombFilter">Comb filter</Value>
+		</Enum>
+		<Enum ID="GbLocalLinkOutputOption">
+			<Value ID="Both">Both</Value>
+			<Value ID="MainSystemOnly">Player 1 only</Value>
+			<Value ID="SubSystemOnly">Player 2 only</Value>
 		</Enum>
 		<Enum ID="VsDualOutputOption">
 			<Value ID="Both">Both</Value>
@@ -2616,10 +2644,15 @@ E
 			<Value ID="iNes">iNes</Value>
 			<Value ID="Nes2_0">NES 2.0</Value>
 		</Enum>
-		<Enum ID="iNesMirroringType">
+		<Enum ID="MirroringType">
 			<Value ID="Horizontal">Horizontal</Value>
 			<Value ID="Vertical">Vertical</Value>
 			<Value ID="FourScreens">Four Screens</Value>
+		</Enum>
+		<Enum ID="RomSizeUnit">
+			<Value ID="Bytes">bytes</Value>
+			<Value ID="KB">KB</Value>
+			<Value ID="MB">MB</Value>
 		</Enum>
 		<Enum ID="VsPpuType">
 			<Value ID="RP2C03B">RP2C03B</Value>
@@ -2658,7 +2691,7 @@ E
 			<Value ID="VsSystemSwapAB">VS System - Swap A/B buttons</Value>
 			<Value ID="VsZapper">VS Zapper</Value>
 			<Value ID="Zapper">Zapper</Value>
-			<Value ID="TwoZappers">2 zappers</Value>
+			<Value ID="TwoZappers">2 Zappers</Value>
 			<Value ID="BandaiHypershot">Bandai Hypershot</Value>
 			<Value ID="PowerPadSideA">Power Pad Side A</Value>
 			<Value ID="PowerPadSideB">Power Pad Side B</Value>
@@ -2688,8 +2721,8 @@ E
 			<Value ID="Pec586Keyboard">PEC-586 Keyboard</Value>
 			<Value ID="Bit79Keyboard">Bit-79 Keyboard</Value>
 			<Value ID="SuborKeyboard">Subor Keyboard</Value>
-			<Value ID="SuborKeyboardMouse1">Subor Keyboard+Mouse (Type A)</Value>
-			<Value ID="SuborKeyboardMouse2">Subor Keyboard+Mouse (Type B)</Value>
+			<Value ID="SuborKeyboardMouse1">Subor Keyboard+Macro Winners Mouse</Value>
+			<Value ID="SuborKeyboardMouse2">Subor Keyboard+Subor Mouse ($4016)</Value>
 			<Value ID="SnesMouse">SNES Mouse</Value>
 			<Value ID="GenericMulticart">Generic Multicart</Value>
 			<Value ID="SnesControllers">SNES Controllers</Value>
@@ -2699,9 +2732,16 @@ E
 			<Value ID="CityPatrolmanLightgun">City Patrolman Lightgun</Value>
 			<Value ID="SharpC1CassetteInterface">Sharp C1 Cassette Interface</Value>
 			<Value ID="StandardControllerWithSwappedButtons">Standard Controller with swapped Left-Right/Up-Down/B-A</Value>
-			<Value ID="ExcaliborSudokuPad">Excalibor Sudoku Pad</Value>
+			<Value ID="ExcaliburSudokuPad">Excalibur Sudoku Pad</Value>
 			<Value ID="AblPinball">ABL Pinball</Value>
 			<Value ID="GoldenNuggetCasino">Golden Nugget Casino</Value>
+			<Value ID="KedaKeyboard">Keda Keyboard</Value>
+			<Value ID="SuborKeyboardMouse3">Subor Keyboard+Subor Mouse ($4017)</Value>
+			<Value ID="PortTestController">Port Test Controller</Value>
+			<Value ID="BandaiMultiGamePlayer">Bandai Multi Game Player Gamepad</Value>
+			<Value ID="VenomTVDance">Venom TV Dance Mat</Value>
+			<Value ID="LgTvRemote">LG TV Remote</Value>
+			<Value ID="FcnsController">FCNS Controller</Value>
 		</Enum>
 
 		<Enum ID="FirmwareType">
@@ -2793,6 +2833,8 @@ E
 			<Value ID="GbBootRom">GB - Boot ROM</Value>
 			<Value ID="GbVideoRam">GB - Video RAM</Value>
 			<Value ID="GbSpriteRam">GB - Sprite RAM</Value>
+			<Value ID="GbBgPaletteRam">GB - Background Palette RAM</Value>
+			<Value ID="GbObjPaletteRam">GB - Sprite Palette RAM</Value>
 
 			<Value ID="NesMemory">CPU Memory</Value>
 			<Value ID="NesPpuMemory">PPU Memory</Value>
@@ -2853,6 +2895,7 @@ E
 			<Value ID="None">None</Value>
 		</Enum>
 		<Enum ID="GameboyModel">
+			<Value ID="AutoFavorBest">Auto (prefer best)</Value>
 			<Value ID="AutoFavorGbc">Auto (prefer Game Boy Color)</Value>
 			<Value ID="AutoFavorSgb">Auto (prefer Super Game Boy)</Value>
 			<Value ID="AutoFavorGb">Auto (prefer Game Boy)</Value>
@@ -2862,6 +2905,7 @@ E
 		</Enum>
 		<Enum ID="WsModel">
 			<Value ID="Auto">Auto</Value>
+			<Value ID="PocketChallenge">Pocket Challenge V2</Value>
 			<Value ID="Monochrome">WonderSwan</Value>
 			<Value ID="Color">WonderSwan Color</Value>
 			<Value ID="SwanCrystal">SwanCrystal</Value>
@@ -2898,6 +2942,7 @@ E
 			<Value ID="Normal">Normal</Value>
 			<Value ID="SingleLine8x16">8x16 (same line)</Value>
 			<Value ID="SingleLine16x16">16x16 (same line)</Value>
+			<Value ID="Vertical">Vertical</Value>
 		</Enum>
 		<Enum ID="TileFilter">
 			<Value ID="None">None</Value>
@@ -3055,7 +3100,7 @@ E
 			<Value ID="Dword">32-bit</Value>
 		</Enum>
 		<Enum ID="MemorySearchCompareTo">
-			<Value ID="PreviousSearchValue">Previous search value</Value>
+			<Value ID="PreviousSearchValue">Last value</Value>
 			<Value ID="PreviousRefreshValue">Previous refresh value</Value>
 			<Value ID="SpecificValue">Specific value:</Value>
 			<Value ID="SpecificAddress">Specific address:</Value>
@@ -3534,6 +3579,7 @@ E
 			<Value ID="InstallHdPack">Install HD Pack</Value>
 			<Value ID="HdPackBuilder">HD Pack Builder</Value>
 			<Value ID="TakeScreenshot">Take Screenshot</Value>
+			<Value ID="SaveSpcFile">Save .SPC File</Value>
 
 			<Value ID="OnlineHelp">Online Help</Value>
 			<Value ID="CommandLineHelp">Command-line options</Value>

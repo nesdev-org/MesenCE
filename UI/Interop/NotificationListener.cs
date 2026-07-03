@@ -72,7 +72,6 @@ namespace Mesen.Interop
 		DebuggerResumed,
 		PpuFrameDone,
 		ResolutionChanged,
-		ConfigChanged,
 		ExecuteShortcut,
 		ReleaseShortcut,
 		EmulationStopped,
@@ -86,7 +85,9 @@ namespace Mesen.Interop
 		GameLoadFailed,
 		CheatsChanged,
 		RequestConfigChange,
-		RefreshSoftwareRenderer
+		RefreshSoftwareRenderer,
+		AfterInitConsole,
+		NetplayStopped
 	}
 
 	public struct GameLoadedEventParams

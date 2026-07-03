@@ -280,55 +280,56 @@ namespace Mesen.Debugger.Labels
 			LabelManager.SetLabel(0x4017, MemoryType.NesMemory, "Ctrl2_FrameCtr_4017", $"Read (NES - input):{Environment.NewLine}---4 3210{Environment.NewLine}Read data from controller port #2.{Environment.NewLine}{Environment.NewLine}Write (Frame counter): MI-- ----{Environment.NewLine}Mode (M, 0 = 4-step, 1 = 5-step), IRQ inhibit flag (I)");
 
 			if(EmuApi.GetRomInfo().Format == RomFormat.Fds) {
-				LabelManager.SetLabel(0x01F8, MemoryType.NesPrgRom, "LoadFiles", "Input: Pointer to Disk ID, Pointer to File List" + Environment.NewLine + "Output: A = error #, Y = # of files loaded" + Environment.NewLine + "Desc: Loads files specified by DiskID into memory from disk. Load addresses are decided by the file's header.");
-				LabelManager.SetLabel(0x0237, MemoryType.NesPrgRom, "AppendFile", "Input: Pointer to Disk ID, Pointer to File Header" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Appends the file data given by DiskID to the disk. This means that the file is tacked onto the end of the disk, and the disk file count is incremented. The file is then read back to verify the write. If an error occurs during verification, the disk's file count is decremented (logically hiding the written file).");
-				LabelManager.SetLabel(0x0239, MemoryType.NesPrgRom, "WriteFile", "Input: Pointer to Disk ID, Pointer to File Header, A = file #" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Same as \"Append File\", but instead of writing the file to the end of the disk, A specifies the sequential position on the disk to write the file (0 is the first). This also has the effect of setting the disk's file count to the A value, therefore logically hiding any other files that may reside after the written one.");
-				LabelManager.SetLabel(0x02B7, MemoryType.NesPrgRom, "CheckFileCount", "Input: Pointer to Disk ID, A = # to set file count to" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Reads in disk's file count, compares it to A, then sets the disk's file count to A.");
-				LabelManager.SetLabel(0x02BB, MemoryType.NesPrgRom, "AdjustFileCount", "Input: Pointer to Disk ID, A = number to reduce current file count by" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Reads in disk's file count, decrements it by A, then writes the new value back.");
-				LabelManager.SetLabel(0x0301, MemoryType.NesPrgRom, "SetFileCount1", "Input: Pointer to Disk ID, A = file count minus one = # of the last file" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Set the file count to A + 1");
-				LabelManager.SetLabel(0x0305, MemoryType.NesPrgRom, "SetFileCount", "Input: Pointer to Disk ID, A = file count" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Set the file count to A");
-				LabelManager.SetLabel(0x032A, MemoryType.NesPrgRom, "GetDiskInfo", "Input: Pointer to Disk Info" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Fills DiskInfo up with data read off the current disk.");
+				LabelManager.SetLabel(0x01F8, MemoryType.NesPrgRom, "LoadFiles", "Input: Direct pointer = Disk ID, Direct pointer = File List" + Environment.NewLine + "Output: A = error #, Y = # of files loaded" + Environment.NewLine + "Desc: Loads files specified by DiskID into memory from disk, attempting twice before returning any errors. Load addresses are decided by the file's header.");
+				LabelManager.SetLabel(0x0237, MemoryType.NesPrgRom, "AppendFile", "Input: Direct pointer = Disk ID, Direct pointer = File Header" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Appends the file data given by Disk ID to the disk, attempting twice before returning any errors. This means that the file is tacked onto the end of the disk, and the disk file count is incremented. The file is then read back to verify the write. If an error occurs during verification, the disk's file count is decremented (logically hiding the written file).");
+				LabelManager.SetLabel(0x0239, MemoryType.NesPrgRom, "WriteFile", "Input: Direct pointer = Disk ID, Direct pointer = File Header, A = file #" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Same as \"AppendFile\", but instead of writing the file to the end of the disk, A specifies the sequential position on the disk to write the file (0 is the first). This also has the effect of setting the disk's file count to the A value, therefore logically hiding any other files that may reside after the written one.");
+				LabelManager.SetLabel(0x02B7, MemoryType.NesPrgRom, "CheckFileCount", "Input: Direct pointer = Disk ID, A = # to set file count to" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Reads in disk's file count, compares it to A, then sets the disk's file count to A.");
+				LabelManager.SetLabel(0x02BB, MemoryType.NesPrgRom, "AdjustFileCount", "Input: Direct pointer = Disk ID, A = number to reduce current file count by" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Reads in disk's file count, decrements it by A, then writes the new value back.");
+				LabelManager.SetLabel(0x0301, MemoryType.NesPrgRom, "SetFileCount1", "Input: Direct pointer = Disk ID, A = file count minus one = # of the last file" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Set the file count to A + 1");
+				LabelManager.SetLabel(0x0305, MemoryType.NesPrgRom, "SetFileCount", "Input: Direct pointer = Disk ID, A = file count" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Set the file count to A");
+				LabelManager.SetLabel(0x032A, MemoryType.NesPrgRom, "GetDiskInfo", "Input: Direct pointer = Disk Info" + Environment.NewLine + "Output: A = error #" + Environment.NewLine + "Desc: Fills DiskInfo up with data read off the current disk.");
 
-				LabelManager.SetLabel(0x0445, MemoryType.NesPrgRom, "CheckDiskHeader", "Input: Pointer to 10 byte string at $00 " + Environment.NewLine + "Output:  " + Environment.NewLine + "Desc: Compares the first 10 bytes on the disk coming after the FDS string, to 10 bytes pointed to by Ptr($00). To bypass the checking of any byte, a -1 can be placed in the equivelant place in the compare string.  Otherwise, if the comparison fails, an appropriate error will be generated.");
-				LabelManager.SetLabel(0x0484, MemoryType.NesPrgRom, "GetNumFiles", "Input:  " + Environment.NewLine + "Output:  " + Environment.NewLine + "Desc: Reads number of files stored on disk, stores the result in $06");
-				LabelManager.SetLabel(0x0492, MemoryType.NesPrgRom, "SetNumFiles", "Input:  " + Environment.NewLine + "Output: A = number of files " + Environment.NewLine + "Desc: Writes new number of files to disk header.");
-				LabelManager.SetLabel(0x04A0, MemoryType.NesPrgRom, "FileMatchTest", "Input: Pointer to FileID list at $02 " + Environment.NewLine + "Output:   " + Environment.NewLine + "Desc: Uses a byte string pointed at by Ptr($02) to tell the disk system which files to load.  The file ID's number is searched for in the string.  If an exact match is found, [$09] is 0'd, and [$0E] is incremented.  If no matches are found after 20 bytes, or a -1 entry is encountered, [$09] is set to -1.  If the first byte in the string is -1, the BootID number is used for matching files (any FileID that is not greater than the BootID qualifies as a match).");
-				LabelManager.SetLabel(0x04DA, MemoryType.NesPrgRom, "SkipFiles", "Input: Number of files to skip in $06 " + Environment.NewLine + "Output:  " + Environment.NewLine + "Desc: Skips over specified number of files.");
+				LabelManager.SetLabel(0x0445, MemoryType.NesPrgRom, "CheckDiskHeader", "Input: $00-$01 = Pointer to 10 byte string " + Environment.NewLine + "Output: " + Environment.NewLine + "Desc: Checks that the '*NINTENDO-HVC*' string is present on the current disk, then compares the Disk ID structure to data pointed to by Ptr($00). To bypass the checking of any byte, a -1 can be placed in the equivalent place in the compare string. If the comparison fails, an appropriate error will be generated.");
+				LabelManager.SetLabel(0x0484, MemoryType.NesPrgRom, "GetNumFiles", "Input: " + Environment.NewLine + "Output: $06 = # of files " + Environment.NewLine + "Desc: Reads the number of files from the file amount block.");
+				LabelManager.SetLabel(0x0492, MemoryType.NesPrgRom, "SetNumFiles", "Input: A = # of files " + Environment.NewLine + "Output: " + Environment.NewLine + "Desc: Writes the new number of files to the file amount block.");
+				LabelManager.SetLabel(0x04A0, MemoryType.NesPrgRom, "FileMatchTest", "Input: $02-$03 = Pointer to File ID list " + Environment.NewLine + "Output: " + Environment.NewLine + "Desc: Uses a byte string pointed at by Ptr($02) to tell the disk system which files to load. The file ID's number is searched for in the string. If an exact match is found, [$09] is 0'd, and [$0e] is incremented. If no matches are found after 20 bytes, or a -1 entry is encountered, [$09] is set to -1. If the first byte in the string is -1, the BootID number is used for matching files (any FileID that is not greater than the BootID qualifies as a match).");
+				LabelManager.SetLabel(0x04DA, MemoryType.NesPrgRom, "SkipFiles", "Input: $06 = # of files to skip " + Environment.NewLine + "Output: " + Environment.NewLine + "Desc: Skips over a specified number of files.");
 
-				LabelManager.SetLabel(0x0149, MemoryType.NesPrgRom, "Delay132", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: " + Environment.NewLine + "Desc: 132 clock cycle delay");
-				LabelManager.SetLabel(0x0153, MemoryType.NesPrgRom, "Delayms", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: X, Y " + Environment.NewLine + "Desc: Delay routine, Y = delay in ms (approximate)");
-				LabelManager.SetLabel(0x0161, MemoryType.NesPrgRom, "DisPFObj", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Disable sprites and background");
-				LabelManager.SetLabel(0x016B, MemoryType.NesPrgRom, "EnPFObj", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Enable sprites and background");
-				LabelManager.SetLabel(0x0171, MemoryType.NesPrgRom, "DisObj", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Disable sprites");
-				LabelManager.SetLabel(0x0178, MemoryType.NesPrgRom, "EnObj", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Enable sprites");
-				LabelManager.SetLabel(0x017E, MemoryType.NesPrgRom, "DisPF", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Disable background");
-				LabelManager.SetLabel(0x0185, MemoryType.NesPrgRom, "EnPF", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Enable background");
-				LabelManager.SetLabel(0x01B2, MemoryType.NesPrgRom, "VINTWait", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: $ff " + Environment.NewLine + "Desc: Wait until next VBlank NMI fires, and return (for programs that does it the \"everything in main\" way). NMI vector selection at $100 is preserved, but further VBlanks are disabled.");
-				LabelManager.SetLabel(0x07BB, MemoryType.NesPrgRom, "VRAMStructWrite", "Input: Pointer to VRAM buffer to be written " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00, $01, $ff " + Environment.NewLine + "Desc: Set VRAM increment to 1 (clear [[PPUCTRL]]/$ff bit 2), and write a VRAM buffer to VRAM. Read below for information on the structure.");
-				LabelManager.SetLabel(0x0844, MemoryType.NesPrgRom, "FetchDirectPtr", "Input: " + Environment.NewLine + "Output: $00, $01 = pointer fetched " + Environment.NewLine + "Affects: A, X, Y, $05, $06 " + Environment.NewLine + "Desc: Fetch a direct pointer from the stack (the pointer should be placed after the return address of the routine that calls this one (see \"important notes\" above)), save the pointer at ($00) and fix the return address.");
-				LabelManager.SetLabel(0x086A, MemoryType.NesPrgRom, "WriteVRAMBuffer", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $301, $302 " + Environment.NewLine + "Desc: Write the VRAM Buffer at $302 to VRAM. Read below for information on the structure.");
-				LabelManager.SetLabel(0x08B3, MemoryType.NesPrgRom, "ReadVRAMBuffer", "Input: X = start address of read buffer, Y = # of bytes to read " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y " + Environment.NewLine + "Desc: Read individual bytes from VRAM to the VRAMBuffer. (see notes below)");
-				LabelManager.SetLabel(0x08D2, MemoryType.NesPrgRom, "PrepareVRAMString", "Input: A = High VRAM address, X = Low VRAM address, Y = string length, Direct Pointer = data to be written to VRAM " + Environment.NewLine + "Output: A = $ff : no error, A = $01 : string didn't fit in buffer " + Environment.NewLine + "Affects: A, X, Y, $00, $01, $02, $03, $04, $05, $06 " + Environment.NewLine + "Desc: This routine copies pointed data into the VRAM buffer.");
-				LabelManager.SetLabel(0x08E1, MemoryType.NesPrgRom, "PrepareVRAMStrings", "Input: A = High VRAM address, X = Low VRAM address, Direct pointer = data to be written to VRAM " + Environment.NewLine + "Output: A = $ff : no error, A = $01 : data didn't fit in buffer " + Environment.NewLine + "Affects: A, X, Y, $00, $01, $02, $03, $04, $05, $06 " + Environment.NewLine + "Desc: This routine copies a 2D string into the VRAM buffer. The first byte of the data determines the width and height of the following string (in tiles): Upper nybble = height, lower nybble = width.");
-				LabelManager.SetLabel(0x094F, MemoryType.NesPrgRom, "GetVRAMBufferByte", "Input: X = starting index of read buffer, Y = # of address to compare (starting at 1), $00, $01 = address to read from " + Environment.NewLine + "Output: carry clear : a previously read byte was returned, carry set : no byte was read, should wait next call to ReadVRAMBuffer " + Environment.NewLine + "Affects: A, X, Y " + Environment.NewLine + "Desc: This routine was likely planned to be used in order to avoid useless latency on a VRAM reads (see notes below). It compares the VRAM address in ($00) with the Yth (starting at 1) address of the read buffer. If both addresses match, the corresponding data byte is returned exit with c clear. If the addresses are different, the buffer address is overwritten by the address in ($00) and the routine exit with c set.");
-				LabelManager.SetLabel(0x097D, MemoryType.NesPrgRom, "Pixel2NamConv", "Input: $02 = Pixel X cord, $03 = Pixel Y cord " + Environment.NewLine + "Output: $00 = High nametable address, $01 = Low nametable address " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: This routine convert pixel screen coordinates to corresponding nametable address (assumes no scrolling, and points to first nametable at $2000-$23ff).");
-				LabelManager.SetLabel(0x0997, MemoryType.NesPrgRom, "Nam2PixelConv", "Input: $00 = High nametable address, $01 = low nametable address " + Environment.NewLine + "Output: $02 = Pixel X cord, $03 = Pixel Y cord " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: This routine convert a nametable address to corresponding pixel coordinates (assume no scrolling).");
-				LabelManager.SetLabel(0x09B1, MemoryType.NesPrgRom, "Random", "Input: X = Zero Page address where the random bytes are placed, Y = # of shift register bytes (normally $02) " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00 " + Environment.NewLine + "Desc: This is a shift-register based random number generator, normally takes 2 bytes (using more won't affect random sequence). On reset you are supposed to write some non-zero values here (BIOS uses writes $d0, $d0), and call this routine several times before the data is actually random. Each call of this routine will shift the bytes ''right''.");
-				LabelManager.SetLabel(0x09C8, MemoryType.NesPrgRom, "SpriteDMA", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: This routine does sprite DMA from RAM $200-$2ff");
-				LabelManager.SetLabel(0x09D3, MemoryType.NesPrgRom, "CounterLogic", "Input: A, Y = end Zeropage address of counters, X = start zeropage address of counters " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, $00 " + Environment.NewLine + "Desc: This decrements several counters in Zeropage. The first counter is a decimal counter 9 -> 8 -> 7 -> ... -> 1 -> 0 -> 9 -> ... Counters 1...A are simply decremented and stays at 0. Counters A+1...Y are decremented when the first counter does a 0 -> 9 transition, and stays at 0.");
-				LabelManager.SetLabel(0x09EB, MemoryType.NesPrgRom, "ReadPads", "Input: " + Environment.NewLine + "Output: $f5 = Joypad #1 data, $f6 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01, " + Environment.NewLine + "Desc: This read hardwired famicom joypads.");
-				LabelManager.SetLabel(0x0A1A, MemoryType.NesPrgRom, "ReadDownPads", "Input: " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: This reads hardwired famicom joypads, and detect up->down button transitions");
-				LabelManager.SetLabel(0x0A1F, MemoryType.NesPrgRom, "ReadOrDownPads", "Input: " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: This read both hardwired famicom and expansion port joypads and detect up->down button transitions.");
-				LabelManager.SetLabel(0x0A36, MemoryType.NesPrgRom, "ReadDownVerifyPads", "Input: " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: This reads hardwired Famicom joypads, and detect up->down button transitions. Data is read until two consecutive read matches to work around the DMC reading glitches.");
-				LabelManager.SetLabel(0x0A4C, MemoryType.NesPrgRom, "ReadOrDownVerifyPads", "Input: " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: This read both hardwired famicom and expansion port joypads and detect up->down button transitions. Data is read until two consecutive read matches to work around the DMC reading glitches.");
-				LabelManager.SetLabel(0x0A68, MemoryType.NesPrgRom, "ReadDownExpPads", "Input: $f1-$f4 = up->down transitions, $f5-$f8 = Joypad data in the order : Pad1, Pad2, Expansion1, Expansion2 " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: This read both hardwired famicom and expansion port joypad, but stores their data separately instead of ORing them together like the other routines does. This routine is NOT DMC fortified.");
-				LabelManager.SetLabel(0x0A84, MemoryType.NesPrgRom, "VRAMFill", "Input: A = High VRAM Address (aka tile row #), X = Fill value, Y = # of tile rows OR attribute fill data " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00, $01, $02 " + Environment.NewLine + "Desc: This routine does 2 things : If A < $20, it fills pattern table data with the value in X for 16 * Y tiles. If A >= $20, it fills the corresponding nametable with the value in X and attribute table with the value in Y.");
-				LabelManager.SetLabel(0x0Ad2, MemoryType.NesPrgRom, "MemFill", "Input: A = fill value, X = first page #, Y = last page # " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00, $01 " + Environment.NewLine + "Desc: This routines fills RAM pages with specified value.");
-				LabelManager.SetLabel(0x0AEA, MemoryType.NesPrgRom, "SetScroll", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: This routine set scroll registers according to values in $fc, $fd and $ff. Should typically be called in VBlank after VRAM updates");
+				LabelManager.SetLabel(0x0149, MemoryType.NesPrgRom, "Delay131", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: " + Environment.NewLine + "Desc: 131 clock cycle delay (including the JSR instruction to call it) used by the \"BIOS acknowledge and delay\" IRQ handler.");
+				LabelManager.SetLabel(0x0153, MemoryType.NesPrgRom, "Delayms", "Input: Y = Delay in ms (approximate) " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: X, Y " + Environment.NewLine + "Desc: Delay routine, where the time in CPU cycles is 1790*Y+5. Y = 0 is treated as 256.");
+				LabelManager.SetLabel(0x0161, MemoryType.NesPrgRom, "DisPFObj", "Input: $fe = PPUMASK value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Disable rendering for both sprites and background.");
+				LabelManager.SetLabel(0x016B, MemoryType.NesPrgRom, "EnPFObj", "Input: $fe = PPUMASK value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Enable rendering for both sprites and background.");
+				LabelManager.SetLabel(0x0171, MemoryType.NesPrgRom, "DisObj", "Input: $fe = PPUMASK value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Disable sprite rendering.");
+				LabelManager.SetLabel(0x0178, MemoryType.NesPrgRom, "EnObj", "Input: $fe = PPUMASK value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Enable sprite rendering.");
+				LabelManager.SetLabel(0x017E, MemoryType.NesPrgRom, "DisPF", "Input: $fe = PPUMASK value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Disable background rendering.");
+				LabelManager.SetLabel(0x0185, MemoryType.NesPrgRom, "EnPF", "Input: $fe = PPUMASK value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, $fe " + Environment.NewLine + "Desc: Enable background rendering.");
+				LabelManager.SetLabel(0x01B2, MemoryType.NesPrgRom, "VINTWait", "Input: $ff = PPUCTRL value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: $ff " + Environment.NewLine + "Desc: Wait until next vblank NMI fires, disable NMIs, read PPUSTATUS to clear the vblank flag, then return (for programs which do \"everything in main\"). NMI vector selection at $100 is preserved, but further NMIs are disabled. It is recommended to clear the vblank flag before calling this if its state is unknown. The Interrupt Disable Flag is not restored, instead remaining set from NMI entry.");
+				LabelManager.SetLabel(0x07BB, MemoryType.NesPrgRom, "VRAMStructWrite", "Input: Direct pointer = VRAM struct to be written, $ff = PPUCTRL value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00, $01, $ff " + Environment.NewLine + "Desc: Set VRAM increment to 1 (clear PPUCTRL/$ff bit 2), and write a VRAM struct to VRAM. Refer to NESdev Wiki for information on the structure.");
+				LabelManager.SetLabel(0x0844, MemoryType.NesPrgRom, "FetchDirectPtr", "Input: " + Environment.NewLine + "Output: $00, $01 = pointer fetched " + Environment.NewLine + "Affects: A, X, Y, $05, $06 " + Environment.NewLine + "Desc: Fetch a direct pointer from the stack (the pointer should be placed after the return address of the routine that calls this one), save the pointer at ($00), and fix the return address.");
+				LabelManager.SetLabel(0x086A, MemoryType.NesPrgRom, "WriteVRAMBuffer", "Input: $ff = PPUCTRL value, $0302-$03ff = VRAM write buffer " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $0301, $0302 " + Environment.NewLine + "Desc: Write the VRAM Buffer at $0302 to VRAM. Refer to NESdev Wiki for information on the structure.");
+				LabelManager.SetLabel(0x08B3, MemoryType.NesPrgRom, "ReadVRAMBuffer", "Input: X = Starting address of VRAM read buffer, Y = # of bytes to read from VRAM, $0300-$03ff = VRAM read buffer " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $0300-$03ff " + Environment.NewLine + "Desc: Read individual bytes from VRAM to the VRAM read buffer at $0300+X. (see notes on NESdev Wiki)");
+				LabelManager.SetLabel(0x08D2, MemoryType.NesPrgRom, "PrepareVRAMString", "Input: A = High VRAM address, X = Low VRAM address, Y = string length, Direct Pointer = data to be written to VRAM " + Environment.NewLine + "Output: A = $ff : success, A = $01 : string didn't fit in buffer " + Environment.NewLine + "Affects: A, X, Y, $00-$06, $0301, $0302-$03ff " + Environment.NewLine + "Desc: Copy pointed data into the VRAM write buffer at $0302. Data which does not fit in the buffer (according to the max index variable defined in $0300) is rejected. (see notes on NESdev Wiki)");
+				LabelManager.SetLabel(0x08E1, MemoryType.NesPrgRom, "PrepareVRAMStrings", "Input: A = High VRAM address, X = Low VRAM address, Direct pointer = data to be written to VRAM " + Environment.NewLine + "Output: A = $ff : success, A = $01 : data didn't fit in buffer " + Environment.NewLine + "Affects: A, X, Y, $00-$06, $0301, $0302-$03ff " + Environment.NewLine + "Desc: Copy a 2D string into the VRAM write buffer at $0302 as multiple 1D strings. The first byte of the data determines the width and height of the 2D string (in tiles): Upper nybble = height, lower nybble = width. Data which does not fit in the buffer (according to the max index variable defined in $0300) is rejected. (see notes on NESdev Wiki)");
+				LabelManager.SetLabel(0x094F, MemoryType.NesPrgRom, "GetVRAMBufferByte", "Input: X = Starting address of read buffer, Y = VRAM read structure to check (starting at 1), $00 = High VRAM address, $01 = Low VRAM address, $0300-$03ff = VRAM read buffer " + Environment.NewLine + "Output: carry clear : a previously read byte was returned in A, carry set : no byte was read, program must call ReadVRAMBuffer " + Environment.NewLine + "Affects: A, X, Y, $0300-$03ff " + Environment.NewLine + "Desc: This routine was likely intended for avoiding repeated VRAM reads (see notes on NESdev Wiki). It compares the target VRAM address in ($00) with the Yth structure in the VRAM read buffer ($0300+X+(Y-1)*3). If the addresses match, the carry is cleared and the corresponding data byte is returned in A. Otherwise, the target VRAM address is overwritten with the contents of ($00) and the routine exits with the carry set to indicate that the program must call ReadVRAMBuffer to obtain the desired data. ");
+				LabelManager.SetLabel(0x097D, MemoryType.NesPrgRom, "Pixel2NamConv", "Input: $02 = Pixel X cord, $03 = Pixel Y cord " + Environment.NewLine + "Output: $00 = High nametable address, $01 = Low nametable address " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: Convert pixel screen coordinates to corresponding nametable address (assumes no scrolling, and points to first nametable at $2000-$23ff).");
+				LabelManager.SetLabel(0x0997, MemoryType.NesPrgRom, "Nam2PixelConv", "Input: $00 = High nametable address, $01 = Low nametable address " + Environment.NewLine + "Output: $02 = Pixel X cord, $03 = Pixel Y cord " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: Convert a nametable address to corresponding pixel coordinates (assume no scrolling).");
+				LabelManager.SetLabel(0x09B1, MemoryType.NesPrgRom, "Random", "Input: X = Starting zero-page address of shift register bytes, Y = # of shift register bytes (normally $02) " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00 " + Environment.NewLine + "Desc: This is a shift register-based pseudo-random number generator which normally takes 2 bytes. Programs should seed the bytes with nonzero values before use. Each call of this routine will shift the bytes right by one bit.");
+				LabelManager.SetLabel(0x09C8, MemoryType.NesPrgRom, "SpriteDMA", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: Perform OAM DMA from RAM $0200-$02ff.");
+				LabelManager.SetLabel(0x09D3, MemoryType.NesPrgRom, "CounterLogic", "Input: A, Y = Ending zero-page address of counters, X = Starting zero-page address of counters " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, $00 " + Environment.NewLine + "Desc: This decrements several counters in zero-page. The first counter, at X, is a decimal counter 9 -> 8 -> 7 -> ... -> 1 -> 0 -> 9 -> ... Counters X+1...A are simply decremented and stay at 0. Counters A+1...Y are decremented when the first counter does a 0 -> 9 transition, and stay at 0.");
+				LabelManager.SetLabel(0x09EB, MemoryType.NesPrgRom, "ReadPads", "Input: $fb = Controller latch bits " + Environment.NewLine + "Output: $f5 = Joypad #1 data, $f6 = Joypad #2 data, $00 = Expansion #1 data, $01 = Expansion #2 data " + Environment.NewLine + "Affects: A, X " + Environment.NewLine + "Desc: Read hardwired/expansion port joypads. Expansion port reads should be placed/used elsewhere if needed after calling this routine, otherwise they will be clobbered by other BIOS calls.");
+				LabelManager.SetLabel(0x0A0D, MemoryType.NesPrgRom, "OrPads", "Input: $f5 = Joypad #1 data, $f6 = Joypad #2 data, $00 = Expansion #1 data, $01 = Expansion #2 data" + Environment.NewLine + "Output: $f5 = Joypad #1 OR Expansion #1, $f6 = Joypad #2 OR Expansion #2 " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: Combine inputs from hardwired/expansion port joypads. Intended to be called after ReadPads.");
+				LabelManager.SetLabel(0x0A1A, MemoryType.NesPrgRom, "ReadDownPads", "Input: $fb = Controller latch bits " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: Read hardwired joypads and detect up->down button transitions.");
+				LabelManager.SetLabel(0x0A1F, MemoryType.NesPrgRom, "ReadOrDownPads", "Input: $fb = Controller latch bits " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: Read both hardwired/expansion port joypads and detect up->down button transitions.");
+				LabelManager.SetLabel(0x0A36, MemoryType.NesPrgRom, "ReadDownVerifyPads", "Input: $fb = Controller latch bits " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: Read hardwired joypads and detect up->down button transitions. Data is read until two consecutive reads match to work around DMC conflicts.");
+				LabelManager.SetLabel(0x0A4C, MemoryType.NesPrgRom, "ReadOrDownVerifyPads", "Input: $fb = Controller latch bits " + Environment.NewLine + "Output: $f5 = Joypad #1 up->down transitions, $f6 = Joypad #2 up->down transitions $f7 = Joypad #1 data, $f8 = Joypad #2 data " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: Read both hardwired/expansion port joypads and detect up->down button transitions. Data is read until two consecutive reads match to work around DMC conflicts.");
+				LabelManager.SetLabel(0x0A68, MemoryType.NesPrgRom, "ReadDownExpPads", "Input: $fb = Controller latch bits " + Environment.NewLine + "Output: $f1-$f4 = up->down transitions, $f5-$f8 = Joypad data in the order : Pad1, Pad2, Expansion1, Expansion2 " + Environment.NewLine + "Affects: A, X, $00, $01 " + Environment.NewLine + "Desc: Read both hardwired/expansion port joypads and process up->down button transitions, but store their data separately instead of ORing them together like the other routines do. This routine is not DMC-safe.");
+				LabelManager.SetLabel(0x0A84, MemoryType.NesPrgRom, "VRAMFill", "Input: A = High VRAM Address (aka tile row #), X = Fill value, Y = # of tile rows OR attribute fill data, $ff = PPUCTRL value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00-$02, $ff " + Environment.NewLine + "Desc: This routine does 2 things: If A < $20, it fills pattern table data with the value in X for 16 * Y tiles. If A >= $20, it fills the corresponding nametable with the value in X and attribute table with the value in Y.");
+				LabelManager.SetLabel(0x0Ad2, MemoryType.NesPrgRom, "MemFill", "Input: A = fill value, X = first page #, Y = last page # " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00, $01 " + Environment.NewLine + "Desc: Fill RAM pages with the value in A.");
+				LabelManager.SetLabel(0x0AEA, MemoryType.NesPrgRom, "SetScroll", "Input: $fc = Y scroll position, $fd = X scroll position, $ff = PPUCTRL value" + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A " + Environment.NewLine + "Desc: Read PPUSTATUS to clear the internal w register and the vblank flag, then set the PPU scroll registers as follows: PPUSCROLL = [$fd], PPUSCROLL = [$fc], PPUCTRL = [$ff]. Should typically be called in vblank after VRAM updates.");
 				LabelManager.SetLabel(0x0AFD, MemoryType.NesPrgRom, "JumpEngine", "Input: A = Jump table entry " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00, $01 " + Environment.NewLine + "Desc: The instruction calling this is supposed to be followed by a jump table (16-bit pointers little endian, up to 128 pointers). A is the entry # to jump to, return address on stack is used to get jump table entries.");
-				LabelManager.SetLabel(0x0B13, MemoryType.NesPrgRom, "ReadKeyboard", "Input: " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: " + Environment.NewLine + "Desc: Read Family Basic Keyboard expansion (detail is under analysis)");
-				LabelManager.SetLabel(0x0B66, MemoryType.NesPrgRom, "LoadTileset", "Input: A = Low VRAM Address & Flags, Y = Hi VRAM Address, X = # of tiles to transfer to/from VRAM " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00, $01, $02, $03, $04 " + Environment.NewLine + "Desc: This routine can read and write 2BP and 1BP tilesets to/from VRAM. See appendix below about the flags.");
-				LabelManager.SetLabel(0x0C22, MemoryType.NesPrgRom, "unk_EC22", "Some kind of logic that some games use. (detail is under analysis)");
+				LabelManager.SetLabel(0x0B13, MemoryType.NesPrgRom, "ReadKeyboard", "Input: $fb = Controller latch bits " + Environment.NewLine + "Output: A = $ff : success, A = $00 : no keyboard connected, $00-$08 = keyboard data" + Environment.NewLine + "Affects: A, X, Y, $00-$08, $fb " + Environment.NewLine + "Desc: This attempts to read the Family BASIC Keyboard, returning with A=0 if nothing is connected. Keyboard data is stored at $00-$08 starting from row 8 in descending order ($00 = row 8, $01 = row 7, and so on), with each byte containing column 0's data in the lower nybble and column 1's data in the upper nybble. A set bit means that a key was pressed.");
+				LabelManager.SetLabel(0x0B66, MemoryType.NesPrgRom, "LoadTileset", "Input: A = Low VRAM Address & Flags, Y = Hi VRAM Address, X = # of tiles to transfer to/from VRAM, $ff = PPUCTRL value " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $00-$04, $ff " + Environment.NewLine + "Desc: Read/write 2BP and 1BP tilesets to/from VRAM. See appendix on NESdev Wiki regarding the flags.");
+				LabelManager.SetLabel(0x0C22, MemoryType.NesPrgRom, "UploadObject", "Input: $00-$01 = Pointer to object structure " + Environment.NewLine + "Output: " + Environment.NewLine + "Affects: A, X, Y, $02-$0c " + Environment.NewLine + "Upload an object to RAM $0200-$02ff. (see object structure on NESdev Wiki)");
 			}
 		}
 
@@ -407,7 +408,7 @@ namespace Mesen.Debugger.Labels
 			addLabel(0x01A, 2, "BG2VOFS", "BG2 Y Scroll Offset");
 			addLabel(0x01C, 2, "BG3HOFS", "BG3 X Scroll Offset");
 			addLabel(0x01E, 2, "BG3VOFS", "BG3 Y Scroll Offset");
-			
+
 			addLabel(0x020, 2, "BG2PA", "BG2 Transform Param A");
 			addLabel(0x022, 2, "BG2PB", "BG2 Transform Param B");
 			addLabel(0x024, 2, "BG2PC", "BG2 Transform Param C");
@@ -427,10 +428,10 @@ namespace Mesen.Debugger.Labels
 
 			addLabel(0x044, 2, "WIN0V", "Window 0 Start/End Y");
 			addLabel(0x046, 2, "WIN1V", "Window 1 Start/End Y");
-			
+
 			addLabel(0x048, 2, "WININ", "Window 0/1 Config");
 			addLabel(0x04A, 2, "WINOUT", "OBJ Window/Outside Window Config");
-			
+
 			addLabel(0x04C, 2, "MOSAIC", "Mosaic Size");
 			addLabel(0x050, 2, "BLDCNT", "Blend Control");
 			addLabel(0x052, 2, "BLDALPHA", "Blend Coefficients");
@@ -500,16 +501,16 @@ namespace Mesen.Debugger.Labels
 			addLabel(0x126, 2, "SIOMULTI3", "Serial I/O Multiplayer Data 3");
 			addLabel(0x128, 2, "SIOCNT", "Serial I/O Control");
 			addLabel(0x12A, 2, "SIODATA8", "Serial I/O Data (8-bit)");
-			
+
 			addLabel(0x130, 2, "KEYINPUT", "Key Status");
 			addLabel(0x132, 2, "KEYCNT", "Key IRQ Control");
-			
+
 			addLabel(0x134, 2, "RNT", "Serial I/O Mode Select");
 			addLabel(0x140, 2, "JOYCNT", "Serial I/O JOY Bus Control");
 			addLabel(0x150, 4, "JOYRECV", "Serial I/O JOY Bus Receive Data");
 			addLabel(0x154, 4, "JOYSEND", "Serial I/O JOY Bus Send Data");
 			addLabel(0x158, 2, "JOYSTAT", "Serial I/O JOY Bus Status");
-			
+
 			addLabel(0x200, 2, "IE", "IRQ Enable");
 			addLabel(0x202, 2, "IF", "IRQ Flags");
 			addLabel(0x204, 2, "WAITCNT", "Waitstate Control");
@@ -520,133 +521,144 @@ namespace Mesen.Debugger.Labels
 
 		private static void SetWsDefaultLabels()
 		{
-			Action<uint, uint, string> addLabel = (addr, length, label) => {
+			Action<uint, uint, string, string> addLabel = (addr, length, label, desc) => {
 				LabelManager.SetLabel(new CodeLabel() {
 					Address = addr,
 					Length = length,
 					MemoryType = MemoryType.WsPort,
-					Label = label
+					Label = label,
+					Comment = desc
 				}, false);
 			};
 
-			addLabel(0x00, 1, "IO_DISPLAY_CTRL");
-			addLabel(0x01, 1, "IO_DISPLAY_BACK");
-			addLabel(0x02, 1, "IO_LCD_LINE");
-			addLabel(0x03, 1, "IO_LCD_INTERRUPT");
-			addLabel(0x04, 1, "IO_SPR_BASE");
-			addLabel(0x05, 1, "IO_SPR_FIRST");
-			addLabel(0x06, 1, "IO_SPR_COUNT");
-			addLabel(0x07, 1, "IO_SCR_BASE");
-			addLabel(0x08, 1, "IO_SCR2_WIN_X1");
-			addLabel(0x09, 1, "IO_SCR2_WIN_Y1");
-			addLabel(0x0A, 1, "IO_SCR2_WIN_X2");
-			addLabel(0x0B, 1, "IO_SCR2_WIN_Y2");
-			addLabel(0x0C, 1, "IO_SPR_WIN_X1");
-			addLabel(0x0D, 1, "IO_SPR_WIN_Y1");
-			addLabel(0x0E, 1, "IO_SPR_WIN_X2");
-			addLabel(0x0F, 1, "IO_SPR_WIN_Y2");
-			addLabel(0x10, 1, "IO_SCR1_SCRL_X");
-			addLabel(0x11, 1, "IO_SCR1_SCRL_Y");
-			addLabel(0x12, 1, "IO_SCR2_SCRL_X");
-			addLabel(0x13, 1, "IO_SCR2_SCRL_Y");
-			addLabel(0x14, 1, "IO_LCD_CTRL");
-			addLabel(0x15, 1, "IO_LCD_SEG");
-			addLabel(0x16, 1, "IO_LCD_VTOTAL");
-			addLabel(0x17, 1, "IO_LCD_VSYNC");
-			addLabel(0x1A, 1, "IO_LCD_STATUS");
-			addLabel(0x1C, 1, "IO_LCD_SHADE_01");
-			addLabel(0x1D, 1, "IO_LCD_SHADE_23");
-			addLabel(0x1E, 1, "IO_LCD_SHADE_45");
-			addLabel(0x1F, 1, "IO_LCD_SHADE_67");
-			addLabel(0x20, 2, "IO_PAL_0");
-			addLabel(0x22, 2, "IO_PAL_1");
-			addLabel(0x24, 2, "IO_PAL_2");
-			addLabel(0x26, 2, "IO_PAL_3");
-			addLabel(0x28, 2, "IO_PAL_4");
-			addLabel(0x2A, 2, "IO_PAL_5");
-			addLabel(0x2C, 2, "IO_PAL_6");
-			addLabel(0x2E, 2, "IO_PAL_7");
-			addLabel(0x30, 2, "IO_PAL_8");
-			addLabel(0x32, 2, "IO_PAL_9");
-			addLabel(0x34, 2, "IO_PAL_10");
-			addLabel(0x36, 2, "IO_PAL_11");
-			addLabel(0x38, 2, "IO_PAL_12");
-			addLabel(0x3A, 2, "IO_PAL_13");
-			addLabel(0x3C, 2, "IO_PAL_14");
-			addLabel(0x3E, 2, "IO_PAL_15");
-			addLabel(0x40, 2, "IO_DMA_SOURCE_L");
-			addLabel(0x42, 1, "IO_DMA_SOURCE_H");
-			addLabel(0x44, 2, "IO_DMA_DEST");
-			addLabel(0x46, 2, "IO_DMA_LENGTH");
-			addLabel(0x48, 1, "IO_DMA_CTRL");
-			addLabel(0x4A, 2, "IO_SDMA_SOURCE_L");
-			addLabel(0x4C, 1, "IO_SDMA_SOURCE_H");
-			addLabel(0x4E, 2, "IO_SDMA_LENGTH_L");
-			addLabel(0x50, 1, "IO_SDMA_LENGTH_H");
-			addLabel(0x52, 1, "IO_SDMA_CTRL");
-			addLabel(0x60, 1, "IO_SYSTEM_CTRL2");
-			addLabel(0x62, 1, "IO_SYSTEM_CTRL3");
-			addLabel(0x64, 2, "IO_HYPERV_OUT_L");
-			addLabel(0x66, 2, "IO_HYPERV_OUT_R");
-			addLabel(0x68, 1, "IO_HYPERV_IN_L");
-			addLabel(0x69, 1, "IO_HYPERV_IN_R");
-			addLabel(0x6A, 2, "IO_HYPERV_CTRL");
-			addLabel(0x80, 2, "IO_SND_FREQ_CH1");
-			addLabel(0x82, 2, "IO_SND_FREQ_CH2");
-			addLabel(0x84, 2, "IO_SND_FREQ_CH3");
-			addLabel(0x86, 2, "IO_SND_FREQ_CH4");
-			addLabel(0x88, 1, "IO_SND_VOL_CH1");
-			addLabel(0x89, 1, "IO_SND_VOL_CH2");
-			addLabel(0x8A, 1, "IO_SND_VOL_CH3");
-			addLabel(0x8B, 1, "IO_SND_VOL_CH4");
-			addLabel(0x8C, 1, "IO_SND_SWEEP");
-			addLabel(0x8D, 1, "IO_SND_SWEEP_TIME");
-			addLabel(0x8E, 1, "IO_SND_NOISE_CTRL");
-			addLabel(0x8F, 1, "IO_SND_WAVE_BASE");
-			addLabel(0x90, 1, "IO_SND_CH_CTRL");
-			addLabel(0x91, 1, "IO_SND_OUT_CTRL");
-			addLabel(0x92, 2, "IO_SND_RANDOM");
-			addLabel(0x94, 1, "IO_SND_VOL_CH2_VOICE");
-			addLabel(0x95, 1, "IO_SND_TEST");
-			addLabel(0x96, 2, "IO_SND_CH_OUT_R");
-			addLabel(0x98, 2, "IO_SND_CH_OUT_L");
-			addLabel(0x9A, 2, "IO_SND_CH_OUT_LR");
-			addLabel(0x9E, 1, "IO_SND_HW_VOL");
-			addLabel(0xA0, 1, "IO_SYSTEM_CTRL1");
-			addLabel(0xA2, 1, "IO_TIMER_CTRL");
-			addLabel(0xA4, 2, "IO_HBLANK_TIMER");
-			addLabel(0xA6, 2, "IO_VBLANK_TIMER");
-			addLabel(0xA8, 2, "IO_HBLANK_COUNTER");
-			addLabel(0xAA, 2, "IO_VBLANK_COUNTER");
-			addLabel(0xB0, 1, "IO_HWINT_VECTOR");
-			addLabel(0xB2, 1, "IO_HWINT_ENABLE");
-			addLabel(0xB4, 1, "IO_HWINT_STATUS");
-			addLabel(0xB6, 1, "IO_HWINT_ACK");
-			addLabel(0xB1, 1, "IO_SERIAL_DATA");
-			addLabel(0xB3, 1, "IO_SERIAL_STATUS");
-			addLabel(0xB5, 1, "IO_KEY_SCAN");
-			addLabel(0xB7, 1, "IO_INT_NMI_CTRL");
-			addLabel(0xBA, 2, "IO_IEEP_DATA");
-			addLabel(0xBC, 2, "IO_IEEP_CMD");
-			addLabel(0xBE, 1, "IO_IEEP_CTRL");
-			addLabel(0xC1, 1, "IO_BANK_RAM");
-			addLabel(0xC2, 1, "IO_BANK_ROM0");
-			addLabel(0xC3, 1, "IO_BANK_ROM1");
-			/*addLabel(0xC0, 1, "IO_BANK_ROM_LINEAR");
-			addLabel(0xC4, 1, "IO_CART_EEP_DATA");
-			addLabel(0xC6, 1, "IO_CART_EEP_CMD");
-			addLabel(0xC8, 1, "IO_CART_EEP_CTRL");
-			addLabel(0xCA, 1, "IO_CART_RTC_CTRL");
-			addLabel(0xCB, 1, "IO_CART_RTC_DATA");
-			addLabel(0xCC, 1, "IO_CART_GPO_CTRL");
-			addLabel(0xCD, 1, "IO_CART_GPO_DATA");
-			addLabel(0xCE, 1, "IO_CART_FLASH");
-			addLabel(0xD0, 1, "IO_BANK_2003_RAM");
-			addLabel(0xD2, 1, "IO_BANK_2003_ROM0");
-			addLabel(0xD4, 1, "IO_BANK_2003_ROM1");
-			addLabel(0xD6, 1, "IO_CART_KARNAK_TIMER");
-			addLabel(0xD8, 1, "IO_CART_KARNAK_ADPCM_INPUT");
-			addLabel(0xD9, 1, "IO_CART_KARNAK_ADPCM_OUTPUT");*/
+			/* Begin auto-generated labels from https://codeberg.org/WonderfulToolchain/hardware-definitions */
+			addLabel(0xC0, 1, "WS_CART_BANK_ROML_PORT", "Linear ROM (0x40000 - 0xFFFFF) bank address.");
+			addLabel(0xC1, 1, "WS_CART_BANK_RAM_PORT", "RAM (0x10000 - 0x1FFFF) bank address (up to 16 MiB).");
+			addLabel(0xC2, 1, "WS_CART_BANK_ROM0_PORT", "ROM0 (0x20000 - 0x2FFFF) bank address (up to 16 MiB).");
+			addLabel(0xC3, 1, "WS_CART_BANK_ROM1_PORT", "ROM1 (0x30000 - 0x3FFFF) bank address (up to 16 MiB).");
+			addLabel(0xCE, 1, "WS_CART_BANK_FLASH_PORT", "Control ROM/Flash access in RAM bank area.");
+			addLabel(0xCF, 1, "WS_CART_EXTBANK_ROML_PORT", "Linear ROM (0x40000 - 0xFFFFF) bank address.");
+			addLabel(0xD0, 2, "WS_CART_EXTBANK_RAM_PORT", "RAM (0x10000 - 0x1FFFF) bank address (up to 4 GiB).");
+			addLabel(0xD2, 2, "WS_CART_EXTBANK_ROM0_PORT", "ROM0 (0x20000 - 0x2FFFF) bank address (up to 4 GiB).");
+			addLabel(0xD4, 2, "WS_CART_EXTBANK_ROM1_PORT", "ROM1 (0x30000 - 0x3FFFF) bank address (up to 4 GiB).");
+			addLabel(0xC4, 2, "WS_CART_EEP_DATA_PORT", "Cartridge EEPROM data.");
+			addLabel(0xC6, 2, "WS_CART_EEP_COMMAND_PORT", "Cartridge EEPROM command.");
+			addLabel(0xC8, 1, "WS_CART_EEP_CTRL_PORT", "");
+			addLabel(0xCC, 1, "WS_CART_GPIO_DIR_PORT", "");
+			addLabel(0xCD, 1, "WS_CART_GPIO_DATA_PORT", "");
+			addLabel(0xD6, 1, "WS_CART_KARNAK_CTRL_PORT", "");
+			addLabel(0xD8, 1, "WS_CART_KARNAK_ADPCM_IN_PORT", "");
+			addLabel(0xD9, 1, "WS_CART_KARNAK_ADPCM_OUT_PORT", "");
+			addLabel(0xCA, 1, "WS_CART_RTC_CTRL_PORT", "");
+			addLabel(0xCB, 1, "WS_CART_RTC_DATA_PORT", "");
+			addLabel(0x00, 1, "WS_DISPLAY_CTRL_PORT", "");
+			addLabel(0x01, 1, "WS_DISPLAY_BACK_PORT", "The display's background shade/color.");
+			addLabel(0x02, 1, "WS_DISPLAY_LINE_PORT", "The current line being drawn by the display.  Note that final color translation is applied with a one-line delay; for changing LCD shade or color palette values, subtract 1 from this value.");
+			addLabel(0x03, 1, "WS_DISPLAY_LINE_IRQ_PORT", "The line on the start of which the line interurpt should be requested.");
+			addLabel(0x04, 1, "WS_SPR_BASE_PORT", "Base address of sprite table data.");
+			addLabel(0x05, 1, "WS_SPR_FIRST_PORT", "First sprite to draw from the sprite table (0 - 127).");
+			addLabel(0x06, 1, "WS_SPR_COUNT_PORT", "Number of consecutive sprites to draw from the sprite table (1 - 128).");
+			addLabel(0x07, 1, "WS_SCR_BASE_PORT", "Base address of screen layer data.");
+			addLabel(0x08, 1, "WS_SCR2_WIN_X1_PORT", "Left-most pixel of the Screen 2 window.");
+			addLabel(0x09, 1, "WS_SCR2_WIN_Y1_PORT", "Top-most pixel of the Screen 2 window.");
+			addLabel(0x0A, 1, "WS_SCR2_WIN_X2_PORT", "Right-most pixel of the Screen 2 window.");
+			addLabel(0x0B, 1, "WS_SCR2_WIN_Y2_PORT", "Bottom-most pixel of the Screen 2 window.");
+			addLabel(0x0C, 1, "WS_SPR_WIN_X1_PORT", "Left-most pixel of the sprite window.");
+			addLabel(0x0D, 1, "WS_SPR_WIN_Y1_PORT", "Top-most pixel of the sprite window.");
+			addLabel(0x0E, 1, "WS_SPR_WIN_X2_PORT", "Right-most pixel of the sprite window.");
+			addLabel(0x0F, 1, "WS_SPR_WIN_Y2_PORT", "Bottom-most pixel of the sprite window.");
+			addLabel(0x10, 1, "WS_SCR1_SCRL_X_PORT", "X drawing offset of the Screen 1 layer.");
+			addLabel(0x11, 1, "WS_SCR1_SCRL_Y_PORT", "Y drawing offset of the Screen 1 layer.");
+			addLabel(0x12, 1, "WS_SCR2_SCRL_X_PORT", "X drawing offset of the Screen 2 layer.");
+			addLabel(0x13, 1, "WS_SCR2_SCRL_Y_PORT", "Y drawing offset of the Screen 2 layer.");
+			addLabel(0x14, 1, "WS_LCD_CTRL_PORT", "Controls LCD driver functionality.");
+			addLabel(0x15, 1, "WS_LCD_ICON_PORT", "Controls the visibility of LCD sidebar icons.");
+			addLabel(0x16, 1, "WS_LCD_VTOTAL_PORT", "The final line preceding line counter restart and the beginning of active display. By default, this is set to 158, which equals 159 total lines per frame.  For safety reasons, this should only be set to even values.");
+			addLabel(0x17, 1, "WS_LCD_STN_VSYNC_PORT", "On STN models (WS/WSC), this controls the start of the vertical back porch. For compatibility, this should always be set to 3 less than LCD_VTOTAL.");
+			addLabel(0x18, 1, "WS_LCD_NEXT_LINE_PORT", "The next line to start drawing on. Write-only. Not recommended for use.");
+			addLabel(0x1A, 1, "WS_LCD_ICON_LATCH_PORT", "Latched (SoC-controlled) icon status/control.");
+			addLabel(0x1C, 1, "WS_LCD_SHADE_01_PORT", "");
+			addLabel(0x1D, 1, "WS_LCD_SHADE_23_PORT", "");
+			addLabel(0x1E, 1, "WS_LCD_SHADE_45_PORT", "");
+			addLabel(0x1F, 1, "WS_LCD_SHADE_67_PORT", "");
+
+			addLabel(0x40, 2, "WS_GDMA_SOURCE_L_PORT", "Low 16 bits of the linear GDMA source address.");
+			addLabel(0x42, 1, "WS_GDMA_SOURCE_H_PORT", "High 4 bits of the linear GDMA source address.");
+			addLabel(0x44, 2, "WS_GDMA_DEST_PORT", "Linear GDMA destination address in IRAM.");
+			addLabel(0x46, 2, "WS_GDMA_LENGTH_PORT", "GDMA length, in bytes; must be a multiple of two.");
+			addLabel(0x48, 1, "WS_GDMA_CTRL_PORT", "Control GDMA functionality.");
+			addLabel(0x4A, 2, "WS_SDMA_SOURCE_L_PORT", "Low 16 bits of the linear sound DMA source address.");
+			addLabel(0x4C, 1, "WS_SDMA_SOURCE_H_PORT", "High 4 bits of the linear sound DMA source address.");
+			addLabel(0x4E, 2, "WS_SDMA_LENGTH_L_PORT", "Low 16 bits of the sound DMA transfer length.");
+			addLabel(0x50, 1, "WS_SDMA_LENGTH_H_PORT", "High 4 bits of the sound DMA transfer length.");
+			addLabel(0x52, 1, "WS_SDMA_CTRL_PORT", "");
+			addLabel(0xBA, 2, "WS_IEEP_DATA_PORT", "Internal EEPROM data.");
+			addLabel(0xBC, 2, "WS_IEEP_COMMAND_PORT", "Internal EEPROM command.");
+			addLabel(0xBE, 1, "WS_IEEP_CTRL_PORT", "");
+			addLabel(0x64, 2, "WS_HYPERV_OUT_L_PORT", "");
+			addLabel(0x66, 2, "WS_HYPERV_OUT_R_PORT", "");
+			addLabel(0x6A, 2, "WS_HYPERV_CTRL_PORT", "");
+			addLabel(0xB0, 1, "WS_INT_VECTOR_PORT", "Currently requested interrupt vector, if any. Bits 3-7 are writable and serve as the vector's offset.");
+			addLabel(0xB2, 1, "WS_INT_ENABLE_PORT", "");
+			addLabel(0xB4, 1, "WS_INT_STATUS_PORT", "");
+			addLabel(0xB6, 1, "WS_INT_ACK_PORT", "");
+			addLabel(0xB7, 1, "WS_INT_NMI_CTRL_PORT", "Controls NMI (non-maskable interrupt) functionality.");
+			addLabel(0xB5, 1, "WS_KEY_SCAN_PORT", "Controls keypad scanning.");
+			addLabel(0x60, 1, "WS_SYSTEM_CTRL_COLOR_PORT", "");
+			addLabel(0x62, 1, "WS_SYSTEM_CTRL_COLOR2_PORT", "");
+			addLabel(0xA0, 1, "WS_SYSTEM_CTRL_PORT", "");
+			addLabel(0xA3, 1, "WS_SYSTEM_TEST_PORT", "");
+			addLabel(0x80, 2, "WS_SOUND_FREQ_CH1_PORT", "Sound channel 1 frequency, stored as a divisor. Every `2048 - divisor` cycles, the index of the sample to be fetched from the wavetable is incremented.  The resulting frequency is calculated as follows: `sample rate = 3072000 Hz / (2048 - divisor)`.  Note that this refers to the sample rate of each sample in the wavetable, and needs to be scaled accordingly for a given waveform. For example, a 50% duty square wave (16 samples of 0 followed by 16 samples of 15) will have an effective sample rate of `(3072000 / 32) Hz / (2048 - divisor)`, or `96000 Hz / (2048 - divisor)`.");
+			addLabel(0x82, 2, "WS_SOUND_FREQ_CH2_PORT", "Sound channel 2 frequency, stored as a divisor. Ignored in voice mode.");
+			addLabel(0x84, 2, "WS_SOUND_FREQ_CH3_PORT", "Sound channel 3 frequency, stored as a divisor.");
+			addLabel(0x86, 2, "WS_SOUND_FREQ_CH4_PORT", "Sound channel 4 frequency, stored as a divisor.");
+			addLabel(0x88, 1, "WS_SOUND_VOL_CH1_PORT", "Sound channel 1 volume.");
+			// addLabel(0x89, 1, "WS_SOUND_VOL_CH2_PORT", "Sound channel 2 volume.");
+			// addLabel(0x89, 1, "WS_SOUND_VOICE_SAMPLE_PORT", "Sound channel 2 unsigned PCM sample; used in voice mode.");
+			addLabel(0x8A, 1, "WS_SOUND_VOL_CH3_PORT", "Sound channel 3 volume.");
+			addLabel(0x8B, 1, "WS_SOUND_VOL_CH4_PORT", "Sound channel 4 volume.");
+			addLabel(0x8C, 1, "WS_SOUND_SWEEP_PORT", "Signed 8-bit value to be added to or subtracted from the channel 3 frequency port every sweep tick.");
+			addLabel(0x8D, 1, "WS_SOUND_SWEEP_TIME_PORT", "Number of 375 Hz ticks between frequency sweep changes, minus one.");
+			addLabel(0x8E, 1, "WS_SOUND_NOISE_CTRL_PORT", "");
+			addLabel(0x8F, 1, "WS_SOUND_WAVE_BASE_PORT", "Sound wavetable base address.");
+			addLabel(0x90, 1, "WS_SOUND_CH_CTRL_PORT", "Controls sound channels.");
+			addLabel(0x91, 1, "WS_SOUND_OUT_CTRL_PORT", "Controls sound output circuitry.");
+			addLabel(0x92, 2, "WS_SOUND_NOISE_LFSR_PORT", "Current state of the noise channel LFSR.");
+			addLabel(0x94, 1, "WS_SOUND_VOICE_VOL_PORT", "");
+			addLabel(0x95, 1, "WS_SOUND_TEST_PORT", "Sound test port.");
+			addLabel(0x96, 2, "WS_SOUND_TEST_CHOUT_R_PORT", "Sound test port: synthesizer (channel 1-4) right channel output sample in bits 0-9.");
+			addLabel(0x98, 2, "WS_SOUND_TEST_CHOUT_L_PORT", "Sound test port: synthesizer (channel 1-4) left channel output sample in bits 0-9.");
+			addLabel(0x9A, 2, "WS_SOUND_TEST_CHOUT_M_PORT", "Sound test port: synthesizer (channel 1-4) sum of output samples in bits 0-10.");
+			addLabel(0x9E, 1, "WS_SOUND_SPEAKER_VOL_PORT", "Controls the internal speaker volume.");
+			addLabel(0xA2, 1, "WS_TIMER_CTRL_PORT", "");
+			addLabel(0xA4, 2, "WS_TIMER_HBL_RELOAD_PORT", "Reload value for horizontal blank timer.");
+			addLabel(0xA6, 2, "WS_TIMER_VBL_RELOAD_PORT", "Reload value for vertical blank timer.");
+			addLabel(0xA8, 2, "WS_TIMER_HBL_COUNTER_PORT", "Current counter value for horizontal blank timer.");
+			addLabel(0xAA, 2, "WS_TIMER_VBL_COUNTER_PORT", "Current counter value for vertical blank timer.");
+			addLabel(0xB1, 1, "WS_UART_DATA_PORT", "");
+			addLabel(0xB3, 1, "WS_UART_CTRL_PORT", "");
+			/* End auto-generated labels */
+
+			addLabel(0x68, 1, "WS_HYPERV_IN_L_PORT", "");
+			addLabel(0x69, 1, "WS_HYPERV_IN_R_PORT", "");
+			addLabel(0x89, 1, "WS_SOUND_VOL_CH2_PORT", "Sound channel 2 volume, or unsigned PCM sample in voice mode.");
+
+			addLabel(0x20, 2, "WS_SCR_PAL_0_PORT", "Palette 0.");
+			addLabel(0x22, 2, "WS_SCR_PAL_1_PORT", "Palette 1.");
+			addLabel(0x24, 2, "WS_SCR_PAL_2_PORT", "Palette 2.");
+			addLabel(0x26, 2, "WS_SCR_PAL_3_PORT", "Palette 3.");
+			addLabel(0x28, 2, "WS_SCR_PAL_4_PORT", "Palette 4.");
+			addLabel(0x2A, 2, "WS_SCR_PAL_5_PORT", "Palette 5.");
+			addLabel(0x2C, 2, "WS_SCR_PAL_6_PORT", "Palette 6.");
+			addLabel(0x2E, 2, "WS_SCR_PAL_7_PORT", "Palette 7.");
+			addLabel(0x30, 2, "WS_SCR_PAL_8_PORT", "Palette 8 (sprite palette 0).");
+			addLabel(0x32, 2, "WS_SCR_PAL_9_PORT", "Palette 9 (sprite palette 1).");
+			addLabel(0x34, 2, "WS_SCR_PAL_10_PORT", "Palette 10 (sprite palette 2).");
+			addLabel(0x36, 2, "WS_SCR_PAL_11_PORT", "Palette 11 (sprite palette 3).");
+			addLabel(0x38, 2, "WS_SCR_PAL_12_PORT", "Palette 12 (sprite palette 4).");
+			addLabel(0x3A, 2, "WS_SCR_PAL_13_PORT", "Palette 13 (sprite palette 5).");
+			addLabel(0x3C, 2, "WS_SCR_PAL_14_PORT", "Palette 14 (sprite palette 6).");
+			addLabel(0x3E, 2, "WS_SCR_PAL_15_PORT", "Palette 15 (sprite palette 7).");
 		}
 	}
 }

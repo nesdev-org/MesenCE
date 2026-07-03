@@ -66,7 +66,7 @@ private:
 	void WriteGameGearPort(uint8_t port, uint8_t value);
 	void WriteSmsPort(uint8_t port, uint8_t value);
 	void WriteColecoVisionPort(uint8_t port, uint8_t value);
-	
+
 	uint32_t DetectSgCartRam(vector<uint8_t>& romData);
 
 public:
@@ -120,7 +120,7 @@ public:
 
 	void Write(uint16_t addr, uint8_t value);
 	void DebugWrite(uint16_t addr, uint8_t value);
-	
+
 	uint8_t DebugReadPort(uint8_t port);
 	uint8_t ReadPort(uint8_t port);
 	void WritePort(uint8_t port, uint8_t value);

@@ -15,7 +15,7 @@ protected:
 	void InitMapper() override
 	{
 		memset(_exRegs, 0, sizeof(_exRegs));
-		
+
 		MMC3::InitMapper();
 		AddRegisterRange(0x6000, 0x6FFF, MemoryOperation::Any);
 		RemoveRegisterRange(0x8000, 0xFFFF, MemoryOperation::Read);

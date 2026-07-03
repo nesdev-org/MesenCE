@@ -11,7 +11,7 @@ namespace Mesen.Config
 
 		[Reactive] public bool ShowGrid { get; set; }
 		[Reactive] public bool ShowScrollOverlay { get; set; }
-		
+
 		[Reactive] public bool NesShowAttributeGrid { get; set; }
 		[Reactive] public bool NesShowAttributeByteGrid { get; set; }
 		[Reactive] public bool NesShowTilemapGrid { get; set; }

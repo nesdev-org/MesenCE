@@ -21,7 +21,7 @@ private:
 	std::unordered_map<string, uint16_t> _keyCodes;
 
 	std::thread _updateDeviceThread;
-	atomic<bool> _stopUpdateDeviceThread; 
+	atomic<bool> _stopUpdateDeviceThread;
 	AutoResetEvent _stopSignal;
 	bool _disableAllKeys;
 

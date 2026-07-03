@@ -11,6 +11,7 @@
 #include "Utilities/FastString.h"
 #include "Utilities/HexUtilities.h"
 
+// clang-format off
 constexpr const char* _opTemplate[256] = {
 	"NOP",		"LD BC, e",	"LD (BC), A",	"INC BC",	"INC B",			"DEC B",		"LD B, d",	"RLCA",		"EX AF,AF'",	"ADD w, BC",	"LD A, (BC)",	"DEC BC",	"INC C",		"DEC C",		"LD C, d",	"RRCA",
 	"DJNZ r",	"LD DE, e",	"LD (DE), A",	"INC DE",	"INC D",			"DEC D",		"LD D, d",	"RLA",		"JR r",			"ADD w, DE",	"LD A, (DE)",	"DEC DE",	"INC E",		"DEC E",		"LD E, d",	"RRA",
@@ -130,6 +131,7 @@ constexpr const uint8_t _opSizeEd[256] = {
 	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 };
+// clang-format on
 
 void SmsDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
@@ -138,7 +140,7 @@ void SmsDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 	AddressInfo addrInfo { 0, MemoryType::SmsMemory };
 	auto getOperand = [&str, &addrInfo, labelManager](uint16_t addr) {
 		addrInfo.Address = addr;
-		string label = labelManager ? labelManager->GetLabel(addrInfo) :"";
+		string label = labelManager ? labelManager->GetLabel(addrInfo) : "";
 		if(label.empty()) {
 			str.WriteAll('$', HexUtilities::ToHex(addr));
 		} else {
@@ -163,7 +165,7 @@ void SmsDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 			//Immediate values
 			case 'd': str.WriteAll("$", HexUtilities::ToHex(opInfo.ByteCode[1])); break;
 			case 'e': str.WriteAll("$", HexUtilities::ToHex((uint16_t)(opInfo.ByteCode[1] | (opInfo.ByteCode[2] << 8)))); break;
-			
+
 			case 'p': {
 				AddressInfo portAddr = { opInfo.ByteCode[1], MemoryType::SmsPort };
 				string label = labelManager ? labelManager->GetLabel(portAddr) : "";
@@ -183,7 +185,7 @@ void SmsDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t me
 				}
 				break;
 
-			case 'w': 
+			case 'w':
 				switch(opInfo.HlType) {
 					default: str.Write("HL"); break;
 					case HlRegType::IX: str.Write("IX"); break;
@@ -233,7 +235,7 @@ SmsOpInfo SmsDisUtils::GetSmsOpInfo(DisassemblyInfo& info)
 	SmsOpInfo result = {};
 	result.ByteCode = info.GetByteCode();
 	uint8_t opSize = info.GetOpSize();
-	
+
 	for(int i = 0; i < opSize && !result.Op; i++) {
 		switch(result.ByteCode[0]) {
 			default:
@@ -286,8 +288,14 @@ EffectiveAddressInfo SmsDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Sms
 		return {};
 	} else if(!smsOp.IsCbPrefix && !smsOp.IsEdPrefix) {
 		switch(smsOp.ByteCode[0]) {
-			case 0xC1: case 0xD1: case 0xE1: case 0xF1:
-			case 0xC5: case 0xD5: case 0xE5: case 0xF5:
+			case 0xC1:
+			case 0xD1:
+			case 0xE1:
+			case 0xF1:
+			case 0xC5:
+			case 0xD5:
+			case 0xE5:
+			case 0xF5:
 				//Don't show address/value for push/pop
 				return {};
 		}
@@ -315,16 +323,15 @@ EffectiveAddressInfo SmsDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Sms
 				result.ValueSize = 1;
 			}
 
-			result.ShowAddress = (
+			result.ShowAddress =
 				(strstr(smsOp.Op, "(") != nullptr && strstr(smsOp.Op, "(a)") == nullptr && strstr(smsOp.Op, "(p)") == nullptr) ||
 				strstr(smsOp.Op, "x") != nullptr ||
 				(smsOp.HlType != HlRegType::HL && strstr(smsOp.Op, "v") != nullptr) ||
-				(smsOp.IsEdPrefix && smsOp.ByteCode[0] >= 0xA0 && smsOp.ByteCode[0] <= 0xAF)
-			);
+				(smsOp.IsEdPrefix && smsOp.ByteCode[0] >= 0xA0 && smsOp.ByteCode[0] <= 0xAF);
 			return result;
 		}
 	}
-	
+
 	return {};
 }
 
@@ -335,7 +342,7 @@ uint8_t SmsDisUtils::GetOpSize(uint8_t opCode, uint32_t cpuAddress, MemoryType m
 	while(true) {
 		switch(opCode) {
 			default: return prefixSize + (hlRegType == HlRegType::HL ? _opSize[opCode] : _opSizeIxIy[opCode]);
-	
+
 			case 0xCB: return prefixSize + (hlRegType == HlRegType::HL ? 2 : 3);
 
 			case 0xDD:
@@ -464,7 +471,6 @@ bool SmsDisUtils::IsConditionalJump(uint8_t opCode)
 			return false;
 	}
 }
-
 
 CdlFlags::CdlFlags SmsDisUtils::GetOpFlags(uint8_t opCode, uint16_t pc, uint16_t prevPc)
 {

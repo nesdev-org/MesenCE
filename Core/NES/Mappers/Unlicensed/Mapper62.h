@@ -23,7 +23,7 @@ protected:
 			SelectChrPage(0, 0);
 		}
 	}
-	
+
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		uint8_t prgPage = ((addr & 0x3F00) >> 8) | (addr & 0x40);

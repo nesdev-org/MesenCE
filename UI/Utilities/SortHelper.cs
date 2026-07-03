@@ -51,7 +51,7 @@ namespace Mesen.Utilities
 				case 3: {
 					Func<T, T, int> comparer = comparers[sortOrder[0].Item1];
 					Func<T, T, int> comparer2 = comparers[sortOrder[1].Item1];
-					Func<T, T, int> comparer3 =  comparers[sortOrder[2].Item1];
+					Func<T, T, int> comparer3 = comparers[sortOrder[2].Item1];
 					int order = sortOrder[0].Item2 == ListSortDirection.Ascending ? 1 : -1;
 					int order2 = sortOrder[1].Item2 == ListSortDirection.Ascending ? 1 : -1;
 					int order3 = sortOrder[2].Item2 == ListSortDirection.Ascending ? 1 : -1;

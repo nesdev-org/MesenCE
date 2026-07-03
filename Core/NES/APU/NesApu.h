@@ -41,10 +41,14 @@ private:
 
 	ConsoleRegion _region;
 
+	uint64_t _apuDisabledStamp = 0;
+
 private:
 	__forceinline bool NeedToRun(uint32_t currentCycle);
 
 	void FrameCounterTick(FrameType type);
+
+	template<bool isPeek = false>
 	uint8_t GetStatus();
 
 public:

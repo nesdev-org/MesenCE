@@ -16,43 +16,43 @@ namespace Mesen.Config
 		[Reactive] public bool EnableAudio { get; set; } = true;
 		[Reactive] public bool DisableDynamicSampleRate { get; set; } = false;
 
-		[Reactive] [MinMax(0, 100)] public UInt32 MasterVolume { get; set; } = 100;
+		[Reactive][MinMax(0, 100)] public UInt32 MasterVolume { get; set; } = 100;
 		[Reactive] public AudioSampleRate SampleRate { get; set; } = AudioSampleRate._48000;
-		[Reactive] [MinMax(15, 300)] public UInt32 AudioLatency { get; set; } = 60;
+		[Reactive][MinMax(15, 300)] public UInt32 AudioLatency { get; set; } = 60;
 
 		[Reactive] public bool MuteSoundInBackground { get; set; } = false;
 		[Reactive] public bool ReduceSoundInBackground { get; set; } = true;
 		[Reactive] public bool ReduceSoundInFastForward { get; set; } = false;
-		[Reactive] [MinMax(0, 100)] public int VolumeReduction { get; set; } = 75;
+		[Reactive][MinMax(0, 100)] public int VolumeReduction { get; set; } = 75;
 
 		[Reactive] public bool ReverbEnabled { get; set; } = false;
-		[Reactive] [MinMax(1, 10)] public UInt32 ReverbStrength { get; set; } = 5;
-		[Reactive] [MinMax(1, 30)] public UInt32 ReverbDelay { get; set; } = 10;
+		[Reactive][MinMax(1, 10)] public UInt32 ReverbStrength { get; set; } = 5;
+		[Reactive][MinMax(1, 30)] public UInt32 ReverbDelay { get; set; } = 10;
 
 		[Reactive] public bool CrossFeedEnabled { get; set; } = false;
-		[Reactive] [MinMax(0, 100)] public UInt32 CrossFeedRatio { get; set; } = 0;
+		[Reactive][MinMax(0, 100)] public UInt32 CrossFeedRatio { get; set; } = 0;
 
 		[Reactive] public bool EnableEqualizer { get; set; } = false;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band1Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band2Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band3Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band4Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band5Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band6Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band7Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band8Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band9Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band10Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band11Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band12Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band13Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band14Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band15Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band16Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band17Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band18Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band19Gain { get; set; } = 0;
-		[Reactive] [MinMax(-20.0, 20.0)] public double Band20Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band1Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band2Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band3Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band4Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band5Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band6Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band7Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band8Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band9Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band10Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band11Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band12Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band13Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band14Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band15Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band16Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band17Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band18Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band19Gain { get; set; } = 0;
+		[Reactive][MinMax(-20.0, 20.0)] public double Band20Gain { get; set; } = 0;
 
 		[Reactive] public bool AudioPlayerEnableTrackLength { get; set; } = true;
 		[Reactive][MinMax(0, 9999)] public UInt32 AudioPlayerTrackLength { get; set; } = 120;
@@ -80,7 +80,7 @@ namespace Mesen.Config
 				ReverbDelay = ReverbDelay,
 				CrossFeedEnabled = CrossFeedEnabled,
 				CrossFeedRatio = CrossFeedRatio,
-				
+
 				EnableEqualizer = EnableEqualizer,
 				Band1Gain = Band1Gain,
 				Band2Gain = Band2Gain,

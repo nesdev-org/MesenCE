@@ -30,7 +30,7 @@ RowDataType PceTraceLogger::GetFormatTagType(string& tag)
 	}
 }
 
-void PceTraceLogger::GetTraceRow(string &output, PceCpuState &cpuState, TraceLogPpuState &ppuState, DisassemblyInfo &disassemblyInfo)
+void PceTraceLogger::GetTraceRow(string& output, PceCpuState& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 {
 	constexpr char activeStatusLetters[8] = { 'N', 'V', '-', 'T', 'D', 'I', 'Z', 'C' };
 	constexpr char inactiveStatusLetters[8] = { 'n', 'v', '-', 't', 'd', 'i', 'z', 'c' };
@@ -50,7 +50,7 @@ void PceTraceLogger::GetTraceRow(string &output, PceCpuState &cpuState, TraceLog
 void PceTraceLogger::LogPpuState()
 {
 	_ppuState[_currentPos] = {};
-	
+
 	_ppuState[_currentPos] = {
 		_vdc->GetHClock(),
 		_vdc->GetHClock(),

@@ -59,7 +59,7 @@ struct TrackInfo
 	TrackFormat Format;
 	uint32_t FileIndex;
 	uint32_t FileOffset;
-	
+
 	uint32_t FirstSector;
 	uint32_t LastSector;
 
@@ -90,6 +90,16 @@ struct DiscInfo
 	{
 		for(size_t i = 0; i < Tracks.size(); i++) {
 			if(sector >= Tracks[i].FirstSector && sector <= Tracks[i].LastSector) {
+				return (int32_t)i;
+			}
+		}
+		return -1;
+	}
+
+	int32_t GetFirstDataTrack()
+	{
+		for(size_t i = 0; i < Tracks.size(); i++) {
+			if(Tracks[i].Format != TrackFormat::Audio) {
 				return (int32_t)i;
 			}
 		}
@@ -135,6 +145,7 @@ struct DiscInfo
 			uint32_t byteOffset = trk.FileOffset + (sector - trk.FirstSector) * sectorSize;
 			if(!Files[trk.FileIndex].ReadChunk(outData, byteOffset + sectorHeaderSize, 2048)) {
 				LogDebug("Invalid read offsets");
+				outData.insert(outData.end(), 2048, 0);
 			}
 		}
 	}

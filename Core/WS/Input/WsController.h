@@ -3,9 +3,7 @@
 #include "WS/WsConsole.h"
 #include "Shared/BaseControlDevice.h"
 #include "Shared/Emulator.h"
-#include "Shared/EmuSettings.h"
 #include "Shared/InputHud.h"
-#include "Utilities/Serializer.h"
 
 class WsController : public BaseControlDevice
 {
@@ -22,6 +20,8 @@ protected:
 
 	void InternalSetStateFromInput() override
 	{
+		bool turboOn = IsTurboOn(_turboSpeed);
+
 		vector<KeyMapping>& keyMappings = _console->IsVerticalMode() ? _verticalMappings : _keyMappings;
 		for(KeyMapping& keyMapping : keyMappings) {
 			SetPressedState(Buttons::A, keyMapping.A);
@@ -38,8 +38,6 @@ protected:
 			SetPressedState(Buttons::Left2, keyMapping.L);
 			SetPressedState(Buttons::Right2, keyMapping.R);
 
-			uint8_t turboFreq = 1 << (4 - _turboSpeed);
-			bool turboOn = (uint8_t)(_emu->GetFrameCount() % turboFreq) < turboFreq / 2;
 			if(turboOn) {
 				SetPressedState(Buttons::A, keyMapping.TurboA);
 				SetPressedState(Buttons::B, keyMapping.TurboB);
@@ -48,10 +46,25 @@ protected:
 	}
 
 	void RefreshStateBuffer() override
-	{}
+	{
+	}
 
 public:
-	enum Buttons { Up = 0, Down, Left, Right, Up2, Down2, Left2, Right2, Sound, Start, B, A };
+	enum Buttons
+	{
+		Up = 0,
+		Down,
+		Left,
+		Right,
+		Up2,
+		Down2,
+		Left2,
+		Right2,
+		Sound,
+		Start,
+		B,
+		A
+	};
 
 	WsController(Emulator* emu, WsConsole* console, uint8_t port, KeyMappingSet horizontalMappings, KeyMappingSet verticalMappings) : BaseControlDevice(emu, ControllerType::WsController, port, horizontalMappings)
 	{

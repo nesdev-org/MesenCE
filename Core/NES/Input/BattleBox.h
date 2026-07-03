@@ -21,7 +21,7 @@ private:
 	uint16_t _inputData = 0;
 	bool _isWrite = false;
 	bool _isRead = false;
-	
+
 	NesConsole* _console = nullptr;
 
 protected:
@@ -29,7 +29,15 @@ protected:
 	{
 		BaseControlDevice::Serialize(s);
 		SVArray((uint8_t*)_data, BattleBox::FileSize);
-		SV(_lastWrite); SV(_address); SV(_chipSelect); SV(_output); SV(_writeEnabled); SV(_inputBitPosition); SV(_isWrite); SV(_isRead); SV(_inputData);
+		SV(_lastWrite);
+		SV(_address);
+		SV(_chipSelect);
+		SV(_output);
+		SV(_writeEnabled);
+		SV(_inputBitPosition);
+		SV(_isWrite);
+		SV(_isRead);
+		SV(_inputData);
 	}
 
 public:
@@ -48,7 +56,7 @@ public:
 	{
 		_emu->GetBatteryManager()->SaveBattery(".battlebox.sav", (uint8_t*)_data, BattleBox::FileSize);
 	}
-	
+
 	uint8_t ReadRam(uint16_t addr) override
 	{
 		if(addr == 0x4017) {

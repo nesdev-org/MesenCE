@@ -61,7 +61,7 @@ void CheatManager::SetCheats(vector<CheatCode>& codes)
 
 	bool hasCheats = !_cheats.empty();
 	ClearCheats(false);
-	for(CheatCode &code : codes) {
+	for(CheatCode& code : codes) {
 		if(!AddCheat(code)) {
 			MessageManager::DisplayMessage("Cheats", "Invalid cheat: " + string(code.Code));
 		}
@@ -80,7 +80,7 @@ void CheatManager::SetCheats(vector<CheatCode>& codes)
 
 void CheatManager::SetCheats(CheatCode codes[], uint32_t length)
 {
-	vector<CheatCode> cheats(codes, codes+length);
+	vector<CheatCode> cheats(codes, codes + length);
 	SetCheats(cheats);
 }
 
@@ -163,11 +163,13 @@ optional<InternalCheatCode> CheatManager::ConvertFromNesProActionRocky(string co
 		return std::nullopt;
 	}
 
+	// clang-format off
 	int shiftValues[31] = {
 		3, 13, 14, 1, 6, 9, 5, 0, 12, 7, 2, 8, 10, 11, 4,	//address
 		19, 21, 23, 22, 20, 17, 16, 18,							//compare
 		29, 31, 24, 26, 25, 30, 27, 28							//value
 	};
+	// clang-format on
 
 	uint32_t key = 0x7E5EE93A;
 	uint32_t xorValue = 0x5C184B91;
@@ -322,7 +324,7 @@ optional<InternalCheatCode> CheatManager::ConvertFromSnesGameGenie(string code)
 {
 	static regex _validator = regex("^[a-f0-9]{4}-[a-f0-9]{4}$", std::regex_constants::icase);
 	static string _convertTable = "DF4709156BC8A23E";
-	
+
 	if(!std::regex_match(code, _validator)) {
 		return std::nullopt;
 	}
@@ -338,15 +340,14 @@ optional<InternalCheatCode> CheatManager::ConvertFromSnesGameGenie(string code)
 	InternalCheatCode cheat = {};
 	cheat.Type = CheatType::SnesGameGenie;
 	cheat.Cpu = CpuType::Snes;
-	cheat.Address = (
+	cheat.Address =
 		((rawValue & 0x3C00) << 10) |
 		((rawValue & 0x3C) << 14) |
 		((rawValue & 0xF00000) >> 8) |
 		((rawValue & 0x03) << 10) |
 		((rawValue & 0xC000) >> 6) |
 		((rawValue & 0xF0000) >> 12) |
-		((rawValue & 0x3C0) >> 6)
-	);
+		((rawValue & 0x3C0) >> 6);
 
 	cheat.Value = rawValue >> 24;
 

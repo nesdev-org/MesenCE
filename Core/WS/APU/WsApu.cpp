@@ -23,7 +23,7 @@ WsApu::WsApu(Emulator* emu, WsConsole* console, WsMemoryManager* memoryManager, 
 	_dmaController = dmaController;
 	_soundMixer = emu->GetSoundMixer();
 
-	_state.MasterVolume = _console->GetModel() == WsModel::Monochrome ? 2 : 3;
+	_state.MasterVolume = _console->IsColorModel() ? 3 : 2;
 	_state.InternalMasterVolume = _state.MasterVolume;
 
 	_ch1.reset(new WsApuCh1(this, _state.Ch1));
@@ -46,9 +46,9 @@ WsApu::~WsApu()
 
 void WsApu::ChangeMasterVolume()
 {
-	if(_emu->GetSettings()->GetWsConfig().AudioMode == WsAudioMode::Speakers) {
+	if(_console->GetAudioMode() == WsAudioMode::Speakers) {
 		if(_state.InternalMasterVolume == 0) {
-			_state.InternalMasterVolume = _console->GetModel() == WsModel::Monochrome ? 2 : 3;
+			_state.InternalMasterVolume = _console->IsColorModel() ? 3 : 2;
 		} else {
 			_state.InternalMasterVolume--;
 		}
@@ -96,26 +96,24 @@ void WsApu::UpdateOutput()
 {
 	WsConfig& cfg = _emu->GetSettings()->GetWsConfig();
 
-	int32_t leftOutput = (
+	int32_t leftOutput =
 		_state.Ch1.LeftOutput * cfg.Channel1Vol / 100 +
 		_state.Ch2.LeftOutput * cfg.Channel2Vol / 100 +
 		_state.Ch3.LeftOutput * cfg.Channel3Vol / 100 +
-		_state.Ch4.LeftOutput * cfg.Channel4Vol / 100
-	);
+		_state.Ch4.LeftOutput * cfg.Channel4Vol / 100;
 
-	int32_t rightOutput = (
+	int32_t rightOutput =
 		_state.Ch1.RightOutput * cfg.Channel1Vol / 100 +
 		_state.Ch2.RightOutput * cfg.Channel2Vol / 100 +
 		_state.Ch3.RightOutput * cfg.Channel3Vol / 100 +
-		_state.Ch4.RightOutput * cfg.Channel4Vol / 100
-	);
+		_state.Ch4.RightOutput * cfg.Channel4Vol / 100;
 
 	if(_state.ForceOutputCh2Voice) {
 		leftOutput = (_state.Ch2.GetVolume() * 5) & 0x3FF;
 		rightOutput = leftOutput;
 	}
-	
-	if(cfg.AudioMode == WsAudioMode::Headphones) {
+
+	if(_console->GetAudioMode() == WsAudioMode::Headphones) {
 		if(_state.HeadphoneEnabled) {
 			leftOutput <<= 5;
 			rightOutput <<= 5;
@@ -134,17 +132,37 @@ void WsApu::UpdateOutput()
 			leftOutput = out;
 			rightOutput = out;
 
-			if(_console->GetModel() == WsModel::Monochrome) {
+			if(!_console->IsColorModel()) {
 				switch(_state.InternalMasterVolume) {
-					case 0: leftOutput = 0; rightOutput = 0; break;
-					case 1: leftOutput >>= 1; rightOutput >>= 1; break;
+					case 0:
+						leftOutput = 0;
+						rightOutput = 0;
+						break;
+
+					case 1:
+						leftOutput >>= 1;
+						rightOutput >>= 1;
+						break;
+
 					case 2: break;
 				}
 			} else {
 				switch(_state.InternalMasterVolume) {
-					case 0: leftOutput = 0; rightOutput = 0; break;
-					case 1: leftOutput /= 3; rightOutput /= 3; break;
-					case 2: leftOutput = leftOutput * 2 / 3; rightOutput = rightOutput * 2 / 3; break;
+					case 0:
+						leftOutput = 0;
+						rightOutput = 0;
+						break;
+
+					case 1:
+						leftOutput /= 3;
+						rightOutput /= 3;
+						break;
+
+					case 2:
+						leftOutput = leftOutput * 2 / 3;
+						rightOutput = rightOutput * 2 / 3;
+						break;
+
 					case 3: break;
 				}
 			}
@@ -158,8 +176,8 @@ void WsApu::UpdateOutput()
 	rightOutput = std::clamp<int32_t>(rightOutput, INT16_MIN, INT16_MAX);
 
 	//Use low pass filter and subtract the result to filter out DC offset
-	_soundBuffer[_sampleCount*2] = leftOutput - _filterL.Process(leftOutput);
-	_soundBuffer[_sampleCount*2+1] = rightOutput - _filterR.Process(rightOutput);
+	_soundBuffer[_sampleCount * 2] = leftOutput - _filterL.Process(leftOutput);
+	_soundBuffer[_sampleCount * 2 + 1] = rightOutput - _filterR.Process(rightOutput);
 	_sampleCount++;
 
 	if(_sampleCount >= WsApu::MaxSamples) {
@@ -193,7 +211,7 @@ void WsApu::Run()
 uint8_t WsApu::Read(uint16_t port)
 {
 	switch(port) {
-		case 0x6A: 
+		case 0x6A:
 		case 0x6B:
 			return _hyperVoice->Read(port);
 
@@ -216,8 +234,7 @@ uint8_t WsApu::Read(uint16_t port)
 		case 0x8E:
 			return (
 				_state.Ch4.TapMode |
-				((uint8_t)_state.Ch4.LfsrEnabled << 4)
-			);
+				((uint8_t)_state.Ch4.LfsrEnabled << 4));
 
 		case 0x8F: return _state.WaveTableAddress >> 6;
 
@@ -229,16 +246,14 @@ uint8_t WsApu::Read(uint16_t port)
 				((uint8_t)_state.Ch4.Enabled << 3) |
 				((uint8_t)_state.Ch2.PcmEnabled << 5) |
 				((uint8_t)_state.Ch3.SweepEnabled << 6) |
-				((uint8_t)_state.Ch4.NoiseEnabled << 7)
-			);
+				((uint8_t)_state.Ch4.NoiseEnabled << 7));
 
 		case 0x91:
 			return (
 				(uint8_t)_state.SpeakerEnabled |
 				(_state.SpeakerVolume << 1) |
 				((uint8_t)_state.HeadphoneEnabled << 3) |
-				(_emu->GetSettings()->GetWsConfig().AudioMode == WsAudioMode::Headphones ? 0x80 : 0)
-			);
+				(_console->GetAudioMode() == WsAudioMode::Headphones ? 0x80 : 0));
 
 		case 0x92: return BitUtilities::GetBits<0>(_state.Ch4.Lfsr);
 		case 0x93: return BitUtilities::GetBits<8>(_state.Ch4.Lfsr);
@@ -248,8 +263,7 @@ uint8_t WsApu::Read(uint16_t port)
 				(uint8_t)_state.Ch2.MaxPcmVolumeRight |
 				((uint8_t)_state.Ch2.HalfPcmVolumeRight << 1) |
 				((uint8_t)_state.Ch2.MaxPcmVolumeLeft << 2) |
-				((uint8_t)_state.Ch2.HalfPcmVolumeLeft << 3)
-			);
+				((uint8_t)_state.Ch2.HalfPcmVolumeLeft << 3));
 
 		case 0x95: return _state.SoundTest;
 
@@ -261,7 +275,7 @@ uint8_t WsApu::Read(uint16_t port)
 		case 0x9B: return (GetApuOutput(false) + GetApuOutput(true)) >> 8;
 
 		case 0x9E:
-			if(_console->GetModel() != WsModel::Monochrome) {
+			if(_console->IsColorModel()) {
 				return _state.MasterVolume;
 			}
 			break;
@@ -273,8 +287,13 @@ uint8_t WsApu::Read(uint16_t port)
 void WsApu::Write(uint16_t port, uint8_t value)
 {
 	switch(port) {
-		case 0x64: case 0x65: case 0x66: case 0x67:
-		case 0x69: case 0x6A: case 0x6B:
+		case 0x64:
+		case 0x65:
+		case 0x66:
+		case 0x67:
+		case 0x69:
+		case 0x6A:
+		case 0x6B:
 			_hyperVoice->Write(port, value);
 			break;
 
@@ -294,7 +313,7 @@ void WsApu::Write(uint16_t port, uint8_t value)
 
 		case 0x8C: _state.Ch3.SweepValue = (int8_t)value; break;
 		case 0x8D: _state.Ch3.SweepPeriod = value & 0x1F; break;
-		
+
 		case 0x8E: {
 			static constexpr uint8_t tapShifts[8] = { 14, 10, 13, 4, 8, 6, 9, 11 };
 			_state.Ch4.TapMode = value & 0x07;
@@ -347,7 +366,7 @@ void WsApu::Write(uint16_t port, uint8_t value)
 			break;
 
 		case 0x9E:
-			if(_console->GetModel() != WsModel::Monochrome) {
+			if(_console->IsColorModel()) {
 				_state.InternalMasterVolume = value & 0x03;
 				_state.MasterVolume = value & 0x03;
 			}
@@ -362,15 +381,13 @@ uint16_t WsApu::GetApuOutput(bool forRight)
 			_state.Ch1.RightOutput +
 			_state.Ch2.RightOutput +
 			_state.Ch3.RightOutput +
-			_state.Ch4.RightOutput
-		);
+			_state.Ch4.RightOutput);
 	} else {
 		return (
 			_state.Ch1.LeftOutput +
 			_state.Ch2.LeftOutput +
 			_state.Ch3.LeftOutput +
-			_state.Ch4.LeftOutput
-		);
+			_state.Ch4.LeftOutput);
 	}
 }
 

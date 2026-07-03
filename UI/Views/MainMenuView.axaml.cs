@@ -15,7 +15,7 @@ namespace Mesen.Views
 		{
 			InitializeComponent();
 			MainMenu = this.GetControl<Menu>("ActionMenu");
-			
+
 			MainMenu.Closed += (s, e) => {
 				//When an option is selected in the menu (e.g with enter or mouse click)
 				//steal focus away from the menu to ensure pressing e.g left/right goes to the
@@ -38,7 +38,7 @@ namespace Mesen.Views
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void mnuTools_Opened(object sender, RoutedEventArgs e)
+		private void MnuTools_Opened(object sender, RoutedEventArgs e)
 		{
 			if(DataContext is MainMenuViewModel model) {
 				if(model.UpdateNetplayMenu() && e.Source is MenuItem item) {

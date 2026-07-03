@@ -19,7 +19,7 @@ namespace Mesen.ViewModels
 		[Reactive] public OtherConsolesConfigTab SelectedTab { get; set; } = 0;
 
 		public CvInputConfigViewModel CvInput { get; private set; }
-		
+
 		public Enum[] AvailableRegionsCv => new Enum[] {
 			ConsoleRegion.Auto,
 			ConsoleRegion.Ntsc,

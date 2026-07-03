@@ -8,7 +8,7 @@ private:
 	vector<PlayerInfo> _playerList;
 
 protected:
-	void Serialize(Serializer &s) override
+	void Serialize(Serializer& s) override
 	{
 		if(s.IsSaving()) {
 			uint32_t playerCount = (uint32_t)_playerList.size();
@@ -32,7 +32,7 @@ protected:
 	}
 
 public:
-	PlayerListMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) { }
+	PlayerListMessage(void* buffer, uint32_t length) : NetMessage(buffer, length) {}
 
 	PlayerListMessage(vector<PlayerInfo> playerList) : NetMessage(MessageType::PlayerList)
 	{

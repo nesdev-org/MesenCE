@@ -3,9 +3,12 @@
 #include "pch.h"
 
 #include "NES/INesMemoryHandler.h"
+#include "NES/NesTypes.h"
 #include "NES/OpenBusHandler.h"
-#include "NES/InternalRamHandler.h"
+#include "NES/BaseMapper.h"
+#include "Shared/Emulator.h"
 #include "Shared/MemoryOperationType.h"
+#include "Shared/CheatManager.h"
 #include "Utilities/ISerializable.h"
 
 class BaseMapper;
@@ -54,9 +57,37 @@ public:
 
 	uint8_t* GetInternalRam();
 
-	uint8_t Read(uint16_t addr, MemoryOperationType operationType = MemoryOperationType::Read);
+	template<NesCpuBusType busType = NesCpuBusType::Both>
+	__forceinline uint8_t Read(uint16_t addr, MemoryOperationType operationType = MemoryOperationType::Read)
+	{
+		uint8_t value;
+		if(addr >= 0x6000) {
+			//Reading from 0x6000+ is by far the most common CPU operation (e.g CPU loading ROM to execute)
+			//The mapper is always mapped in this address range, allowing us to directly call the
+			//mapper's read function here, which allows it to be inlined and skips a virtual function call
+			//(which isn't possible when called via the ReadRam interface)
+			value = _mapper->Read(addr);
+		} else {
+			value = _ramReadHandlers[addr]->ReadRam(addr);
+		}
+		if(_cheatManager->HasCheats<CpuType::Nes>()) {
+			_cheatManager->ApplyCheat<CpuType::Nes>(addr, value);
+		}
+		_emu->ProcessMemoryRead<CpuType::Nes>(addr, value, operationType);
+
+		_openBusHandler.SetOpenBus<busType>(value, addr == 0x4015);
+
+		return value;
+	}
+
 	void Write(uint16_t addr, uint8_t value, MemoryOperationType operationType);
 
 	uint8_t GetOpenBus(uint8_t mask = 0xFF);
 	uint8_t GetInternalOpenBus(uint8_t mask = 0xFF);
+
+	template<NesCpuBusType busType = NesCpuBusType::Both>
+	void SetOpenBus(uint8_t value)
+	{
+		_openBusHandler.SetOpenBus<busType>(value);
+	}
 };

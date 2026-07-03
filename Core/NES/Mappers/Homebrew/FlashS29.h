@@ -150,11 +150,28 @@ public:
 				//3rd write, determines command type
 				_cycle++;
 				switch(value) {
-					case 0x20: ResetState(); _unlockBypass = true; break;
-					case 0x80: _mode = ChipMode::Erase; break;
-					case 0x90: ResetState();  _softwareId = true; break;
-					case 0xA0: _mode = ChipMode::Write; break;
-					case 0xF0: ResetState(); _softwareId = false; break;
+					case 0x20:
+						ResetState();
+						_unlockBypass = true;
+						break;
+
+					case 0x80:
+						_mode = ChipMode::Erase;
+						break;
+
+					case 0x90:
+						ResetState();
+						_softwareId = true;
+						break;
+
+					case 0xA0:
+						_mode = ChipMode::Write;
+						break;
+
+					case 0xF0:
+						ResetState();
+						_softwareId = false;
+						break;
 				}
 			} else {
 				_cycle = 0;

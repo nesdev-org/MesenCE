@@ -20,7 +20,7 @@ protected:
 		_mode = 1;
 		UpdateState();
 	}
-	
+
 	void Serialize(Serializer& s) override
 	{
 		BaseMapper::Serialize(s);

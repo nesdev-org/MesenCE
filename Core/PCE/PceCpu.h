@@ -1,14 +1,14 @@
 #if (defined(DUMMYCPU) && !defined(__DUMMYCPU__H)) || (!defined(DUMMYCPU) && !defined(__CPU__H))
-#ifdef DUMMYCPU
-#define __DUMMYCPU__H
-#else
-#define __CPU__H
-#endif
+	#ifdef DUMMYCPU
+		#define __DUMMYCPU__H
+	#else
+		#define __CPU__H
+	#endif
 
-#include "pch.h"
-#include "PCE/PceTypes.h"
-#include "Utilities/ISerializable.h"
-#include "Shared/MemoryOperationType.h"
+	#include "pch.h"
+	#include "PCE/PceTypes.h"
+	#include "Utilities/ISerializable.h"
+	#include "Shared/MemoryOperationType.h"
 
 class Emulator;
 class PceMemoryManager;
@@ -21,11 +21,11 @@ private:
 	static constexpr uint16_t TimerIrqVector = 0xFFFA;
 	static constexpr uint16_t Irq1Vector = 0xFFF8;
 	static constexpr uint16_t Irq2Vector = 0xFFF6;
-	
+
 	static constexpr uint16_t ZeroPage = 0x2000;
 	static constexpr uint16_t StackPage = 0x2100;
 
-	typedef void(PceCpu::* Func)();
+	typedef void (PceCpu::*Func)();
 
 	static Func const _opTable[256];
 	static PceAddrMode const _addrMode[256];
@@ -155,7 +155,7 @@ private:
 	void SXY();
 	void SAX();
 	void SAY();
-	
+
 	void CLA();
 	void CLX();
 	void CLY();
@@ -166,7 +166,7 @@ private:
 
 	void TMA();
 	void TAM();
-	
+
 	void StartBlockTransfer();
 	void EndBlockTransfer();
 
@@ -182,9 +182,9 @@ private:
 
 	void CSL();
 	void CSH();
-	
+
 	void SET();
-	
+
 	void RMB0() { RMB(0); }
 	void RMB1() { RMB(1); }
 	void RMB2() { RMB(2); }
@@ -205,7 +205,7 @@ private:
 
 	void INC_Acc();
 	void DEC_Acc();
-	
+
 	void BBR0() { BBR(0); }
 	void BBR1() { BBR(1); }
 	void BBR2() { BBR(2); }
@@ -214,7 +214,7 @@ private:
 	void BBR5() { BBR(5); }
 	void BBR6() { BBR(6); }
 	void BBR7() { BBR(7); }
-	
+
 	void BBS0() { BBS(0); }
 	void BBS1() { BBS(1); }
 	void BBS2() { BBS(2); }
@@ -228,7 +228,7 @@ private:
 	void BBS(uint8_t bit);
 	void RMB(uint8_t bit);
 	void SMB(uint8_t bit);
-	
+
 	__forceinline void FetchOperand();
 
 	void SetRegister(uint8_t& reg, uint8_t value);
@@ -297,14 +297,14 @@ public:
 	PceCpu(Emulator* emu, PceMemoryManager* memoryManager);
 
 	PceCpuState& GetState() { return _state; }
-	
+
 	void RunIdleCpuCycle();
 
 	void Exec();
 
 	void Serialize(Serializer& s) override;
 
-#ifdef DUMMYCPU
+	#ifdef DUMMYCPU
 private:
 	uint32_t _memOpCounter = 0;
 	MemoryOperationInfo _memOperations[10] = {};
@@ -316,7 +316,7 @@ public:
 
 	uint32_t GetOperationCount();
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
-#endif
+	#endif
 };
 
 #endif

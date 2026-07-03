@@ -11,9 +11,9 @@
 
 class NoiseChannel : public INesMemoryHandler, public ISerializable
 {
-private:	
+private:
 	static constexpr uint16_t _noisePeriodLookupTableNtsc[16] = { 4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068 };
-	static constexpr uint16_t _noisePeriodLookupTablePal[16] = { 4, 8, 14, 30, 60, 88, 118, 148, 188, 236, 354, 472, 708,  944, 1890, 3778 };
+	static constexpr uint16_t _noisePeriodLookupTablePal[16] = { 4, 8, 14, 30, 60, 88, 118, 148, 188, 236, 354, 472, 708, 944, 1890, 3778 };
 
 	NesConsole* _console = nullptr;
 	ApuEnvelope _envelope;
@@ -95,12 +95,13 @@ public:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_shiftRegister); SV(_modeFlag);
+		SV(_shiftRegister);
+		SV(_modeFlag);
 		SV(_envelope);
 		SV(_timer);
 	}
 
-	void GetMemoryRanges(MemoryRanges &ranges) override
+	void GetMemoryRanges(MemoryRanges& ranges) override
 	{
 		ranges.AddHandler(MemoryOperation::Write, 0x400C, 0x400F);
 	}
@@ -110,16 +111,16 @@ public:
 		_console->GetApu()->Run();
 
 		switch(addr & 0x03) {
-			case 0:		//400C
+			case 0: //400C
 				_envelope.InitializeEnvelope(value);
 				break;
 
-			case 2:		//400E
+			case 2: //400E
 				_timer.SetPeriod((NesApu::GetApuRegion(_console) == ConsoleRegion::Ntsc ? _noisePeriodLookupTableNtsc : _noisePeriodLookupTablePal)[value & 0x0F] - 1);
 				_modeFlag = (value & 0x80) == 0x80;
 				break;
 
-			case 3:		//400F
+			case 3: //400F
 				_envelope.LengthCounter.LoadLengthCounter(value >> 3);
 
 				//The envelope is also restarted.

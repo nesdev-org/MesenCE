@@ -25,19 +25,23 @@ private:
 	string _connectionHash;
 	string _serverPassword;
 	bool _handshakeCompleted = false;
+	bool _needSendGameInfo = false;
 
 	void PushState(ControlDeviceState state);
 	void SendServerInformation();
-	void SendGameInformation();
+	void SendGameInformation(bool forceReload);
 	void SelectControllerPort(NetplayControllerInfo port);
 
 	void SendForceDisconnectMessage(string disconnectMessage);
 
 	void ProcessHandshakeResponse(HandShakeMessage* message);
 
+	string GetSerializedConfig();
+
 protected:
 	void ProcessMessage(NetMessage* message) override;
-	
+	void ProcessPendingEvents() override;
+
 public:
 	GameServerConnection(GameServer* gameServer, Emulator* emu, unique_ptr<Socket> socket, string serverPassword);
 	virtual ~GameServerConnection();

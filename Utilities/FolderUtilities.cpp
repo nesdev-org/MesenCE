@@ -2,10 +2,10 @@
 
 #if __has_include(<filesystem>)
 	#include <filesystem>
-	namespace fs = std::filesystem;
+namespace fs = std::filesystem;
 #elif __has_include(<experimental/filesystem>)
 	#include <experimental/filesystem>
-	namespace fs = std::experimental::filesystem;
+namespace fs = std::experimental::filesystem;
 #endif
 
 #include <unordered_set>
@@ -159,7 +159,7 @@ vector<string> FolderUtilities::GetFolders(string rootFolder)
 	std::error_code errorCode;
 	if(!fs::is_directory(fs::u8path(rootFolder), errorCode)) {
 		return folders;
-	} 
+	}
 
 	for(fs::recursive_directory_iterator i(fs::u8path(rootFolder)), end; i != end; i++) {
 		if(i.depth() > 1) {
@@ -175,7 +175,7 @@ vector<string> FolderUtilities::GetFolders(string rootFolder)
 	return folders;
 }
 
-vector<string> FolderUtilities::GetFilesInFolder(string rootFolder, std::unordered_set<string> extensions, bool recursive)
+vector<string> FolderUtilities::GetFilesInFolder(string rootFolder, std::unordered_set<string> extensions, bool recursive, int maxDepth)
 {
 	vector<string> files;
 	vector<string> folders = { { rootFolder } };
@@ -187,7 +187,7 @@ vector<string> FolderUtilities::GetFilesInFolder(string rootFolder, std::unorder
 
 	if(recursive) {
 		for(fs::recursive_directory_iterator i(fs::u8path(rootFolder)), end; i != end; i++) {
-			if(i.depth() > 1) {
+			if(i.depth() > maxDepth) {
 				//Prevent excessive recursion
 				i.disable_recursion_pending();
 			} else {

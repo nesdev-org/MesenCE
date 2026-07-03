@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using System;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
-using Avalonia.Input;
-using Mesen.Debugger.Utilities;
-using System.Globalization;
 using Avalonia.Threading;
+using Mesen.Debugger.Utilities;
+using System;
+using System.Globalization;
 
 namespace Mesen.Controls
 {
@@ -15,7 +15,7 @@ namespace Mesen.Controls
 		protected override Type StyleKeyOverride => typeof(TextBox);
 
 		private static HexConverter _hexConverter = new HexConverter();
-		
+
 		public static readonly StyledProperty<bool> TrimProperty = AvaloniaProperty.Register<MesenNumericTextBox, bool>(nameof(Trim));
 		public static readonly StyledProperty<bool> HexProperty = AvaloniaProperty.Register<MesenNumericTextBox, bool>(nameof(Hex));
 		public static readonly StyledProperty<IComparable> ValueProperty = AvaloniaProperty.Register<MesenNumericTextBox, IComparable>(nameof(Value), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
@@ -94,7 +94,7 @@ namespace Mesen.Controls
 		public MesenNumericTextBox()
 		{
 		}
-		
+
 		protected override void OnInitialized()
 		{
 			base.OnInitialized();
@@ -229,7 +229,7 @@ namespace Mesen.Controls
 
 			long? max = GetMax();
 			long? min = GetMin();
-			
+
 			if(max != null && val.CompareTo(Convert.ChangeType(max, val.GetType())) > 0) {
 				val = (IComparable)Convert.ChangeType(max, val.GetType());
 			} else if(min != null && val.CompareTo(Convert.ChangeType(min, val.GetType())) < 0) {
@@ -264,7 +264,7 @@ namespace Mesen.Controls
 				if(text?.Length == 0) {
 					text = "0";
 				}
-				
+
 				Text = text;
 			}
 		}

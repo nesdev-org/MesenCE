@@ -14,7 +14,7 @@
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 
-PceEventManager::PceEventManager(Debugger *debugger, PceConsole *console)
+PceEventManager::PceEventManager(Debugger* debugger, PceConsole* console)
 {
 	_debugger = debugger;
 	_emu = debugger->GetEmulator();
@@ -34,7 +34,7 @@ PceEventManager::~PceEventManager()
 	delete[] _ppuBuffer;
 }
 
-void PceEventManager::AddEvent(DebugEventType type, MemoryOperationInfo &operation, int32_t breakpointId)
+void PceEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId)
 {
 	DebugEventInfo evt = {};
 	evt.Type = type;
@@ -132,16 +132,25 @@ EventViewerCategoryCfg PceEventManager::GetEventConfig(DebugEventInfo& evt)
 						case 2: return _config.VdcVramWrites;
 						case 5: return _config.VdcControlWrites;
 						case 6: return _config.VdcRcrWrites;
-						
-						case 7: case 8:
+
+						case 7:
+						case 8:
 							return _config.VdcScrollWrites;
 
 						case 9: return _config.VdcMemoryWidthWrites;
-						
-						case 0xA: case 0xB: case 0xC: case 0xD: case 0xE:
+
+						case 0xA:
+						case 0xB:
+						case 0xC:
+						case 0xD:
+						case 0xE:
 							return _config.VdcHvConfigWrites;
 
-						case 0xF: case 0x10: case 0x11: case 0x12: case 0x13:
+						case 0xF:
+						case 0x10:
+						case 0x11:
+						case 0x12:
+						case 0x13:
 							return _config.VdcDmaWrites;
 					}
 				} else {
@@ -169,7 +178,12 @@ EventViewerCategoryCfg PceEventManager::GetEventConfig(DebugEventInfo& evt)
 						case 8:
 							return isWrite ? _config.AdpcmWrites : _config.CdRomReads;
 
-						case 9: case 0xA: case 0xB: case 0xC: case 0xD: case 0xE:
+						case 9:
+						case 0xA:
+						case 0xB:
+						case 0xC:
+						case 0xD:
+						case 0xE:
 							return isWrite ? _config.AdpcmWrites : _config.AdpcmReads;
 
 						default:
@@ -198,14 +212,14 @@ uint32_t PceEventManager::TakeEventSnapshot(bool forAutoRefresh)
 	constexpr uint32_t size = PceConstants::MaxScreenWidth * PceConstants::ScreenHeight;
 	if(scanline < 14 || scanline >= 256) {
 		memcpy(_ppuBuffer, _vpc->GetScreenBuffer(), size * sizeof(uint16_t));
-		memcpy(_rowClockDividers, _vpc->GetScreenBuffer()+size, PceConstants::ScreenHeight * sizeof(uint16_t));
+		memcpy(_rowClockDividers, _vpc->GetScreenBuffer() + size, PceConstants::ScreenHeight * sizeof(uint16_t));
 	} else {
 		uint32_t scanlineOffset = (scanline - 14);
 		uint32_t offset = PceConstants::MaxScreenWidth * scanlineOffset;
 		memcpy(_ppuBuffer, _vpc->GetScreenBuffer(), offset * sizeof(uint16_t));
 		memcpy(_ppuBuffer + offset, _vpc->GetPreviousScreenBuffer() + offset, (size - offset) * sizeof(uint16_t));
-		
-		memcpy(_rowClockDividers, _vpc->GetScreenBuffer()+size, scanlineOffset * sizeof(uint16_t));
+
+		memcpy(_rowClockDividers, _vpc->GetScreenBuffer() + size, scanlineOffset * sizeof(uint16_t));
 		memcpy(_rowClockDividers + scanlineOffset, _vpc->GetPreviousScreenBuffer() + size + scanlineOffset, (PceConstants::ScreenHeight - scanlineOffset) * sizeof(uint16_t));
 	}
 
@@ -226,9 +240,9 @@ FrameInfo PceEventManager::GetDisplayBufferSize()
 	return size;
 }
 
-void PceEventManager::DrawScreen(uint32_t *buffer)
+void PceEventManager::DrawScreen(uint32_t* buffer)
 {
-	uint16_t *src = _ppuBuffer;
+	uint16_t* src = _ppuBuffer;
 	uint32_t* palette = _emu->GetSettings()->GetPcEngineConfig().Palette;
 
 	for(uint32_t y = 0, len = PceConstants::ScreenHeight * 2; y < len; y++) {
@@ -240,7 +254,7 @@ void PceEventManager::DrawScreen(uint32_t *buffer)
 
 		for(uint32_t x = 0; x < PceConstants::ClockPerScanline; x++) {
 			int srcOffset = (scanline * PceConstants::MaxScreenWidth) + (x / divider);
-			buffer[(y + 14*2) * PceConstants::ClockPerScanline + x] = palette[src[srcOffset] & 0x3FF];
+			buffer[(y + 14 * 2) * PceConstants::ClockPerScanline + x] = palette[src[srcOffset] & 0x3FF];
 		}
 	}
 }

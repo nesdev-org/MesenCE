@@ -27,7 +27,7 @@ namespace Mesen.Debugger.ViewModels
 		public CpuType CpuType { get; set; }
 
 		public TileViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		[Reactive] public DynamicBitmap ViewerBitmap { get; private set; }
 
@@ -50,7 +50,7 @@ namespace Mesen.Debugger.ViewModels
 		[Reactive] public int GridSizeY { get; set; } = 8;
 
 		[Reactive] public Rect SelectionRect { get; set; }
-		
+
 		[Reactive] public List<PictureViewerLine>? PageDelimiters { get; set; }
 
 		[Reactive] public Enum[] AvailableMemoryTypes { get; set; } = Array.Empty<Enum>();
@@ -64,7 +64,7 @@ namespace Mesen.Debugger.ViewModels
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
 
-		public int ColumnCount => Math.Clamp(Config.ColumnCount, 4, 256); 
+		public int ColumnCount => Math.Clamp(Config.ColumnCount, 4, 256);
 		public int RowCount => Math.Clamp(Config.RowCount, 4, 256);
 
 		private BaseState? _ppuState;
@@ -251,7 +251,7 @@ namespace Mesen.Debugger.ViewModels
 				x => x.Config.Source, x => x.Config.StartAddress, x => x.Config.ColumnCount,
 				x => x.Config.RowCount, x => x.Config.Format
 			).Skip(1).Subscribe(x => ClearPresetSelection()));
-			
+
 			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, Config_PropertyChanged));
 		}
 
@@ -264,8 +264,11 @@ namespace Mesen.Debugger.ViewModels
 			}
 		}
 
+		[MemberNotNull(nameof(RefreshTiming))]
 		private void InitForCpuType()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
+
 			string selectedPreset = Config.SelectedPreset;
 
 			AvailableFormats = CpuType switch {
@@ -362,6 +365,11 @@ namespace Mesen.Debugger.ViewModels
 					return new PixelPoint(displayColumn, displayRow);
 				}
 
+				case TileLayout.Vertical: {
+					int index = row * ColumnCount + column;
+					return new PixelPoint(index / RowCount, index % RowCount);
+				}
+
 				case TileLayout.Normal:
 					return pos;
 
@@ -392,6 +400,11 @@ namespace Mesen.Debugger.ViewModels
 					int displayColumn = ((column & ~0x01) * 2 + ((row & 0x01) != 0 ? 2 : 0) + (column & 0x01)) % ColumnCount;
 					int displayRow = (row & ~0x01) + ((column >= ColumnCount / 2) ? 1 : 0);
 					return new PixelPoint(displayColumn, displayRow);
+				}
+
+				case TileLayout.Vertical: {
+					int index = column * RowCount + row;
+					return new PixelPoint(index % ColumnCount, index / ColumnCount);
 				}
 
 				case TileLayout.Normal:
@@ -425,7 +438,7 @@ namespace Mesen.Debugger.ViewModels
 		public void RefreshData()
 		{
 			_ppuState = DebugApi.GetPpuState(CpuType);
-			
+
 			RefreshPalette();
 
 			int bytesPerTile = Config.Format.GetBytesPerTile();
@@ -475,7 +488,7 @@ namespace Mesen.Debugger.ViewModels
 			}
 
 			InitBitmap();
-				
+
 			lock(_updateLock) {
 				Array.Resize(ref _sourceData, _coreSourceData.Length);
 				Array.Copy(_coreSourceData, _sourceData, _coreSourceData.Length);
@@ -576,10 +589,10 @@ namespace Mesen.Debugger.ViewModels
 		private void EditTileGrid(int columnCount, int rowCount, Window wnd)
 		{
 			PixelPoint p = ViewerMousePos ?? PixelPoint.FromPoint(SelectionRect.TopLeft, 1);
-			List<AddressInfo> addresses = new();
+			List<TileAddressInfo> addresses = new();
 			for(int row = 0; row < rowCount; row++) {
 				for(int col = 0; col < columnCount; col++) {
-					addresses.Add(new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + col*GridSizeX, p.Y + row*GridSizeY)), Type = Config.Source });
+					addresses.Add(new TileAddressInfo() { Address = new AddressInfo() { Address = GetTileAddress(new PixelPoint(p.X + col * GridSizeX, p.Y + row * GridSizeY)), Type = Config.Source } });
 				}
 			}
 			TileEditorWindow.OpenAtTile(
@@ -589,8 +602,8 @@ namespace Mesen.Debugger.ViewModels
 				SelectedPalette,
 				wnd,
 				CpuType,
-				RefreshTiming.Config.RefreshScanline,
-				RefreshTiming.Config.RefreshCycle
+				RefreshTiming.ConsoleConfig.RefreshScanline,
+				RefreshTiming.ConsoleConfig.RefreshCycle
 			);
 		}
 
@@ -795,7 +808,7 @@ namespace Mesen.Debugger.ViewModels
 							CreatePreset(0, "ROM", () => ApplyPrgPreset()),
 						};
 					}
-				
+
 				case CpuType.Sms:
 					return new() {
 						CreatePreset(0, "VDP", () => ApplyPpuPreset()),
@@ -1038,7 +1051,7 @@ namespace Mesen.Debugger.ViewModels
 					WsPpuState ppu = (WsPpuState)state;
 					int bank0Addr = ppu.Mode >= WsVideoMode.Color4bpp ? 0x4000 : 0x2000;
 					int bank1Addr = ppu.Mode >= WsVideoMode.Color4bpp ? 0x8000 : (ppu.Mode == WsVideoMode.Monochrome ? 0x2000 : 0x4000);
-					
+
 					preset.Source = MemoryType.WsWorkRam;
 					preset.StartAddress = layer == 0 ? bank0Addr : bank1Addr;
 					preset.ColumnCount = 16;

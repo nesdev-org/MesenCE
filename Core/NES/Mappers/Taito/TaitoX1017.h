@@ -13,10 +13,10 @@ private:
 	{
 		SetCpuMemoryMapping(0x6000, 0x63FF, 0, PrgMemoryType::SaveRam, _ramPermission[0] == 0xCA ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess);
 		SetCpuMemoryMapping(0x6400, 0x67FF, 1, PrgMemoryType::SaveRam, _ramPermission[0] == 0xCA ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess);
-		
+
 		SetCpuMemoryMapping(0x6800, 0x6BFF, 2, PrgMemoryType::SaveRam, _ramPermission[1] == 0x69 ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess);
 		SetCpuMemoryMapping(0x6C00, 0x6FFF, 3, PrgMemoryType::SaveRam, _ramPermission[1] == 0x69 ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess);
-		
+
 		SetCpuMemoryMapping(0x7000, 0x73FF, 4, PrgMemoryType::SaveRam, _ramPermission[2] == 0x84 ? MemoryAccessType::ReadWrite : MemoryAccessType::NoAccess);
 	}
 
@@ -76,13 +76,13 @@ protected:
 				UpdateChrBanking();
 				break;
 
-			case 0x7EF6: 
+			case 0x7EF6:
 				SetMirroringType((value & 0x01) == 0x01 ? MirroringType::Vertical : MirroringType::Horizontal);
 				_chrMode = (value & 0x02) >> 1;
 				UpdateChrBanking();
 				break;
 
-			case 0x7EF7: 
+			case 0x7EF7:
 			case 0x7EF8:
 			case 0x7EF9:
 				_ramPermission[(addr & 0xF) - 7] = value;
@@ -95,14 +95,13 @@ protected:
 				if(_romInfo.MapperID == 82) {
 					SelectPrgPage(addr - 0x7EFA, value >> 2);
 				} else {
-					uint8_t page = (
+					uint8_t page =
 						((value & 0x20) >> 5) |
 						((value & 0x10) >> 3) |
 						((value & 0x08) >> 1) |
 						((value & 0x04) << 1) |
 						((value & 0x02) << 3) |
-						((value & 0x01) << 5)
-					);
+						((value & 0x01) << 5);
 					SelectPrgPage(addr - 0x7EFA, page);
 				}
 				break;

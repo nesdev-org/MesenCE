@@ -36,7 +36,7 @@ protected:
 			_base = ((addr & 0x60) >> 2) | ((addr & 0x100) >> 3);
 			_mode = (addr & 0x80) == 0x80;
 			_locked = (addr & 0x2000) == 0x2000;
-			
+
 			SetMirroringType(addr & 0x02 ? MirroringType::Horizontal : MirroringType::Vertical);
 		}
 

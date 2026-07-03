@@ -20,8 +20,8 @@ protected:
 
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
-		switch(addr & 0x03){
-			case 0: 
+		switch(addr & 0x03) {
+			case 0:
 				SelectChrPage(0, value >> 1);
 				SelectChrPage(1, (value >> 1) + 1);
 				break;

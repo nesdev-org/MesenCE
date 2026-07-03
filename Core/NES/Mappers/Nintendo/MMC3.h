@@ -182,8 +182,18 @@ protected:
 		BaseMapper::Serialize(s);
 		SVArray(_registers, 8);
 		SV(_a12LowClock);
-		SV(_state.Reg8000); SV(_state.RegA000); SV(_state.RegA001); SV(_currentRegister); SV(_chrMode); SV(_prgMode);
-		SV(_irqReloadValue); SV(_irqCounter); SV(_irqReload); SV(_irqEnabled); SV(_wramEnabled); SV(_wramWriteProtected);
+		SV(_state.Reg8000);
+		SV(_state.RegA000);
+		SV(_state.RegA001);
+		SV(_currentRegister);
+		SV(_chrMode);
+		SV(_prgMode);
+		SV(_irqReloadValue);
+		SV(_irqCounter);
+		SV(_irqReload);
+		SV(_irqEnabled);
+		SV(_wramEnabled);
+		SV(_wramWriteProtected);
 	}
 
 	uint16_t GetPrgPageSize() override { return 0x2000; }
@@ -268,7 +278,13 @@ protected:
 		entries.push_back(MapperStateEntry("$8000.6", "PRG Banking Mode", (_state.Reg8000 & 0x40) != 0));
 		entries.push_back(MapperStateEntry("$8000.7", "CHR Banking Mode", (_state.Reg8000 & 0x80) != 0));
 
-		entries.push_back(MapperStateEntry("$A000.0", "Mirroring", _state.RegA000 & 0x01 ? "Horizontal" : "Vertical"));
+		string mirroring = (_state.RegA000 & 0x01 ? "Horizontal" : "Vertical");
+		if(GetMirroringType() == MirroringType::FourScreens) {
+			mirroring += " (4-screen)";
+		} else if(_romInfo.MapperID == 118) {
+			mirroring += " (Ignored)";
+		}
+		entries.push_back(MapperStateEntry("$A000.0", "Mirroring", mirroring, _state.RegA000 & 0x01));
 
 		if(isMmc6) {
 			entries.push_back(MapperStateEntry("$A001.4", "Work RAM Bank 0 Write Enabled", (_state.RegA001 & 0x10) != 0));

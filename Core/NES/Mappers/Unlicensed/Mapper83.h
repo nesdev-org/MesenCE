@@ -76,7 +76,7 @@ protected:
 			case 2: SetMirroringType(MirroringType::ScreenAOnly); break;
 			case 3: SetMirroringType(MirroringType::ScreenBOnly); break;
 		}
-		
+
 		if(_is2kBank && !_isNot2kBank) {
 			SelectChrPage2x(0, _regs[0] << 1);
 			SelectChrPage2x(1, _regs[1] << 1);
@@ -87,7 +87,7 @@ protected:
 				SelectChrPage(i, _regs[i] | ((_bank & 0x30) << 4));
 			}
 		}
-		
+
 		if(_mode & 0x40) {
 			SelectPrgPage2x(0, (_bank & 0x3F) << 1);
 			SelectPrgPage2x(1, ((_bank & 0x30) | 0x0F) << 1);
@@ -124,33 +124,35 @@ protected:
 			UpdateState();
 		} else {
 			switch(addr) {
-				case 0x8000: 
+				case 0x8000:
 					_is2kBank = true;
 					_bank = value;
 					_mode |= 0x40;
 					UpdateState();
 					break;
 
-				case 0xB000: case 0xB0FF: case 0xB1FF:
+				case 0xB000:
+				case 0xB0FF:
+				case 0xB1FF:
 					// Dragon Ball Z Party [p1] BMC
-					_bank = value; 
+					_bank = value;
 					_mode |= 0x40;
 					UpdateState();
 					break;
 
-				case 0x8100: 
+				case 0x8100:
 					_mode = value | (_mode & 0x40);
 					UpdateState();
 					break;
 
-				case 0x8200: 
+				case 0x8200:
 					_irqCounter = (_irqCounter & 0xFF00) | value;
 					_console->GetCpu()->ClearIrqSource(IRQSource::External);
 					break;
 
-				case 0x8201: 
+				case 0x8201:
 					_irqEnabled = (_mode & 0x80) == 0x80;
-					_irqCounter = (_irqCounter & 0xFF) | (value << 8); 
+					_irqCounter = (_irqCounter & 0xFF) | (value << 8);
 					break;
 			}
 		}

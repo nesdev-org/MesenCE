@@ -1,30 +1,31 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using Mesen.ViewModels;
+using Avalonia.VisualTree;
 using Mesen.Config;
+using Mesen.Controls;
+using Mesen.Debugger.Utilities;
+using Mesen.Debugger.Windows;
+using Mesen.Interop;
+using Mesen.Localization;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using Mesen.Views;
 using System;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using Mesen.Utilities;
-using Mesen.Interop;
-using Mesen.Views;
-using Avalonia.Layout;
-using Mesen.Debugger.Utilities;
-using System.Threading;
-using Mesen.Debugger.Windows;
-using Avalonia.Input.Platform;
-using System.Collections.Generic;
-using Mesen.Controls;
-using Mesen.Localization;
-using System.Diagnostics;
-using Avalonia.VisualTree;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mesen.Windows
 {
@@ -67,6 +68,9 @@ namespace Mesen.Windows
 		private Stopwatch _stopWatch = Stopwatch.StartNew();
 		private Dictionary<Key, long> _keyPressedStamp = new();
 		private bool _focusInMenu;
+		private bool _needRendererReset;
+
+		public Control Renderer => _usesSoftwareRenderer ? _softwareRenderer : _renderer;
 
 		static MainWindow()
 		{
@@ -76,7 +80,7 @@ namespace Mesen.Windows
 
 		public MainWindow()
 		{
-			_testModeEnabled = System.Diagnostics.Debugger.IsAttached;
+			_testModeEnabled = ConfigManager.Config.EnableTestMode || System.Diagnostics.Debugger.IsAttached;
 			_isLinux = OperatingSystem.IsLinux();
 			_usesSoftwareRenderer = ConfigManager.Config.Video.UseSoftwareRenderer || OperatingSystem.IsMacOS();
 
@@ -102,7 +106,8 @@ namespace Mesen.Windows
 			_rendererPanel = this.GetControl<Panel>("RendererPanel");
 			_rendererPanel.LayoutUpdated += RendererPanel_LayoutUpdated;
 
-			_renderer = this.GetControl<NativeRenderer>("Renderer");
+			ResetRenderer();
+
 			_softwareRenderer = this.GetControl<SoftwareRendererView>("SoftwareRenderer");
 			_audioPlayer = this.GetControl<ContentControl>("AudioPlayer");
 			_mainMenu = this.GetControl<MainMenuView>("MainMenu");
@@ -115,6 +120,23 @@ namespace Mesen.Windows
 #endif
 		}
 
+		[MemberNotNull(nameof(_renderer))]
+		private void ResetRenderer()
+		{
+			if(_renderer != null && !_needRendererReset) {
+				//Renderer needs to be reset when VRR mode is enabled, because DX11 does not allow switching
+				//back to the non-flip swapchain model on a window that had the flip model enabled once.
+				return;
+			}
+
+			ContentControl container = this.GetControl<ContentControl>("RendererContainer");
+			_renderer = new NativeRenderer();
+			_renderer.IsVisible = _model.IsNativeRendererVisible;
+			_model.Renderer = _renderer;
+			container.Content = _renderer;
+			_needRendererReset = false;
+		}
+
 		private static void InitGlobalShortcuts()
 		{
 			if(Application.Current?.PlatformSettings == null) {
@@ -122,7 +144,7 @@ namespace Mesen.Windows
 			}
 
 			PlatformHotkeyConfiguration hotkeyConfig = Application.Current.PlatformSettings.HotkeyConfiguration;
-			List <KeyGesture> gestures = hotkeyConfig.OpenContextMenu;
+			List<KeyGesture> gestures = hotkeyConfig.OpenContextMenu;
 			for(int i = gestures.Count - 1; i >= 0; i--) {
 				if(gestures[i].Key == Key.F10 && gestures[i].KeyModifiers == KeyModifiers.Shift) {
 					//Disable Shift-F10 shortcut to open context menu - interferes with default shortcut for step back
@@ -196,7 +218,7 @@ namespace Mesen.Windows
 
 		private void OnDrop(object? sender, DragEventArgs e)
 		{
-			string? filename = e.Data.GetFiles()?.FirstOrDefault()?.Path.LocalPath;
+			string? filename = e.DataTransfer.TryGetFiles()?.FirstOrDefault()?.Path.LocalPath;
 			if(filename != null) {
 				if(File.Exists(filename)) {
 					LoadRomHelper.LoadFile(filename);
@@ -215,14 +237,14 @@ namespace Mesen.Windows
 				return;
 			}
 
-			_mouseManager = new MouseManager(this, _usesSoftwareRenderer ? _softwareRenderer : _renderer, _mainMenu, _usesSoftwareRenderer);
+			_mouseManager = new MouseManager(this, _mainMenu, _usesSoftwareRenderer);
 
 			ConfigManager.Config.InitializeFontDefaults();
 			ConfigManager.Config.Preferences.ApplyFontOptions();
 			ConfigManager.Config.Debug.Fonts.ApplyConfig();
 
 			_timerBackgroundFlag.Interval = TimeSpan.FromMilliseconds(100);
-			_timerBackgroundFlag.Tick += timerUpdateBackgroundFlag;
+			_timerBackgroundFlag.Tick += TimerUpdateBackgroundFlag;
 			_timerBackgroundFlag.Start();
 
 			//Give focus to panel to avoid menu being given focus by default
@@ -247,7 +269,7 @@ namespace Mesen.Windows
 				);
 
 				ConfigManager.Config.RemoveObsoleteConfig();
-				
+
 				//InitializeDefaults must be after InitializeEmu, otherwise keybindings will be empty
 				ConfigManager.Config.InitializeDefaults();
 				ConfigManager.Config.UpgradeConfig();
@@ -301,10 +323,10 @@ namespace Mesen.Windows
 				case ConsoleNotificationType.GameLoaded:
 					CheatCodes.ApplyCheats();
 					RomInfo romInfo = EmuApi.GetRomInfo();
-					
+
 					Dispatcher.UIThread.Post(() => {
 						bool wasAudioFile = _model.AudioPlayer != null;
-						bool updateConfig = _model.RomInfo.Format != romInfo.Format;
+						bool updateConfig = _model.RomInfo.Format != romInfo.Format || _model.RomInfo.ConsoleType != romInfo.ConsoleType;
 						_model.RomInfo = romInfo;
 
 						if(updateConfig) {
@@ -433,6 +455,13 @@ namespace Mesen.Windows
 					SoftwareRendererFrame frame = Marshal.PtrToStructure<SoftwareRendererFrame>(e.Parameter);
 					_softwareRenderer.UpdateSoftwareRenderer(frame);
 					break;
+
+				case ConsoleNotificationType.NetplayStopped:
+					Dispatcher.UIThread.Post(() => {
+						//Re-apply user config (netplay might temporarily modify options to match host server's options)
+						ConfigManager.Config.ApplyConfig();
+					});
+					break;
 			}
 		}
 
@@ -547,8 +576,21 @@ namespace Mesen.Windows
 			EmuApi.SetRendererSize(realWidth, realHeight);
 			_model.RendererSize = new Size(realWidth, realHeight);
 
-			_renderer.Width = width;
-			_renderer.Height = height;
+			if(WindowState == WindowState.FullScreen && !ConfigManager.Config.Video.UseExclusiveFullscreen && ConfigManager.Config.Video.EnableVariableRefreshRate) {
+				//When VRR is enabled, set the renderer to the same size as the monitor when in fullscreen mode
+				PixelRect bounds = ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds ?? default;
+				if(bounds != default) {
+					_rendererSize = bounds.Size.ToSize(LayoutHelper.GetLayoutScale(this));
+					if(_model.IsMenuVisible) {
+						_rendererSize = _rendererSize.WithHeight(_rendererSize.Height - _mainMenu.Bounds.Height);
+					}
+					_renderer.Width = _rendererSize.Width;
+					_renderer.Height = _rendererSize.Height;
+				}
+			} else {
+				_renderer.Width = width;
+				_renderer.Height = height;
+			}
 			_model.SoftwareRenderer.Width = width;
 			_model.SoftwareRenderer.Height = height;
 		}
@@ -559,6 +601,16 @@ namespace Mesen.Windows
 			ResizeRenderer();
 		}
 
+		private void SetFullscreenMode(FullscreenMode mode, IntPtr windowHandle)
+		{
+			EmuApi.SetFullscreenMode(new FullscreenSettings() {
+				Mode = mode,
+				WindowHandle = windowHandle,
+				Width = ConfigManager.Config.Video.GetFullscreenWidth(),
+				Height = ConfigManager.Config.Video.GetFullscreenHeight()
+			});
+		}
+
 		public void ToggleFullscreen()
 		{
 			if(_preventFullscreenToggle) {
@@ -567,10 +619,13 @@ namespace Mesen.Windows
 
 			_preventFullscreenToggle = true;
 			if(WindowState == WindowState.FullScreen) {
+				if(ConfigManager.Config.Video.EnableVariableRefreshRate && !ConfigManager.Config.Video.UseExclusiveFullscreen && OperatingSystem.IsWindows()) {
+					_needRendererReset = true;
+				}
+				ResetRenderer();
+
 				Task.Run(() => {
-					if(ConfigManager.Config.Video.UseExclusiveFullscreen) {
-						EmuApi.SetExclusiveFullscreenMode(false, _renderer.Handle);
-					}
+					SetFullscreenMode(FullscreenMode.Disabled, _renderer.Handle);
 
 					Dispatcher.UIThread.Post(() => {
 						WindowState = _prevWindowState;
@@ -595,7 +650,7 @@ namespace Mesen.Windows
 					}
 
 					Task.Run(() => {
-						EmuApi.SetExclusiveFullscreenMode(true, TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
+						SetFullscreenMode(FullscreenMode.Exclusive, TryGetPlatformHandle()?.Handle ?? IntPtr.Zero);
 						_preventFullscreenToggle = false;
 
 						Dispatcher.UIThread.Post(() => {
@@ -603,8 +658,14 @@ namespace Mesen.Windows
 						});
 					});
 				} else {
-					WindowState = WindowState.FullScreen;
-					_preventFullscreenToggle = false;
+					Dispatcher.UIThread.Post(() => {
+						if(ConfigManager.Config.Video.EnableVariableRefreshRate) {
+							_needRendererReset = OperatingSystem.IsWindows();
+							SetFullscreenMode(FullscreenMode.Borderless, _renderer.Handle);
+						}
+						WindowState = WindowState.FullScreen;
+						_preventFullscreenToggle = false;
+					});
 				}
 			}
 		}
@@ -722,7 +783,7 @@ namespace Mesen.Windows
 			}
 		}
 
-		private void timerUpdateBackgroundFlag(object? sender, EventArgs e)
+		private void TimerUpdateBackgroundFlag(object? sender, EventArgs e)
 		{
 			Window? activeWindow = ApplicationHelper.GetActiveWindow();
 

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Mesen.Config;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
-using System.Threading;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Mesen.Config;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mesen.Utilities
 {
@@ -13,7 +13,7 @@ namespace Mesen.Utilities
 	{
 		public static SingleInstance Instance { get; private set; } = new SingleInstance();
 
-		private static Guid _identifier = new Guid("{A46696B7-2D1C-4CC5-A52F-43BCAF094AEF}");
+		private static Guid _identifier = new Guid("{A46696B7-2D1C-4CC5-A52F-40BCAF094AEF}");
 
 		private Mutex? _mutex;
 		private FileStream? _lockFileStream;

@@ -37,13 +37,27 @@ struct PceCpuState : public BaseState
 
 enum class PceAddrMode
 {
-	None, Acc, Imp, Imm, Rel,
-	Zero, Abs, ZeroX, ZeroY,
-	Ind, IndX, IndY,
-	AbsX, AbsY,
-	ZInd, ZeroRel,
+	None,
+	Acc,
+	Imp,
+	Imm,
+	Rel,
+	Zero,
+	Abs,
+	ZeroX,
+	ZeroY,
+	Ind,
+	IndX,
+	IndY,
+	AbsX,
+	AbsY,
+	ZInd,
+	ZeroRel,
 	Block,
-	ImZero, ImZeroX, ImAbs, ImAbsX,
+	ImZero,
+	ImZeroX,
+	ImAbs,
+	ImAbsX,
 	AbsXInd,
 };
 
@@ -84,7 +98,7 @@ struct PceVdcHvLatches
 struct PceVdcState
 {
 	uint32_t FrameCount;
-	
+
 	uint16_t HClock;
 	uint16_t Scanline;
 	uint16_t RcrCounter;
@@ -129,10 +143,10 @@ struct PceVdcState
 
 	//R10 - SOUR
 	uint16_t BlockSrc;
-	
+
 	//R11 - DESR
 	uint16_t BlockDst;
-	
+
 	//R12 - LENR
 	uint16_t BlockLen;
 
@@ -140,7 +154,7 @@ struct PceVdcState
 	uint16_t SatbBlockSrc;
 	bool SatbTransferPending;
 	bool SatbTransferRunning;
-	
+
 	uint16_t SatbTransferNextWordCounter;
 	uint8_t SatbTransferOffset;
 
@@ -151,7 +165,7 @@ struct PceVdcState
 	bool ScanlineDetected;
 	bool SpriteOverflow;
 	bool Sprite0Hit;
-	
+
 	bool BurstModeEnabled;
 	bool NextSpritesEnabled;
 	bool NextBackgroundEnabled;
@@ -178,7 +192,6 @@ struct PceMemoryManagerState
 
 struct PceControlManagerState
 {
-
 };
 
 struct PceTimerState

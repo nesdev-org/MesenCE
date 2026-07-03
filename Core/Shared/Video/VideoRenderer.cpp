@@ -6,6 +6,7 @@
 #include "Shared/EmuSettings.h"
 #include "Shared/Video/DebugHud.h"
 #include "Shared/Video/SystemHud.h"
+#include "Shared/Video/DebugStats.h"
 #include "Shared/InputHud.h"
 #include "Shared/MessageManager.h"
 #include "Utilities/Video/IVideoRecorder.h"
@@ -73,6 +74,8 @@ void VideoRenderer::RenderThread()
 		_renderer->OnRendererThreadStarted();
 	}
 
+	Timer lastFrameTimer;
+	bool needClearHud = false;
 	while(!_stopFlag.load()) {
 		//Wait until a frame is ready, or until 32ms have passed (to allow HUD to update at ~30fps when paused)
 		bool forceRender = !_waitForRender.Wait(32);
@@ -91,14 +94,31 @@ void VideoRenderer::RenderThread()
 				frame = _lastFrame;
 			}
 
+			if(needClearHud) {
+				_emuHudSurface.Clear();
+				_rendererHud->ClearScreen();
+			}
+
 			_inputHud->DrawControllers(size, frame.InputData);
+
 			{
 				auto lock = _hudLock.AcquireSafe();
 				_systemHud->Draw(_rendererHud.get(), size.Width, size.Height);
 			}
-			
-			_emuHudSurface.IsDirty = _rendererHud->Draw(_emuHudSurface.Buffer, size, {}, 0, {}, true);
+
+			bool showDebugInfo = _emu->GetSettings()->GetPreferences().ShowDebugInfo;
+			if(showDebugInfo) {
+				double lastFrameTime = lastFrameTimer.GetElapsedMS();
+				lastFrameTimer.Reset();
+				_emu->GetDebugStats()->UpdateStats(_emu, true, lastFrameTime);
+				_emu->GetDebugStats()->DisplayStats(_emu, _rendererHud.get());
+				needClearHud = true;
+			}
+
+			_emuHudSurface.IsDirty = _rendererHud->Draw(_emuHudSurface.Buffer, size, {}, 0, {}, !needClearHud);
 			_scriptHudSurface.IsDirty = DrawScriptHud(frame);
+
+			needClearHud = showDebugInfo;
 
 			if(forceRender || _needRedraw || _emuHudSurface.IsDirty || _scriptHudSurface.IsDirty) {
 				_needRedraw = false;
@@ -187,13 +207,13 @@ void VideoRenderer::ClearFrame()
 	}
 }
 
-void VideoRenderer::RegisterRenderingDevice(IRenderingDevice *renderer)
+void VideoRenderer::RegisterRenderingDevice(IRenderingDevice* renderer)
 {
 	_renderer = renderer;
 	StartThread();
 }
 
-void VideoRenderer::UnregisterRenderingDevice(IRenderingDevice *renderer)
+void VideoRenderer::UnregisterRenderingDevice(IRenderingDevice* renderer)
 {
 	if(_renderer == renderer) {
 		StopThread();
@@ -217,7 +237,7 @@ void VideoRenderer::ProcessAviRecording(RenderedFrame& frame)
 
 			//Update the surface to match the frame's size
 			_aviRecorderSurface.UpdateSize(frame.Width, frame.Height);
-			
+
 			//Copy the game screen
 			memcpy(_aviRecorderSurface.Buffer, frame.FrameBuffer, frame.Width * frame.Height * sizeof(uint32_t));
 
@@ -260,7 +280,7 @@ void VideoRenderer::StartRecording(string filename, RecordAviOptions options)
 
 	if(recorder->Init(filename)) {
 		_recorder.reset(recorder);
-		
+
 		if(!options.RecordSystemHud) {
 			//Only display message if not recording the system HUD (otherwise the message is always visible on the recording, which isn't ideal)
 			MessageManager::DisplayMessage("VideoRecorder", "VideoRecorderStarted", filename);

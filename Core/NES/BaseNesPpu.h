@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 #include "pch.h"
 #include "NES/INesMemoryHandler.h"
 #include "Utilities/ISerializable.h"
@@ -40,10 +40,9 @@ protected:
 	uint8_t _oamCopybuffer = 0;
 	bool _spriteInRange = false;
 	bool _sprite0Added = false;
-	uint8_t _spriteAddrH = 0;
-	uint8_t _spriteAddrL = 0;
 	uint8_t _overflowBugCounter = 0;
 	bool _oamCopyDone = false;
+	uint16_t _ppuBusAddress = 0;
 	uint16_t _minimumDrawBgCycle = 0;
 	uint16_t _minimumDrawSpriteCycle = 0;
 	uint16_t _minimumDrawSpriteStandardCycle = 0;
@@ -59,7 +58,7 @@ protected:
 	//128 : end of cache line
 	////////////////////////
 	TileInfo _tile = {};
-	uint16_t _ppuBusAddress = 0;
+	uint16_t _vblankEnd = 0;
 	uint16_t _nmiScanline = 0;
 	uint8_t _currentTilePalette = 0;
 	uint8_t _previousTilePalette = 0;
@@ -79,16 +78,24 @@ protected:
 	//176
 	PpuControlFlags _control = {}; // 8 bytes
 	PpuMaskFlags _mask = {}; // 8 bytes
-  ////////////////////////
+	////////////////////////
 	//192 : end of cache line
 	////////////////////////
 	uint8_t _spriteRam[0x100] = {};
 	////////////////////////
 	//448 : end of cache line
 	////////////////////////
-	bool _hasSprite[257] = {};
-	//705
 	NesSpriteInfo _spriteTiles[64] = {};
+
+	static constexpr int SpriteShifterDone = 0x8000;
+	uint16_t _spriteShifterList[9] = { SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone, SpriteShifterDone }; //Ordered by X coordinate.
+	uint8_t _nextSpriteShifter = 0;
+	uint16_t _nextSpriteShifterCycle = 0;
+	uint8_t _activeSpriteShifters = 0;
+	uint8_t _countingSpriteShifters = 0;
+	uint8_t _expiredSpriteShifters = 0;
+	uint8_t _dotSkipped = 0;
+	bool _processSprites = false;
 
 	Emulator* _emu = nullptr;
 	EmuSettings* _settings = nullptr;
@@ -97,12 +104,14 @@ protected:
 	ConsoleRegion _region = {};
 	uint16_t _standardVblankEnd = 0;
 	uint16_t _standardNmiScanline = 0;
-	uint16_t _vblankEnd = 0;
 	uint16_t _palSpriteEvalScanline = 0;
 
 	bool _needVideoRamIncrement = false;
 	bool _allowFullPpuAccess = false;
 
+	uint8_t _ppuMemoryDataReadStateMachine = 0;
+	uint8_t _ppuMemoryDataWriteStateMachine = 0;
+	uint8_t _ppuMemoryDataWriteLatch = 0;
 	uint8_t _memoryReadBuffer = 0;
 	PPUStatusFlags _statusFlags = {};
 
@@ -112,9 +121,8 @@ protected:
 	uint32_t _ignoreVramRead = 0;
 	int32_t _openBusDecayStamp[8] = {};
 
-	uint64_t _oamDecayCycles[0x40] = {};
-	bool _corruptOamRow[32] = {};
-	
+	uint64_t _oamDecayCycles[0x20] = {};
+
 	bool IsRenderingEnabled();
 	void UpdateGrayscaleAndIntensifyBits();
 	void UpdateColorBitMasks();

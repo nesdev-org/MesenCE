@@ -4,17 +4,19 @@
 #include <unordered_set>
 #if __has_include(<filesystem>)
 	#include <filesystem>
-	namespace fs = std::filesystem;
+namespace fs = std::filesystem;
 #elif __has_include(<experimental/filesystem>)
 	#include <experimental/filesystem>
-	namespace fs = std::experimental::filesystem;
+namespace fs = std::experimental::filesystem;
 #endif
 
 using std::string;
 using std::vector;
 
-extern "C" {
+extern "C"
+{
 	void __stdcall PgoRunTest(vector<string> testRoms, bool enableDebugger);
+	bool __stdcall RunCiTests(string testFolder);
 }
 
 vector<string> GetFilesInFolder(string rootFolder, std::unordered_set<string> extensions)
@@ -43,12 +45,18 @@ vector<string> GetFilesInFolder(string rootFolder, std::unordered_set<string> ex
 int main(int argc, char* argv[])
 {
 	string romFolder = "../PGOGames";
+	bool ciTestMode = argc == 3 && strcmp(argv[2], "citests") == 0;
+
 	if(argc >= 2) {
 		romFolder = argv[1];
 	}
 
-	vector<string> testRoms = GetFilesInFolder(romFolder, { ".sfc", ".gb", ".gbc", ".gbx", ".nes", ".pce", ".cue", ".sms", ".gg", ".sg", ".gba", ".col", ".ws", ".wsc" });
-	PgoRunTest(testRoms, true);
+	if(ciTestMode) {
+		return RunCiTests(romFolder) ? 0 : -1;
+	} else {
+		vector<string> testRoms = GetFilesInFolder(romFolder, { ".sfc", ".gb", ".gbc", ".gbx", ".nes", ".pce", ".cue", ".sms", ".gg", ".sg", ".gba", ".col", ".ws", ".wsc", ".pc2" });
+		PgoRunTest(testRoms, true);
+	}
 	return 0;
 }
 

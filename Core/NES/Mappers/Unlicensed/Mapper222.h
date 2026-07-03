@@ -57,7 +57,7 @@ protected:
 			case 0xD002: SelectChrPage(5, value); break;
 			case 0xE000: SelectChrPage(6, value); break;
 			case 0xE002: SelectChrPage(7, value); break;
-			case 0xF000: 
+			case 0xF000:
 				_irqCounter = value;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;

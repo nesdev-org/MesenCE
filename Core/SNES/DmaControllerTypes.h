@@ -20,7 +20,6 @@ struct DmaChannelConfig
 	uint8_t HdmaBank;
 	uint8_t HdmaLineCounterAndRepeat;
 	bool DoTransfer;
-	bool HdmaFinished;
 
 	bool UnusedControlFlag;
 

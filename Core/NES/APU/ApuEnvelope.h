@@ -33,7 +33,7 @@ public:
 	{
 		_start = true;
 	}
-	
+
 	uint32_t GetVolume()
 	{
 		if(LengthCounter.GetStatus()) {
@@ -59,7 +59,11 @@ public:
 
 	void Serialize(Serializer& s) override
 	{
-		SV(_constantVolume); SV(_volume); SV(_start); SV(_divider); SV(_counter);
+		SV(_constantVolume);
+		SV(_volume);
+		SV(_start);
+		SV(_divider);
+		SV(_counter);
 		SV(LengthCounter);
 	}
 

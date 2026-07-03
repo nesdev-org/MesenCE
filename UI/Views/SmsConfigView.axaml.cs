@@ -28,12 +28,12 @@ public class SmsConfigView : UserControl
 		}
 	}
 
-	private void btnSelectPreset_OnClick(object sender, RoutedEventArgs e)
+	private void BtnSelectPreset_OnClick(object sender, RoutedEventArgs e)
 	{
 		((Button)sender).ContextMenu?.Open();
 	}
 
-	private void mnuGameGearPreset_Click(object sender, RoutedEventArgs e)
+	private void MnuGameGearPreset_Click(object sender, RoutedEventArgs e)
 	{
 		_model.Config.GameGearOverscan.Left = 48;
 		_model.Config.GameGearOverscan.Right = 48;
@@ -41,7 +41,7 @@ public class SmsConfigView : UserControl
 		_model.Config.GameGearOverscan.Bottom = 48;
 	}
 
-	private void mnuFullFramePreset_Click(object sender, RoutedEventArgs e)
+	private void MnuFullFramePreset_Click(object sender, RoutedEventArgs e)
 	{
 		_model.Config.GameGearOverscan.Left = 0;
 		_model.Config.GameGearOverscan.Right = 0;
@@ -49,7 +49,7 @@ public class SmsConfigView : UserControl
 		_model.Config.GameGearOverscan.Bottom = 24;
 	}
 
-	private void mnuFullFrameFirstColumnPreset_Click(object sender, RoutedEventArgs e)
+	private void MnuFullFrameFirstColumnPreset_Click(object sender, RoutedEventArgs e)
 	{
 		_model.Config.GameGearOverscan.Left = 8;
 		_model.Config.GameGearOverscan.Right = 0;

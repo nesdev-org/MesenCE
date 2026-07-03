@@ -3,7 +3,7 @@
 #include "Core/Shared/Interfaces/INotificationListener.h"
 #include "Core/Shared/NotificationManager.h"
 
-typedef void(__stdcall *NotificationListenerCallback)(int, void*);
+typedef void(__stdcall* NotificationListenerCallback)(int, void*);
 
 class InteropNotificationListener : public INotificationListener
 {

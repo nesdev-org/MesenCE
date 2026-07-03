@@ -16,6 +16,7 @@ static constexpr const char* _modRegLut8[8] = { "AL", "CL", "DL", "BL", "AH", "C
 static constexpr const char* _modRegLut16[8] = { "AX", "CX", "DX", "BX", "SP", "BP", "SI", "DI" };
 static constexpr const char* _modSegRegLut[4] = { "ES", "CS", "SS", "DS" };
 
+// clang-format off
 constexpr const char* _opTemplate[256] = {
 	//0-0F
 	"ADD m", "ADD m", "ADD m", "ADD m", "ADD AL, i", "ADD AX, j", "PUSH ES", "POP ES",
@@ -81,11 +82,12 @@ constexpr const char* _opTemplate[256] = {
 	"LOCK", "UNDEFINED_F1", "REPNZ", "REPZ", "HLT", "CMC", "x", "x",
 	"CLC", "STC", "CLI", "STI", "CLD", "STD", "y", "z"
 };
+// clang-format on
 
 void WsDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t memoryAddr, LabelManager* labelManager, EmuSettings* settings)
 {
 	FastString str(settings->GetDebugConfig().UseLowerCaseDisassembly);
-	
+
 	uint8_t* byteCode = info.GetByteCode();
 	uint8_t opCode = byteCode[0];
 
@@ -121,8 +123,15 @@ void WsDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t mem
 				break;
 
 			//Immediate values
-			case 'i': str.WriteAll("$", HexUtilities::ToHex(byteCode[1])); byteCode++; break;
-			case 'j': str.WriteAll("$", HexUtilities::ToHex((uint16_t)(byteCode[1] | (byteCode[2] << 8)))); byteCode += 2; break;
+			case 'i':
+				str.WriteAll("$", HexUtilities::ToHex(byteCode[1]));
+				byteCode++;
+				break;
+
+			case 'j':
+				str.WriteAll("$", HexUtilities::ToHex((uint16_t)(byteCode[1] | (byteCode[2] << 8))));
+				byteCode += 2;
+				break;
 
 			//ModRM (2 operands)
 			case 'm': {
@@ -174,13 +183,13 @@ void WsDisUtils::GetDisassembly(DisassemblyInfo& info, string& out, uint32_t mem
 					str.Write(", ");
 					GetModSegRegParam(str, byteCode);
 				}
-				break;	
+				break;
 			}
 
 			//Relative jumps
-			case 'r': GetJmpDestination(str, byteCode+1, 1); break;
-			case 's': GetJmpDestination(str, byteCode+1, 2); break;
-			case 't': GetJmpDestination(str, byteCode+1, 4); break;
+			case 'r': GetJmpDestination(str, byteCode + 1, 1); break;
+			case 's': GetJmpDestination(str, byteCode + 1, 2); break;
+			case 't': GetJmpDestination(str, byteCode + 1, 4); break;
 
 			case 'v': //GRP1
 				switch((byteCode[1] >> 3) & 0x07) {
@@ -297,7 +306,8 @@ void WsDisUtils::GetJmpDestination(FastString& str, uint8_t* byteCode, uint8_t s
 void WsDisUtils::GetSegment(FastString& str, WsSegment segment, const char* defaultSegment)
 {
 	switch(segment) {
-		default: case WsSegment::Default: str.WriteAll(defaultSegment, ':'); break;
+		default:
+		case WsSegment::Default: str.WriteAll(defaultSegment, ':'); break;
 		case WsSegment::ES: str.Write("ES:"); break;
 		case WsSegment::SS: str.Write("SS:"); break;
 		case WsSegment::CS: str.Write("CS:"); break;
@@ -332,14 +342,45 @@ int WsDisUtils::GetModRmParam(FastString& str, uint8_t* byteCode, WsSegment segm
 	if(mode == 3) {
 		if(forLeaLdsLes) {
 			switch(rm) {
-				case 0x00: GetSegment(str, segment, "DS"); str.Write("[BX+AX]"); break;
-				case 0x01: GetSegment(str, segment, "DS"); str.Write("[BX+CX]"); break;
-				case 0x02: GetSegment(str, segment, "SS"); str.Write("[BP+DX]"); break;
-				case 0x03: GetSegment(str, segment, "SS"); str.Write("[BP+BX]"); break;
-				case 0x04: GetSegment(str, segment, "DS"); str.Write("[SP+SI]"); break;
-				case 0x05: GetSegment(str, segment, "DS"); str.Write("[BP+DI]"); break;
-				case 0x06: GetSegment(str, segment, "SS"); str.Write("[BP+SI]"); break;
-				case 0x07: GetSegment(str, segment, "DS"); str.Write("[BX+DI]"); break;
+				case 0x00:
+					GetSegment(str, segment, "DS");
+					str.Write("[BX+AX]");
+					break;
+
+				case 0x01:
+					GetSegment(str, segment, "DS");
+					str.Write("[BX+CX]");
+					break;
+
+				case 0x02:
+					GetSegment(str, segment, "SS");
+					str.Write("[BP+DX]");
+					break;
+
+				case 0x03:
+					GetSegment(str, segment, "SS");
+					str.Write("[BP+BX]");
+					break;
+
+				case 0x04:
+					GetSegment(str, segment, "DS");
+					str.Write("[SP+SI]");
+					break;
+
+				case 0x05:
+					GetSegment(str, segment, "DS");
+					str.Write("[BP+DI]");
+					break;
+
+				case 0x06:
+					GetSegment(str, segment, "SS");
+					str.Write("[BP+SI]");
+					break;
+
+				case 0x07:
+					GetSegment(str, segment, "DS");
+					str.Write("[BX+DI]");
+					break;
 			}
 		} else {
 			str.Write(word ? _modRegLut16[rm] : _modRegLut8[rm]);
@@ -350,14 +391,45 @@ int WsDisUtils::GetModRmParam(FastString& str, uint8_t* byteCode, WsSegment segm
 		len += 2;
 	} else {
 		switch(rm) {
-			case 0x00: GetSegment(str, segment, "DS"); str.Write("[BX+SI"); break;
-			case 0x01: GetSegment(str, segment, "DS"); str.Write("[BX+DI"); break;
-			case 0x02: GetSegment(str, segment, "SS"); str.Write("[BP+SI"); break;
-			case 0x03: GetSegment(str, segment, "SS"); str.Write("[BP+DI"); break;
-			case 0x04: GetSegment(str, segment, "DS"); str.Write("[SI"); break;
-			case 0x05: GetSegment(str, segment, "DS"); str.Write("[DI"); break;
-			case 0x06: GetSegment(str, segment, "SS"); str.Write("[BP"); break;
-			case 0x07: GetSegment(str, segment, "DS"); str.Write("[BX"); break;
+			case 0x00:
+				GetSegment(str, segment, "DS");
+				str.Write("[BX+SI");
+				break;
+
+			case 0x01:
+				GetSegment(str, segment, "DS");
+				str.Write("[BX+DI");
+				break;
+
+			case 0x02:
+				GetSegment(str, segment, "SS");
+				str.Write("[BP+SI");
+				break;
+
+			case 0x03:
+				GetSegment(str, segment, "SS");
+				str.Write("[BP+DI");
+				break;
+
+			case 0x04:
+				GetSegment(str, segment, "DS");
+				str.Write("[SI");
+				break;
+
+			case 0x05:
+				GetSegment(str, segment, "DS");
+				str.Write("[DI");
+				break;
+
+			case 0x06:
+				GetSegment(str, segment, "SS");
+				str.Write("[BP");
+				break;
+
+			case 0x07:
+				GetSegment(str, segment, "DS");
+				str.Write("[BX");
+				break;
 		}
 
 		if(mode == 1) {
@@ -409,7 +481,7 @@ EffectiveAddressInfo WsDisUtils::GetEffectiveAddress(DisassemblyInfo& info, WsCo
 			MemoryOperationInfo prevOpInfo = dummyCpu.GetOperationInfo(i - 1);
 			EffectiveAddressInfo result;
 			result.ShowAddress = true;
-			
+
 			if(dummyCpu.IsWordAccess(i)) {
 				result.ValueSize = 2;
 				if(dummyCpu.IsWordAccess(i - 1) && prevOpInfo.Type == opInfo.Type && prevOpInfo.Address == opInfo.Address - 2) {
@@ -473,8 +545,8 @@ uint8_t WsDisUtils::GetOpSize(uint32_t cpuAddress, MemoryType memType, MemoryDum
 	while(op[i]) {
 		switch(op[i]) {
 			//Absolute address
-			case 'a': size+=2; break;
-			
+			case 'a': size += 2; break;
+
 			//Immediate values
 			case 'i': size++; break;
 			case 'j': size += 2; break;
@@ -534,10 +606,8 @@ uint16_t WsDisUtils::GetFullOpCode(uint16_t cs, uint16_t ip, WsMemoryManager* me
 
 	return (
 		memoryManager->DebugRead((cs << 4) + ip) |
-		(memoryManager->DebugRead((cs << 4) + (uint16_t)(ip + 1)) << 8)
-	);
+		(memoryManager->DebugRead((cs << 4) + (uint16_t)(ip + 1)) << 8));
 }
-
 
 uint16_t WsDisUtils::GetFullOpCode(DisassemblyInfo& disInfo)
 {
@@ -548,7 +618,7 @@ uint16_t WsDisUtils::GetFullOpCode(DisassemblyInfo& disInfo)
 		i++;
 	}
 
-	return byteCode[i] | (byteCode[i+1] << 8);
+	return byteCode[i] | (byteCode[i + 1] << 8);
 }
 
 bool WsDisUtils::IsJumpToSub(uint16_t opCode)
@@ -695,25 +765,45 @@ bool WsDisUtils::IsPushPopInstruction(uint16_t opCode)
 {
 	switch((uint8_t)opCode) {
 		//Push/pop segments
-		case 0x06: case 0x07: case 0x0E: case 0x16:
-		case 0x17: case 0x1E: case 0x1F:
+		case 0x06:
+		case 0x07:
+		case 0x0E:
+		case 0x16:
+		case 0x17:
+		case 0x1E:
+		case 0x1F:
 
 		//Push
-		case 0x50: case 0x51: case 0x52: case 0x53:
-		case 0x54: case 0x55: case 0x56: case 0x57:
+		case 0x50:
+		case 0x51:
+		case 0x52:
+		case 0x53:
+		case 0x54:
+		case 0x55:
+		case 0x56:
+		case 0x57:
 
 		//Pop
-		case 0x58: case 0x59: case 0x5A: case 0x5B:
-		case 0x5C: case 0x5D: case 0x5E: case 0x5F:
+		case 0x58:
+		case 0x59:
+		case 0x5A:
+		case 0x5B:
+		case 0x5C:
+		case 0x5D:
+		case 0x5E:
+		case 0x5F:
 
 		//Push/pop all
-		case 0x60: case 0x61:
+		case 0x60:
+		case 0x61:
 
 		//Push immediate
-		case 0x68: case 0x6A:
+		case 0x68:
+		case 0x6A:
 
 		//Push/pop flags
-		case 0x9C: case 0x9D:
+		case 0x9C:
+		case 0x9D:
 			return true;
 	}
 
@@ -729,7 +819,7 @@ CdlFlags::CdlFlags WsDisUtils::GetOpFlags(uint16_t opCode, uint32_t pc, uint32_t
 	} else if(WsDisUtils::IsConditionalJump(opCode) && (pc != prevPc + opSize)) {
 		return CdlFlags::JumpTarget;
 	}
-	
+
 	return CdlFlags::None;
 }
 

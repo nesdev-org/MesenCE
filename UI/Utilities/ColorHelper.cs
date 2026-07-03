@@ -2,10 +2,6 @@
 using Avalonia.Media;
 using Mesen.Config;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Mesen.Utilities
 {
@@ -24,7 +20,7 @@ namespace Mesen.Utilities
 
 			HslColor hsl;
 			hsl.L = (max + min) / 2;
-			
+
 			if(Math.Abs(c) < 0.00001) {
 				hsl.S = 0;
 				hsl.H = 0;
@@ -87,11 +83,11 @@ namespace Mesen.Utilities
 		public static Color InvertBrightness(Color color)
 		{
 			HslColor hsl = RgbToHsl(color);
-			
+
 			if(hsl.L >= 0.3 && hsl.L < 0.6) {
 				hsl.L -= 0.2;
 			}
-			
+
 			hsl.L = 1 - hsl.L;
 
 			if(hsl.L < 0.1) {
@@ -158,8 +154,8 @@ namespace Mesen.Utilities
 				} else {
 					return Math.Pow((c + 0.055) / 1.055, 2.4);
 				}
-			};
-			
+			}
+
 			r = convertColor(r);
 			g = convertColor(g);
 			b = convertColor(b);

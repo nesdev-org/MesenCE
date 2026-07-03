@@ -89,7 +89,12 @@ AssemblerSpecialCodes NesAssembler::ResolveOpMode(AssemblerLineData& op, uint32_
 		} else if(operand.Type == OperandType::A) {
 			op.AddrMode = NesAddrMode::Acc;
 		} else if(op.OperandCount == 0) {
-			op.AddrMode = IsOpModeAvailable(op.OpCode, NesAddrMode::Acc) ? NesAddrMode::Acc : NesAddrMode::Imp;
+			if(IsOpModeAvailable(op.OpCode, NesAddrMode::None)) {
+				//For STP
+				op.AddrMode = NesAddrMode::None;
+			} else {
+				op.AddrMode = IsOpModeAvailable(op.OpCode, NesAddrMode::Acc) ? NesAddrMode::Acc : NesAddrMode::Imp;
+			}
 		} else if(op.OperandCount == 1) {
 			if(IsOpModeAvailable(op.OpCode, NesAddrMode::Rel)) {
 				op.AddrMode = NesAddrMode::Rel;

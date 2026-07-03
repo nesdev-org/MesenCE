@@ -11,7 +11,7 @@
 
 LinuxMouseManager::LinuxMouseManager(void* windowHandle)
 {
-	_mainWindow = (Window) windowHandle;
+	_mainWindow = (Window)windowHandle;
 
 	_display = XOpenDisplay(nullptr);
 	_defaultScreen = XDefaultScreen(_display);
@@ -22,11 +22,13 @@ LinuxMouseManager::LinuxMouseManager(void* windowHandle)
 
 	XColor color = {};
 	uint8_t nullCursorData = 0;
-	Pixmap pixmap = XCreateBitmapFromData(_display, _rootWindow, (const char*) &nullCursorData, 1, 1);
+	Pixmap pixmap = XCreateBitmapFromData(_display, _rootWindow, (const char*)&nullCursorData, 1, 1);
 	_hiddenCursor = XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
 }
 
-LinuxMouseManager::~LinuxMouseManager() {}
+LinuxMouseManager::~LinuxMouseManager()
+{
+}
 
 SystemMouseState LinuxMouseManager::GetSystemMouseState(void* rendererHandle)
 {
@@ -80,7 +82,7 @@ bool LinuxMouseManager::CaptureMouse(int32_t x, int32_t y, int32_t width, int32_
 	}
 
 	for(int i = 0; i < 10; i++) {
-		int result = XGrabPointer(_display, (Window) rendererHandle, true, NoEventMask, GrabModeAsync, GrabModeAsync, (Window) rendererHandle, _hiddenCursor, 0);
+		int result = XGrabPointer(_display, (Window)rendererHandle, true, NoEventMask, GrabModeAsync, GrabModeAsync, (Window)rendererHandle, _hiddenCursor, 0);
 		XFlush(_display);
 		if(result == 1 && i < 9) {
 			//XGrabPointer can fail with AlreadyGrabbed - this can be normal, retry a few times

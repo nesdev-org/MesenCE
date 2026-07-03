@@ -1,10 +1,10 @@
-﻿using Mesen.Interop;
-using Mesen.Debugger.ViewModels;
-using System.Collections.Generic;
-using Mesen.Debugger.Controls;
-using Avalonia.Media;
-using System.Text.RegularExpressions;
+﻿using Avalonia.Media;
 using Mesen.Config;
+using Mesen.Debugger.Controls;
+using Mesen.Debugger.ViewModels;
+using Mesen.Interop;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Mesen.Debugger.Disassembly
 {

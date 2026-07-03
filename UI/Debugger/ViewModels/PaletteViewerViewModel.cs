@@ -22,7 +22,7 @@ namespace Mesen.Debugger.ViewModels
 	{
 		public CpuType CpuType { get; set; }
 		public PaletteViewerConfig Config { get; }
-		public RefreshTimingViewModel RefreshTiming { get; }
+		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
 
 		[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
 		[Reactive] public UInt32[]? PaletteValues { get; set; } = null;
@@ -202,7 +202,7 @@ namespace Mesen.Debugger.ViewModels
 		private void UpdatePreviewPanel()
 		{
 			PreviewPanel = GetPreviewPanel(SelectedPalette, PreviewPanel);
-			
+
 			if(ViewerTooltip != null && ViewerMouseOverPalette >= 0) {
 				GetPreviewPanel(ViewerMouseOverPalette, ViewerTooltip);
 			}
@@ -227,6 +227,7 @@ namespace Mesen.Debugger.ViewModels
 
 		public void OnGameLoaded()
 		{
+			RefreshTiming = new RefreshTimingViewModel(Config.RefreshTiming, CpuType);
 			RefreshData();
 		}
 	}

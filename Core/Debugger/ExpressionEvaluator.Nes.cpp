@@ -50,12 +50,12 @@ int64_t ExpressionEvaluator::GetNesTokenValue(int64_t token, EvalResultType& res
 		case EvalValues::RegPS: return s.PS;
 		case EvalValues::RegPC: return s.PC;
 		case EvalValues::Nmi: return ReturnBool(s.NmiFlag, resultType);
-		case EvalValues::Irq:  return ReturnBool(s.IrqFlag, resultType);
+		case EvalValues::Irq: return ReturnBool(s.IrqFlag, resultType);
 
 		case EvalValues::PpuFrameCount: return ppu().FrameCount;
 		case EvalValues::PpuCycle: return ppu().Cycle;
 		case EvalValues::PpuScanline: return ppu().Scanline;
-		
+
 		case EvalValues::PpuVramAddress: return ppu().VideoRamAddr;
 		case EvalValues::PpuTmpVramAddress: return ppu().TmpVideoRamAddr;
 

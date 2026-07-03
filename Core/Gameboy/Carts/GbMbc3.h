@@ -59,7 +59,7 @@ public:
 			//Disabled RAM/RTC registers returns 0xFF on reads (?)
 			return 0xFF;
 		}
-		
+
 		if(_hasRtcTimer) {
 			return _rtc.Read(_ramBank & 0x0F);
 		} else {

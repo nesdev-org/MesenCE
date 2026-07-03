@@ -18,7 +18,7 @@ namespace Mesen.Config
 		[Reactive] public EventViewerCategoryCfg PsgWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xFF, 0x5E, 0x5E));
 		[Reactive] public EventViewerCategoryCfg IoWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x18, 0x98, 0xE4));
 		[Reactive] public EventViewerCategoryCfg IoRead { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x9F, 0x93, 0xC6));
-		
+
 		[Reactive] public EventViewerCategoryCfg MemoryControlWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0x4A, 0xFE, 0xAC));
 
 		[Reactive] public EventViewerCategoryCfg GameGearPortWrite { get; set; } = new EventViewerCategoryCfg(Color.FromRgb(0xF9, 0xFE, 0xAC));
@@ -37,16 +37,16 @@ namespace Mesen.Config
 				Irq = this.Irq,
 				Nmi = this.Nmi,
 				MarkedBreakpoints = this.MarkedBreakpoints,
-				
+
 				VdpPaletteWrite = this.VdpPaletteWrite,
 				VdpVramWrite = this.VdpVramWrite,
-				
+
 				VdpVCounterRead = this.VdpVCounterRead,
 				VdpHCounterRead = this.VdpHCounterRead,
 				VdpVramRead = this.VdpVramRead,
 				VdpControlPortRead = this.VdpControlPortRead,
 				VdpControlPortWrite = this.VdpControlPortWrite,
-				
+
 				PsgWrite = this.PsgWrite,
 				IoWrite = this.IoWrite,
 				IoRead = this.IoRead,

@@ -41,7 +41,7 @@ void FdsLoader::AddGaps(vector<uint8_t>& diskSide, uint8_t* readBuffer, uint32_t
 		switch(blockType) {
 			case 1: blockLength = 56; break; //Disk header
 			case 2: blockLength = 2; break; //File count
-			
+
 			case 3:
 				//File header
 				//Log("ID: $" + HexUtilities::ToHex(read(j + 1)) + " - $" + HexUtilities::ToHex(read(j + 2)) + " - " + StringUtilities::GetString(readBuffer + j + 3, 8));
@@ -61,7 +61,7 @@ void FdsLoader::AddGaps(vector<uint8_t>& diskSide, uint8_t* readBuffer, uint32_t
 			default:
 				//Unexpected data, pretend the rest of the FDS file is on the disk as-is
 				diskSide.push_back(0x80);
-				diskSide.insert(diskSide.end(), &readBuffer[j], readBuffer+bufferSize);
+				diskSide.insert(diskSide.end(), &readBuffer[j], readBuffer + bufferSize);
 				return;
 		}
 
@@ -101,7 +101,7 @@ vector<uint8_t> FdsLoader::RebuildFdsFile(vector<vector<uint8_t>> diskData, bool
 	}
 
 	int sideCount = 0;
-	for(vector<uint8_t> &diskSide : diskData) {
+	for(vector<uint8_t>& diskSide : diskData) {
 		bool inGap = true;
 		size_t i = 0, len = diskSide.size();
 		uint32_t fileSize = 0;
@@ -116,11 +116,14 @@ vector<uint8_t> FdsLoader::RebuildFdsFile(vector<vector<uint8_t>> diskData, bool
 				switch(diskSide[i]) {
 					case 1: blockLength = 56; break; //Disk header
 					case 2: blockLength = 2; break; //File count
-					case 3: blockLength = 16; fileSize = diskSide[i + 13] + diskSide[i + 14] * 0x100;  break; //File header
+					case 3:
+						blockLength = 16;
+						fileSize = diskSide[i + 13] + diskSide[i + 14] * 0x100;
+						break; //File header
 					case 4: blockLength = 1 + fileSize; break;
 					default:
 						//Invalid/non-standard data, use the rest of the disk data as-is
-						output.insert(output.end(), &diskSide[i], diskSide.data()+diskSide.size());
+						output.insert(output.end(), &diskSide[i], diskSide.data() + diskSide.size());
 						blockLength = 0;
 						break;
 				}
@@ -173,7 +176,7 @@ void FdsLoader::LoadDiskData(vector<uint8_t>& romFile, vector<vector<uint8_t>>& 
 
 	for(uint32_t i = 0; i < numberOfSides; i++) {
 		diskData.push_back(vector<uint8_t>());
-		vector<uint8_t> &fdsDiskImage = diskData.back();
+		vector<uint8_t>& fdsDiskImage = diskData.back();
 
 		diskHeaders.push_back(vector<uint8_t>(romFile.data() + fileOffset + 1, romFile.data() + fileOffset + 57));
 

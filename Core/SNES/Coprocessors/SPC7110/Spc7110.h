@@ -70,7 +70,7 @@ private:
 
 public:
 	Spc7110(SnesConsole* console, bool useRtc);
-	
+
 	uint8_t ReadDataRom(uint32_t addr);
 
 	void Serialize(Serializer& s) override;

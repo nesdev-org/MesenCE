@@ -19,15 +19,15 @@ private:
 	atomic<bool> _workDone;
 
 	int _resDivider = 1;
-	uint16_t *_ppuOutputBuffer = nullptr;
-	
+	uint16_t* _ppuOutputBuffer = nullptr;
+
 	/* Ywidth, Iwidth and Qwidth are the filter widths for Y,I,Q respectively.
-	* All widths at 12 produce the best signal quality.
-	* 12,24,24 would be the closest values matching the NTSC spec.
-	* But off-spec values 12,22,26 are used here, to bring forth mild
-	* "chroma dots", an artifacting common with badly tuned TVs.
-	* Larger values = more horizontal blurring.
-	*/
+	 * All widths at 12 produce the best signal quality.
+	 * 12,24,24 would be the closest values matching the NTSC spec.
+	 * But off-spec values 12,22,26 are used here, to bring forth mild
+	 * "chroma dots", an artifacting common with badly tuned TVs.
+	 * Larger values = more horizontal blurring.
+	 */
 	int _yWidth, _iWidth, _qWidth;
 	int _y;
 	int _ir, _ig, _ib;
@@ -40,19 +40,19 @@ private:
 
 	uint32_t _brightness = 0;
 
-	void RecursiveBlend(int iterationCount, uint64_t *output, uint64_t *currentLine, uint64_t *nextLine, int pixelsPerCycle, bool verticalBlend);
-	
+	void RecursiveBlend(int iterationCount, uint64_t* output, uint64_t* currentLine, uint64_t* nextLine, int pixelsPerCycle, bool verticalBlend);
+
 	void NtscDecodeLine(int width, const int8_t* signal, uint32_t* target, int phase0);
-	
-	void GenerateNtscSignal(int8_t *ntscSignal, int &phase, int rowNumber);
-	void DecodeFrame(int startRow, int endRow, uint16_t *ppuOutputBuffer, uint32_t* outputBuffer, int startPhase);
+
+	void GenerateNtscSignal(int8_t* ntscSignal, int& phase, int rowNumber);
+	void DecodeFrame(int startRow, int endRow, uint16_t* ppuOutputBuffer, uint32_t* outputBuffer, int startPhase);
 	void OnBeforeApplyFilter() override;
 
 public:
 	BisqwitNtscFilter(Emulator* emu);
 	virtual ~BisqwitNtscFilter();
 
-	void ApplyFilter(uint16_t *ppuOutputBuffer) override;
+	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 	FrameInfo GetFrameInfo() override;
 	HudScaleFactors GetScaleFactor() override;
 };

@@ -10,7 +10,7 @@
 #include "Debugger/BaseEventManager.h"
 #include "Shared/ColorUtilities.h"
 
-SnesEventManager::SnesEventManager(Debugger *debugger, SnesCpu *cpu, SnesPpu *ppu, SnesMemoryManager *memoryManager, SnesDmaController *dmaController)
+SnesEventManager::SnesEventManager(Debugger* debugger, SnesCpu* cpu, SnesPpu* ppu, SnesMemoryManager* memoryManager, SnesDmaController* dmaController)
 {
 	_debugger = debugger;
 	_cpu = cpu;
@@ -27,7 +27,7 @@ SnesEventManager::~SnesEventManager()
 	delete[] _ppuBuffer;
 }
 
-void SnesEventManager::AddEvent(DebugEventType type, MemoryOperationInfo &operation, int32_t breakpointId)
+void SnesEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operation, int32_t breakpointId)
 {
 	DebugEventInfo evt = {};
 	evt.Type = type;
@@ -57,7 +57,7 @@ void SnesEventManager::AddEvent(DebugEventType type)
 	evt.Cycle = _memoryManager->GetHClock();
 	evt.BreakpointId = -1;
 	evt.DmaChannel = -1;
-	
+
 	evt.ProgramCounter = (_cpu->GetState().K << 16) | _cpu->GetState().PC;
 
 	_debugEvents.push_back(evt);
@@ -168,13 +168,13 @@ uint32_t SnesEventManager::TakeEventSnapshot(bool forAutoRefresh)
 	_useHighResOutput = _ppu->IsHighResOutput();
 
 	if(scanline >= _ppu->GetNmiScanline() || scanline == 0) {
-		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), (_useHighResOutput ? (512 * 478) : (256*239)) * sizeof(uint16_t));
+		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), (_useHighResOutput ? (512 * 478) : (256 * 239)) * sizeof(uint16_t));
 	} else {
 		uint16_t adjustedScanline = scanline + (_overscanMode ? 0 : 7);
 		uint32_t size = _useHighResOutput ? (512 * 478) : (256 * 239);
 		uint32_t offset = _useHighResOutput ? (512 * adjustedScanline * 2) : (256 * adjustedScanline);
 		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), offset * sizeof(uint16_t));
-		memcpy(_ppuBuffer+offset, _ppu->GetPreviousScreenBuffer()+offset, (size - offset) * sizeof(uint16_t));
+		memcpy(_ppuBuffer + offset, _ppu->GetPreviousScreenBuffer() + offset, (size - offset) * sizeof(uint16_t));
 	}
 
 	_snapshotCurrentFrame = _debugEvents;
@@ -194,15 +194,15 @@ FrameInfo SnesEventManager::GetDisplayBufferSize()
 	return size;
 }
 
-void SnesEventManager::DrawScreen(uint32_t *buffer)
+void SnesEventManager::DrawScreen(uint32_t* buffer)
 {
 	//Skip the first 7 blank lines in the buffer when overscan mode is off
-	uint16_t *src = _ppuBuffer + (_overscanMode ? 0 : (_useHighResOutput ? (512 * 14) : (256 * 7)));
+	uint16_t* src = _ppuBuffer + (_overscanMode ? 0 : (_useHighResOutput ? (512 * 14) : (256 * 7)));
 
-	for(uint32_t y = 0, len = _overscanMode ? 239*2 : 224*2; y < len; y++) {
+	for(uint32_t y = 0, len = _overscanMode ? 239 * 2 : 224 * 2; y < len; y++) {
 		for(uint32_t x = 0; x < 512; x++) {
 			int srcOffset = _useHighResOutput ? ((y << 9) | x) : (((y >> 1) << 8) | (x >> 1));
-			buffer[(y + 2)*SnesEventManager::ScanlineWidth + x + 22*2] = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
+			buffer[(y + 2) * SnesEventManager::ScanlineWidth + x + 22 * 2] = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
 		}
 	}
 }

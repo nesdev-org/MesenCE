@@ -4,7 +4,7 @@
 #include "Shared/SaveStateManager.h"
 #include "Utilities/CompressionHelper.h"
 
-void RewindData::GetStateData(stringstream &stateData, deque<RewindData>& prevStates, int32_t position)
+void RewindData::GetStateData(stringstream& stateData, deque<RewindData>& prevStates, int32_t position)
 {
 	vector<uint8_t> data;
 	CompressionHelper::Decompress(_saveStateData, data);
@@ -47,7 +47,7 @@ void RewindData::LoadState(Emulator* emu, deque<RewindData>& prevStates, int32_t
 	if(_saveStateData.size() == 0) {
 		return;
 	}
-		
+
 	vector<uint8_t> data;
 	CompressionHelper::Decompress(_saveStateData, data);
 

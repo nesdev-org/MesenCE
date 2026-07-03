@@ -2,10 +2,10 @@
 using Avalonia.Media;
 using Mesen.Debugger;
 using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
-using System.Reactive.Linq;
-using System.Reactive;
 using Mesen.ViewModels;
+using ReactiveUI.Fody.Helpers;
+using System.Reactive;
+using System.Reactive.Linq;
 
 namespace Mesen.Config
 {
@@ -13,6 +13,6 @@ namespace Mesen.Config
 	{
 		[Reactive] public bool BreakOnBrk { get; set; } = false;
 		[Reactive] public bool BreakOnUnofficialOpCode { get; set; } = false;
-		[Reactive] public bool BreakOnInvalidVramAddress { get; set; } = false;		
+		[Reactive] public bool BreakOnInvalidVramAddress { get; set; } = false;
 	}
 }

@@ -10,14 +10,14 @@
 	xmlns:cfg="using:Mesen.Config"
 	mc:Ignorable="d"
 	x:DataType="vm:KeyMappingViewModel"
-	x:Class="Mesen.Views.BandaiHypershotControllerView"
+	x:Class="Mesen.Views.SnesNttDataKeypadControllerView"
 >
 	<Design.DataContext>
 		<vm:KeyMappingViewModel />
 	</Design.DataContext>
 
 	<StackPanel>
-		<v:NesControllerView />
-		<v:DefaultControllerView />
+		<v:SnesControllerView />
+		<v:DefaultControllerView MaxWidth="1000" Margin="0 5 0 0" />
 	</StackPanel>
 </UserControl>

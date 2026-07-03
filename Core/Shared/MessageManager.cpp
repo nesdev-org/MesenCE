@@ -112,7 +112,7 @@ void MessageManager::SetOptions(bool osdEnabled, bool outputToStdout)
 
 string MessageManager::Localize(string key)
 {
-	std::unordered_map<string, string> *resources = &_enResources;
+	std::unordered_map<string, string>* resources = &_enResources;
 	/*switch(EmulationSettings::GetDisplayLanguage()) {
 		case Language::English: resources = &_enResources; break;
 		case Language::French: resources = &_frResources; break;
@@ -127,13 +127,13 @@ string MessageManager::Localize(string key)
 	if(resources) {
 		if(resources->find(key) != resources->end()) {
 			return (*resources)[key];
-		}/* else if(EmulationSettings::GetDisplayLanguage() != Language::English) {
-			//Fallback on English if resource key is missing another language
-			resources = &_enResources;
-			if(resources->find(key) != resources->end()) {
-				return (*resources)[key];
-			}
-		}*/
+		} /* else if(EmulationSettings::GetDisplayLanguage() != Language::English) {
+			 //Fallback on English if resource key is missing another language
+			 resources = &_enResources;
+			 if(resources->find(key) != resources->end()) {
+				 return (*resources)[key];
+			 }
+		 }*/
 	}
 
 	return key;
@@ -194,7 +194,7 @@ string MessageManager::GetLog()
 {
 	auto lock = _logLock.AcquireSafe();
 	stringstream ss;
-	for(string &msg : _log) {
+	for(string& msg : _log) {
 		ss << msg << "\n";
 	}
 	return ss.str();

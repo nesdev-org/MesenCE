@@ -34,7 +34,7 @@ namespace Mesen.Debugger.Controls
 
 		public static readonly StyledProperty<bool> AllowSelectionProperty = AvaloniaProperty.Register<ScrollPictureViewer, bool>(nameof(AllowSelection), true);
 		public static readonly StyledProperty<bool> AllowClickDragProperty = AvaloniaProperty.Register<ScrollPictureViewer, bool>(nameof(AllowClickDrag), true);
-		
+
 		public static readonly StyledProperty<GridRowColumn?> GridHighlightProperty = AvaloniaProperty.Register<ScrollPictureViewer, GridRowColumn?>(nameof(GridHighlight), null);
 
 		public static readonly StyledProperty<bool> ShowMousePositionProperty = AvaloniaProperty.Register<ScrollPictureViewer, bool>(nameof(ShowMousePosition), true);
@@ -42,7 +42,7 @@ namespace Mesen.Debugger.Controls
 
 		public static readonly StyledProperty<Rect> SelectionRectProperty = AvaloniaProperty.Register<ScrollPictureViewer, Rect>(nameof(SelectionRect), default, defaultBindingMode: BindingMode.TwoWay);
 		public static readonly StyledProperty<Rect> OverlayRectProperty = AvaloniaProperty.Register<ScrollPictureViewer, Rect>(nameof(OverlayRect), default);
-		
+
 		public static readonly StyledProperty<ScrollBarVisibility> ScrollBarVisibilityProperty = AvaloniaProperty.Register<ScrollPictureViewer, ScrollBarVisibility>(nameof(ScrollBarVisibility), ScrollBarVisibility.Auto);
 
 		public static readonly StyledProperty<List<PictureViewerLine>?> OverlayLinesProperty = AvaloniaProperty.Register<PictureViewer, List<PictureViewerLine>?>(nameof(OverlayLines), null);
@@ -284,8 +284,8 @@ namespace Mesen.Debugger.Controls
 
 				double xPadding = GridSizeX / 2 * Zoom;
 				double yPadding = GridSizeY / 2 * Zoom;
-				double x = offset.X + (xRightGap > 0 ? (xRightGap + xPadding): 0) + (xLeftGap < 0 ? (xLeftGap - xPadding) : 0);
-				double y = offset.Y + (yBottomGap > 0 ? (yBottomGap + yPadding): 0) + (yTopGap < 0 ? (yTopGap - yPadding) : 0);
+				double x = offset.X + (xRightGap > 0 ? (xRightGap + xPadding) : 0) + (xLeftGap < 0 ? (xLeftGap - xPadding) : 0);
+				double y = offset.Y + (yBottomGap > 0 ? (yBottomGap + yPadding) : 0) + (yTopGap < 0 ? (yTopGap - yPadding) : 0);
 
 				ScrollOffset = new Vector(
 					Math.Max(0, Math.Min(x, maxOffsets.Width)),

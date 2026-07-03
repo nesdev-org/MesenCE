@@ -26,7 +26,7 @@ namespace Mesen.ViewModels
 		[Reactive] public HdPackBuilderConfig Config { get; set; }
 		[Reactive] public FilterInfo? SelectedFilter { get; set; }
 		[Reactive] public BankSizeInfo SelectedBankSize { get; set; }
-		
+
 		[Reactive] public FilterInfo[] Filters { get; private set; } = Array.Empty<FilterInfo>();
 
 		public BankSizeInfo[] BankSizes { get; } = {

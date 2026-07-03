@@ -13,7 +13,7 @@ namespace Mesen.Config
 {
 	public class VideoConfig : BaseConfig<VideoConfig>
 	{
-		[Reactive] [MinMax(0.1, 5.0)] public double CustomAspectRatio { get; set; } = 1.0;
+		[Reactive][MinMax(0.1, 5.0)] public double CustomAspectRatio { get; set; } = 1.0;
 		[Reactive] public VideoFilterType VideoFilter { get; set; } = VideoFilterType.None;
 		[Reactive] public VideoAspectRatio AspectRatio { get; set; } = VideoAspectRatio.NoStretching;
 
@@ -23,30 +23,31 @@ namespace Mesen.Config
 		[Reactive] public bool VerticalSync { get; set; } = false;
 		[Reactive] public bool IntegerFpsMode { get; set; } = false;
 
-		[Reactive] [MinMax(-100, 100)] public int Brightness { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int Contrast { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int Hue { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int Saturation { get; set; } = 0;
-		[Reactive] [MinMax(0, 100)] public int ScanlineIntensity { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Brightness { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Contrast { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Hue { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int Saturation { get; set; } = 0;
+		[Reactive][MinMax(0, 100)] public int ScanlineIntensity { get; set; } = 0;
 
 		[Reactive][MinMax(0, 100)] public int LcdGridTopLeftBrightness { get; set; } = 100;
 		[Reactive][MinMax(0, 100)] public int LcdGridTopRightBrightness { get; set; } = 85;
 		[Reactive][MinMax(0, 100)] public int LcdGridBottomLeftBrightness { get; set; } = 85;
 		[Reactive][MinMax(0, 100)] public int LcdGridBottomRightBrightness { get; set; } = 85;
 
-		[Reactive] [MinMax(-100, 100)] public int NtscArtifacts { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscBleed { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscFringing { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscGamma { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscResolution { get; set; } = 0;
-		[Reactive] [MinMax(-100, 100)] public int NtscSharpness { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscArtifacts { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscBleed { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscFringing { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscGamma { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscResolution { get; set; } = 0;
+		[Reactive][MinMax(-100, 100)] public int NtscSharpness { get; set; } = 0;
 		[Reactive] public bool NtscMergeFields { get; set; } = false;
 
 		[Reactive] public NtscBisqwitFilterScale NtscScale { get; set; } = NtscBisqwitFilterScale._2x;
-		[Reactive] [MinMax(-50, 400)] public Int32 NtscYFilterLength { get; set; } = 0;
-		[Reactive] [MinMax(0, 400)] public Int32 NtscIFilterLength { get; set; } = 50;
-		[Reactive] [MinMax(0, 400)] public Int32 NtscQFilterLength { get; set; } = 50;
+		[Reactive][MinMax(-50, 400)] public Int32 NtscYFilterLength { get; set; } = 0;
+		[Reactive][MinMax(0, 400)] public Int32 NtscIFilterLength { get; set; } = 50;
+		[Reactive][MinMax(0, 400)] public Int32 NtscQFilterLength { get; set; } = 50;
 
+		[Reactive] public bool EnableVariableRefreshRate { get; set; } = false;
 		[Reactive] public bool FullscreenForceIntegerScale { get; set; } = false;
 		[Reactive] public bool UseExclusiveFullscreen { get; set; } = false;
 		[Reactive] public UInt32 ExclusiveFullscreenRefreshRateNtsc { get; set; } = 60;
@@ -54,6 +55,7 @@ namespace Mesen.Config
 		[Reactive] public FullscreenResolution ExclusiveFullscreenResolution { get; set; } = 0;
 
 		[Reactive] public ScreenRotation ScreenRotation { get; set; } = ScreenRotation.None;
+		[Reactive] public bool DisableHighPrecisionFramePacing { get; set; } = false;
 
 		public VideoConfig()
 		{
@@ -81,7 +83,7 @@ namespace Mesen.Config
 				AspectRatio = aspectRatio,
 
 				UseBilinearInterpolation = this.UseBilinearInterpolation,
-				UseSrgbTextureFormat = this.UseSrgbTextureFormat,
+				UseSrgbTextureFormat = this.UseSrgbTextureFormat && this.UseBilinearInterpolation,
 				VerticalSync = this.VerticalSync,
 				IntegerFpsMode = this.IntegerFpsMode,
 
@@ -109,15 +111,36 @@ namespace Mesen.Config
 				NtscIFilterLength = this.NtscIFilterLength / 100.0,
 				NtscQFilterLength = this.NtscQFilterLength / 100.0,
 
+				EnableVariableRefreshRate = this.EnableVariableRefreshRate,
+
 				FullscreenForceIntegerScale = this.FullscreenForceIntegerScale,
 				UseExclusiveFullscreen = this.UseExclusiveFullscreen,
 				ExclusiveFullscreenRefreshRateNtsc = this.ExclusiveFullscreenRefreshRateNtsc,
 				ExclusiveFullscreenRefreshRatePal = this.ExclusiveFullscreenRefreshRatePal,
-				FullscreenResWidth = (uint)(ExclusiveFullscreenResolution == FullscreenResolution.Default ? (ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Width ?? 1920) : ExclusiveFullscreenResolution.GetWidth()),
-				FullscreenResHeight = (uint)(ExclusiveFullscreenResolution == FullscreenResolution.Default ? (ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Height ?? 1080) : ExclusiveFullscreenResolution.GetHeight()),
 
-				ScreenRotation = (uint)ScreenRotation
+				ScreenRotation = (uint)ScreenRotation,
+				DisableHighPrecisionFramePacing = this.DisableHighPrecisionFramePacing
 			});
+		}
+
+		public UInt32 GetFullscreenWidth()
+		{
+			uint monitorWidth = (uint)(ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Width ?? 1920);
+			if(UseExclusiveFullscreen) {
+				return ExclusiveFullscreenResolution == FullscreenResolution.Default ? monitorWidth : (uint)ExclusiveFullscreenResolution.GetWidth();
+			} else {
+				return monitorWidth;
+			}
+		}
+
+		public UInt32 GetFullscreenHeight()
+		{
+			uint monitorHeight = (uint)(ApplicationHelper.GetMainWindow()?.Screens.Primary?.Bounds.Height ?? 1080);
+			if(UseExclusiveFullscreen) {
+				return ExclusiveFullscreenResolution == FullscreenResolution.Default ? monitorHeight : (uint)ExclusiveFullscreenResolution.GetHeight();
+			} else {
+				return monitorHeight;
+			}
 		}
 	}
 
@@ -157,14 +180,15 @@ namespace Mesen.Config
 		public double NtscIFilterLength;
 		public double NtscQFilterLength;
 
+		[MarshalAs(UnmanagedType.I1)] public bool EnableVariableRefreshRate;
 		[MarshalAs(UnmanagedType.I1)] public bool FullscreenForceIntegerScale;
 		[MarshalAs(UnmanagedType.I1)] public bool UseExclusiveFullscreen;
 		public UInt32 ExclusiveFullscreenRefreshRateNtsc;
 		public UInt32 ExclusiveFullscreenRefreshRatePal;
-		public UInt32 FullscreenResWidth;
-		public UInt32 FullscreenResHeight;
 
 		public UInt32 ScreenRotation;
+
+		[MarshalAs(UnmanagedType.I1)] public bool DisableHighPrecisionFramePacing;
 	}
 
 	public enum VideoFilterType

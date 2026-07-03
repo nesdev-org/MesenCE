@@ -107,7 +107,7 @@ namespace Mesen.Debugger.Utilities
 				},
 
 				new ContextMenuSeparator(),
-				
+
 				new ContextMenuAction() {
 					ActionType = ActionType.RunToNmi,
 					Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.RunToNmi),

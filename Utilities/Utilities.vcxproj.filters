@@ -172,7 +172,6 @@
     <ClInclude Include="UTF8Util.h" />
     <ClInclude Include="VirtualFile.h" />
     <ClInclude Include="CRC32.h" />
-    <ClInclude Include="md5.h" />
     <ClInclude Include="sha1.h" />
     <ClInclude Include="magic_enum.hpp" />
     <ClInclude Include="pch.h" />
@@ -212,6 +211,7 @@
     <ClInclude Include="Audio\ymfm\ymfm_adpcm.h">
       <Filter>Audio\ymfm</Filter>
     </ClInclude>
+    <ClInclude Include="TimeUtilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xBRZ\xbrz.cpp">
@@ -329,7 +329,6 @@
     <ClCompile Include="UTF8Util.cpp" />
     <ClCompile Include="VirtualFile.cpp" />
     <ClCompile Include="CRC32.cpp" />
-    <ClCompile Include="md5.cpp" />
     <ClCompile Include="sha1.cpp" />
     <ClCompile Include="NTSC\sms_ntsc.cpp">
       <Filter>NTSC</Filter>

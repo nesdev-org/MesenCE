@@ -1,9 +1,9 @@
-﻿using Mesen.Config;
+﻿using Avalonia.Threading;
+using Mesen.Config;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
 using System.IO;

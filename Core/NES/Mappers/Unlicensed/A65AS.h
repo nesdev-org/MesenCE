@@ -22,7 +22,7 @@ protected:
 			SelectPrgPage(0, ((value & 0x30) >> 1) | (value & 0x07));
 			SelectPrgPage(1, ((value & 0x30) >> 1) | 0x07);
 		}
-		
+
 		if(value & 0x80) {
 			SetMirroringType(value & 0x20 ? MirroringType::ScreenBOnly : MirroringType::ScreenAOnly);
 		} else {

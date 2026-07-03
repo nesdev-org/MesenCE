@@ -13,6 +13,6 @@ private:
 	vector<double> _prevEqualizerGains;
 
 public:
-	void ApplyEqualizer(uint32_t sampleCount, int16_t *samples);
+	void ApplyEqualizer(uint32_t sampleCount, int16_t* samples);
 	void UpdateEqualizers(vector<double> bandGains, uint32_t sampleRate);
 };

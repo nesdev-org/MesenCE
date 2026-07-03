@@ -74,7 +74,11 @@ protected:
 
 		switch(addr & 0xC101) {
 			case 0x4100: _currentRegister = value & 0x07; break;
-			case 0x4101: _regs[_currentRegister] = (value & 0x07); UpdateState(); break;
+
+			case 0x4101:
+				_regs[_currentRegister] = (value & 0x07);
+				UpdateState();
+				break;
 		}
 	}
 };

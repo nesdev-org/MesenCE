@@ -18,9 +18,9 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr) {
-			case 0x7FFD: SelectPrgPage(0, value & 0x01); break;
-			case 0x7FFE: SelectChrPage(0, value & 0x0F); break;
-			case 0x7FFF: SelectChrPage(1, value & 0x0F); break;
+			case 0x7FFD: SelectPrgPage(0, value); break;
+			case 0x7FFE: SelectChrPage(0, value); break;
+			case 0x7FFF: SelectChrPage(1, value); break;
 		}
 
 		WritePrgRam(addr, value);

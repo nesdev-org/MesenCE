@@ -1,10 +1,10 @@
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Mesen.Config;
-using Avalonia.Interactivity;
-using Mesen.ViewModels;
 using Mesen.Utilities;
-using Avalonia.Input;
+using Mesen.ViewModels;
 using System.ComponentModel;
 
 namespace Mesen.Windows
@@ -56,19 +56,19 @@ namespace Mesen.Windows
 			}
 		}
 
-		private void btnOk_OnClick(object sender, RoutedEventArgs e)
+		private void BtnOk_OnClick(object sender, RoutedEventArgs e)
 		{
 			_promptToSave = false;
 			Close(true);
 		}
 
-		private void btnCancel_OnClick(object sender, RoutedEventArgs e)
+		private void BtnCancel_OnClick(object sender, RoutedEventArgs e)
 		{
 			_promptToSave = false;
 			Close(false);
 		}
 
-		private void btnPreset_OnClick(object sender, RoutedEventArgs e)
+		private void BtnPreset_OnClick(object sender, RoutedEventArgs e)
 		{
 			((Button)sender).ContextMenu?.Open();
 		}
@@ -85,7 +85,7 @@ namespace Mesen.Windows
 			}
 		}
 
-		private void btnClearBindings_OnClick(object sender, RoutedEventArgs e)
+		private void BtnClearBindings_OnClick(object sender, RoutedEventArgs e)
 		{
 			int index = this.GetControl<TabControl>("tabMain").SelectedIndex;
 			ControllerConfig cfg = Model.Config;
@@ -97,57 +97,57 @@ namespace Mesen.Windows
 			}
 		}
 
-		private void mnuWasdLayout_OnClick(object sender, RoutedEventArgs e)
+		private void MnuWasdLayout_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.WasdKeys);
 		}
 
-		private void mnuArrowLayout_OnClick(object sender, RoutedEventArgs e)
+		private void MnuArrowLayout_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.ArrowKeys);
 		}
 
-		private void mnuXboxLayout1_OnClick(object sender, RoutedEventArgs e)
+		private void MnuXboxLayout1_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.XboxP1);
 		}
 
-		private void mnuXboxLayout1Alt_OnClick(object sender, RoutedEventArgs e)
+		private void MnuXboxLayout1Alt_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.XboxP1Alt);
 		}
 
-		private void mnuXboxLayout2_OnClick(object sender, RoutedEventArgs e)
+		private void MnuXboxLayout2_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.XboxP2);
 		}
 
-		private void mnuXboxLayout2Alt_OnClick(object sender, RoutedEventArgs e)
+		private void MnuXboxLayout2Alt_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.XboxP2Alt);
 		}
 
-		private void mnuPs4Layout1_OnClick(object sender, RoutedEventArgs e)
+		private void MnuPs4Layout1_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.Ps4P1);
 		}
 
-		private void mnuPs4Layout1Alt_OnClick(object sender, RoutedEventArgs e)
+		private void MnuPs4Layout1Alt_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.Ps4P1Alt);
 		}
 
-		private void mnuPs4Layout2_OnClick(object sender, RoutedEventArgs e)
+		private void MnuPs4Layout2_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.Ps4P2);
 		}
 
-		private void mnuPs4Layout2Alt_OnClick(object sender, RoutedEventArgs e)
+		private void MnuPs4Layout2Alt_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(KeyPresetType.Ps4P2Alt);
 		}
 
-		private void btnSetDefaultBindings_OnClick(object sender, RoutedEventArgs e)
+		private void BtnSetDefaultBindings_OnClick(object sender, RoutedEventArgs e)
 		{
 			SetDefaultMappings(null);
 		}

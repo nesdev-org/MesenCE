@@ -8,7 +8,7 @@ protected:
 	uint16_t GetPrgPageSize() override { return 0x4000; }
 	uint16_t GetChrPageSize() override { return 0x2000; }
 	bool AllowRegisterRead() override { return true; }
-	
+
 	void InitMapper() override
 	{
 		AddRegisterRange(0x6000, 0x7FFF, MemoryOperation::Read);

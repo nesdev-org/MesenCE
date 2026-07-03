@@ -62,13 +62,21 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile)
 			return LoadRomResult::Failure;
 		}
 
+		if(consoleType == PceConsoleType::Auto && IsSuperGrafxCd(disc)) {
+			consoleType = PceConsoleType::SuperGrafx;
+		}
+
 		_cdrom.reset(new PceCdRom(_emu, this, disc));
 		_romFormat = RomFormat::PceCdRom;
 		cdromUnitEnabled = true;
 	} else {
 		romFile.ReadFile(romData);
 		crc32 = CRC32::GetCRC(romData);
-		if((romData.size() % 0x2000) == 512) {
+
+		if(romData.size() < 0x2000) {
+			//Pad ROM to 8kb when smaller (prevents crashes)
+			romData.insert(romData.end(), 0x2000 - romData.size(), 0);
+		} else if((romData.size() % 0x2000) == 512) {
 			//File probably has header, discard it
 			romData.erase(romData.begin(), romData.begin() + 512);
 		}
@@ -85,7 +93,7 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile)
 		}
 
 		cdromUnitEnabled = cfg.EnableCdRomForHuCardGames;
-		
+
 		if(cdromUnitEnabled || !cfg.DisableCdRomSaveRamForHuCardGames) {
 			//CD-ROM is used for save ram for non-cd-rom games
 			DiscInfo emptyDisc = {};
@@ -113,7 +121,7 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile)
 	_controlManager.reset(new PceControlManager(_emu));
 	_vce.reset(new PceVce(_emu, this));
 	_vpc.reset(new PceVpc(_emu, this, _vce.get()));
-	
+
 	_vdc.reset(new PceVdc(_emu, this, _vpc.get(), _vce.get(), false));
 	if(consoleType == PceConsoleType::SuperGrafx) {
 		_vdc2.reset(new PceVdc(_emu, this, _vpc.get(), _vce.get(), true));
@@ -132,6 +140,9 @@ LoadRomResult PceConsole::LoadRom(VirtualFile& romFile)
 
 	MessageManager::Log("-----------------");
 	MessageManager::Log("Loaded: " + romFile.GetFileName());
+	if(consoleType == PceConsoleType::SuperGrafx && cfg.ConsoleType == PceConsoleType::Auto) {
+		MessageManager::Log("Enabled SuperGrafx mode (auto-detect)");
+	}
 	MessageManager::Log("-----------------");
 
 	return LoadRomResult::Success;
@@ -157,6 +168,25 @@ bool PceConsole::IsPopulousCard(uint32_t crc32)
 	return crc32 == 0x083C956A;
 }
 
+bool PceConsole::IsSuperGrafxCd(DiscInfo& disc)
+{
+	int32_t track = disc.GetFirstDataTrack();
+	if(track < 0) {
+		return false;
+	}
+
+	int32_t sector = disc.GetTrackFirstSector(track);
+	if(sector < 0) {
+		return false;
+	}
+
+	//Check for custom homebrew marker to automatically enable SuperGrafx mode for CD games
+	//This should be in the 2nd sector of the first data track, at offset 0x80
+	vector<uint8_t> sectorData;
+	disc.ReadDataSector(sector + 1, sectorData);
+	return memcmp(sectorData.data() + 0x80, "(for SuperGRAFX)", 16) == 0;
+}
+
 bool PceConsole::IsSuperGrafxCard(uint32_t crc32)
 {
 	//These are the 5 SuperGrafx-exclusive games
@@ -169,7 +199,7 @@ void PceConsole::RunFrame()
 	while(frameCount == _vdc->GetFrameCount()) {
 		_cpu->Exec();
 	}
-	
+
 	_psg->Run();
 	_psg->PlayQueuedAudio();
 }
@@ -277,8 +307,7 @@ BaseVideoFilter* PceConsole::GetVideoFilter(bool getDefaultFilter)
 PpuFrameInfo PceConsole::GetPpuFrame()
 {
 	PpuFrameInfo frame = {};
-	PceVdcState& state = _vdc->GetState();
-	frame.FrameCount = state.FrameCount;
+	frame.FrameCount = _vdc->GetFrameCount();
 	frame.CycleCount = PceConstants::ClockPerScanline;
 
 	frame.FirstScanline = 0;
@@ -290,6 +319,11 @@ PpuFrameInfo PceConsole::GetPpuFrame()
 	frame.Width = PceConstants::InternalOutputWidth;
 	frame.FrameBufferSize = PceConstants::MaxScreenWidth * (PceConstants::ScreenHeight + 1) * sizeof(uint16_t);
 	return frame;
+}
+
+uint32_t PceConsole::GetFrameCount()
+{
+	return _vdc->GetFrameCount();
 }
 
 RomFormat PceConsole::GetRomFormat()
@@ -322,7 +356,7 @@ void PceConsole::InitHesPlayback(uint8_t selectedTrack)
 		_memoryManager->DebugWrite(0x2000 | i, 0);
 	}
 
-	//Setup stack to return to 0x1C00 on RTS, 0x1C00 is setup to cause an infinite loop with BRA	
+	//Setup stack to return to 0x1C00 on RTS, 0x1C00 is setup to cause an infinite loop with BRA
 	_cpu->GetState().SP = 0xFD;
 	_memoryManager->DebugWrite(0x21FE, 0xFF);
 	_memoryManager->DebugWrite(0x21FF, 0x1B);

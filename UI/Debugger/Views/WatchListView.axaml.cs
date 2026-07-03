@@ -1,17 +1,17 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using System.Linq;
-using Mesen.Debugger.ViewModels;
-using Avalonia.Input;
-using System;
-using Avalonia.Interactivity;
-using DataBoxControl;
-using Avalonia.Styling;
-using Avalonia.LogicalTree;
 using Avalonia.Controls.Selection;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
+using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using Avalonia.Threading;
+using DataBoxControl;
+using Mesen.Debugger.ViewModels;
 using Mesen.Utilities;
+using System;
+using System.Linq;
 
 namespace Mesen.Debugger.Views
 {
@@ -20,6 +20,7 @@ namespace Mesen.Debugger.Views
 		public WatchListViewModel Model => (WatchListViewModel)DataContext!;
 
 		private DataBox _grid;
+		bool _inSelectionChanged = false;
 
 		public WatchListView()
 		{
@@ -43,14 +44,13 @@ namespace Mesen.Debugger.Views
 			base.OnDataContextChanged(e);
 		}
 
-		bool inSelectionChanged = false;
 		private void Selection_SelectionChanged(object? sender, SelectionModelSelectionChangedEventArgs<WatchValueInfo> e)
 		{
-			if(inSelectionChanged || Model == null || !IsKeyboardFocusWithin) {
+			if(_inSelectionChanged || Model == null || !IsKeyboardFocusWithin) {
 				return;
 			}
 
-			inSelectionChanged = true;
+			_inSelectionChanged = true;
 			if(Model.Selection.Count == 1) {
 				Dispatcher.UIThread.Post(() => {
 					int index = Model.Selection.SelectedIndex;
@@ -64,7 +64,7 @@ namespace Mesen.Debugger.Views
 					Model.Selection.Select(0);
 				});
 			}
-			inSelectionChanged = false;
+			_inSelectionChanged = false;
 		}
 
 		private void OnEntryContextRequested(object? sender, ContextRequestedEventArgs e)

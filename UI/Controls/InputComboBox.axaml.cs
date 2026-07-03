@@ -38,7 +38,7 @@ namespace Mesen.Controls
 			get { return GetValue(SetupEnabledProperty); }
 			set { SetValue(SetupEnabledProperty, value); }
 		}
-		
+
 		public int Port
 		{
 			get { return GetValue(PortProperty); }
@@ -68,16 +68,16 @@ namespace Mesen.Controls
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private async void btnSetup_Click(object sender, RoutedEventArgs e)
+		private async void BtnSetup_Click(object sender, RoutedEventArgs e)
 		{
 			Button btn = (Button)sender;
 
 			PixelPoint startPosition = btn.PointToScreen(new Point(-7, btn.Bounds.Height));
-			
+
 			ControllerConfigWindow wnd = new ControllerConfigWindow();
 			ControllerConfig cfg = Config.Clone();
 			wnd.DataContext = new ControllerConfigViewModel(ControllerType, cfg, Config, Port);
-			
+
 			if(await wnd.ShowDialogAtPosition<bool>(btn.GetVisualRoot() as Visual, startPosition)) {
 				Config = cfg;
 			}

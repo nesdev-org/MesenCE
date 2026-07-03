@@ -30,7 +30,7 @@
 				HorizontalAlignment="Stretch"
 				HorizontalContentAlignment="Center"
 				Content="{l:Translate btnSelectPalette}"
-				Click="btnSelectPalette_OnClick"
+				Click="BtnSelectPalette_OnClick"
 			>
 				<Button.ContextMenu>
 					<ContextMenu Name="Preset" Placement="BottomEdgeAlignedLeft" ItemsSource="{Binding PalettePresets, ElementName=root}">
@@ -49,14 +49,14 @@
 				HorizontalAlignment="Stretch"
 				HorizontalContentAlignment="Center"
 				Content="{l:Translate btnLoadPalFile}"
-				Click="btnLoadPalFile_OnClick"
+				Click="BtnLoadPalFile_OnClick"
 			/>
 			<Button
 				Grid.Column="2"
 				HorizontalAlignment="Stretch"
 				HorizontalContentAlignment="Center"
 				Content="{l:Translate btnExportPalette}"
-				Click="btnExportPalette_OnClick"
+				Click="BtnExportPalette_OnClick"
 			/>
 		</Grid>
 	</StackPanel>

@@ -131,13 +131,13 @@
 										<Button
 											Grid.Column="2"
 											Content="{l:Translate btnSelectPreset}"
-											Click="btnSelectPreset_OnClick"
+											Click="BtnSelectPreset_OnClick"
 										>
 											<Button.ContextMenu>
 												<ContextMenu Placement="BottomEdgeAlignedLeft">
-													<MenuItem Header="{l:Translate lblGameGearPreset}" Click="mnuGameGearPreset_Click" />
-													<MenuItem Header="{l:Translate lblFullFramePreset}" Click="mnuFullFramePreset_Click" />
-													<MenuItem Header="{l:Translate lblFullFrameFirstColumnPreset}" Click="mnuFullFrameFirstColumnPreset_Click" />
+													<MenuItem Header="{l:Translate lblGameGearPreset}" Click="MnuGameGearPreset_Click" />
+													<MenuItem Header="{l:Translate lblFullFramePreset}" Click="MnuFullFramePreset_Click" />
+													<MenuItem Header="{l:Translate lblFullFrameFirstColumnPreset}" Click="MnuFullFrameFirstColumnPreset_Click" />
 												</ContextMenu>
 											</Button.ContextMenu>
 										</Button>

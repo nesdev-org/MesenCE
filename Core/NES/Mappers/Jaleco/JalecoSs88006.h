@@ -108,20 +108,65 @@ protected:
 		value &= 0x0F;
 
 		switch(addr & 0xF003) {
-			case 0x8000: case 0x8001: UpdatePrgBank(0, value, updateUpperBits); break;
-			case 0x8002: case 0x8003: UpdatePrgBank(1, value, updateUpperBits); break;
-			case 0x9000: case 0x9001: UpdatePrgBank(2, value, updateUpperBits); break;
+			case 0x8000:
+			case 0x8001:
+				UpdatePrgBank(0, value, updateUpperBits);
+				break;
 
-			case 0xA000: case 0xA001: UpdateChrBank(0, value, updateUpperBits); break;
-			case 0xA002: case 0xA003: UpdateChrBank(1, value, updateUpperBits); break;
-			case 0xB000: case 0xB001: UpdateChrBank(2, value, updateUpperBits); break;
-			case 0xB002: case 0xB003: UpdateChrBank(3, value, updateUpperBits); break;
-			case 0xC000: case 0xC001: UpdateChrBank(4, value, updateUpperBits); break;
-			case 0xC002: case 0xC003: UpdateChrBank(5, value, updateUpperBits); break;
-			case 0xD000: case 0xD001: UpdateChrBank(6, value, updateUpperBits); break;
-			case 0xD002: case 0xD003: UpdateChrBank(7, value, updateUpperBits); break;
+			case 0x8002:
+			case 0x8003:
+				UpdatePrgBank(1, value, updateUpperBits);
+				break;
 
-			case 0xE000: case 0xE001: case 0xE002:	case 0xE003:
+			case 0x9000:
+			case 0x9001:
+				UpdatePrgBank(2, value, updateUpperBits);
+				break;
+
+			case 0xA000:
+			case 0xA001:
+				UpdateChrBank(0, value, updateUpperBits);
+				break;
+
+			case 0xA002:
+			case 0xA003:
+				UpdateChrBank(1, value, updateUpperBits);
+				break;
+
+			case 0xB000:
+			case 0xB001:
+				UpdateChrBank(2, value, updateUpperBits);
+				break;
+
+			case 0xB002:
+			case 0xB003:
+				UpdateChrBank(3, value, updateUpperBits);
+				break;
+
+			case 0xC000:
+			case 0xC001:
+				UpdateChrBank(4, value, updateUpperBits);
+				break;
+
+			case 0xC002:
+			case 0xC003:
+				UpdateChrBank(5, value, updateUpperBits);
+				break;
+
+			case 0xD000:
+			case 0xD001:
+				UpdateChrBank(6, value, updateUpperBits);
+				break;
+
+			case 0xD002:
+			case 0xD003:
+				UpdateChrBank(7, value, updateUpperBits);
+				break;
+
+			case 0xE000:
+			case 0xE001:
+			case 0xE002:
+			case 0xE003:
 				_irqReloadValue[addr & 0x03] = value;
 				break;
 

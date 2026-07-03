@@ -19,10 +19,13 @@ namespace Mesen.Views
 			if(mappings != null) {
 				return mappings.Type switch {
 					ControllerType.SnesController or ControllerType.SnesRumbleController => new SnesControllerView(),
+					ControllerType.SnesNttDataKeypad => new SnesNttDataKeypadControllerView(),
 					ControllerType.NesController => new NesControllerView(),
 					ControllerType.FamicomController => new NesControllerView(),
 					ControllerType.FamicomControllerP2 => new NesControllerView(true),
-					ControllerType.BandaiHyperShot => new BandaiHypershotControllerView(),
+					ControllerType.BandaiHyperShot => new NesCustomControllerView(),
+					ControllerType.Pachinko => new NesCustomControllerView(),
+					ControllerType.FcnsController => new NesCustomControllerView(),
 					ControllerType.HoriTrack => new NesControllerView(),
 					ControllerType.GameboyController => new NesControllerView(),
 					ControllerType.GbaController => new GbaControllerView(),
@@ -31,6 +34,7 @@ namespace Mesen.Views
 					ControllerType.SmsController => new SmsControllerView(),
 					ControllerType.WsController => new WsControllerView(),
 					ControllerType.WsControllerVertical => new WsControllerVerticalView(),
+					ControllerType.Pcv2Controller => new WsPcv2ControllerView(),
 					_ => new DefaultControllerView()
 				};
 			}

@@ -23,7 +23,10 @@ protected:
 		return "F";
 	}
 
-	enum Buttons { Fire };
+	enum Buttons
+	{
+		Fire
+	};
 
 	void InternalSetStateFromInput() override
 	{
@@ -100,7 +103,7 @@ public:
 		hud.DrawOutline(11, 14);
 		hud.DrawButton(2, 1, 7, 5, IsPressed(Buttons::Fire));
 		hud.DrawNumber(hud.GetControllerIndex() + 1, 4, 7);
-		
+
 		hud.DrawMousePosition(GetCoordinates());
 	}
 

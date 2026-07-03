@@ -49,16 +49,36 @@ protected:
 	void WriteRegister(uint16_t addr, uint8_t value) override
 	{
 		switch(addr & 0x0F) {
-			case 0: case 2: SelectChrPage(addr & 0x0F, value & 0xFE); break;
-			case 1: case 3: SelectChrPage(addr & 0x0F, value | 0x01); break;
-			case 4: case 5: case 6: case 7: SelectChrPage(addr & 0x0F, value); break;
+			case 0:
+			case 2:
+				SelectChrPage(addr & 0x0F, value & 0xFE);
+				break;
 
-			case 8: case 0x0B: SelectPrgPage((addr & 0x0F) - 8, (value & 0x0F) | 0x10); break;
-			case 9: case 0x0A: SelectPrgPage((addr & 0x0F) - 8, value & 0x1F); break;
+			case 1:
+			case 3:
+				SelectChrPage(addr & 0x0F, value | 0x01);
+				break;
 
-			case 0x0D: 
-				_irqEnabled = false; 
-				_irqCounter = 0; 
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+				SelectChrPage(addr & 0x0F, value);
+				break;
+
+			case 8:
+			case 0x0B:
+				SelectPrgPage((addr & 0x0F) - 8, (value & 0x0F) | 0x10);
+				break;
+
+			case 9:
+			case 0x0A:
+				SelectPrgPage((addr & 0x0F) - 8, value & 0x1F);
+				break;
+
+			case 0x0D:
+				_irqEnabled = false;
+				_irqCounter = 0;
 				_console->GetCpu()->ClearIrqSource(IRQSource::External);
 				break;
 

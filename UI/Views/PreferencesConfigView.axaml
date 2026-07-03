@@ -76,7 +76,7 @@
 					<c:OptionSection Header="{l:Translate grpDataStorageLocation}">
 						<DockPanel>
 							<TextBlock Text="{l:Translate lblDataLocation}" DockPanel.Dock="Left" VerticalAlignment="Center" />
-							<Button DockPanel.Dock="Right" Content="{l:Translate btnChangeStorageFolder}" Click="btnChangeStorageFolder_OnClick" />
+							<Button DockPanel.Dock="Right" Content="{l:Translate btnChangeStorageFolder}" Click="BtnChangeStorageFolder_OnClick" />
 							<TextBox IsReadOnly="True" Text="{Binding DataStorageLocation}" />
 						</DockPanel>
 					</c:OptionSection>
@@ -166,7 +166,7 @@
 						<CheckBox Content="{l:Translate chkShowGameTimer}" IsChecked="{Binding Config.ShowGameTimer}" />
 						<StackPanel Orientation="Horizontal">
 							<CheckBox Content="{l:Translate chkShowLagCounter}" IsChecked="{Binding Config.ShowLagCounter}" />
-							<c:ButtonWithIcon Icon="Assets/Refresh.png" Text="{l:Translate btnResetLagCounter}" Click="btnResetLagCounter_OnClick" Margin="10 -5 0 -5" />
+							<c:ButtonWithIcon Icon="Assets/Refresh.png" Text="{l:Translate btnResetLagCounter}" Click="BtnResetLagCounter_OnClick" Margin="10 -5 0 -5" />
 						</StackPanel>
 						<CheckBox Content="{l:Translate chkShowDebugInformation}" IsChecked="{Binding Config.ShowDebugInfo}" />
 					</c:OptionSection>

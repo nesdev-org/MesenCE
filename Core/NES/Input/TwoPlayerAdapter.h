@@ -8,7 +8,8 @@ class TwoPlayerAdapter : public ControllerHub<2>
 {
 public:
 	TwoPlayerAdapter(Emulator* emu, ControllerType type, ControllerConfig controllers[]) : ControllerHub(emu, type, BaseControlDevice::ExpDevicePort, controllers)
-	{}
+	{
+	}
 
 	void WriteRam(uint16_t addr, uint8_t value) override
 	{
@@ -21,7 +22,7 @@ public:
 		StrobeProcessRead();
 		uint8_t output = 0;
 		uint8_t i = addr - 0x4016;
-		
+
 		if(_ports[i]) {
 			output |= (ReadPort(i) & 0x01) << 1;
 		}

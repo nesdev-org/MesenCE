@@ -35,7 +35,7 @@ protected:
 	{
 		if(addr < 0xA000) {
 			switch(addr & 0xE003) {
-				case 0x8000: 
+				case 0x8000:
 					_exRegs[0] = 0;
 					_exRegs[1] = value;
 					break;
@@ -47,8 +47,14 @@ protected:
 					}
 
 					switch(_exRegs[1]) {
-						case 0x08: case 0x0A: case 0x0E: case 0x12: case 0x16: case 0x1A:	case 0x1E: 
-							_exRegs[2] = value << 4; 
+						case 0x08:
+						case 0x0A:
+						case 0x0E:
+						case 0x12:
+						case 0x16:
+						case 0x1A:
+						case 0x1E:
+							_exRegs[2] = value << 4;
 							break;
 
 						case 0x09: SelectChrPage(0, _exRegs[2] | (value >> 1 & 0x0E)); break;

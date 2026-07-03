@@ -122,7 +122,7 @@ void Gameboy::Init(GbCart* cart, std::vector<uint8_t>& romData, uint32_t cartRam
 				break;
 		}
 	}
-	
+
 	_emu->RegisterMemory(MemoryType::GbBootRom, _bootRom, _bootRomSize);
 
 	InitializeRam(_cartRam, _cartRamSize);
@@ -137,7 +137,7 @@ void Gameboy::Init(GbCart* cart, std::vector<uint8_t>& romData, uint32_t cartRam
 	}
 }
 
-void Gameboy::PowerOn(SuperGameboy *sgb)
+void Gameboy::PowerOn(SuperGameboy* sgb)
 {
 	_superGameboy = sgb;
 
@@ -152,7 +152,7 @@ void Gameboy::PowerOn(SuperGameboy *sgb)
 	_cpu->PowerOn();
 }
 
-void Gameboy::Run(uint64_t runUntilClock)
+void Gameboy::RunSgb(uint64_t runUntilClock)
 {
 	while(_cpu->GetCycleCount() < runUntilClock) {
 		_cpu->Exec();
@@ -162,16 +162,20 @@ void Gameboy::Run(uint64_t runUntilClock)
 void Gameboy::LoadBattery()
 {
 	if(_hasBattery) {
-		_emu->GetBatteryManager()->LoadBattery(".srm", _cartRam, _cartRamSize);
+		_emu->GetBatteryManager()->LoadBattery(IsPrimaryConsole() ? ".srm" : ".p2.srm", _cartRam, _cartRamSize);
 	}
 }
 
 void Gameboy::SaveBattery()
 {
 	if(_hasBattery) {
-		_emu->GetBatteryManager()->SaveBattery(".srm", _cartRam, _cartRamSize);
+		_emu->GetBatteryManager()->SaveBattery(IsPrimaryConsole() ? ".srm" : ".p2.srm", _cartRam, _cartRamSize);
 	}
 	_cart->SaveBattery();
+
+	if(_secondaryConsole) {
+		_secondaryConsole->SaveBattery();
+	}
 }
 
 GbState Gameboy::GetState()
@@ -232,6 +236,11 @@ Emulator* Gameboy::GetEmulator()
 	return _emu;
 }
 
+GbApu* Gameboy::GetApu()
+{
+	return _apu.get();
+}
+
 GbPpu* Gameboy::GetPpu()
 {
 	return _ppu.get();
@@ -247,7 +256,7 @@ GbTimer* Gameboy::GetTimer()
 	return _timer.get();
 }
 
-void Gameboy::GetSoundSamples(int16_t* &samples, uint32_t& sampleCount)
+void Gameboy::GetSoundSamples(int16_t*& samples, uint32_t& sampleCount)
 {
 	_apu->GetSoundSamples(samples, sampleCount);
 }
@@ -333,6 +342,14 @@ SuperGameboy* Gameboy::GetSgb()
 	return _superGameboy;
 }
 
+Gameboy* Gameboy::GetLinkedConsole()
+{
+	if(_secondaryConsole) {
+		return _secondaryConsole.get();
+	}
+	return _mainConsole;
+}
+
 uint64_t Gameboy::GetCycleCount()
 {
 	return _cpu->GetCycleCount();
@@ -341,6 +358,11 @@ uint64_t Gameboy::GetCycleCount()
 uint64_t Gameboy::GetApuCycleCount()
 {
 	return _memoryManager->GetApuCycleCount();
+}
+
+bool Gameboy::IsPrimaryConsole()
+{
+	return _mainConsole == nullptr;
 }
 
 void Gameboy::Serialize(Serializer& s)
@@ -361,14 +383,21 @@ void Gameboy::Serialize(Serializer& s)
 	SVArray(_highRam, Gameboy::HighRamSize);
 
 	SV(_controlManager);
+
+	if(_secondaryConsole) {
+		SV(_secondaryConsole);
+	}
 }
 
-SaveStateCompatInfo Gameboy::ValidateSaveStateCompatibility(ConsoleType stateConsoleType)
+optional<SaveStateCompatInfo> Gameboy::ValidateSaveStateCompatibility(Serializer& s, ConsoleType stateConsoleType)
 {
-	if(stateConsoleType == ConsoleType::Snes) {
-		return { true, "", "cart.gameboy." };
+	if(_secondaryConsole && !s.ContainsPrefix("secondaryConsole")) {
+		//Only allow loading save states that contain 2 GBs when 2 GBs are active
+		return SaveStateCompatInfo { false };
+	} else if(stateConsoleType == ConsoleType::Snes) {
+		//Allow loading SGB save state when running a GB
+		return SaveStateCompatInfo { true, "", "cart.gameboy." };
 	}
-
 	return {};
 }
 
@@ -400,7 +429,7 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 			//Pad to multiple of 16kb
 			gbsRomData.insert(gbsRomData.end(), 0x4000 - (gbsRomData.size() & 0x3FFF), 0);
 		}
-		
+
 		MessageManager::Log("-----------------------------");
 		MessageManager::Log("File: " + romFile.GetFileName());
 
@@ -446,7 +475,13 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 		}
 
 		GbCart* cart = GbCartFactory::CreateCart(_emu, header, gbxFooter, romData);
-		
+
+		switch(_model) {
+			case GameboyModel::Gameboy: MessageManager::Log("Game Boy model selected: Game Boy"); break;
+			case GameboyModel::SuperGameboy: MessageManager::Log("Game Boy model selected: Super Game Boy"); break;
+			case GameboyModel::GameboyColor: MessageManager::Log("Game Boy model selected: Game Boy Color"); break;
+		}
+
 		MessageManager::Log("-----------------------------");
 
 		if(cart) {
@@ -454,6 +489,23 @@ LoadRomResult Gameboy::LoadRom(VirtualFile& romFile)
 				Init(cart, romData, gbxFooter.GetRamSize(), gbxFooter.HasBattery());
 			} else {
 				Init(cart, romData, header.GetCartRamSize(), header.HasBattery());
+			}
+
+			EmuSettings* settings = _emu->GetSettings();
+			GameboyConfig cfg = settings->GetGameboyConfig();
+			if(!_mainConsole && cfg.UseLocalLinkCable && !_allowSgb) { // Don't allow link cable with SGB for now
+
+				// Create second console and link it with this one
+				_secondaryConsole.reset(new Gameboy(_emu));
+				_secondaryConsole->_mainConsole = this;
+
+				_emu->SetDebuggerDisabled(true);
+				LoadRomResult result = _secondaryConsole->LoadRom(romFile);
+				_emu->SetDebuggerDisabled(false);
+
+				if(result != LoadRomResult::Success) {
+					return result;
+				}
 			}
 			return LoadRomResult::Success;
 		} else {
@@ -533,6 +585,16 @@ GameboyModel Gameboy::GetEffectiveModel(GameboyHeader& header)
 				model = GameboyModel::GameboyColor;
 			}
 			break;
+
+		case GameboyModel::AutoFavorBest:
+			if(cgbFlag == CgbCompat::GameboyColorExclusive || cgbFlag == CgbCompat::GameboyColorSupport) {
+				model = GameboyModel::GameboyColor;
+			} else if(supportsSgb) {
+				model = GameboyModel::SuperGameboy;
+			} else {
+				model = GameboyModel::Gameboy;
+			}
+			break;
 	}
 
 	if(!_allowSgb && model == GameboyModel::SuperGameboy) {
@@ -545,13 +607,37 @@ GameboyModel Gameboy::GetEffectiveModel(GameboyHeader& header)
 
 void Gameboy::RunFrame()
 {
+	if(_secondaryConsole) {
+		InternalRunFrame<true>();
+	} else {
+		InternalRunFrame<false>();
+	}
+}
+
+template<bool hasLink>
+void Gameboy::InternalRunFrame()
+{
 	uint32_t frameCount = _ppu->GetFrameCount();
+
 	while(frameCount == _ppu->GetFrameCount()) {
 		_cpu->Exec();
+		if constexpr(hasLink) {
+			RunLinkedConsole();
+		}
 	}
 
 	_apu->Run();
 	_apu->PlayQueuedAudio();
+}
+
+void Gameboy::RunLinkedConsole()
+{
+	_emu->SetDebuggerDisabled(true);
+	while((int64_t)(_cpu->GetCycleCount() - _secondaryConsole->_cpu->GetCycleCount()) > 5) {
+		//Run the sub console until it catches up to the main CPU
+		_secondaryConsole->_cpu->Exec();
+	}
+	_emu->SetDebuggerDisabled(false);
 }
 
 void Gameboy::ProcessEndOfFrame()
@@ -594,6 +680,11 @@ PpuFrameInfo Gameboy::GetPpuFrame()
 	return frame;
 }
 
+uint32_t Gameboy::GetFrameCount()
+{
+	return _ppu->GetFrameCount();
+}
+
 vector<CpuType> Gameboy::GetCpuTypes()
 {
 	return { CpuType::Gameboy };
@@ -616,7 +707,7 @@ uint64_t Gameboy::GetMasterClock()
 
 uint32_t Gameboy::GetMasterClockRate()
 {
-	return _memoryManager->IsHighSpeed() ? 4194304*2 : 4194304;
+	return _memoryManager->IsHighSpeed() ? 4194304 * 2 : 4194304;
 }
 
 BaseVideoFilter* Gameboy::GetVideoFilter(bool getDefaultFilter)

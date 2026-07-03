@@ -27,7 +27,7 @@ void Spc::ProcessCycle()
 	if(_opStep == SpcOpStep::ReadOpCode) {
 #ifndef DUMMYSPC
 		_emu->ProcessInstruction<CpuType::Spc>();
-#endif 
+#endif
 		_opCode = GetOpCode();
 		_opStep = SpcOpStep::Addressing;
 		_opSubStep = 0;
@@ -60,6 +60,7 @@ void Spc::EndAddr()
 
 void Spc::Exec()
 {
+	// clang-format off
 	switch(_opCode) {
 		case 0x00: NOP(); break;
 		case 0x01: TCALL<0>(); break;
@@ -318,6 +319,7 @@ void Spc::Exec()
 		case 0xFE: DBNZ_Y(); break;
 		case 0xFF: STOP(); break;
 	}
+	// clang-format on
 
 	if(_opStep == SpcOpStep::AfterAddressing) {
 		_opStep = SpcOpStep::Operation;
@@ -340,7 +342,10 @@ void Spc::Addr_DirIdxX()
 	if(_opStep == SpcOpStep::Addressing) {
 		switch(_opSubStep++) {
 			case 0: _operandA = GetDirectAddress(ReadOperandByte() + _state.X); break;
-			case 1: Idle(); EndAddr(); break;
+			case 1:
+				Idle();
+				EndAddr();
+				break;
 		}
 	}
 }
@@ -350,7 +355,10 @@ void Spc::Addr_DirIdxY()
 	if(_opStep == SpcOpStep::Addressing) {
 		switch(_opSubStep++) {
 			case 0: _operandA = GetDirectAddress(ReadOperandByte() + _state.Y); break;
-			case 1: Idle(); EndAddr(); break;
+			case 1:
+				Idle();
+				EndAddr();
+				break;
 		}
 	}
 }
@@ -361,7 +369,10 @@ void Spc::Addr_DirToDir()
 		switch(_opSubStep++) {
 			case 0: _tmp1 = GetDirectAddress(ReadOperandByte()); break;
 			case 1: _operandA = Read(_tmp1); break;
-			case 2: _operandB = GetDirectAddress(ReadOperandByte()); EndAddr(); break;
+			case 2:
+				_operandB = GetDirectAddress(ReadOperandByte());
+				EndAddr();
+				break;
 		}
 	}
 }
@@ -371,7 +382,10 @@ void Spc::Addr_DirImm()
 	if(_opStep == SpcOpStep::Addressing) {
 		switch(_opSubStep++) {
 			case 0: _operandA = ReadOperandByte(); break;
-			case 1: _operandB = GetDirectAddress(ReadOperandByte()); EndAddr(); break;
+			case 1:
+				_operandB = GetDirectAddress(ReadOperandByte());
+				EndAddr();
+				break;
 		}
 	}
 }
@@ -386,7 +400,7 @@ void Spc::Addr_DirIdxXInd()
 			case 3:
 				_tmp3 = Read(GetDirectAddress(_tmp1 + 1));
 				_operandA = (_tmp3 << 8) | _tmp2;
-				EndAddr(); 
+				EndAddr();
 				break;
 		}
 	}
@@ -402,7 +416,7 @@ void Spc::Addr_DirIndIdxY()
 			case 4:
 				Idle();
 				_operandA = ((_tmp3 << 8) | _tmp2) + _state.Y;
-				EndAddr(); 
+				EndAddr();
 				break;
 		}
 	}
@@ -489,7 +503,7 @@ void Spc::Addr_AbsIdxY()
 				_tmp2 = ReadOperandByte();
 				_operandA = ((_tmp2 << 8) | _tmp1);
 				break;
-			
+
 			case 2:
 				Idle();
 				_operandA += _state.Y;
@@ -544,7 +558,10 @@ void Spc::STA()
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
 			case 0: Read(_operandA); break;
-			case 1: Write(_operandA, _state.A); EndOp(); break;
+			case 1:
+				Write(_operandA, _state.A);
+				EndOp();
+				break;
 		}
 	}
 }
@@ -554,7 +571,10 @@ void Spc::STX()
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
 			case 0: Read(_operandA); break;
-			case 1: Write(_operandA, _state.X); EndOp(); break;
+			case 1:
+				Write(_operandA, _state.X);
+				EndOp();
+				break;
 		}
 	}
 }
@@ -564,7 +584,10 @@ void Spc::STY()
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
 			case 0: Read(_operandA); break;
-			case 1: Write(_operandA, _state.Y); EndOp(); break;
+			case 1:
+				Write(_operandA, _state.Y);
+				EndOp();
+				break;
 		}
 	}
 }
@@ -688,7 +711,7 @@ void Spc::LDW()
 	}
 }
 
-void Spc::Transfer(uint8_t &dst, uint8_t src)
+void Spc::Transfer(uint8_t& dst, uint8_t src)
 {
 	DummyRead();
 	dst = src;
@@ -741,7 +764,10 @@ void Spc::MOV_Imm()
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
 			case 0: DummyRead(_operandB); break;
-			case 1: Write(_operandB, (uint8_t)_operandA); EndOp(); break;
+			case 1:
+				Write(_operandB, (uint8_t)_operandA);
+				EndOp();
+				break;
 		}
 	}
 }
@@ -939,7 +965,10 @@ void Spc::CMP()
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
 			case 0: Compare(Read(_operandB), (uint8_t)_operandA); break;
-			case 1: Idle(); EndOp(); break;
+			case 1:
+				Idle();
+				EndOp();
+				break;
 		}
 	}
 }
@@ -1194,7 +1223,6 @@ void Spc::DIV()
 				}
 			}
 
-
 			if((_state.Y & 0x0F) >= (_state.X & 0x0F)) {
 				SetFlags(SpcFlags::HalfCarry);
 			} else {
@@ -1364,8 +1392,7 @@ void Spc::OR1()
 {
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
-			case 0:
-			{
+			case 0: {
 				uint8_t carry = _state.PS & SpcFlags::Carry;
 				carry |= (Read(_operandA) >> _operandB) & 0x01;
 				SetCarry(carry);
@@ -1384,8 +1411,7 @@ void Spc::NOR1()
 {
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
-			case 0:
-			{
+			case 0: {
 				uint8_t carry = _state.PS & SpcFlags::Carry;
 				carry |= ~((Read(_operandA) >> _operandB)) & 0x01;
 				SetCarry(carry);
@@ -1424,8 +1450,7 @@ void Spc::EOR1()
 {
 	if(_opStep == SpcOpStep::Operation) {
 		switch(_opSubStep++) {
-			case 0:
-			{
+			case 0: {
 				uint8_t carry = _state.PS & SpcFlags::Carry;
 				carry ^= (Read(_operandA) >> _operandB) & 0x01;
 				SetCarry(carry);
@@ -1434,7 +1459,7 @@ void Spc::EOR1()
 
 			case 1:
 				Idle();
-				EndOp(); 
+				EndOp();
 				break;
 		}
 	}
@@ -1617,7 +1642,7 @@ void Spc::XCN()
 			Idle();
 			_state.A = (_state.A >> 4) | (_state.A << 4);
 			SetZeroNegativeFlags(_state.A);
-			EndOp(); 
+			EndOp();
 			break;
 	}
 }
@@ -1738,7 +1763,7 @@ void Spc::SET1()
 			case 0: _tmp1 = Read(_operandA); break;
 			case 1:
 				Write(_operandA, _tmp1 | (1 << bit));
-				EndOp(); 
+				EndOp();
 				break;
 		}
 	}
@@ -1813,7 +1838,7 @@ void Spc::CBNE()
 			case 0: _tmp1 = Read(_operandA); break;
 			case 1: Idle(); break;
 			case 2:
-				_tmp2  = ReadOperandByte();
+				_tmp2 = ReadOperandByte();
 				if(_state.A == _tmp1) {
 					EndOp();
 				}
@@ -1894,7 +1919,7 @@ void Spc::NOTC()
 			} else {
 				SetFlags(SpcFlags::Carry);
 			}
-			EndOp(); 
+			EndOp();
 			break;
 	}
 }
@@ -2046,7 +2071,7 @@ void Spc::RTS()
 		case 2: _tmp1 = Pop(); break;
 		case 3:
 			_state.PC = (Pop() << 8) | _tmp1;
-			EndOp(); 
+			EndOp();
 			break;
 	}
 }
@@ -2097,7 +2122,7 @@ void Spc::PushOperation(uint8_t value)
 	}
 }
 
-void Spc::PullOperation(uint8_t &dst)
+void Spc::PullOperation(uint8_t& dst)
 {
 	switch(_opSubStep++) {
 		case 0: DummyRead(); break;

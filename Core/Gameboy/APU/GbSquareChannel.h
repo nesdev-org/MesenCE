@@ -31,7 +31,7 @@ public:
 	void Disable();
 	void ResetLengthCounter();
 
-	void ClockSweepUnit();	
+	void ClockSweepUnit();
 	uint16_t GetSweepTargetFrequency();
 
 	void ClockLengthCounter();

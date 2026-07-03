@@ -35,7 +35,7 @@ protected:
 public:
 	BaseControlManager(Emulator* emu, CpuType cpuType);
 	virtual ~BaseControlManager();
-	
+
 	void Serialize(Serializer& s) override;
 
 	void AddSystemControlDevice(shared_ptr<BaseControlDevice> device);
@@ -55,6 +55,8 @@ public:
 	uint32_t GetPollCounter();
 	void SetPollCounter(uint32_t value);
 
+	void SaveBattery();
+
 	virtual void Reset(bool softReset) {}
 
 	void RegisterInputProvider(IInputProvider* provider);
@@ -71,19 +73,18 @@ public:
 	shared_ptr<BaseControlDevice> GetControlDeviceByIndex(uint8_t index);
 	void RefreshHubState();
 	vector<shared_ptr<BaseControlDevice>> GetControlDevices();
-	
+
 	template<typename T>
 	shared_ptr<T> GetControlDevice()
 	{
 		auto lock = _deviceLock.AcquireSafe();
 
-		for (shared_ptr<BaseControlDevice>& device : _controlDevices) {
+		for(shared_ptr<BaseControlDevice>& device : _controlDevices) {
 			shared_ptr<T> typedDevice = std::dynamic_pointer_cast<T>(device);
-			if (typedDevice) {
+			if(typedDevice) {
 				return typedDevice;
 			}
 		}
 		return nullptr;
 	}
-
 };

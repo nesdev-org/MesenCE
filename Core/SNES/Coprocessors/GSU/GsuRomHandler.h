@@ -7,11 +7,11 @@
 class GsuRomHandler : public IMemoryHandler
 {
 private:
-	GsuState *_state;
-	IMemoryHandler *_romHandler;
+	GsuState* _state;
+	IMemoryHandler* _romHandler;
 
 public:
-	GsuRomHandler(GsuState &state, IMemoryHandler *romHandler) : IMemoryHandler(MemoryType::SnesPrgRom)
+	GsuRomHandler(GsuState& state, IMemoryHandler* romHandler) : IMemoryHandler(MemoryType::SnesPrgRom)
 	{
 		_romHandler = romHandler;
 		_state = &state;
@@ -29,7 +29,10 @@ public:
 
 		switch(addr & 0x0E) {
 			default:
-			case 2: case 6: case 8: case 0x0C: 
+			case 2:
+			case 6:
+			case 8:
+			case 0x0C:
 				return 0;
 
 			case 4: return 0x04;
@@ -43,7 +46,7 @@ public:
 		return Read(addr);
 	}
 
-	void PeekBlock(uint32_t addr, uint8_t *output) override
+	void PeekBlock(uint32_t addr, uint8_t* output) override
 	{
 		for(int i = 0; i < 0x1000; i++) {
 			output[i] = Read(i);

@@ -71,6 +71,7 @@ void NesApu::FrameCounterTick(FrameType type)
 	}
 }
 
+template<bool isPeek>
 uint8_t NesApu::GetStatus()
 {
 	uint8_t status = 0;
@@ -79,7 +80,11 @@ uint8_t NesApu::GetStatus()
 	status |= _triangle->GetStatus() ? 0x04 : 0x00;
 	status |= _noise->GetStatus() ? 0x08 : 0x00;
 	status |= _dmc->GetStatus() ? 0x10 : 0x00;
-	status |= _frameCounter->GetIrqFlag() ? 0x40 : 0x00;
+	if constexpr(isPeek) {
+		status |= _frameCounter->PeekIrqFlag() ? 0x40 : 0x00;
+	} else {
+		status |= _frameCounter->GetIrqFlag() ? 0x40 : 0x00;
+	}
 	status |= _console->GetCpu()->HasIrqSource(IRQSource::DMC) ? 0x80 : 0x00;
 
 	return status;
@@ -119,7 +124,7 @@ uint8_t NesApu::PeekRam(uint16_t addr)
 		//Only run the Apu (to catch up) if we're running this in the emulation thread (not 100% accurate, but we can't run the Apu from any other thread without locking)
 		Run();
 	}
-	return GetStatus();
+	return GetStatus<true>();
 }
 
 void NesApu::WriteRam(uint16_t addr, uint8_t value)
@@ -138,7 +143,7 @@ void NesApu::WriteRam(uint16_t addr, uint8_t value)
 	_dmc->SetEnabled((value & 0x10) == 0x10);
 }
 
-void NesApu::GetMemoryRanges(MemoryRanges &ranges)
+void NesApu::GetMemoryRanges(MemoryRanges& ranges)
 {
 	ranges.AddHandler(MemoryOperation::Read, 0x4015);
 	ranges.AddHandler(MemoryOperation::Read, 0x4018, 0x401A);
@@ -194,6 +199,7 @@ void NesApu::Exec()
 {
 	_currentCycle++;
 	if(_currentCycle == NesSoundMixer::CycleLength - 1) {
+		_dmc->ProcessClock();
 		EndFrame();
 	} else if(NeedToRun(_currentCycle)) {
 		Run();
@@ -202,7 +208,6 @@ void NesApu::Exec()
 
 void NesApu::EndFrame()
 {
-	_dmc->ProcessClock();
 	Run();
 	_square1->EndFrame();
 	_square2->EndFrame();
@@ -241,6 +246,9 @@ void NesApu::Serialize(Serializer& s)
 	if(s.GetFormat() != SerializeFormat::Map) {
 		//End the Apu frame - makes it simpler to restore sound after a state reload
 		EndFrame();
+
+		SV(_apuEnabled);
+		SV(_apuDisabledStamp);
 	}
 
 	SV(_square1);
@@ -258,7 +266,23 @@ void NesApu::AddExpansionAudioDelta(AudioChannel channel, int16_t delta)
 
 void NesApu::SetApuStatus(bool enabled)
 {
-	_apuEnabled = enabled;
+	if(_apuEnabled == enabled) {
+		return;
+	}
+
+	if(!enabled) {
+		_apuDisabledStamp = _console->GetCpu()->GetCycleCount();
+		_apuEnabled = false;
+	} else {
+		uint64_t gap = _console->GetCpu()->GetCycleCount() - _apuDisabledStamp;
+		if(gap & 0x01) {
+			//CPU ran an odd number of cycles while the APU was disabled for overclocking
+			//Run an extra APU cycle here to re-sync odd/even cycles with the CPU
+			//This is needed to ensure DMC DMA occurs on the correct cycles with overclocking.
+			Exec();
+		}
+		_apuEnabled = true;
+	}
 }
 
 bool NesApu::IsApuEnabled()

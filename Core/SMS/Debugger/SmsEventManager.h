@@ -29,7 +29,7 @@ struct SmsEventViewerConfig : public BaseEventViewerConfig
 	EventViewerCategoryCfg PsgWrite;
 	EventViewerCategoryCfg IoWrite;
 	EventViewerCategoryCfg IoRead;
-	
+
 	EventViewerCategoryCfg MemoryControlWrite;
 
 	EventViewerCategoryCfg GameGearPortWrite;
@@ -41,7 +41,7 @@ struct SmsEventViewerConfig : public BaseEventViewerConfig
 class SmsEventManager final : public BaseEventManager
 {
 private:
-	static constexpr int ScanlineWidth = 342*2;
+	static constexpr int ScanlineWidth = 342 * 2;
 	static constexpr int ScreenHeight = 262;
 
 	SmsEventViewerConfig _config;

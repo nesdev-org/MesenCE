@@ -22,7 +22,7 @@
 		<Button
 			VerticalAlignment="Center"
 			Content="{l:Translate btnSetup}"
-			Click="btnSetup_Click"
+			Click="BtnSetup_Click"
 			IsEnabled="{Binding SetupEnabled, ElementName=root}"
 		/>
 	</StackPanel>

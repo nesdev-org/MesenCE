@@ -1,16 +1,16 @@
 #if (defined(DUMMYCPU) && !defined(__DUMMYARMV3CPU__H)) || (!defined(DUMMYCPU) && !defined(__ARMV3CPU__H))
-#ifdef DUMMYCPU
-#define __DUMMYARMV3CPU__H
-#else
-#define __ARMV3CPU__H
-#endif
+	#ifdef DUMMYCPU
+		#define __DUMMYARMV3CPU__H
+	#else
+		#define __ARMV3CPU__H
+	#endif
 
-#include "pch.h"
-#include "SNES/Coprocessors/ST018/ArmV3Types.h"
-#include "Shared/Emulator.h"
-#include "Shared/ArmEnums.h"
-#include "Debugger/DebugTypes.h"
-#include "Utilities/ISerializable.h"
+	#include "pch.h"
+	#include "SNES/Coprocessors/ST018/ArmV3Types.h"
+	#include "Shared/Emulator.h"
+	#include "Shared/ArmEnums.h"
+	#include "Debugger/DebugTypes.h"
+	#include "Utilities/ISerializable.h"
 
 class Emulator;
 class St018;
@@ -24,7 +24,7 @@ private:
 	Emulator* _emu = nullptr;
 	St018* _st018 = nullptr;
 
-	typedef void(ArmV3Cpu::* Func)();
+	typedef void (ArmV3Cpu::*Func)();
 	static Func _armTable[0x1000];
 	static ArmOpCategory _armCategory[0x1000];
 
@@ -109,41 +109,41 @@ public:
 
 	__forceinline void Exec()
 	{
-#ifndef DUMMYCPU
+	#ifndef DUMMYCPU
 		_emu->ProcessInstruction<CpuType::St018>();
-#endif
+	#endif
 
 		_opCode = _state.Pipeline.Execute.OpCode;
-#ifndef DUMMYCPU
+	#ifndef DUMMYCPU
 		if(CheckConditions(_opCode >> 28)) {
-#else 
+	#else
 		{
-#endif
+	#endif
 			uint16_t opType = ((_opCode & 0x0FF00000) >> 16) | ((_opCode & 0xF0) >> 4);
 			(this->*_armTable[opType])();
 		}
 
-#ifndef DUMMYCPU
+	#ifndef DUMMYCPU
 		ProcessPipeline();
-#endif
+	#endif
 	}
 
 	void PowerOn(bool forReset);
 
-	void Serialize(Serializer & s) override;
+	void Serialize(Serializer& s) override;
 
-#ifdef DUMMYCPU
+	#ifdef DUMMYCPU
 private:
 	uint32_t _memOpCounter = 0;
 	MemoryOperationInfo _memOperations[32] = {};
 	ArmV3AccessModeVal _memAccessMode[32] = {};
 
 public:
-	void SetDummyState(ArmV3CpuState & state);
+	void SetDummyState(ArmV3CpuState& state);
 	uint32_t GetOperationCount();
 	void LogMemoryOperation(uint32_t addr, uint32_t value, ArmV3AccessModeVal mode, MemoryOperationType type);
 	MemoryOperationInfo GetOperationInfo(uint32_t index);
 	ArmV3AccessModeVal GetOperationMode(uint32_t index);
-#endif
-	};
+	#endif
+};
 #endif

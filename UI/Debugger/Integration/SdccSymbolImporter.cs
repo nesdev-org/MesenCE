@@ -122,7 +122,7 @@ public abstract class SdccSymbolImporter : ISymbolProvider
 			return null;
 		}
 
-		string ? foundPath = Directory.EnumerateFiles(Path.Combine(basePath, folder), filename, SearchOption.AllDirectories).FirstOrDefault();
+		string? foundPath = Directory.EnumerateFiles(Path.Combine(basePath, folder), filename, SearchOption.AllDirectories).FirstOrDefault();
 		if(File.Exists(foundPath)) {
 			return foundPath;
 		}
@@ -253,7 +253,7 @@ public abstract class SdccSymbolImporter : ISymbolProvider
 		}
 	}
 
-	private record MemAddress(int addr, MemoryType type);
+	private record MemAddress(int Addr, MemoryType Type);
 
 	private void LoadSymFile(string path, Dictionary<string, CodeLabel> labels)
 	{
@@ -287,7 +287,7 @@ public abstract class SdccSymbolImporter : ISymbolProvider
 
 				int bank = int.Parse(m.Groups[1].Value, System.Globalization.NumberStyles.HexNumber);
 				int addr = int.Parse(m.Groups[2].Value, System.Globalization.NumberStyles.HexNumber);
-				
+
 				if(!TryDecodeAddress(addr, out AddressInfo absAddr)) {
 					continue;
 				}
@@ -303,7 +303,7 @@ public abstract class SdccSymbolImporter : ISymbolProvider
 						label = baseLabel + "_" + count.ToString();
 						count++;
 					}
-					
+
 					labels[label] = new CodeLabel() {
 						Label = label,
 						Address = (UInt32)absAddr.Address,

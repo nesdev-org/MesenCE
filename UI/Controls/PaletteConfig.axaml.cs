@@ -1,22 +1,22 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
+using Mesen.Config;
+using Mesen.Debugger.Controls;
+using Mesen.Localization;
+using Mesen.Utilities;
+using Mesen.ViewModels;
+using Mesen.Windows;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
-using Mesen.Config;
-using Mesen.Localization;
-using Avalonia.Interactivity;
-using Avalonia.Data;
 using System.IO;
-using Mesen.ViewModels;
-using Mesen.Debugger.Controls;
-using Mesen.Windows;
-using Mesen.Utilities;
-using ReactiveUI;
+using System.Linq;
 using System.Reactive;
-using Avalonia.VisualTree;
+using System.Reflection;
 
 namespace Mesen.Controls
 {
@@ -82,7 +82,7 @@ namespace Mesen.Controls
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		private void btnSelectPalette_OnClick(object sender, RoutedEventArgs e)
+		private void BtnSelectPalette_OnClick(object sender, RoutedEventArgs e)
 		{
 			((Button)sender).ContextMenu?.Open();
 		}
@@ -100,7 +100,7 @@ namespace Mesen.Controls
 			}
 		}
 
-		private async void btnLoadPalFile_OnClick(object sender, RoutedEventArgs e)
+		private async void BtnLoadPalFile_OnClick(object sender, RoutedEventArgs e)
 		{
 			string? filename = await FileDialogHelper.OpenFile(null, this.GetVisualRoot(), FileDialogHelper.PaletteExt);
 			if(filename != null) {
@@ -108,7 +108,7 @@ namespace Mesen.Controls
 			}
 		}
 
-		private async void btnExportPalette_OnClick(object sender, RoutedEventArgs e)
+		private async void BtnExportPalette_OnClick(object sender, RoutedEventArgs e)
 		{
 			string? filename = await FileDialogHelper.SaveFile(null, null, this.GetVisualRoot(), FileDialogHelper.PaletteExt);
 			if(filename != null) {

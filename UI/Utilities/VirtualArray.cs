@@ -20,7 +20,7 @@ namespace Mesen.Utilities
 		public VirtualArray(int size, Func<int, int, T[]> loader)
 		{
 			_size = size;
-			_pageData = new T[0];			
+			_pageData = new T[0];
 			_loader = loader;
 		}
 

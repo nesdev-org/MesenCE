@@ -4,6 +4,8 @@
 class PlatformUtilities
 {
 public:
+	static void IdleLoop();
+
 	static void DisableScreensaver();
 	static void EnableScreensaver();
 
