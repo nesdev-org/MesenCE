@@ -48,10 +48,10 @@
 				VerticalAlignment="Center"
 			/>
 
-			<Panel IsVisible="{Binding IsSoftwareRendererVisible}">
+			<Panel IsVisible="{Binding $parent[vm:MainWindowViewModel].IsSoftwareRendererVisible}"
+			       DataContext="{Binding SoftwareRenderer}">
 				<c:SoftwareRendererView
 					Name="SoftwareRenderer"
-					DataContext="{Binding SoftwareRenderer}"
 					Width="{Binding Width}"
 					Height="{Binding Height}"
 			  />
