@@ -77,18 +77,21 @@ namespace Mesen.Views
 					return;
 				}
 
-				Typeface typeface = new Typeface(new FontFamily(InternalFontFamily));
-				if(PreferMonospace && !typeface.GlyphTypeface.Metrics.IsFixedPitch) {
-					ShowWarning = true;
-				} else {
-					ShowWarning = false;
-				}
-
-				FormattedText text = new FormattedText("W", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 10, null);
-				if(text.Width < 2 || text.Height < 2 || !double.IsFinite(text.Width) || !double.IsFinite(text.Height)) {
+				var typeface = new Typeface(new FontFamily(InternalFontFamily));
+				var largeLetter = new FormattedText("W", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 10, null);
+				// If the font somehow produced too small or too large of a letter, then bail out.
+				if(largeLetter.Width < 2 || largeLetter.Height < 2 || !double.IsFinite(largeLetter.Width) || !double.IsFinite(largeLetter.Height)) {
 					ShowWarning = false;
 					ShowError = true;
 					return;
+				}
+				var smallLetter = new FormattedText("i", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 10, null);
+				// Check that the width of the two letters which are very often different widths in a variable width font are roughly the same.
+				// If it is not roughly the same width, then its variable width.
+				if(PreferMonospace && Math.Abs(largeLetter.Width - smallLetter.Width) > .01) {
+					ShowWarning = true;
+				} else {
+					ShowWarning = false;
 				}
 
 				ShowError = false;
