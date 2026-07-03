@@ -25,8 +25,8 @@
 	</Design.DataContext>
 
 	<Window.Styles>
-		<Style Selector="DataBoxRow > Grid Rectangle#BackgroundRectangle">
-			<Setter Property="Fill" Value="{Binding Path=Background, DataType={x:Type vm:RegEntry}}"/>
+		<Style Selector="DataBoxRow > Grid Rectangle#BackgroundRectangle" x:DataType="vm:RegEntry">
+			<Setter Property="Fill" Value="{Binding Path=Background}"/>
 		</Style>
 	</Window.Styles>
 

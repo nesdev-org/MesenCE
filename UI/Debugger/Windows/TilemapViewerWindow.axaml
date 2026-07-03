@@ -94,12 +94,12 @@
 		>
 			<TabControl.Styles>
 				<Style Selector="TabItem">
-					<Setter Property="IsEnabled" Value="{Binding Enabled, DataType={x:Type dvm:TilemapViewerTab}}" />
+					<Setter Property="IsEnabled" Value="{Binding Enabled}" x:DataType="dvm:TilemapViewerTab" />
 				</Style>
 			</TabControl.Styles>
 			<TabControl.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding Title}" IsEnabled="{Binding Enabled, DataType={x:Type dvm:TilemapViewerTab}}" />
+					<TextBlock Text="{Binding Title}" IsEnabled="{Binding Enabled}" x:DataType="dvm:TilemapViewerTab" />
 				</DataTemplate>
 			</TabControl.ItemTemplate>
 			<TabControl.ContentTemplate>

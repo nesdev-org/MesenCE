@@ -138,23 +138,23 @@
 							ColumnName="Color"
 							InitialWidth="16"
 						>
-							<DataTemplate>
+							<DataTemplate DataType="dvm:DebugEventViewModel">
 								<Border
 									BorderBrush="{DynamicResource MesenBlackBorderColor}"
 									BorderThickness="1"
-									Background="{Binding Color, Converter={StaticResource ArgbColorToBrushConverter}, DataType={x:Type dvm:DebugEventViewModel}}"
+									Background="{Binding Color, Converter={StaticResource ArgbColorToBrushConverter}}"
 									Width="12"
 									Height="12"
 								/>
 							</DataTemplate>
 						</DataBoxTemplateColumn>
-						<DataBoxTextColumn Header="{l:Translate colScanline}" ColumnName="Scanline" InitialWidth="88" Binding="{Binding Scanline, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colCycle}" ColumnName="Cycle" InitialWidth="77" Binding="{Binding Cycle, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colPc}" ColumnName="ProgramCounter" InitialWidth="62" Binding="{Binding ProgramCounter, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colType}" ColumnName="Type" InitialWidth="77" Binding="{Binding Type, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colAddress}" ColumnName="Address" InitialWidth="68" Binding="{Binding Address, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colValue}" ColumnName="Value" InitialWidth="50" Binding="{Binding Value, DataType={x:Type dvm:DebugEventViewModel}}" />
-						<DataBoxTextColumn Header="{l:Translate colDetails}" CanUserSort="False" InitialWidth="416" Binding="{Binding Details, DataType={x:Type dvm:DebugEventViewModel}}" />
+						<DataBoxTextColumn Header="{l:Translate colScanline}" ColumnName="Scanline" InitialWidth="88" Binding="{Binding Scanline}" x:DataType="dvm:DebugEventViewModel" />
+						<DataBoxTextColumn Header="{l:Translate colCycle}" ColumnName="Cycle" InitialWidth="77" Binding="{Binding Cycle}" x:DataType="dvm:DebugEventViewModel" />
+						<DataBoxTextColumn Header="{l:Translate colPc}" ColumnName="ProgramCounter" InitialWidth="62" Binding="{Binding ProgramCounter}" x:DataType="dvm:DebugEventViewModel" />
+						<DataBoxTextColumn Header="{l:Translate colType}" ColumnName="Type" InitialWidth="77" Binding="{Binding Type}" x:DataType="dvm:DebugEventViewModel" />
+						<DataBoxTextColumn Header="{l:Translate colAddress}" ColumnName="Address" InitialWidth="68" Binding="{Binding Address}" x:DataType="dvm:DebugEventViewModel" />
+						<DataBoxTextColumn Header="{l:Translate colValue}" ColumnName="Value" InitialWidth="50" Binding="{Binding Value}" x:DataType="dvm:DebugEventViewModel" />
+						<DataBoxTextColumn Header="{l:Translate colDetails}" CanUserSort="False" InitialWidth="416" Binding="{Binding Details}" x:DataType="dvm:DebugEventViewModel" />
 					</DataBox.Columns>
 				</DataBox>
 			</Border>

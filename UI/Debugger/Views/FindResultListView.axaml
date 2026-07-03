@@ -33,13 +33,15 @@
 				<DataBoxTextColumn
 					ColumnName="Address"
 					Header="{l:Translate colAddress}"
-					Binding="{Binding Address, DataType={x:Type vm:FindResultViewModel}}"
+					Binding="{Binding Address}"
+					x:DataType="vm:FindResultViewModel"
 					InitialWidth="100"
 				/>
 				<DataBoxTextColumn
 					ColumnName="Result"
 					Header="{l:Translate colResult}"
-					Binding="{Binding Text, DataType={x:Type vm:FindResultViewModel}}"
+					Binding="{Binding Text}"
+					x:DataType="vm:FindResultViewModel"
 					InitialWidth="300"
 				/>
 			</DataBox.Columns>

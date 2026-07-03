@@ -48,9 +48,9 @@
 				ColumnWidths="{Binding Config.ColumnWidths}"
 			>
 				<DataBox.Columns>
-					<DataBoxCheckBoxColumn ColumnName="Enabled" Header="" Binding="{Binding Enabled, DataType={x:Type cfg:CheatCode}}" InitialWidth="22" />
-					<DataBoxTextColumn ColumnName="Description" Header="{l:Translate colDescription}" Binding="{Binding Description, DataType={x:Type cfg:CheatCode}}" CanUserResize="True" InitialWidth="150" />
-					<DataBoxTextColumn ColumnName="Codes" Header="{l:Translate colCodes}" CanUserResize="True" InitialWidth="150" Binding="{Binding Codes, Converter={StaticResource CodeConverter}, DataType={x:Type cfg:CheatCode}}" />
+					<DataBoxCheckBoxColumn ColumnName="Enabled" Header="" Binding="{Binding Enabled}" x:DataType="cfg:CheatCode"  InitialWidth="22" />
+					<DataBoxTextColumn ColumnName="Description" Header="{l:Translate colDescription}" Binding="{Binding Description}" x:DataType="cfg:CheatCode"  CanUserResize="True" InitialWidth="150" />
+					<DataBoxTextColumn ColumnName="Codes" Header="{l:Translate colCodes}" CanUserResize="True" InitialWidth="150" Binding="{Binding Codes, Converter={StaticResource CodeConverter}}" x:DataType="cfg:CheatCode"  />
 				</DataBox.Columns>
 			</DataBox>
 		</Border>

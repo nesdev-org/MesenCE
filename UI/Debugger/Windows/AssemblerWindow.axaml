@@ -66,8 +66,8 @@
 					CellClick="OnCellClick"
 				>
 					<DataBox.Columns>
-						<DataBoxTextColumn Header="{l:Translate colLine}" Binding="{Binding LineNumber, DataType={x:Type vm:AssemblerError}}" CanUserResize="True" />
-						<DataBoxTextColumn Header="{l:Translate colError}" Binding="{Binding Message, DataType={x:Type vm:AssemblerError}}" CanUserResize="True" InitialWidth="400" />
+						<DataBoxTextColumn Header="{l:Translate colLine}" Binding="{Binding LineNumber}" x:DataType="vm:AssemblerError" CanUserResize="True" />
+						<DataBoxTextColumn Header="{l:Translate colError}" Binding="{Binding Message}" x:DataType="vm:AssemblerError" CanUserResize="True" InitialWidth="400" />
 					</DataBox.Columns>
 				</DataBox>
 			</Border>

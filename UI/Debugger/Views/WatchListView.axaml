@@ -62,13 +62,13 @@
 		>
 			<DataBox.Columns>
 				<DataBoxTemplateColumn Header="{l:Translate colName}" CanUserResize="True" InitialWidth="200">
-					<DataTemplate>
+					<DataTemplate DataType="md:WatchValueInfo">
 						<v:WatchListTextBox
 							Classes="PreventShortcuts"
 							Name="WatchTextBox"
 							ContextFlyout="{x:Null}"
 							ContextRequested="OnEntryContextRequested"
-							Text="{Binding Expression, DataType={x:Type md:WatchValueInfo}}"
+							Text="{Binding Expression}"
 							LostFocus="OnEntryLostFocus"
 							KeyDown="OnEntryKeyDown"
 							Watermark="Click to add..."
@@ -76,11 +76,10 @@
 					</DataTemplate>
 				</DataBoxTemplateColumn>
 				<DataBoxTemplateColumn Header="{l:Translate colValue}" CanUserResize="True" InitialWidth="100">
-					<DataTemplate>
+					<DataTemplate DataType="md:WatchValueInfo">
 						<TextBlock
 							Padding="3 0 0 0"
 							VerticalAlignment="Center"
-							x:DataType="md:WatchValueInfo"
 							Text="{Binding Value}"
 							Classes.changed="{Binding IsChanged}"
 						/>

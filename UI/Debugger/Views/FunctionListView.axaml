@@ -20,8 +20,8 @@
 
 	<UserControl.Styles>
 		<Style Selector="DataBoxRow">
-			<Setter Property="Foreground" Value="{Binding RowBrush, DataType={x:Type vm:FunctionViewModel}}" />
-			<Setter Property="FontStyle" Value="{Binding RowStyle, DataType={x:Type vm:FunctionViewModel}}" />
+			<Setter Property="Foreground" Value="{Binding RowBrush}" x:DataType="vm:FunctionViewModel" />
+			<Setter Property="FontStyle" Value="{Binding RowStyle}" x:DataType="vm:FunctionViewModel" />
 		</Style>
 	</UserControl.Styles>
 
@@ -41,21 +41,21 @@
 				<DataBoxTextColumn
 					ColumnName="Function"
 					Header="{l:Translate colFunction}"
-					Binding="{Binding LabelName, DataType={x:Type vm:FunctionViewModel}}"
+					Binding="{Binding LabelName}" x:DataType="vm:FunctionViewModel"
 					CanUserResize="True"
 					InitialWidth="100"
 				/>
 				<DataBoxTextColumn
 					ColumnName="RelAddr"
 					Header="{l:Translate colCpuAddr}"
-					Binding="{Binding RelAddressDisplay, DataType={x:Type vm:FunctionViewModel}}"
+					Binding="{Binding RelAddressDisplay}" x:DataType="vm:FunctionViewModel"
 					CanUserResize="True"
 					InitialWidth="80"
 				/>
 				<DataBoxTextColumn
 					ColumnName="AbsAddr"
 					Header="{l:Translate colRomAddr}"
-					Binding="{Binding AbsAddressDisplay, DataType={x:Type vm:FunctionViewModel}}"
+					Binding="{Binding AbsAddressDisplay}" x:DataType="vm:FunctionViewModel"
 					CanUserResize="True"
 					InitialWidth="80"
 				/>

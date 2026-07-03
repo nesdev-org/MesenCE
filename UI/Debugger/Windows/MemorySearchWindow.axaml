@@ -181,23 +181,23 @@
 				ColumnWidths="{Binding ColumnWidths}"
 			>
 				<DataBox.Columns>
-					<DataBoxTextColumn ColumnName="Address" Header="{l:Translate colAddress}" Binding="{Binding AddressString, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="Value" Header="{l:Translate colValue}" Binding="{Binding Value, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="PrevValue" Header="{l:Translate colPrevValue}" Binding="{Binding PrevValue, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="ReadCount" Header="{l:Translate colReadCount}" Binding="{Binding ReadCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="LastRead" Header="{l:Translate colLastRead}" Binding="{Binding LastRead, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="WriteCount" Header="{l:Translate colWriteCount}" Binding="{Binding WriteCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="LastWrite" Header="{l:Translate colLastWrite}" Binding="{Binding LastWrite, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="ExecCount" Header="{l:Translate colExecCount}" Binding="{Binding ExecCount, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
-					<DataBoxTextColumn ColumnName="LastExec" Header="{l:Translate colLastExec}" Binding="{Binding LastExec, DataType={x:Type dvm:MemoryAddressViewModel}}" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="Address" Header="{l:Translate colAddress}" Binding="{Binding AddressString}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="Value" Header="{l:Translate colValue}" Binding="{Binding Value}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="PrevValue" Header="{l:Translate colPrevValue}" Binding="{Binding PrevValue}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="ReadCount" Header="{l:Translate colReadCount}" Binding="{Binding ReadCount}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="LastRead" Header="{l:Translate colLastRead}" Binding="{Binding LastRead}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="WriteCount" Header="{l:Translate colWriteCount}" Binding="{Binding WriteCount}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="LastWrite" Header="{l:Translate colLastWrite}" Binding="{Binding LastWrite}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="ExecCount" Header="{l:Translate colExecCount}" Binding="{Binding ExecCount}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
+					<DataBoxTextColumn ColumnName="LastExec" Header="{l:Translate colLastExec}" Binding="{Binding LastExec}" x:DataType="vm:MemoryAddressViewModel" CanUserResize="True" />
 					<DataBoxTemplateColumn
 						ColumnName="Match"
 						CanUserSort="False"
 						Header="{l:Translate colMatch}"
 						InitialWidth="22"
 					>
-						<DataTemplate>
-							<CheckBox IsChecked="{Binding IsMatch, DataType={x:Type dvm:MemoryAddressViewModel}}" IsHitTestVisible="False" Classes.isNotMatch="{Binding !IsMatch, DataType={x:Type dvm:MemoryAddressViewModel}}" />
+						<DataTemplate DataType="vm:MemoryAddressViewModel">
+							<CheckBox IsChecked="{Binding IsMatch}" IsHitTestVisible="False" Classes.isNotMatch="{Binding !IsMatch}" />
 						</DataTemplate>
 					</DataBoxTemplateColumn>
 				</DataBox.Columns>

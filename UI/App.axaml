@@ -4,6 +4,7 @@
 	xmlns:dbg="using:Mesen.Debugger"
 	xmlns:l="using:Mesen.Localization"
 	xmlns:u="using:Mesen.Utilities"
+	xmlns:system="clr-namespace:System;assembly=System.Runtime"
 	x:Class="Mesen.App"
 	Name="Mesen"
 >
@@ -44,8 +45,8 @@
 	</Application.Resources>
 	
 	<Application.DataTemplates>
-		<DataTemplate DataType="x:Enum">
-			<TextBlock Text="{Binding, Converter={StaticResource Enum}}" />
+		<DataTemplate DataType="system:Enum">
+			<TextBlock Text="{Binding ., Converter={StaticResource Enum}}" />
 		</DataTemplate>
 	</Application.DataTemplates>
 

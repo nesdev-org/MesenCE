@@ -6,7 +6,6 @@
 	xmlns:vm="using:Mesen.ViewModels"
 	xmlns:v="using:Mesen.Views"
 	xmlns:l="using:Mesen.Localization"
-	xmlns:picker="using:ThemeEditor.Controls.ColorPicker"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d"
 	x:Class="Mesen.Windows.SelectStorageFolderWindow"

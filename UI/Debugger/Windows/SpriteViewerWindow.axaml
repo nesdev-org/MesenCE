@@ -175,50 +175,50 @@
 					</DataBox.Styles>
 						
 					<DataBox.Columns>
-						<DataBoxTextColumn ColumnName="SpriteIndex" Header="{l:Translate colSpriteIndex}" InitialWidth="50" Binding="{Binding SpriteIndex, DataType={x:Type dvm:SpritePreviewModel}}" />
+						<DataBoxTextColumn ColumnName="SpriteIndex" Header="{l:Translate colSpriteIndex}" InitialWidth="50" Binding="{Binding SpriteIndex}" x:DataType="dvm:SpritePreviewModel" />
 						<DataBoxTemplateColumn ColumnName="X" Header="{l:Translate colX}" InitialWidth="82">
-							<DataTemplate>
+							<DataTemplate DataType="dvm:SpritePreviewModel">
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="$" />
-									<TextBlock Text="{Binding RawX, Converter={StaticResource Hex}, ConverterParameter='X2', DataType={x:Type dvm:SpritePreviewModel}}" />
+									<TextBlock Text="{Binding RawX, Converter={StaticResource Hex}, ConverterParameter='X2'}" />
 									<TextBlock Classes="smallValue" Text=" (" />
-									<TextBlock Classes="smallValue" Text="{Binding X, DataType={x:Type dvm:SpritePreviewModel}}" />
+									<TextBlock Classes="smallValue" Text="{Binding X}" />
 									<TextBlock Classes="smallValue" Text=")" />
 								</StackPanel>
 							</DataTemplate>
 						</DataBoxTemplateColumn>
 						<DataBoxTemplateColumn ColumnName="Y" Header="{l:Translate colY}" InitialWidth="78">
-							<DataTemplate>
+							<DataTemplate DataType="dvm:SpritePreviewModel">
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="$" />
-									<TextBlock Text="{Binding RawY, Converter={StaticResource Hex}, ConverterParameter='X2', DataType={x:Type dvm:SpritePreviewModel}}" />
+									<TextBlock Text="{Binding RawY, Converter={StaticResource Hex}, ConverterParameter='X2'}" />
 									<TextBlock Classes="smallValue" Text=" (" />
-									<TextBlock Classes="smallValue" Text="{Binding Y, DataType={x:Type dvm:SpritePreviewModel}}" />
+									<TextBlock Classes="smallValue" Text="{Binding Y}" />
 									<TextBlock Classes="smallValue" Text=")" />
 								</StackPanel>
 							</DataTemplate>
 						</DataBoxTemplateColumn>
 						<DataBoxTemplateColumn ColumnName="Size" Header="{l:Translate colSize}" InitialWidth="64">
-							<DataTemplate>
+							<DataTemplate DataType="dvm:SpritePreviewModel">
 								<StackPanel Orientation="Horizontal">
-									<TextBlock Text="{Binding Width, DataType={x:Type dvm:SpritePreviewModel}}" />
+									<TextBlock Text="{Binding Width}" />
 									<TextBlock Text="x" />
-									<TextBlock Text="{Binding Height, DataType={x:Type dvm:SpritePreviewModel}}" />
+									<TextBlock Text="{Binding Height}" />
 								</StackPanel>
 							</DataTemplate>
 						</DataBoxTemplateColumn>
 						<DataBoxTemplateColumn ColumnName="TileIndex" Header="{l:Translate colTileIndex}" InitialWidth="60">
-							<DataTemplate>
+							<DataTemplate DataType="dvm:SpritePreviewModel">
 								<StackPanel Orientation="Horizontal">
 									<TextBlock Text="$" />
-									<TextBlock Text="{Binding TileIndex, Converter={StaticResource Hex}, ConverterParameter='X2', DataType={x:Type dvm:SpritePreviewModel}}" />
+									<TextBlock Text="{Binding TileIndex, Converter={StaticResource Hex}, ConverterParameter='X2'}" />
 								</StackPanel>
 							</DataTemplate>
 						</DataBoxTemplateColumn>
-						<DataBoxTextColumn ColumnName="Palette" Header="{l:Translate colPalette}" InitialWidth="67" Binding="{Binding Palette, DataType={x:Type dvm:SpritePreviewModel}}" />
-						<DataBoxTextColumn ColumnName="Priority" Header="{l:Translate colPriority}" InitialWidth="83" Binding="{Binding Priority, Converter={StaticResource Enum}, DataType={x:Type dvm:SpritePreviewModel}}" />
-						<DataBoxTextColumn ColumnName="Flags" Header="{l:Translate colFlags}" InitialWidth="68" Binding="{Binding Flags, DataType={x:Type dvm:SpritePreviewModel}}" />
-						<DataBoxCheckBoxColumn ColumnName="Visible" Header="{l:Translate colVisible}" InitialWidth="60" Binding="{Binding !FadePreview, DataType={x:Type dvm:SpritePreviewModel}}" />
+						<DataBoxTextColumn ColumnName="Palette" Header="{l:Translate colPalette}" InitialWidth="67" Binding="{Binding Palette}" x:DataType="dvm:SpritePreviewModel" />
+						<DataBoxTextColumn ColumnName="Priority" Header="{l:Translate colPriority}" InitialWidth="83" Binding="{Binding Priority, Converter={StaticResource Enum}}" x:DataType="dvm:SpritePreviewModel" />
+						<DataBoxTextColumn ColumnName="Flags" Header="{l:Translate colFlags}" InitialWidth="68" Binding="{Binding Flags}" x:DataType="dvm:SpritePreviewModel" />
+						<DataBoxCheckBoxColumn ColumnName="Visible" Header="{l:Translate colVisible}" InitialWidth="60" Binding="{Binding !FadePreview}" x:DataType="dvm:SpritePreviewModel" />
 					</DataBox.Columns>
 				</DataBox>
 			</Border>

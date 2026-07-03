@@ -7,6 +7,7 @@
 	xmlns:c="using:Mesen.Controls"
 	xmlns:cfg="using:Mesen.Config"
 	xmlns:l="using:Mesen.Localization"
+	xmlns:system="clr-namespace:System;assembly=System.Runtime"
 	mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="550"
 	VerticalAlignment="Stretch"
 	HorizontalAlignment="Stretch"
@@ -18,7 +19,7 @@
 	</Design.DataContext>
 
 	<UserControl.DataTemplates>
-		<DataTemplate DataType="{x:Type x:UInt32}">
+		<DataTemplate DataType="{x:Type system:UInt32}">
 			<StackPanel Orientation="Horizontal">
 				<TextBlock Text="{Binding}" />
 				<TextBlock Text=" Hz" />

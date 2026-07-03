@@ -19,8 +19,8 @@
 
 	<UserControl.Styles>
 		<Style Selector="DataBoxCell">
-			<Setter Property="Foreground" Value="{Binding Path=RowBrush, DataType={x:Type vm:StackInfo}}"/>
-			<Setter Property="FontStyle" Value="{Binding Path=RowStyle, DataType={x:Type vm:StackInfo}}"/>
+			<Setter Property="Foreground" Value="{Binding Path=RowBrush}" x:DataType="vm:StackInfo"/>
+			<Setter Property="FontStyle" Value="{Binding Path=RowStyle}" x:DataType="vm:StackInfo"/>
 		</Style>
 	</UserControl.Styles>
 
@@ -35,17 +35,17 @@
 			<DataBox.Columns>
 				<DataBoxTextColumn
 					Header="{l:Translate colFunction}"
-					Binding="{Binding EntryPoint, DataType={x:Type vm:StackInfo}}"
+					Binding="{Binding EntryPoint}" x:DataType="vm:StackInfo"
 					InitialWidth="100"
 				/>
 				<DataBoxTextColumn
 					Header="{l:Translate colPcAddress}"
-					Binding="{Binding PcAddress, DataType={x:Type vm:StackInfo}}"
+					Binding="{Binding PcAddress}" x:DataType="vm:StackInfo"
 					InitialWidth="90"
 				/>
 				<DataBoxTextColumn
 					Header="{l:Translate colRomAddress}"
-					Binding="{Binding AbsAddress, DataType={x:Type vm:StackInfo}}"
+					Binding="{Binding AbsAddress}" x:DataType="vm:StackInfo"
 					InitialWidth="90"
 				/>
 			</DataBox.Columns>

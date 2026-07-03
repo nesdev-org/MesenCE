@@ -36,9 +36,9 @@
 					<ContextMenu Name="Preset" Placement="BottomEdgeAlignedLeft" ItemsSource="{Binding PalettePresets, ElementName=root}">
 						<ContextMenu.Styles>
 							<Style Selector="MenuItem">
-								<Setter Property="Header" Value="{Binding Name, DataType={x:Type c:PalettePreset}}" />
-								<Setter Property="Command" Value="{Binding $parent[c:PaletteConfig].SelectPreset, DataType={x:Type c:PaletteConfig}}" />
-								<Setter Property="CommandParameter" Value="{Binding Palette, DataType={x:Type c:PalettePreset}}" />
+								<Setter Property="Header" Value="{Binding Name}" x:DataType="c:PalettePreset" />
+								<Setter Property="Command" Value="{Binding $parent[c:PaletteConfig].SelectPreset}" x:DataType="c:PaletteConfig" />
+								<Setter Property="CommandParameter" Value="{Binding Palette}" x:DataType="c:PalettePreset" />
 							</Style>
 						</ContextMenu.Styles>
 					</ContextMenu>
