@@ -43,9 +43,6 @@ public:
 	BaseVideoFilter(Emulator* emu);
 	virtual ~BaseVideoFilter();
 
-	template<typename T> bool NtscFilterOptionsChanged(T& ntscSetup, VideoConfig& cfg);
-	template<typename T> static void InitNtscFilter(T& ntscSetup, VideoConfig& cfg);
-
 	uint32_t* GetOutputBuffer();
 	FrameInfo SendFrame(uint16_t* ppuOutputBuffer, uint32_t frameNumber, uint32_t videoPhase, void* frameData, bool enableOverscan = true);
 	void TakeScreenshot(string romName, VideoFilterType filterType);

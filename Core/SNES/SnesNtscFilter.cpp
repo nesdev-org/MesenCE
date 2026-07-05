@@ -73,6 +73,32 @@ void SnesNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 			memcpy(GetOutputBuffer() + (i + 1) * frameInfo.Width, _ntscBuffer + yOffset + xOffset + i / 2 * baseWidth, frameInfo.Width * sizeof(uint32_t));
 		}
 	}
+
+	AdjustColors();
+}
+
+void SnesNtscFilter::AdjustColors()
+{
+	SnesColorCorrectionMode mode = _emu->GetSettings()->GetSnesConfig().ColorCorrection;
+	if(mode == SnesColorCorrectionMode::None) {
+		return;
+	}
+
+	FrameInfo frameInfo = _frameInfo;
+	uint32_t* out = GetOutputBuffer();
+	for(uint32_t i = 0, len = frameInfo.Height * frameInfo.Width; i < len; i++) {
+		uint8_t r = (out[i] >> 16) & 0xFF;
+		uint8_t g = (out[i] >> 8) & 0xFF;
+		uint8_t b = out[i] & 0xFF;
+
+		if(mode == SnesColorCorrectionMode::NtscBlackLevel) {
+			ColorUtilities::ApplyNtscBlackLevel(r, g, b);
+		} else {
+			ColorUtilities::ApplyDeepBlackBoost(r, g, b);
+		}
+
+		out[i] = 0xFF000000 | (r << 16) | (g << 8) | b;
+	}
 }
 
 SnesNtscFilter::~SnesNtscFilter()

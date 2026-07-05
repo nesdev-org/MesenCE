@@ -187,6 +187,10 @@ bool SaveStateManager::LoadState(istream& stream)
 		RenderedFrame frame;
 		vector<uint8_t> frameData;
 		if(GetVideoData(frameData, frame, stream)) {
+			uint32_t size = _emu->GetPpuFrame().FrameBufferSize;
+			if(frameData.size() < size) {
+				frameData.resize(size);
+			}
 			frame.FrameBuffer = frameData.data();
 		} else {
 			MessageManager::DisplayMessage("SaveStates", "SaveStateInvalidFile");

@@ -12,6 +12,8 @@ private:
 	snes_ntsc_t _ntscData = {};
 	uint32_t* _ntscBuffer = nullptr;
 
+	void AdjustColors();
+
 protected:
 	void OnBeforeApplyFilter() override;
 

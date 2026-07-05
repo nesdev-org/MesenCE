@@ -1,7 +1,5 @@
 #include "pch.h"
-#include <algorithm>
 #include "SNES/SnesDefaultVideoFilter.h"
-#include "Shared/Video/DebugHud.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/SettingTypes.h"
@@ -44,6 +42,7 @@ OverscanDimensions SnesDefaultVideoFilter::GetOverscan()
 void SnesDefaultVideoFilter::InitLookupTable()
 {
 	VideoConfig config = _emu->GetSettings()->GetVideoConfig();
+	SnesConfig& snesConfig = _emu->GetSettings()->GetSnesConfig();
 
 	InitConversionMatrix(config.Hue, config.Saturation);
 
@@ -52,12 +51,16 @@ void SnesDefaultVideoFilter::InitLookupTable()
 		uint8_t g = ColorUtilities::Convert5BitTo8Bit((rgb555 >> 5) & 0x1F);
 		uint8_t b = ColorUtilities::Convert5BitTo8Bit((rgb555 >> 10) & 0x1F);
 
+		if(snesConfig.ColorCorrection == SnesColorCorrectionMode::NtscBlackLevel) {
+			ColorUtilities::ApplyNtscBlackLevel(r, g, b);
+		} else if(snesConfig.ColorCorrection == SnesColorCorrectionMode::DeepBlackBoost) {
+			ColorUtilities::ApplyDeepBlackBoost(r, g, b);
+		}
+
 		if(config.Hue != 0 || config.Saturation != 0 || config.Brightness != 0 || config.Contrast != 0) {
 			ApplyColorOptions(r, g, b, config.Brightness, config.Contrast);
-			_calculatedPalette[rgb555] = 0xFF000000 | (r << 16) | (g << 8) | b;
-		} else {
-			_calculatedPalette[rgb555] = 0xFF000000 | (r << 16) | (g << 8) | b;
 		}
+		_calculatedPalette[rgb555] = 0xFF000000 | (r << 16) | (g << 8) | b;
 	}
 
 	_videoConfig = config;
@@ -68,11 +71,12 @@ void SnesDefaultVideoFilter::OnBeforeApplyFilter()
 	VideoConfig& config = _emu->GetSettings()->GetVideoConfig();
 	SnesConfig& snesConfig = _emu->GetSettings()->GetSnesConfig();
 
-	if(_videoConfig.Hue != config.Hue || _videoConfig.Saturation != config.Saturation || _videoConfig.Contrast != config.Contrast || _videoConfig.Brightness != config.Brightness) {
+	if(_videoConfig.Hue != config.Hue || _videoConfig.Saturation != config.Saturation || _videoConfig.Contrast != config.Contrast || _videoConfig.Brightness != config.Brightness || _colorCorrection != snesConfig.ColorCorrection) {
 		InitLookupTable();
 	}
 	_forceFixedRes = snesConfig.ForceFixedResolution;
 	_highResBlendMode = snesConfig.HighResBlendMode;
+	_colorCorrection = snesConfig.ColorCorrection;
 	_videoConfig = config;
 }
 
