@@ -72,6 +72,10 @@ private:
 	GbPixelType _lastPixelType = {};
 	uint8_t _lastBgColor = 0;
 
+	uint16_t _overclockScanlineCount = 0;
+	uint16_t _vblankStartScanline = 144;
+	uint16_t _lastScanline = 153;
+
 	__forceinline void WriteBgPixel(uint8_t colorIndex);
 	__forceinline void WriteObjPixel(uint8_t colorIndex);
 
@@ -81,6 +85,7 @@ private:
 	__forceinline void ProcessVblankScanline();
 	void ProcessFirstScanlineAfterPowerOn();
 	__forceinline void ProcessVisibleScanline();
+	void ProcessOverclockScanline();
 	__forceinline void RunDrawCycle();
 	__forceinline void RunSpriteEvaluation();
 	void ResetRenderer();
@@ -122,6 +127,8 @@ public:
 	uint32_t GetFrameCount();
 	uint8_t GetScanline();
 	uint16_t GetCycle();
+	uint32_t GetScanlineCount() { return _lastScanline + 1; }
+
 	bool IsLcdEnabled();
 	bool IsCgbEnabled();
 	PpuMode GetMode();

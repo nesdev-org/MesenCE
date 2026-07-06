@@ -51,7 +51,6 @@ class GbEventManager final : public BaseEventManager
 {
 private:
 	static constexpr int ScanlineWidth = 456 * 2;
-	static constexpr int ScreenHeight = 154;
 	static constexpr int VBlankScanline = 144;
 
 	GbEventViewerConfig _config;
@@ -60,7 +59,7 @@ private:
 	GbCpu* _cpu;
 	Debugger* _debugger;
 
-	uint32_t _scanlineCount = GbEventManager::ScreenHeight;
+	uint32_t _scanlineCount = 153;
 	uint16_t* _ppuBuffer = nullptr;
 
 protected:

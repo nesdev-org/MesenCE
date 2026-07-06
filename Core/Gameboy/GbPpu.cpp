@@ -37,10 +37,10 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 	memset(_outputBuffers[1], 0, GbConstants::PixelCount * sizeof(uint16_t));
 	_currentBuffer = _outputBuffers[0];
 
-	_eventViewerBuffers[0] = new uint16_t[456 * 154];
-	_eventViewerBuffers[1] = new uint16_t[456 * 154];
-	memset(_eventViewerBuffers[0], 0, 456 * 154 * sizeof(uint16_t));
-	memset(_eventViewerBuffers[1], 0, 456 * 154 * sizeof(uint16_t));
+	_eventViewerBuffers[0] = new uint16_t[GbConstants::EventViewerBufferSize];
+	_eventViewerBuffers[1] = new uint16_t[GbConstants::EventViewerBufferSize];
+	memset(_eventViewerBuffers[0], 0, GbConstants::EventViewerBufferSize * sizeof(uint16_t));
+	memset(_eventViewerBuffers[1], 0, GbConstants::EventViewerBufferSize * sizeof(uint16_t));
 	_currentEventViewerBuffer = _eventViewerBuffers[0];
 
 	_state = {};
@@ -75,6 +75,10 @@ void GbPpu::Init(Emulator* emu, Gameboy* gameboy, GbMemoryManager* memoryManager
 	_isFirstFrame = true;
 	_forceBlankFrame = true;
 	_rendererIdle = false;
+
+	_overclockScanlineCount = 0;
+	_vblankStartScanline = 144;
+	_lastScanline = 153;
 }
 
 GbPpu::~GbPpu()
@@ -211,17 +215,22 @@ void GbPpu::ExecCycle()
 
 void GbPpu::ProcessVblankScanline()
 {
+	if(_state.Scanline < _vblankStartScanline) {
+		ProcessOverclockScanline();
+		return;
+	}
+
 	switch(_state.Cycle) {
 		case 2:
-			if(_state.Scanline == 144) {
+			if(_state.Scanline == _vblankStartScanline) {
 				_state.IrqMode = PpuMode::OamEvaluation;
 			}
 			break;
 
 		case 4:
-			if(_state.Scanline < 153) {
-				_state.LyForCompare = _state.Scanline;
-				if(_state.Scanline == 144) {
+			if(_state.Scanline < _lastScanline) {
+				_state.LyForCompare = _state.Scanline - _overclockScanlineCount;
+				if(_state.Scanline == _vblankStartScanline) {
 					SetMode(PpuMode::VBlank);
 					_state.IrqMode = PpuMode::VBlank;
 					if(_gameboy->IsSgb()) {
@@ -235,20 +244,20 @@ void GbPpu::ProcessVblankScanline()
 			break;
 
 		case 6:
-			if(_state.Scanline == 153) {
+			if(_state.Scanline == _lastScanline) {
 				_state.Ly = 0;
-				_state.LyForCompare = _state.Scanline;
+				_state.LyForCompare = _state.Scanline - _overclockScanlineCount;
 			}
 			break;
 
 		case 8:
-			if(_state.Scanline == 153) {
+			if(_state.Scanline == _lastScanline) {
 				_state.LyForCompare = -1;
 			}
 			break;
 
 		case 12:
-			if(_state.Scanline == 153) {
+			if(_state.Scanline == _lastScanline) {
 				_state.LyForCompare = 0;
 			}
 			_state.IdleCycles = 456 - 12 - 1;
@@ -259,11 +268,15 @@ void GbPpu::ProcessVblankScanline()
 			_state.Scanline++;
 			_drawnPixels = 0;
 
-			if(_state.Scanline == 154) {
+			if(_state.Scanline > _lastScanline) {
+				_overclockScanlineCount = _gameboy->IsSgb() ? 0 : _settings->GetGameboyConfig().OverclockScanlineCount;
+				_vblankStartScanline = 144 + _overclockScanlineCount;
+				_lastScanline = 153 + _overclockScanlineCount;
+
 				_state.Scanline = 0;
 				_state.Ly = 0;
 				_state.LyForCompare = 0;
-				_wyEnableFlag = _state.Scanline == _state.WindowY && _state.WindowEnabled;
+				_wyEnableFlag = _state.WindowY == 0 && _state.WindowEnabled;
 
 				if(!_gameboy->IsCgb()) {
 					//On scanline 0, hblank gets set here (not on CGB)
@@ -275,7 +288,7 @@ void GbPpu::ProcessVblankScanline()
 					_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0] ? _eventViewerBuffers[1] : _eventViewerBuffers[0];
 				}
 			} else {
-				_state.Ly = _state.Scanline;
+				_state.Ly = _state.Scanline - _overclockScanlineCount;
 				_state.LyForCompare = -1;
 			}
 			break;
@@ -309,7 +322,6 @@ void GbPpu::ProcessFirstScanlineAfterPowerOn()
 			_wyEnableFlag |= _state.Scanline == _state.WindowY && _state.WindowEnabled;
 			_drawnPixels = 0;
 			_state.Ly = _state.Scanline;
-			_drawnPixels = 0;
 			break;
 	}
 }
@@ -370,9 +382,29 @@ void GbPpu::ProcessVisibleScanline()
 			_wyEnableFlag |= _state.Scanline == _state.WindowY && _state.WindowEnabled;
 			_drawnPixels = 0;
 			if(_state.Scanline == 144) {
+				if(_vblankStartScanline != 144) {
+					//Overclocked scanlines behave as if LY was 143 for all of them
+					_state.Ly = 143;
+				}
 				_state.LyForCompare = -1;
 			}
 			break;
+	}
+}
+
+void GbPpu::ProcessOverclockScanline()
+{
+	if(_state.Cycle == 456) {
+		_state.Cycle = 0;
+		_state.Scanline++;
+		if(_state.Scanline == _vblankStartScanline) {
+			_state.Ly = _state.Scanline - _overclockScanlineCount;
+			_state.LyForCompare = -1;
+			_gameboy->SetApuEnabled(true);
+		}
+	} else {
+		_gameboy->SetApuEnabled(false);
+		_state.IdleCycles = 456 - _state.Cycle - 1;
 	}
 }
 
@@ -382,13 +414,15 @@ void GbPpu::ProcessPpuCycle()
 
 	if(_emu->IsDebugging()) {
 		_emu->ProcessPpuCycle<CpuType::Gameboy>();
-		if(_state.Mode != PpuMode::Drawing) {
-			_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = evtColors[(int)_state.Mode];
-		} else if(_prevDrawnPixels != _drawnPixels && _drawnPixels > 0) {
-			uint16_t color = _currentBuffer[_state.Scanline * GbConstants::ScreenWidth + (_drawnPixels - 1)];
-			_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = color;
-		} else {
-			_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = evtColors[(int)_evtColor];
+		if(_state.Scanline < 144) {
+			if(_state.Mode != PpuMode::Drawing) {
+				_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = evtColors[(int)_state.Mode];
+			} else if(_prevDrawnPixels != _drawnPixels && _drawnPixels > 0) {
+				uint16_t color = _currentBuffer[_state.Scanline * GbConstants::ScreenWidth + (_drawnPixels - 1)];
+				_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = color;
+			} else {
+				_currentEventViewerBuffer[456 * _state.Scanline + _state.Cycle] = evtColors[(int)_evtColor];
+			}
 		}
 		_prevDrawnPixels = _drawnPixels;
 	}
@@ -995,9 +1029,7 @@ void GbPpu::Write(uint16_t addr, uint8_t value)
 						_emu->ProcessEvent(EventType::StartFrame, CpuType::Gameboy);
 
 						_currentEventViewerBuffer = _currentEventViewerBuffer == _eventViewerBuffers[0] ? _eventViewerBuffers[1] : _eventViewerBuffers[0];
-						for(int i = 0; i < 456 * 154; i++) {
-							_currentEventViewerBuffer[i] = 0x18C6;
-						}
+						std::fill(_currentEventViewerBuffer, _currentEventViewerBuffer + GbConstants::EventViewerBufferSize, evtColors[0]);
 					}
 				}
 			}
@@ -1422,6 +1454,10 @@ void GbPpu::Serialize(Serializer& s)
 		SVArray(_spriteX, 10);
 		SVArray(_spriteY, 10);
 		SVArray(_spriteIndexes, 10);
+
+		SV(_overclockScanlineCount);
+		SV(_vblankStartScanline);
+		SV(_lastScanline);
 	}
 
 	if(!s.IsSaving()) {

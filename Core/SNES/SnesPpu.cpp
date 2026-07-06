@@ -559,12 +559,19 @@ void SnesPpu::UpdateNmiScanline()
 	}
 
 	SnesConfig snesCfg = _settings->GetSnesConfig();
-	_overclockEnabled = snesCfg.PpuExtraScanlinesBeforeNmi > 0 || snesCfg.PpuExtraScanlinesAfterNmi > 0;
+	uint32_t beforeNmi = snesCfg.PpuExtraScanlinesBeforeNmi;
+	uint32_t afterNmi = snesCfg.PpuExtraScanlinesAfterNmi;
+	if(_emu->GetRomInfo().Format == RomFormat::Gb) {
+		//Disable overclocking for SGB (does not work properly)
+		beforeNmi = 0;
+		afterNmi = 0;
+	}
 
-	_adjustedVblankEndScanline = _baseVblankEndScanline + snesCfg.PpuExtraScanlinesBeforeNmi;
-	_vblankEndScanline = _baseVblankEndScanline + snesCfg.PpuExtraScanlinesAfterNmi + snesCfg.PpuExtraScanlinesBeforeNmi;
+	_overclockEnabled = beforeNmi > 0 || afterNmi > 0;
+	_adjustedVblankEndScanline = _baseVblankEndScanline + beforeNmi;
+	_vblankEndScanline = _baseVblankEndScanline + afterNmi + beforeNmi;
 	_vblankStartScanline = _state.OverscanMode ? 240 : 225;
-	_nmiScanline = _vblankStartScanline + snesCfg.PpuExtraScanlinesBeforeNmi;
+	_nmiScanline = _vblankStartScanline + beforeNmi;
 }
 
 uint16_t SnesPpu::GetRealScanline()

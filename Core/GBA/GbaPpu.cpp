@@ -1744,6 +1744,10 @@ void GbaPpu::Serialize(Serializer& s)
 		SV(_oamMosaicY);
 		SV(_oamMosaicScanline);
 
+		SV(_vblankStartScanline);
+		SV(_lastScanline);
+		SV(_inOverclock);
+
 		SV(_newObjLayerEnabled);
 
 		for(int i = 0; i < 4; i++) {

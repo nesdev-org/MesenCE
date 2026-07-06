@@ -2,15 +2,12 @@
 #include "SNES/Coprocessors/SGB/SuperGameboy.h"
 #include "SNES/SnesConsole.h"
 #include "SNES/SnesMemoryManager.h"
-#include "SNES/BaseCartridge.h"
 #include "SNES/Spc.h"
 #include "Gameboy/Gameboy.h"
 #include "Gameboy/GbControlManager.h"
 #include "Gameboy/APU/GbApu.h"
-#include "Gameboy/GbPpu.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
-#include "Shared/MessageManager.h"
 #include "Shared/Audio/SoundMixer.h"
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Audio/HermiteResampler.h"
@@ -25,7 +22,6 @@ SuperGameboy::SuperGameboy(SnesConsole* console, Gameboy* gameboy)
 
 	_gameboy = gameboy;
 	_controlManager = (GbControlManager*)gameboy->GetControlManager();
-	_ppu = gameboy->GetPpu();
 
 	_control = 0x01; //Divider = 5, gameboy = not running
 	UpdateClockRatio();
@@ -372,6 +368,7 @@ void SuperGameboy::Serialize(Serializer& s)
 {
 	SV(_control);
 	SV(_resetClock);
+	SV(_clockOffset);
 	SV(_input[0]);
 	SV(_input[1]);
 	SV(_input[2]);

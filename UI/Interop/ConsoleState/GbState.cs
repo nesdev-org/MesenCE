@@ -159,7 +159,7 @@ public enum PpuMode
 
 public struct GbPpuState : BaseState
 {
-	public byte Scanline;
+	public UInt16 Scanline;
 	public UInt16 Cycle;
 	public UInt16 IdleCycles;
 	public PpuMode Mode;
