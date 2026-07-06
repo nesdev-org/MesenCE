@@ -1,12 +1,9 @@
 #include "pch.h"
-#include <limits>
 #include "Debugger/Profiler.h"
 #include "Debugger/DebugBreakHelper.h"
 #include "Debugger/Debugger.h"
 #include "Debugger/IDebugger.h"
-#include "Debugger/MemoryDumper.h"
 #include "Debugger/DebugTypes.h"
-#include "Shared/Interfaces/IConsole.h"
 
 static constexpr int32_t ResetFunctionIndex = -1;
 
@@ -32,7 +29,7 @@ void Profiler::StackFunction(AddressInfo& addr, StackFrameFlags stackFlag)
 
 		UpdateCycles();
 
-		_stackFlags.push_back(stackFlag);
+		_stackFlags.push_back(_functions[_currentFunction].Flags);
 		_cycleCountStack.push_back(_currentCycleCount);
 		_functionStack.push_back(_currentFunction);
 
@@ -62,12 +59,14 @@ void Profiler::UpdateCycles()
 	func.ExclusiveCycles += clockGap;
 	func.InclusiveCycles += clockGap;
 
-	int32_t len = (int32_t)_functionStack.size();
-	for(int32_t i = len - 1; i >= 0; i--) {
-		_functions[_functionStack[i]].InclusiveCycles += clockGap;
-		if(_stackFlags[i] != StackFrameFlags::None) {
-			//Don't apply inclusive times to stack frames before an IRQ/NMI
-			break;
+	if(func.Flags == StackFrameFlags::None) {
+		int32_t len = (int32_t)_functionStack.size();
+		for(int32_t i = len - 1; i >= 0; i--) {
+			_functions[_functionStack[i]].InclusiveCycles += clockGap;
+			if(_stackFlags[i] != StackFrameFlags::None) {
+				//Don't apply inclusive times to stack frames before an IRQ/NMI
+				break;
+			}
 		}
 	}
 
@@ -89,8 +88,14 @@ void Profiler::UnstackFunction()
 		_functionStack.pop_back();
 		_stackFlags.pop_back();
 
-		//Add the subroutine's cycle count to the current routine's cycle count
-		_currentCycleCount = _cycleCountStack.back() + _currentCycleCount;
+		if(func.Flags == StackFrameFlags::None) {
+			//Add the subroutine's cycle count to the current routine's cycle count
+			_currentCycleCount = _cycleCountStack.back() + _currentCycleCount;
+		} else {
+			//If the current call stack was the start of NMI/IRQ, don't add the
+			//cycle count for NMI/IRQ to the previous function on the call stack.
+			_currentCycleCount = _cycleCountStack.back();
+		}
 		_cycleCountStack.pop_back();
 	}
 }
