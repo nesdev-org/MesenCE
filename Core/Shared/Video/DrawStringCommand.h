@@ -1,10 +1,17 @@
-#pragma once
+﻿#pragma once
 #include "pch.h"
 #include "Shared/Video/DrawCommand.h"
 
 class DrawStringCommand : public DrawCommand
 {
+public:
+	static constexpr uint32_t ColumnWidth = 12;
+	static constexpr uint32_t RowHeight = 12;
+
 private:
+	static constexpr uint32_t CharWidth = 11;
+	static constexpr uint32_t CharHeight = 11;
+
 	int _x, _y, _color, _backColor;
 	int _maxWidth = 0;
 	string _text;
@@ -12,9 +19,10 @@ private:
 	//Taken from FCEUX's LUA code
 	static constexpr int _tabSpace = 4;
 
-	static unordered_map<int, char const*> _jpFont;
+	// UTF-8 multi-byte character font map
+	// Map type changed to uint16_t[11] (22 bytes per character)
+	static unordered_map<int, char const*> _utf8Font;
 
-	// clang-format off
 	static constexpr uint8_t _font[792] = {
 		6,  0,  0,  0,  0,  0,  0,  0,	// 0x20 - Spacebar
 		2,128,128,128,128,128,  0,128,
@@ -113,7 +121,6 @@ private:
 		6,  0,104,176,  0,  0,  0,  0,
 		5,  0,  0,113, 80,113,  0,  0,
 	};
-	// clang-format off
 
 	static int GetCharNumber(char ch)
 	{
@@ -138,12 +145,14 @@ protected:
 		int x = startX;
 		int y = _y;
 		int lineHeight = 9;
-		
+
 		auto newLine = [&lineWidth, &x, &y, &lineHeight, startX]() {
 			lineWidth = 0;
 			x = startX;
 			y += lineHeight;
-			lineHeight = 9;
+			// Reserve 3 extra pixels for wide UTF-8 characters (CJK, Kana, etc.) 
+			// to maintain vertical alignment with standard ASCII characters
+			lineHeight = 12;
 		};
 
 		for(int i = 0; i < _text.size(); i++) {
@@ -173,39 +182,38 @@ protected:
 					x += 6;
 				}
 			} else if(c >= 0x80) {
-				//8x12 UTF-8 font for Japanese
+				// 12x11 multi-byte UTF-8 characters (CJK, Kana, etc.)
 				int code = (uint8_t)c;
 				if(i + 2 < _text.size()) {
 					code |= ((uint8_t)_text[i + 1]) << 8;
 					code |= ((uint8_t)_text[i + 2]) << 16;
 
-					auto res = _jpFont.find(code);
-					if(res != _jpFont.end()) {
-						lineWidth += 8;
+					auto res = _utf8Font.find(code);
+					if(res != _utf8Font.end()) {
+						lineWidth += ColumnWidth;
 						if(_maxWidth > 0 && lineWidth > _maxWidth) {
 							newLine();
-							lineWidth += 8;
+							lineWidth += ColumnWidth;
 						}
 
-						uint8_t* charDef = (uint8_t*)res->second;
-
-						for(int row = 0; row < 12; row++) {
-							uint8_t rowData = charDef[row];
-							for(int column = 0; column < 8; column++) {
-								int drawFg = (rowData >> (7 - column)) & 0x01;
+						uint16_t* charDef = (uint16_t*)res->second;
+						for(int row = 0; row < CharHeight; row++) {
+							uint16_t rowData = charDef[row];
+							for(int column = 0; column < CharWidth; column++) {
+								int drawFg = (rowData >> (CharWidth - column)) & 0x01;
 								DrawPixel(x + column, y + row - 2, drawFg ? _color : _backColor);
 							}
 						}
 						i += 2;
-						x += 8;
-						lineHeight = 12;
+						x += ColumnWidth;
+						lineHeight = RowHeight;
 					}
 				}
 			} else {
 				//Variable size font for standard ASCII
 				int ch = GetCharNumber(c);
 				int width = GetCharWidth(c);
-				
+
 				lineWidth += width;
 				if(_maxWidth > 0 && lineWidth > _maxWidth) {
 					newLine();
@@ -229,8 +237,7 @@ protected:
 	}
 
 public:
-	DrawStringCommand(int x, int y, string text, int color, int backColor, int frameCount, int startFrame, int maxWidth = 0, bool overwritePixels = false) :
-		DrawCommand(startFrame, frameCount, true), _x(x), _y(y), _color(color), _backColor(backColor), _maxWidth(maxWidth), _text(text)
+	DrawStringCommand(int x, int y, const string& text, int color, int backColor, int frameCount, int startFrame, int maxWidth = 0, bool overwritePixels = false) : DrawCommand(startFrame, frameCount, true), _x(x), _y(y), _color(color), _backColor(backColor), _maxWidth(maxWidth), _text(std::move(text))
 	{
 		//Invert alpha byte - 0 = opaque, 255 = transparent (this way, no need to specifiy alpha channel all the time)
 		_overwritePixels = overwritePixels;
@@ -238,18 +245,18 @@ public:
 		_backColor = (~backColor & 0xFF000000) | (backColor & 0xFFFFFF);
 	}
 
-	static TextSize MeasureString(string& text, uint32_t maxWidth = 0)
+	static TextSize MeasureString(const string& text, uint32_t maxWidth = 0)
 	{
 		uint32_t maxX = 0;
 		uint32_t x = 0;
 		uint32_t y = 0;
-		uint32_t lineHeight = 9;
+		uint32_t lineHeight = RowHeight;
 
 		auto newLine = [&]() {
 			maxX = std::max(x, maxX);
 			x = 0;
 			y += lineHeight;
-			lineHeight = 9;
+			lineHeight = RowHeight;
 		};
 
 		for(int i = 0; i < text.size(); i++) {
@@ -269,20 +276,19 @@ public:
 					x += 6;
 				}
 			} else if(c >= 0x80) {
-				//8x12 UTF-8 font for Japanese
+				// 12x11 multi-byte UTF-8 characters (CJK, Kana, etc.)
 				int code = (uint8_t)c;
 				if(i + 2 < text.size()) {
 					code |= ((uint8_t)text[i + 1]) << 8;
 					code |= ((uint8_t)text[i + 2]) << 16;
-					auto res = _jpFont.find(code);
-					if(res != _jpFont.end()) {
-						if(maxWidth > 0 && x + 8 > maxWidth) {
+					auto res = _utf8Font.find(code);
+					if(res != _utf8Font.end()) {
+						if(maxWidth > 0 && x + ColumnWidth > maxWidth) {
 							newLine();
 						}
-
 						i += 2;
-						x += 8;
-						lineHeight = 12;
+						x += ColumnWidth;
+						lineHeight = RowHeight;
 					}
 				}
 			} else {
