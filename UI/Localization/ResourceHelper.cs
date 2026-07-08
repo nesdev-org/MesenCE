@@ -1,6 +1,7 @@
 ﻿using Mesen.Interop;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,12 +17,27 @@ namespace Mesen.Localization
 		private static Dictionary<string, string> _viewLabelCache = new();
 		private static Dictionary<string, string> _messageCache = new();
 
+		private static string GetResourceFileName()
+		{
+			// Check if the current system culture is Chinese
+			string cultureName = CultureInfo.CurrentCulture.Name;
+			if(cultureName == "zh-CN") {
+				string zhResource = "Mesen.Localization.resources.zh-CN.xml";
+				Assembly assembly = Assembly.GetExecutingAssembly();
+				if(assembly.GetManifestResourceStream(zhResource) != null) {
+					return zhResource;
+				}
+			}
+			return "Mesen.Localization.resources.en.xml";
+		}
+
 		public static void LoadResources()
 		{
 			try {
 				Assembly assembly = Assembly.GetExecutingAssembly();
+				string resourceName = GetResourceFileName();
 
-				using(StreamReader reader = new StreamReader(assembly.GetManifestResourceStream("Mesen.Localization.resources.en.xml")!)) {
+				using(StreamReader reader = new StreamReader(assembly.GetManifestResourceStream(resourceName)!)) {
 					_resources.LoadXml(reader.ReadToEnd());
 				}
 
