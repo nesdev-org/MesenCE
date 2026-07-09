@@ -92,25 +92,25 @@ protected:
 				break;
 			case 0xA000:
 				switch(_command) {
-					case 0:
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-					case 5:
-					case 6:
-					case 7:
+					case 0x0:
+					case 0x1:
+					case 0x2:
+					case 0x3:
+					case 0x4:
+					case 0x5:
+					case 0x6:
+					case 0x7:
 						_chrRegs[_command] = value;
 						SelectChrPage(_command, value);
 						break;
 
-					case 8: {
+					case 0x8: {
 						_workRamValue = value;
 						UpdateWorkRam();
 						break;
 					}
 
-					case 9:
+					case 0x9:
 					case 0xA:
 					case 0xB:
 						_prgRegs[_command - 9] = value & 0x3F;
@@ -155,21 +155,21 @@ protected:
 		string mirroringType;
 		uint8_t mirValue = 0;
 		switch(GetMirroringType()) {
-			case MirroringType::Horizontal:
-				mirroringType = "Horizontal";
-				mirValue = 3;
-				break;
 			case MirroringType::Vertical:
 				mirroringType = "Vertical";
-				mirValue = 2;
+				mirValue = 0;
 				break;
-			case MirroringType::ScreenBOnly:
-				mirroringType = "Screen B";
+			case MirroringType::Horizontal:
+				mirroringType = "Horizontal";
 				mirValue = 1;
 				break;
 			case MirroringType::ScreenAOnly:
 				mirroringType = "Screen A";
-				mirValue = 0;
+				mirValue = 2;
+				break;
+			case MirroringType::ScreenBOnly:
+				mirroringType = "Screen B";
+				mirValue = 3;
 				break;
 		}
 		entries.push_back(MapperStateEntry("$8000", "Current Register", _command, MapperStateValueType::Number8));
