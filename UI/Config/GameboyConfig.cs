@@ -28,6 +28,7 @@ namespace Mesen.Config
 
 		[ObservableProperty] public partial bool DisableBackground { get; set; } = false;
 		[ObservableProperty] public partial bool DisableSprites { get; set; } = false;
+		[ObservableProperty] public partial bool RemoveSpriteLimit { get; set; } = false;
 		[ObservableProperty] public partial bool HideSgbBorders { get; set; } = false;
 
 		[ObservableProperty] public partial RamState RamPowerOnState { get; set; } = RamState.Random;
@@ -62,6 +63,7 @@ namespace Mesen.Config
 				GbcAdjustColors = GbcAdjustColors,
 				DisableBackground = DisableBackground,
 				DisableSprites = DisableSprites,
+				RemoveSpriteLimit = RemoveSpriteLimit,
 				HideSgbBorders = HideSgbBorders,
 
 				RamPowerOnState = RamPowerOnState,
@@ -104,6 +106,7 @@ namespace Mesen.Config
 
 		[MarshalAs(UnmanagedType.I1)] public bool DisableBackground;
 		[MarshalAs(UnmanagedType.I1)] public bool DisableSprites;
+		[MarshalAs(UnmanagedType.I1)] public bool RemoveSpriteLimit;
 		[MarshalAs(UnmanagedType.I1)] public bool HideSgbBorders;
 
 		public RamState RamPowerOnState;

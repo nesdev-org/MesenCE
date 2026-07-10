@@ -472,10 +472,14 @@ void GbPpu::RunDrawCycle()
 
 	FindNextSprite();
 	if(_fetchSprite >= 0 && _bgFetcher.Step >= 5 && _bgFifo.Size > 0) {
-		_evtColor = EvtColor::RenderingOamLoad;
-		ClockSpriteFetcher();
-		FindNextSprite();
-		return;
+		if(_fetchSprite < 10) {
+			_evtColor = EvtColor::RenderingOamLoad;
+			ClockSpriteFetcher();
+			FindNextSprite();
+			return;
+		} else {
+			LoadExtraSprite();
+		}
 	}
 
 	if(_fetchSprite == -1 && _bgFifo.Size > 0) {
@@ -546,7 +550,7 @@ void GbPpu::WriteObjPixel(uint8_t colorIndex)
 void GbPpu::RunSpriteEvaluation()
 {
 	if(_state.Cycle & 0x01) {
-		if(_spriteCount < 10) {
+		if(_spriteCount < 10 || (_spriteCount < 40 && _settings->GetGameboyConfig().RemoveSpriteLimit)) {
 			uint8_t spriteIndex = ((_state.Cycle - 4) >> 1) * 4;
 
 			if(!_dmaController->IsOamDmaRunning()) {
@@ -568,6 +572,14 @@ void GbPpu::RunSpriteEvaluation()
 		}
 	} else {
 		//TODO check proper timing for even&odd cycles
+	}
+}
+
+void GbPpu::LoadExtraSprite()
+{
+	//Push the sprite into the FIFO immediately without delaying the LCD, etc.
+	for(int i = 0; i < 6; i++) {
+		ClockSpriteFetcher();
 	}
 }
 
@@ -1451,9 +1463,9 @@ void GbPpu::Serialize(Serializer& s)
 		}
 
 		SVArray(_oamReadBuffer, 2);
-		SVArray(_spriteX, 10);
-		SVArray(_spriteY, 10);
-		SVArray(_spriteIndexes, 10);
+		SVArray(_spriteX, 40);
+		SVArray(_spriteY, 40);
+		SVArray(_spriteIndexes, 40);
 
 		SV(_overclockScanlineCount);
 		SV(_vblankStartScanline);

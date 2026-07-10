@@ -190,6 +190,7 @@
 					<c:OptionSection Header="{l:Translate lblLcdSettings}">
 						<CheckBox IsChecked="{Binding Config.GbcAdjustColors}" Content="{l:Translate chkGbcAdjustColors}"/>
 						<CheckBox IsChecked="{Binding Config.BlendFrames}" Content="{l:Translate chkGbBlendFrames}" />
+						<CheckBox IsChecked="{Binding Config.RemoveSpriteLimit}" Content="{l:Translate chkRemoveSpriteLimit}" />
 						<c:CheckBoxWarning IsChecked="{Binding Config.DisableBackground}" Text="{l:Translate chkDisableBackground}" />
 						<c:CheckBoxWarning IsChecked="{Binding Config.DisableSprites}" Text="{l:Translate chkDisableSprites}" />
 					</c:OptionSection>

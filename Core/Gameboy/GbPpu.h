@@ -47,9 +47,9 @@ private:
 
 	int16_t _fetchSprite = -1;
 	uint8_t _spriteCount = 0;
-	uint8_t _spriteX[10] = {};
-	uint8_t _spriteY[10] = {};
-	uint8_t _spriteIndexes[10] = {};
+	uint8_t _spriteX[40] = {};
+	uint8_t _spriteY[40] = {};
+	uint8_t _spriteIndexes[40] = {};
 	uint8_t _oamReadBuffer[2] = {};
 
 	bool _lcdDisabled = true;
@@ -88,6 +88,7 @@ private:
 	void ProcessOverclockScanline();
 	__forceinline void RunDrawCycle();
 	__forceinline void RunSpriteEvaluation();
+	void LoadExtraSprite();
 	void ResetRenderer();
 	void ClockSpriteFetcher();
 	void FindNextSprite();
