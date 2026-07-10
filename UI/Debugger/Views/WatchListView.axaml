@@ -71,7 +71,7 @@
 							Text="{Binding Expression, DataType={x:Type md:WatchValueInfo}}"
 							LostFocus="OnEntryLostFocus"
 							KeyDown="OnEntryKeyDown"
-							Watermark="Click to add..."
+							PlaceholderText="Click to add..."
 						/>
 					</DataTemplate>
 				</DataBoxTemplateColumn>

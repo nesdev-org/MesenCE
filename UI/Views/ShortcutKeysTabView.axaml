@@ -31,15 +31,13 @@
 			<ItemsControl ItemsSource="{Binding ShortcutKeys, ElementName=root}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate DataType="{x:Type cs:ShortcutKeyInfo}">
-						<StackPanel>
-							<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Margin="0 -1 0 0">
-								<Grid ColumnDefinitions="3*, 1*, 1*" Margin="5 0 0 0">
-									<TextBlock Grid.Column="0" Text="{Binding Shortcut, Converter={StaticResource EnumConverter}}" />
-									<c:MultiKeyBindingButton Grid.Column="1" KeyBinding="{Binding KeyCombination}" HorizontalAlignment="Stretch"  />
-									<c:MultiKeyBindingButton Grid.Column="2" KeyBinding="{Binding KeyCombination2}" HorizontalAlignment="Stretch" />
-								</Grid>
-							</Border>
-						</StackPanel>
+						<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1 0 1 1">
+							<Grid ColumnDefinitions="3*, 1*, 1*" Margin="5 0 0 0">
+								<TextBlock Grid.Column="0" Text="{Binding Shortcut, Converter={StaticResource EnumConverter}}" />
+								<c:MultiKeyBindingButton Grid.Column="1" KeyBinding="{Binding KeyCombination}" HorizontalAlignment="Stretch"  />
+								<c:MultiKeyBindingButton Grid.Column="2" KeyBinding="{Binding KeyCombination2}" HorizontalAlignment="Stretch" />
+							</Grid>
+						</Border>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>

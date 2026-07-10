@@ -133,10 +133,10 @@ extern "C"
 		}
 	}
 
-	DllExport void __stdcall SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle)
+	DllExport void __stdcall SetFullscreenMode(FullscreenSettings settings)
 	{
 		if(_renderer) {
-			_renderer->SetExclusiveFullscreenMode(fullscreen, windowHandle);
+			_renderer->SetFullscreenMode(settings);
 		}
 	}
 

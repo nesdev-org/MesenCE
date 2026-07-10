@@ -53,10 +53,12 @@ private:
 	const uint32_t _bytesPerPixel = 4;
 	uint32_t _screenBufferSize = 0;
 
-	bool _newFullscreen = false;
-	bool _fullscreen = false;
+	FullscreenMode _newFullscreen = FullscreenMode::Disabled;
+	FullscreenMode _fullscreen = FullscreenMode::Disabled;
 	uint32_t _fullscreenRefreshRate = 60;
 	bool _useSrgbTextureFormat = false;
+	bool _allowTearing = false;
+	uint32_t _bufferCount = 1;
 
 	uint32_t _screenWidth = 0;
 	uint32_t _screenHeight = 0;
@@ -73,7 +75,12 @@ private:
 
 	atomic<int> _resetCounter = 0;
 
+	void LogError(const char* msg, HRESULT hr);
+
+	HRESULT InitDeviceLegacy();
 	HRESULT InitDevice();
+	HRESULT InitDeviceCommon();
+
 	void CleanupDevice();
 
 	void SetScreenSize(uint32_t width, uint32_t height);
@@ -96,7 +103,7 @@ public:
 	Renderer(Emulator* emu, HWND hWnd);
 	~Renderer();
 
-	void SetExclusiveFullscreenMode(bool fullscreen, void* windowHandle) override;
+	void SetFullscreenMode(FullscreenSettings settings) override;
 
 	void Reset() override;
 	void Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud) override;

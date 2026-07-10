@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Selection;
 using Avalonia.Interactivity;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Disassembly;
 using Mesen.Debugger.Labels;
@@ -10,22 +11,20 @@ using Mesen.Debugger.Windows;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class WatchListViewModel : DisposableViewModel, IToolHelpTooltip
+	public partial class WatchListViewModel : DisposableViewModel, IToolHelpTooltip
 	{
 		private static Regex _watchAddressOrLabel = new Regex(@"^(\[|{)(\s*((\$[0-9A-Fa-f]+)|(\d+)|([@_a-zA-Z0-9]+)))\s*[,]{0,1}\d*\s*(\]|})$", RegexOptions.Compiled);
 
-		[Reactive] public MesenList<WatchValueInfo> WatchEntries { get; private set; } = new();
-		[Reactive] public SelectionModel<WatchValueInfo> Selection { get; set; } = new() { SingleSelect = false };
+		[ObservableProperty] public partial MesenList<WatchValueInfo> WatchEntries { get; private set; } = new();
+		[ObservableProperty] public partial SelectionModel<WatchValueInfo> Selection { get; set; } = new() { SingleSelect = false };
 		public List<int> ColumnWidths { get; } = ConfigManager.Config.Debug.Debugger.WatchListColumnWidths;
 
 		public WatchManager Manager { get; }

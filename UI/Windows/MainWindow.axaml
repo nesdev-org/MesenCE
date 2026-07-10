@@ -42,11 +42,10 @@
 		<Panel Name="RendererPanel" Background="Black" Focusable="True">
 			<ContentControl Background="#181818" Content="{Binding RecentGames}" IsVisible="{Binding RecentGames.Visible}" />
 
-			<m:NativeRenderer
-				Name="Renderer"
+			<ContentControl
+				Name="RendererContainer"
 				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
-				IsVisible="{Binding IsNativeRendererVisible}"
 			/>
 
 			<Panel IsVisible="{Binding IsSoftwareRendererVisible}">

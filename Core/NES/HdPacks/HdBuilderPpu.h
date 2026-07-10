@@ -38,11 +38,14 @@ public:
 		info.HighByte = sprite.HighByte;
 	}
 
-	__forceinline void StoreTileInformation()
+	__forceinline void PushTileInformation()
 	{
 		_previousTileEx = _currentTileEx;
 		_currentTileEx = _nextTileEx;
+	}
 
+	__forceinline void StoreTileInformation()
+	{
 		uint8_t tileIndex = _mapper->DebugReadVram(GetNameTableAddr());
 		uint16_t tileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
 

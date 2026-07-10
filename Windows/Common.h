@@ -13,6 +13,7 @@
 #pragma comment(lib, "dsound.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "dxgi.lib")
 
 // C RunTime Header Files
 #include <stdlib.h>

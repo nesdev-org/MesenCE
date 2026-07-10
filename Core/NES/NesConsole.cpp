@@ -638,6 +638,9 @@ void NesConsole::InitializeInputDevices(GameInputType inputType, GameSystem syst
 		log("[Input] 2 SNES controllers connected");
 		port1 = ControllerType::SnesController;
 		port2 = ControllerType::SnesController;
+	} else if(inputType == GameInputType::FcnsController) {
+		log("[Input] FCNS controller connected");
+		expDevice = ControllerType::FcnsController;
 	} else {
 		log("[Input] 2 NES controllers connected");
 	}

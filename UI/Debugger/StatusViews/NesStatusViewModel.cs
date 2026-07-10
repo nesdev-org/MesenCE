@@ -1,86 +1,91 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
+using Mesen.Utilities;
 using System;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class NesStatusViewModel : BaseConsoleStatusViewModel
+	public partial class NesStatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public byte RegA { get; set; }
-		[Reactive] public byte RegX { get; set; }
-		[Reactive] public byte RegY { get; set; }
-		[Reactive] public byte RegSP { get; set; }
-		[Reactive] public UInt16 RegPC { get; set; }
-		[Reactive] public byte RegPS { get; set; }
+		[ObservableProperty] public partial byte RegA { get; set; }
+		[ObservableProperty] public partial byte RegX { get; set; }
+		[ObservableProperty] public partial byte RegY { get; set; }
+		[ObservableProperty] public partial byte RegSP { get; set; }
+		[ObservableProperty] public partial UInt16 RegPC { get; set; }
+		[ObservableProperty] public partial byte RegPS { get; set; }
 
-		[Reactive] public bool FlagN { get; set; }
-		[Reactive] public bool FlagV { get; set; }
-		[Reactive] public bool FlagD { get; set; }
-		[Reactive] public bool FlagI { get; set; }
-		[Reactive] public bool FlagZ { get; set; }
-		[Reactive] public bool FlagC { get; set; }
+		[ObservableProperty] public partial bool FlagN { get; set; }
+		[ObservableProperty] public partial bool FlagV { get; set; }
+		[ObservableProperty] public partial bool FlagD { get; set; }
+		[ObservableProperty] public partial bool FlagI { get; set; }
+		[ObservableProperty] public partial bool FlagZ { get; set; }
+		[ObservableProperty] public partial bool FlagC { get; set; }
 
-		[Reactive] public bool FlagNmi { get; set; }
+		[ObservableProperty] public partial bool FlagNmi { get; set; }
 
-		[Reactive] public bool FlagIrqExternal { get; set; }
-		[Reactive] public bool FlagIrqFrameCount { get; set; }
-		[Reactive] public bool FlagIrqDmc { get; set; }
-		[Reactive] public bool FlagIrqFdsDisk { get; set; }
+		[ObservableProperty] public partial bool FlagIrqExternal { get; set; }
+		[ObservableProperty] public partial bool FlagIrqFrameCount { get; set; }
+		[ObservableProperty] public partial bool FlagIrqDmc { get; set; }
+		[ObservableProperty] public partial bool FlagIrqFdsDisk { get; set; }
 
-		[Reactive] public uint Cycle { get; private set; }
-		[Reactive] public int Scanline { get; private set; }
-		[Reactive] public UInt32 FrameCount { get; private set; }
-		[Reactive] public UInt16 VramAddr { get; set; }
-		[Reactive] public UInt16 TmpVramAddr { get; set; }
-		[Reactive] public UInt16 BusAddr { get; set; }
-		[Reactive] public byte ScrollX { get; set; }
-		[Reactive] public bool Sprite0Hit { get; set; }
-		[Reactive] public bool SpriteOverflow { get; set; }
-		[Reactive] public bool VerticalBlank { get; set; }
-		[Reactive] public bool WriteToggle { get; set; }
+		[ObservableProperty] public partial uint Cycle { get; private set; }
+		[ObservableProperty] public partial int Scanline { get; private set; }
+		[ObservableProperty] public partial UInt32 FrameCount { get; private set; }
+		[ObservableProperty] public partial UInt16 VramAddr { get; set; }
+		[ObservableProperty] public partial UInt16 TmpVramAddr { get; set; }
+		[ObservableProperty] public partial UInt16 BusAddr { get; set; }
+		[ObservableProperty] public partial byte ScrollX { get; set; }
+		[ObservableProperty] public partial bool Sprite0Hit { get; set; }
+		[ObservableProperty] public partial bool SpriteOverflow { get; set; }
+		[ObservableProperty] public partial bool VerticalBlank { get; set; }
+		[ObservableProperty] public partial bool WriteToggle { get; set; }
 
 		//Mask
-		[Reactive] public bool BgEnabled { get; set; }
-		[Reactive] public bool SpritesEnabled { get; set; }
-		[Reactive] public bool BgMaskLeft { get; set; }
-		[Reactive] public bool SpriteMaskLeft { get; set; }
-		[Reactive] public bool Grayscale { get; set; }
-		[Reactive] public bool IntensifyRed { get; set; }
-		[Reactive] public bool IntensifyGreen { get; set; }
-		[Reactive] public bool IntensifyBlue { get; set; }
+		[ObservableProperty] public partial bool BgEnabled { get; set; }
+		[ObservableProperty] public partial bool SpritesEnabled { get; set; }
+		[ObservableProperty] public partial bool BgMaskLeft { get; set; }
+		[ObservableProperty] public partial bool SpriteMaskLeft { get; set; }
+		[ObservableProperty] public partial bool Grayscale { get; set; }
+		[ObservableProperty] public partial bool IntensifyRed { get; set; }
+		[ObservableProperty] public partial bool IntensifyGreen { get; set; }
+		[ObservableProperty] public partial bool IntensifyBlue { get; set; }
 
 		//Control
-		[Reactive] public bool LargeSprites { get; set; }
-		[Reactive] public bool NmiOnVBlank { get; set; }
-		[Reactive] public bool VerticalWrite { get; set; }
-		[Reactive] public bool BgAt1000 { get; set; }
-		[Reactive] public bool SpritesAt1000 { get; set; }
+		[ObservableProperty] public partial bool LargeSprites { get; set; }
+		[ObservableProperty] public partial bool NmiOnVBlank { get; set; }
+		[ObservableProperty] public partial bool VerticalWrite { get; set; }
+		[ObservableProperty] public partial bool BgAt1000 { get; set; }
+		[ObservableProperty] public partial bool SpritesAt1000 { get; set; }
 
-		[Reactive] public string StackPreview { get; private set; } = "";
+		[ObservableProperty] public partial string StackPreview { get; private set; } = "";
 
 		public NesStatusViewModel()
 		{
-			this.WhenAnyValue(x => x.FlagC, x => x.FlagD, x => x.FlagI, x => x.FlagN, x => x.FlagV, x => x.FlagZ).Subscribe(x => {
-				RegPS = (byte)(
-					(FlagN ? (byte)NesCpuFlags.Negative : 0) |
-					(FlagV ? (byte)NesCpuFlags.Overflow : 0) |
-					(FlagD ? (byte)NesCpuFlags.Decimal : 0) |
-					(FlagI ? (byte)NesCpuFlags.IrqDisable : 0) |
-					(FlagZ ? (byte)NesCpuFlags.Zero : 0) |
-					(FlagC ? (byte)NesCpuFlags.Carry : 0)
-				);
+			bool preventUpdate = false;
+
+			this.ObserveProp([nameof(FlagC), nameof(FlagD), nameof(FlagI), nameof(FlagN), nameof(FlagV), nameof(FlagZ)], () => {
+				if(!preventUpdate) {
+					RegPS = (byte)(
+						(FlagN ? (byte)NesCpuFlags.Negative : 0) |
+						(FlagV ? (byte)NesCpuFlags.Overflow : 0) |
+						(FlagD ? (byte)NesCpuFlags.Decimal : 0) |
+						(FlagI ? (byte)NesCpuFlags.IrqDisable : 0) |
+						(FlagZ ? (byte)NesCpuFlags.Zero : 0) |
+						(FlagC ? (byte)NesCpuFlags.Carry : 0)
+					);
+				}
 			});
 
-			this.WhenAnyValue(x => x.RegPS).Subscribe(x => {
-				using var delayNotifs = DelayChangeNotifications(); //don't reupdate PS while updating the flags
-				FlagN = (x & (byte)NesCpuFlags.Negative) != 0;
-				FlagV = (x & (byte)NesCpuFlags.Overflow) != 0;
-				FlagD = (x & (byte)NesCpuFlags.Decimal) != 0;
-				FlagI = (x & (byte)NesCpuFlags.IrqDisable) != 0;
-				FlagZ = (x & (byte)NesCpuFlags.Zero) != 0;
-				FlagC = (x & (byte)NesCpuFlags.Carry) != 0;
+			this.ObserveProp(nameof(RegPS), () => {
+				preventUpdate = true;
+				FlagN = (RegPS & (byte)NesCpuFlags.Negative) != 0;
+				FlagV = (RegPS & (byte)NesCpuFlags.Overflow) != 0;
+				FlagD = (RegPS & (byte)NesCpuFlags.Decimal) != 0;
+				FlagI = (RegPS & (byte)NesCpuFlags.IrqDisable) != 0;
+				FlagZ = (RegPS & (byte)NesCpuFlags.Zero) != 0;
+				FlagC = (RegPS & (byte)NesCpuFlags.Carry) != 0;
+				preventUpdate = false;
 			});
 		}
 

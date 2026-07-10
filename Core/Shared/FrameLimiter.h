@@ -1,5 +1,6 @@
 #pragma once
 #include "Utilities/Timer.h"
+#include "Utilities/PlatformUtilities.h"
 
 class FrameLimiter
 {
@@ -39,15 +40,29 @@ public:
 		_targetTime += _delay;
 	}
 
-	bool WaitForNextFrame()
+	bool WaitForNextFrame(bool useSpinWait)
 	{
-		if(_targetTime - _clockTimer.GetElapsedMS() > 50) {
+		int gap = (int)(_targetTime - _clockTimer.GetElapsedMS());
+		if(gap > 50) {
 			//When sleeping for a long time (e.g <= 25% speed), sleep in small chunks and check to see if we need to stop sleeping between each sleep call
-			_clockTimer.WaitUntil(_clockTimer.GetElapsedMS() + 40);
+			std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(40));
 			return true;
 		}
 
-		_clockTimer.WaitUntil(_targetTime);
+		if(useSpinWait) {
+			if(gap >= 2) {
+				//2+ms left to wait, sleep until 1ms before the thread is meant to run
+				std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(gap - 1));
+			}
+
+			while(_clockTimer.GetElapsedMS() < _targetTime) {
+				//Spin wait until the exact time, to improve frame pacing
+				PlatformUtilities::IdleLoop();
+			}
+		} else {
+			std::this_thread::sleep_for(std::chrono::duration<int, std::milli>(gap));
+		}
+
 		return false;
 	}
 };

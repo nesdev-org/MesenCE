@@ -1,0 +1,24 @@
+<UserControl 
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="50"
+	x:Name="root"
+	HorizontalAlignment="Stretch"
+	x:Class="Mesen.Controls.HelpTooltip"
+>
+	
+	<UserControl.Resources>
+		<x:Double x:Key="ToolTipContentMaxWidth">400</x:Double>
+	</UserControl.Resources>
+
+	<Image
+		Stretch="None"
+		Margin="3 0"
+		Source="/Assets/Help.png"
+		ToolTip.Tip="{Binding Text, ElementName=root}"
+		ToolTip.Placement="Right"
+		ToolTip.ShowDelay="100"
+	/>
+</UserControl>

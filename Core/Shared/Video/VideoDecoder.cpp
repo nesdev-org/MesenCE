@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "Shared/Interfaces/IRenderingDevice.h"
 #include "Shared/Video/VideoDecoder.h"
 #include "Shared/Video/VideoRenderer.h"
 #include "Shared/Video/BaseVideoFilter.h"
@@ -12,10 +11,7 @@
 #include "Shared/Video/RotateFilter.h"
 #include "Shared/Video/ScanlineFilter.h"
 #include "Shared/Video/DebugHud.h"
-#include "Shared/InputHud.h"
 #include "Shared/RenderedFrame.h"
-#include "Shared/Video/SystemHud.h"
-#include "SNES/CartTypes.h"
 
 VideoDecoder::VideoDecoder(Emulator* emu)
 {

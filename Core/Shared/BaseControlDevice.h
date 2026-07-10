@@ -26,6 +26,10 @@ protected:
 	bool _strobe = false;
 	ControllerType _type = ControllerType::None;
 	uint8_t _port = 0;
+
+	uint8_t _prevReadValue = 0;
+	uint64_t _prevReadCycle = 0;
+
 	bool _connected = true;
 	SimpleLock _stateLock;
 
@@ -100,6 +104,10 @@ public:
 
 	virtual uint8_t ReadRam(uint16_t addr) = 0;
 	virtual void WriteRam(uint16_t addr, uint8_t value) = 0;
+
+	void SetPreviousRead(uint64_t cycle, uint8_t value);
+	uint8_t GetPreviousReadValue();
+	uint64_t GetPreviousReadCycle();
 
 	//Used by Lua API
 	virtual vector<DeviceButtonName> GetKeyNameAssociations() { return {}; }

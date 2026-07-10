@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -7,6 +8,10 @@ namespace Mesen.Views
 	{
 		public DefaultControllerView()
 		{
+			//Defaults
+			MaxWidth = 600;
+			Margin = new Thickness(0);
+
 			InitializeComponent();
 		}
 

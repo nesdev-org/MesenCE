@@ -6,7 +6,12 @@
 #include "Shared/IControllerHub.h"
 #include "SNES/Input/SnesController.h"
 #include "SNES/Input/SnesMouse.h"
+#include "SNES/Input/SnesNttDataKeypad.h"
 #include "NES/Input/NesController.h"
+#include "NES/Input/SuborMouse.h"
+#include "NES/Input/PachinkoController.h"
+#include "NES/Input/FcnsController.h"
+#include "NES/Input/VirtualBoyController.h"
 #include "PCE/Input/PceController.h"
 #include "PCE/Input/PceAvenuePad6.h"
 #include "Utilities/Serializer.h"
@@ -63,18 +68,38 @@ public:
 
 		for(int i = 0; i < HubPortCount; i++) {
 			switch(controllers[i].Type) {
-				case ControllerType::FamicomController:
-				case ControllerType::FamicomControllerP2:
-				case ControllerType::NesController:
-					_ports[i].reset(new NesController(emu, controllers[i].Type, 0, controllers[i].Keys));
-					break;
-
 				case ControllerType::SnesController:
 					_ports[i].reset(new SnesController(emu, 0, controllers[i].Keys));
 					break;
 
 				case ControllerType::SnesMouse:
 					_ports[i].reset(new SnesMouse(emu, 0, controllers[i].Keys));
+					break;
+
+				case ControllerType::SnesNttDataKeypad:
+					_ports[i].reset(new SnesNttDataKeypad(emu, 0, controllers[i].Keys));
+					break;
+
+				case ControllerType::NesController:
+				case ControllerType::FamicomController:
+				case ControllerType::FamicomControllerP2:
+					_ports[i].reset(new NesController(emu, controllers[i].Type, 0, controllers[i].Keys));
+					break;
+
+				case ControllerType::SuborMouse:
+					_ports[i].reset(new SuborMouse(emu, 0, controllers[i].Keys));
+					break;
+
+				case ControllerType::VirtualBoyController:
+					_ports[i].reset(new VirtualBoyController(emu, 0, controllers[i].Keys));
+					break;
+
+				case ControllerType::Pachinko:
+					_ports[i].reset(new PachinkoController(emu, 0, controllers[i].Keys));
+					break;
+
+				case ControllerType::FcnsController:
+					_ports[i].reset(new FcnsController(emu, 0, controllers[i].Keys));
 					break;
 
 				case ControllerType::PceController:

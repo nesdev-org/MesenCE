@@ -12,9 +12,8 @@ jobs:
     strategy:
       matrix:
         platform: [
-          {netversion: 6.x, targetframework: net6.0, aot: false, singleFile: true, aotString: ""},
-          {netversion: 8.x, targetframework: net8.0, aot: false, singleFile: true, aotString: ""},
-          {netversion: 8.x, targetframework: net8.0, aot: true, singleFile: false, aotString: " - AoT"}
+          {netversion: 10.x, targetframework: net10.0, aot: false, singleFile: true, aotString: ""},
+          {netversion: 10.x, targetframework: net10.0, aot: true, singleFile: false, aotString: " - AoT"}
         ]
       fail-fast: false
     runs-on: windows-2025-vs2026
@@ -42,7 +41,7 @@ jobs:
         uses: ./.github/actions/build-sha1-action
 
       - name: Build Mesen
-        run: msbuild -nologo -v:d -clp:ForceConsoleColor -m -p:Configuration=Release -p:Platform=x64 -t:Clean,UI -p:TargetFramework="${{ matrix.platform.targetframework }}"
+        run: msbuild -nologo -v:d -clp:ForceConsoleColor -m -p:Configuration=Release -p:Platform=x64 -t:Clean,UI -p:TargetFramework="${{ matrix.platform.targetframework }}" -p:OptimizeUi="true"
 
       - name: Publish Mesen
         run: dotnet publish --no-restore -c Release -p:PublishAot="${{ matrix.platform.aot }}" -p:SelfContained="${{ matrix.platform.aot }}" -p:PublishSingleFile="${{ matrix.platform.singleFile }}" -p:OptimizeUi="true" -p:Platform="Any CPU" -p:TargetFramework="${{ matrix.platform.targetframework }}" -r win-x64 Mesen.sln /p:PublishProfile=UI\Properties\PublishProfiles\Release.pubxml
@@ -84,7 +83,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |
@@ -130,7 +129,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |
@@ -181,7 +180,7 @@ jobs:
       - name: Install .NET Core
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install dependencies
         run: |

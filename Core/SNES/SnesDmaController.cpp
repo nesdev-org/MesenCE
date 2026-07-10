@@ -2,7 +2,6 @@
 #include "SNES/SnesDmaController.h"
 #include "SNES/DmaControllerTypes.h"
 #include "SNES/SnesMemoryManager.h"
-#include "Shared/MessageManager.h"
 #include "Utilities/Serializer.h"
 
 static constexpr uint8_t _transferByteCount[8] = { 1, 2, 2, 4, 4, 4, 2, 4 };
@@ -43,6 +42,7 @@ void SnesDmaController::Reset()
 	_dmaStartDelay = false;
 	_dmaPending = false;
 	_needToProcess = false;
+	_stoppedHdmaChannels = 0;
 
 	for(int i = 0; i < 8; i++) {
 		_state.Channel[i].DmaActive = false;
@@ -110,11 +110,11 @@ bool SnesDmaController::InitHdmaChannels()
 {
 	_hdmaInitPending = false;
 
+	//Reset internal flags on every frame, whether or not the channels are enabled
 	for(int i = 0; i < 8; i++) {
-		//Reset internal flags on every frame, whether or not the channels are enabled
-		_state.Channel[i].HdmaFinished = false;
 		_state.Channel[i].DoTransfer = false; //not resetting this causes graphical glitches in some games (Aladdin, Super Ghouls and Ghosts)
 	}
+	_stoppedHdmaChannels = 0;
 
 	if(!_state.HdmaChannels) {
 		//No channels are enabled, no more processing needs to be done
@@ -146,8 +146,9 @@ bool SnesDmaController::InitHdmaChannels()
 			_dmaClockCounter += 8;
 
 			ch.HdmaTableAddress++;
-			if(ch.HdmaLineCounterAndRepeat == 0) {
-				ch.HdmaFinished = true;
+			bool stopped = ch.HdmaLineCounterAndRepeat == 0;
+			if(stopped) {
+				StopHdmaChannel(i);
 			}
 
 			//3. Load Indirect Address, if necessary.
@@ -156,7 +157,7 @@ bool SnesDmaController::InitHdmaChannels()
 				_memoryManager->IncMasterClock4();
 				_dmaClockCounter += 8;
 
-				if(!ch.HdmaFinished) {
+				if(!stopped) {
 					uint8_t msb = _memoryManager->ReadDma((ch.SrcBank << 16) | ch.HdmaTableAddress++, true);
 					_memoryManager->IncMasterClock4();
 					_dmaClockCounter += 8;
@@ -230,11 +231,26 @@ bool SnesDmaController::HasActiveDmaChannel()
 	return false;
 }
 
+uint8_t SnesDmaController::GetActiveHdmaChannels()
+{
+	return _state.HdmaChannels & ~_stoppedHdmaChannels;
+}
+
+bool SnesDmaController::IsHdmaChannelActive(int i)
+{
+	return GetActiveHdmaChannels() & (1 << i);
+}
+
+void SnesDmaController::StopHdmaChannel(int i)
+{
+	_stoppedHdmaChannels |= (1 << i);
+}
+
 bool SnesDmaController::ProcessHdmaChannels()
 {
 	_hdmaPending = false;
 
-	if(!_state.HdmaChannels) {
+	if(!GetActiveHdmaChannels()) {
 		UpdateNeedToProcessFlag();
 		return false;
 	}
@@ -251,15 +267,11 @@ bool SnesDmaController::ProcessHdmaChannels()
 	//Run all the DMA transfers for each channel first, before fetching data for the next scanline
 	for(int i = 0; i < 8; i++) {
 		DmaChannelConfig& ch = _state.Channel[i];
-		if((_state.HdmaChannels & (1 << i)) == 0) {
+		if(!IsHdmaChannelActive(i)) {
 			continue;
 		}
 
 		ch.DmaActive = false;
-
-		if(ch.HdmaFinished) {
-			continue;
-		}
 
 		//1. If DoTransfer is false, skip to step 3.
 		if(ch.DoTransfer) {
@@ -272,7 +284,7 @@ bool SnesDmaController::ProcessHdmaChannels()
 	//Update the channel's state & fetch data for the next scanline
 	for(int i = 0; i < 8; i++) {
 		DmaChannelConfig& ch = _state.Channel[i];
-		if((_state.HdmaChannels & (1 << i)) == 0 || ch.HdmaFinished) {
+		if(!IsHdmaChannelActive(i)) {
 			continue;
 		}
 
@@ -318,7 +330,7 @@ bool SnesDmaController::ProcessHdmaChannels()
 
 			//"c. If $43xA is zero, terminate this HDMA channel for this frame. The bit in $420c is not cleared, though, so it may be automatically restarted next frame."
 			if(ch.HdmaLineCounterAndRepeat == 0) {
-				ch.HdmaFinished = true;
+				StopHdmaChannel(i);
 			}
 
 			//"d. Set DoTransfer to true."
@@ -339,12 +351,8 @@ bool SnesDmaController::ProcessHdmaChannels()
 
 bool SnesDmaController::IsLastActiveHdmaChannel(uint8_t channel)
 {
-	for(int i = channel + 1; i < 8; i++) {
-		if((_state.HdmaChannels & (1 << i)) && !_state.Channel[i].HdmaFinished) {
-			return false;
-		}
-	}
-	return true;
+	uint8_t mask = (1 << (channel + 1)) - 1;
+	return (GetActiveHdmaChannels() & ~mask) == 0;
 }
 
 void SnesDmaController::UpdateNeedToProcessFlag()
@@ -355,7 +363,7 @@ void SnesDmaController::UpdateNeedToProcessFlag()
 
 void SnesDmaController::BeginHdmaTransfer()
 {
-	if(_state.HdmaChannels) {
+	if(GetActiveHdmaChannels()) {
 		_hdmaPending = true;
 		_dmaStartDelay = true;
 		UpdateNeedToProcessFlag();
@@ -804,13 +812,14 @@ void SnesDmaController::Serialize(Serializer& s)
 	SV(_hdmaInitPending);
 	SV(_dmaStartDelay);
 	SV(_needToProcess);
+	SV(_stoppedHdmaChannels);
+
 	for(int i = 0; i < 8; i++) {
 		SVI(_state.Channel[i].Decrement);
 		SVI(_state.Channel[i].DestAddress);
 		SVI(_state.Channel[i].DoTransfer);
 		SVI(_state.Channel[i].FixedTransfer);
 		SVI(_state.Channel[i].HdmaBank);
-		SVI(_state.Channel[i].HdmaFinished);
 		SVI(_state.Channel[i].HdmaIndirectAddressing);
 		SVI(_state.Channel[i].HdmaLineCounterAndRepeat);
 		SVI(_state.Channel[i].HdmaTableAddress);

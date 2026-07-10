@@ -3,7 +3,26 @@
 
 #ifdef _WIN32
 	#include <Windows.h>
+#else
+	#if defined(__x86_64__) || defined(_M_X64)
+		#include <immintrin.h>
+	#elif __aarch64__
+		#include <arm_acle.h>
+	#endif
 #endif
+
+void PlatformUtilities::IdleLoop()
+{
+#if _WIN32
+	YieldProcessor();
+#elif defined(__x86_64__) || defined(_M_X64)
+	_mm_pause();
+#elif __aarch64__
+	#ifdef __clang__
+	__isb(0xF);
+	#endif
+#endif
+}
 
 void PlatformUtilities::DisableScreensaver()
 {

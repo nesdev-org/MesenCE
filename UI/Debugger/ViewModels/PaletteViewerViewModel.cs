@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Controls;
 using Mesen.Debugger.Utilities;
@@ -10,33 +11,31 @@ using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class PaletteViewerViewModel : DisposableViewModel, ICpuTypeModel
+	public partial class PaletteViewerViewModel : DisposableViewModel, ICpuTypeModel
 	{
 		public CpuType CpuType { get; set; }
 		public PaletteViewerConfig Config { get; }
-		[Reactive] public RefreshTimingViewModel RefreshTiming { get; private set; }
+		[ObservableProperty] public partial RefreshTimingViewModel RefreshTiming { get; private set; }
 
-		[Reactive] public UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
-		[Reactive] public UInt32[]? PaletteValues { get; set; } = null;
-		[Reactive] public int PaletteColumnCount { get; private set; } = 16;
+		[ObservableProperty] public partial UInt32[] PaletteColors { get; set; } = Array.Empty<UInt32>();
+		[ObservableProperty] public partial UInt32[]? PaletteValues { get; set; } = null;
+		[ObservableProperty] public partial int PaletteColumnCount { get; private set; } = 16;
 
-		[Reactive] public DynamicTooltip? PreviewPanel { get; private set; }
-		[Reactive] public int SelectedPalette { get; set; } = 0;
-		[Reactive] public int BlockSize { get; set; } = 8;
+		[ObservableProperty] public partial DynamicTooltip? PreviewPanel { get; private set; }
+		[ObservableProperty] public partial int SelectedPalette { get; set; } = 0;
+		[ObservableProperty] public partial int BlockSize { get; set; } = 8;
 
-		[Reactive] public DynamicTooltip? ViewerTooltip { get; set; }
-		[Reactive] public int ViewerMouseOverPalette { get; set; } = -1;
+		[ObservableProperty] public partial DynamicTooltip? ViewerTooltip { get; set; }
+		[ObservableProperty] public partial int ViewerMouseOverPalette { get; set; } = -1;
 
-		[Reactive] public List<object> FileMenuActions { get; private set; } = new();
-		[Reactive] public List<object> ViewMenuActions { get; private set; } = new();
+		[ObservableProperty] public partial List<object> FileMenuActions { get; private set; } = new();
+		[ObservableProperty] public partial List<object> ViewMenuActions { get; private set; } = new();
 
 		private RefStruct<DebugPaletteInfo>? _palette = null;
 
@@ -53,8 +52,13 @@ namespace Mesen.Debugger.ViewModels
 				return;
 			}
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.Zoom).Subscribe(x => BlockSize = Math.Max(16, 16 + (x - 1) * 4)));
-			AddDisposable(this.WhenAnyValue(x => x.SelectedPalette).Subscribe(x => UpdatePreviewPanel()));
+			AddDisposable(Config.ObserveProp(nameof(Config.Zoom), () => BlockSize = Math.Max(16, 16 + (Config.Zoom - 1) * 4)));
+			UpdatePreviewPanel();
+		}
+
+		partial void OnSelectedPaletteChanged(int value)
+		{
+			UpdatePreviewPanel();
 		}
 
 		public void InitActions(Window wnd, PaletteSelector palSelector, Border selectorBorder)

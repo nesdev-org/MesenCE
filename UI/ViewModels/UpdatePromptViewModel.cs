@@ -3,7 +3,7 @@ using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -17,14 +17,14 @@ using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class UpdatePromptViewModel : ViewModelBase
+	public partial class UpdatePromptViewModel : ViewModelBase
 	{
 		public Version LatestVersion { get; }
 		public Version InstalledVersion { get; }
 		public string Changelog { get; }
 
-		[Reactive] public bool IsUpdating { get; internal set; }
-		[Reactive] public int Progress { get; internal set; }
+		[ObservableProperty] public partial bool IsUpdating { get; internal set; }
+		[ObservableProperty] public partial int Progress { get; internal set; }
 		public UpdateFileInfo? FileInfo => _fileInfo;
 
 		private UpdateFileInfo? _fileInfo;

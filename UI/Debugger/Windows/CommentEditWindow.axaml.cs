@@ -27,9 +27,6 @@ namespace Mesen.Debugger.Windows
 
 			AddHandler(CommentEditWindow.KeyDownEvent, this.KeyDownHandler, RoutingStrategies.Tunnel);
 
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()

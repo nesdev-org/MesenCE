@@ -35,14 +35,12 @@
 				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<StackPanel>
-							<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Margin="0 -1 0 0">
-								<Grid ColumnDefinitions="3*, 1*" Margin="5 0 0 0">
-									<TextBlock Grid.Column="0" Text="{Binding Shortcut, Converter={StaticResource EnumConverter}}" />
-									<dc:DebuggerKeyBindingButton Grid.Column="1" KeyBinding="{Binding KeyBinding}" HorizontalAlignment="Stretch"  />
-								</Grid>
-							</Border>
-						</StackPanel>
+						<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1 0 1 1">
+							<Grid ColumnDefinitions="3*, 1*" Margin="5 0 0 0">
+								<TextBlock Grid.Column="0" Text="{Binding Shortcut, Converter={StaticResource EnumConverter}}" />
+								<dc:DebuggerKeyBindingButton Grid.Column="1" KeyBinding="{Binding KeyBinding}" HorizontalAlignment="Stretch"  />
+							</Grid>
+						</Border>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>

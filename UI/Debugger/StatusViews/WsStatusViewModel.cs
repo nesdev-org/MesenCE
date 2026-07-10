@@ -1,69 +1,77 @@
-﻿using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
+using Mesen.Utilities;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Mesen.Debugger.StatusViews;
 
-public class WsStatusViewModel : BaseConsoleStatusViewModel
+public partial class WsStatusViewModel : BaseConsoleStatusViewModel
 {
-	[Reactive] public UInt16 RegAX { get; set; }
-	[Reactive] public UInt16 RegBX { get; set; }
-	[Reactive] public UInt16 RegCX { get; set; }
-	[Reactive] public UInt16 RegDX { get; set; }
-	[Reactive] public UInt16 RegFlags { get; set; }
+	[ObservableProperty] public partial UInt16 RegAX { get; set; }
+	[ObservableProperty] public partial UInt16 RegBX { get; set; }
+	[ObservableProperty] public partial UInt16 RegCX { get; set; }
+	[ObservableProperty] public partial UInt16 RegDX { get; set; }
+	[ObservableProperty] public partial UInt16 RegFlags { get; set; }
 
-	[Reactive] public UInt16 RegSS { get; set; }
-	[Reactive] public UInt16 RegDS { get; set; }
-	[Reactive] public UInt16 RegES { get; set; }
+	[ObservableProperty] public partial UInt16 RegSS { get; set; }
+	[ObservableProperty] public partial UInt16 RegDS { get; set; }
+	[ObservableProperty] public partial UInt16 RegES { get; set; }
 
-	[Reactive] public UInt16 RegCS { get; set; }
-	[Reactive] public UInt16 RegIP { get; set; }
+	[ObservableProperty] public partial UInt16 RegCS { get; set; }
+	[ObservableProperty] public partial UInt16 RegIP { get; set; }
 
-	[Reactive] public UInt16 RegDI { get; set; }
-	[Reactive] public UInt16 RegSI { get; set; }
+	[ObservableProperty] public partial UInt16 RegDI { get; set; }
+	[ObservableProperty] public partial UInt16 RegSI { get; set; }
 
-	[Reactive] public UInt16 RegSP { get; set; }
-	[Reactive] public UInt16 RegBP { get; set; }
+	[ObservableProperty] public partial UInt16 RegSP { get; set; }
+	[ObservableProperty] public partial UInt16 RegBP { get; set; }
 
-	[Reactive] public UInt16 Scanline { get; set; }
-	[Reactive] public UInt16 Cycle { get; set; }
+	[ObservableProperty] public partial UInt16 Scanline { get; set; }
+	[ObservableProperty] public partial UInt16 Cycle { get; set; }
 
-	[Reactive] public bool FlagCarry { get; set; }
-	[Reactive] public bool FlagAuxCarry { get; set; }
-	[Reactive] public bool FlagParity { get; set; }
-	[Reactive] public bool FlagSign { get; set; }
-	[Reactive] public bool FlagZero { get; set; }
-	[Reactive] public bool FlagOverflow { get; set; }
-	[Reactive] public bool FlagTrap { get; set; }
-	[Reactive] public bool FlagIrq { get; set; }
-	[Reactive] public bool FlagDirection { get; set; }
-	[Reactive] public bool FlagMode { get; set; }
+	[ObservableProperty] public partial bool FlagCarry { get; set; }
+	[ObservableProperty] public partial bool FlagAuxCarry { get; set; }
+	[ObservableProperty] public partial bool FlagParity { get; set; }
+	[ObservableProperty] public partial bool FlagSign { get; set; }
+	[ObservableProperty] public partial bool FlagZero { get; set; }
+	[ObservableProperty] public partial bool FlagOverflow { get; set; }
+	[ObservableProperty] public partial bool FlagTrap { get; set; }
+	[ObservableProperty] public partial bool FlagIrq { get; set; }
+	[ObservableProperty] public partial bool FlagDirection { get; set; }
+	[ObservableProperty] public partial bool FlagMode { get; set; }
 
-	[Reactive] public bool FlagHalted { get; set; }
+	[ObservableProperty] public partial bool FlagHalted { get; set; }
 
-	[Reactive] public string StackPreview { get; private set; } = "";
+	[ObservableProperty] public partial string StackPreview { get; private set; } = "";
 
 	public WsStatusViewModel()
 	{
-		this.WhenAnyValue(x => x.FlagZero, x => x.FlagCarry, x => x.FlagSign, x => x.FlagOverflow).Subscribe(x => UpdateFlags());
-		this.WhenAnyValue(x => x.FlagParity, x => x.FlagIrq, x => x.FlagTrap, x => x.FlagMode).Subscribe(x => UpdateFlags());
-		this.WhenAnyValue(x => x.FlagAuxCarry, x => x.FlagDirection).Subscribe(x => UpdateFlags());
+		bool preventUpdate = false;
 
-		this.WhenAnyValue(x => x.RegFlags).Subscribe(f => {
-			using var delayNotifs = DelayChangeNotifications(); //don't reupdate RegFlags while updating the flags
-			FlagCarry = (f & 0x01) != 0;
-			FlagParity = (f & 0x04) != 0;
-			FlagAuxCarry = (f & 0x10) != 0;
-			FlagZero = (f & 0x40) != 0;
-			FlagSign = (f & 0x80) != 0;
-			FlagTrap = (f & 0x100) != 0;
-			FlagIrq = (f & 0x200) != 0;
-			FlagDirection = (f & 0x400) != 0;
-			FlagOverflow = (f & 0x800) != 0;
-			FlagMode = (f & 0x8000) != 0;
+		this.ObserveProp([
+			nameof(FlagZero), nameof(FlagCarry), nameof(FlagSign), nameof(FlagOverflow), nameof(FlagParity),
+			nameof(FlagIrq), nameof(FlagTrap), nameof(FlagMode), nameof(FlagAuxCarry), nameof(FlagDirection)
+		], () => {
+			if(!preventUpdate) {
+				UpdateFlags();
+			}
+		});
+
+		this.ObserveProp(nameof(RegFlags), () => {
+			preventUpdate = true;
+			FlagCarry = (RegFlags & 0x01) != 0;
+			FlagParity = (RegFlags & 0x04) != 0;
+			FlagAuxCarry = (RegFlags & 0x10) != 0;
+			FlagZero = (RegFlags & 0x40) != 0;
+			FlagSign = (RegFlags & 0x80) != 0;
+			FlagTrap = (RegFlags & 0x100) != 0;
+			FlagIrq = (RegFlags & 0x200) != 0;
+			FlagDirection = (RegFlags & 0x400) != 0;
+			FlagOverflow = (RegFlags & 0x800) != 0;
+			FlagMode = (RegFlags & 0x8000) != 0;
+			preventUpdate = false;
 		});
 	}
 

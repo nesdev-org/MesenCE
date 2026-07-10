@@ -1,7 +1,6 @@
-﻿using Mesen.Interop;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,23 +10,23 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class InputConfig : BaseConfig<InputConfig>
+	public partial class InputConfig : BaseConfig<InputConfig>
 	{
-		[Reactive][MinMax(0, 4)] public UInt32 ControllerDeadzoneSize { get; set; } = 2;
-		[Reactive][MinMax(0, 9)] public UInt32 MouseSensitivity { get; set; } = 5;
-		[Reactive] public bool HidePointerForLightGuns { get; set; } = false;
-		[Reactive][MinMax(0, 10)] public UInt32 ForceFeedbackIntensity { get; set; } = 5;
+		[ObservableProperty][MinMax(0, 4)] public partial UInt32 ControllerDeadzoneSize { get; set; } = 2;
+		[ObservableProperty][MinMax(0, 9)] public partial UInt32 MouseSensitivity { get; set; } = 5;
+		[ObservableProperty] public partial bool HidePointerForLightGuns { get; set; } = false;
+		[ObservableProperty][MinMax(0, 10)] public partial UInt32 ForceFeedbackIntensity { get; set; } = 5;
 
-		[Reactive] public InputDisplayPosition DisplayInputPosition { get; set; } = InputDisplayPosition.BottomRight;
-		[Reactive] public bool DisplayInputPort1 { get; set; } = false;
-		[Reactive] public bool DisplayInputPort2 { get; set; } = false;
-		[Reactive] public bool DisplayInputPort3 { get; set; } = false;
-		[Reactive] public bool DisplayInputPort4 { get; set; } = false;
-		[Reactive] public bool DisplayInputPort5 { get; set; } = false;
-		[Reactive] public bool DisplayInputPort6 { get; set; } = false;
-		[Reactive] public bool DisplayInputPort7 { get; set; } = false;
-		[Reactive] public bool DisplayInputPort8 { get; set; } = false;
-		[Reactive] public bool DisplayInputHorizontally { get; set; } = true;
+		[ObservableProperty] public partial InputDisplayPosition DisplayInputPosition { get; set; } = InputDisplayPosition.BottomRight;
+		[ObservableProperty] public partial bool DisplayInputPort1 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputPort2 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputPort3 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputPort4 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputPort5 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputPort6 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputPort7 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputPort8 { get; set; } = false;
+		[ObservableProperty] public partial bool DisplayInputHorizontally { get; set; } = true;
 
 		public InputConfig()
 		{
@@ -53,33 +52,33 @@ namespace Mesen.Config
 		}
 	}
 
-	public class KeyMapping : ReactiveObject
+	public partial class KeyMapping : ObservableObject
 	{
-		[Reactive] public UInt16 A { get; set; }
-		[Reactive] public UInt16 B { get; set; }
-		[Reactive] public UInt16 X { get; set; }
-		[Reactive] public UInt16 Y { get; set; }
-		[Reactive] public UInt16 L { get; set; }
-		[Reactive] public UInt16 R { get; set; }
-		[Reactive] public UInt16 Up { get; set; }
-		[Reactive] public UInt16 Down { get; set; }
-		[Reactive] public UInt16 Left { get; set; }
-		[Reactive] public UInt16 Right { get; set; }
-		[Reactive] public UInt16 Start { get; set; }
-		[Reactive] public UInt16 Select { get; set; }
-		[Reactive] public UInt16 U { get; set; }
-		[Reactive] public UInt16 D { get; set; }
+		[ObservableProperty] public partial UInt16 A { get; set; }
+		[ObservableProperty] public partial UInt16 B { get; set; }
+		[ObservableProperty] public partial UInt16 X { get; set; }
+		[ObservableProperty] public partial UInt16 Y { get; set; }
+		[ObservableProperty] public partial UInt16 L { get; set; }
+		[ObservableProperty] public partial UInt16 R { get; set; }
+		[ObservableProperty] public partial UInt16 Up { get; set; }
+		[ObservableProperty] public partial UInt16 Down { get; set; }
+		[ObservableProperty] public partial UInt16 Left { get; set; }
+		[ObservableProperty] public partial UInt16 Right { get; set; }
+		[ObservableProperty] public partial UInt16 Start { get; set; }
+		[ObservableProperty] public partial UInt16 Select { get; set; }
+		[ObservableProperty] public partial UInt16 U { get; set; }
+		[ObservableProperty] public partial UInt16 D { get; set; }
 
-		[Reactive] public UInt16 TurboA { get; set; }
-		[Reactive] public UInt16 TurboB { get; set; }
-		[Reactive] public UInt16 TurboX { get; set; }
-		[Reactive] public UInt16 TurboY { get; set; }
-		[Reactive] public UInt16 TurboL { get; set; }
-		[Reactive] public UInt16 TurboR { get; set; }
-		[Reactive] public UInt16 TurboSelect { get; set; }
-		[Reactive] public UInt16 TurboStart { get; set; }
+		[ObservableProperty] public partial UInt16 TurboA { get; set; }
+		[ObservableProperty] public partial UInt16 TurboB { get; set; }
+		[ObservableProperty] public partial UInt16 TurboX { get; set; }
+		[ObservableProperty] public partial UInt16 TurboY { get; set; }
+		[ObservableProperty] public partial UInt16 TurboL { get; set; }
+		[ObservableProperty] public partial UInt16 TurboR { get; set; }
+		[ObservableProperty] public partial UInt16 TurboSelect { get; set; }
+		[ObservableProperty] public partial UInt16 TurboStart { get; set; }
 
-		[Reactive] public UInt16 GenericKey1 { get; set; }
+		[ObservableProperty] public partial UInt16 GenericKey1 { get; set; }
 
 		public virtual InteropKeyMapping ToInterop(ControllerType type, int mappingIndex)
 		{
@@ -199,7 +198,7 @@ namespace Mesen.Config
 		ArrowKeys
 	}
 
-	public class ControllerConfig : BaseConfig<ControllerConfig>
+	public partial class ControllerConfig : BaseConfig<ControllerConfig>
 	{
 		protected KeyMapping _mapping1 = new();
 		protected KeyMapping _mapping2 = new();
@@ -210,8 +209,8 @@ namespace Mesen.Config
 		public KeyMapping Mapping2 { get => _mapping2; set => _mapping2 = value; }
 		public KeyMapping Mapping3 { get => _mapping3; set => _mapping3 = value; }
 		public KeyMapping Mapping4 { get => _mapping4; set => _mapping4 = value; }
-		[Reactive] public UInt32 TurboSpeed { get; set; } = 0;
-		[Reactive] public ControllerType Type { get; set; } = ControllerType.None;
+		[ObservableProperty] public partial UInt32 TurboSpeed { get; set; } = 0;
+		[ObservableProperty] public partial ControllerType Type { get; set; } = ControllerType.None;
 
 		public void InitDefaults(DefaultKeyMappingType defaultMappings, ControllerType type)
 		{
@@ -259,15 +258,16 @@ namespace Mesen.Config
 			}
 		}
 
-		public InteropControllerConfig ToInterop()
+		public InteropControllerConfig ToInterop(ControllerType? type = null)
 		{
+			ControllerType effectiveType = type ?? this.Type;
 			return new InteropControllerConfig() {
-				Type = this.Type,
+				Type = effectiveType,
 				Keys = new InteropKeyMappingSet() {
-					Mapping1 = this.Mapping1.ToInterop(Type, 0),
-					Mapping2 = this.Mapping2.ToInterop(Type, 1),
-					Mapping3 = this.Mapping3.ToInterop(Type, 2),
-					Mapping4 = this.Mapping4.ToInterop(Type, 3),
+					Mapping1 = this.Mapping1.ToInterop(effectiveType, 0),
+					Mapping2 = this.Mapping2.ToInterop(effectiveType, 1),
+					Mapping3 = this.Mapping3.ToInterop(effectiveType, 2),
+					Mapping4 = this.Mapping4.ToInterop(effectiveType, 3),
 					TurboSpeed = this.TurboSpeed
 				}
 			};
@@ -380,6 +380,7 @@ namespace Mesen.Config
 		FamilyBasicKeyboard,
 		PartyTap,
 		Pachinko,
+		FcnsController,
 		ExcitingBoxing,
 		JissenMahjong,
 		SuborKeyboard,
@@ -438,6 +439,8 @@ namespace Mesen.Config
 				case ControllerType.WsController:
 				case ControllerType.WsControllerVertical:
 				case ControllerType.Pcv2Controller:
+				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 					return true;
 			}
 
@@ -458,6 +461,7 @@ namespace Mesen.Config
 				case ControllerType.PceController:
 				case ControllerType.PceAvenuePad6:
 				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 				case ControllerType.HoriTrack:
 				case ControllerType.BandaiHyperShot:
 				case ControllerType.SmsController:
@@ -486,6 +490,7 @@ namespace Mesen.Config
 				case ControllerType.SuborKeyboard:
 				case ControllerType.FamilyBasicKeyboard:
 				case ControllerType.Pachinko:
+				case ControllerType.FcnsController:
 				case ControllerType.PartyTap:
 				case ControllerType.VbController:
 				case ControllerType.JissenMahjong:

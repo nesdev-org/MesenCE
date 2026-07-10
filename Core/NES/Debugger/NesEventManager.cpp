@@ -160,7 +160,7 @@ EventViewerCategoryCfg NesEventManager::GetEventConfig(DebugEventInfo& evt)
 			bool isWrite = evt.Operation.Type == MemoryOperationType::Write || evt.Operation.Type == MemoryOperationType::DmaWrite || evt.Operation.Type == MemoryOperationType::DummyWrite;
 			if(isWrite) {
 				if(addr >= 0x2000 && addr <= 0x3FFF) {
-					switch(addr & 0x200F) {
+					switch(addr & 0x2007) {
 						case 0x2000: return _config.Ppu2000Write;
 						case 0x2001: return _config.Ppu2001Write;
 						case 0x2003: return _config.Ppu2003Write;
@@ -178,7 +178,7 @@ EventViewerCategoryCfg NesEventManager::GetEventConfig(DebugEventInfo& evt)
 				}
 			} else {
 				if(addr >= 0x2000 && addr <= 0x3FFF) {
-					switch(addr & 0x200F) {
+					switch(addr & 0x2007) {
 						case 0x2002: return _config.Ppu2002Read;
 						case 0x2004: return _config.Ppu2004Read;
 						case 0x2007: return _config.Ppu2007Read;

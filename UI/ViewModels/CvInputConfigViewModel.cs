@@ -1,15 +1,13 @@
 ﻿using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
-using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
-	public class CvInputConfigViewModel : DisposableViewModel
+	public partial class CvInputConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public CvConfig Config { get; set; }
+		[ObservableProperty] public partial CvConfig Config { get; set; }
 
 		public Enum[] AvailableControllerTypesP12 => new Enum[] {
 			ControllerType.None,

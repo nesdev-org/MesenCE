@@ -763,10 +763,31 @@ bool GbaMemoryManager::UseInlineHalt()
 	return result;
 }
 
+uint32_t GbaMemoryManager::GetOpenBus()
+{
+	return (
+		_state.InternalOpenBus[0] |
+		(_state.InternalOpenBus[1] << 8) |
+		(_state.InternalOpenBus[2] << 16) |
+		(_state.InternalOpenBus[3] << 24));
+}
+
 uint8_t GbaMemoryManager::GetOpenBus(uint32_t addr)
 {
 	_openBusReadStamp = _masterClock;
 	return _state.InternalOpenBus[addr & 0x03];
+}
+
+uint32_t GbaMemoryManager::ReadCoprocessor()
+{
+	ProcessWaitStates(GbaAccessMode::Word, UINT32_MAX);
+	return GetOpenBus();
+}
+
+void GbaMemoryManager::WriteCoprocessor(uint32_t value)
+{
+	ProcessWaitStates(GbaAccessMode::Word, UINT32_MAX);
+	UpdateOpenBus<4>(value);
 }
 
 uint32_t GbaMemoryManager::DebugCpuRead(GbaAccessModeVal mode, uint32_t addr)

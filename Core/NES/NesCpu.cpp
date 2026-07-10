@@ -340,32 +340,10 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 
 	uint16_t prevReadAddress = readAddress;
 	bool enableInternalRegReads = (readAddress & 0xFFE0) == 0x4000;
-	bool skipFirstInputClock = false;
-	if(enableInternalRegReads && _dmcDmaRunning && (readAddress == 0x4016 || readAddress == 0x4017)) {
-		uint16_t dmcAddress = _console->GetApu()->GetDmcReadAddress();
-		if((dmcAddress & 0x1F) == (readAddress & 0x1F)) {
-			//DMC will cause a read on the same address as the CPU was reading from
-			//This will hide the reads from the controllers because /OE will be active the whole time
-			skipFirstInputClock = true;
-		}
-	}
-
-	//On Famicom, each dummy/idle read to 4016/4017 is intepreted as a read of the joypad registers
-	//On NES (or AV Famicom), only the first dummy/idle read causes side effects (e.g only a single bit is lost)
-	bool isNesBehavior = _console->GetNesConfig().ConsoleType != NesConsoleType::Hvc001;
-	bool skipDummyReads = isNesBehavior && (readAddress == 0x4016 || readAddress == 0x4017);
-
 	_needHalt = false;
 
 	StartCpuCycle(true);
-	if(_abortDmcDma && isNesBehavior && (readAddress == 0x4016 || readAddress == 0x4017)) {
-		//Skip halt cycle dummy read on 4016/4017
-		//The DMA was aborted, and the CPU will read 4016/4017 next
-		//If 4016/4017 is read here, the controllers will see 2 separate reads
-		//even though they would only see a single read on hardware (except the original Famicom)
-	} else if(!skipFirstInputClock) {
-		_memoryManager->Read(readAddress, MemoryOperationType::DmaRead);
-	}
+	_memoryManager->Read(readAddress, MemoryOperationType::DmaRead);
 	EndCpuCycle(true);
 
 	if(_abortDmcDma) {
@@ -407,7 +385,7 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 				//DMC DMA is ready to read a byte (both halt and dummy read cycles were performed before this)
 				processCycle();
 				_isDmcDmaRead = true; //used by debugger to distinguish between dmc and oam/dummy dma reads
-				readValue = ProcessDmaRead(_console->GetApu()->GetDmcReadAddress(), prevReadAddress, enableInternalRegReads, isNesBehavior);
+				readValue = ProcessDmaRead(_console->GetApu()->GetDmcReadAddress(), prevReadAddress, enableInternalRegReads);
 				_isDmcDmaRead = false;
 				EndCpuCycle(true);
 				_dmcDmaRunning = false;
@@ -423,7 +401,7 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 			} else if(_spriteDmaTransfer) {
 				//DMC DMA is not running, or not ready, run sprite DMA
 				processCycle();
-				readValue = ProcessDmaRead(_spriteDmaOffset * 0x100 + spriteReadAddr, prevReadAddress, enableInternalRegReads, isNesBehavior);
+				readValue = ProcessDmaRead(_spriteDmaOffset * 0x100 + spriteReadAddr, prevReadAddress, enableInternalRegReads);
 				EndCpuCycle(true);
 				spriteReadAddr++;
 				spriteDmaCounter++;
@@ -431,9 +409,7 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 				//DMC DMA is running, but not ready (need halt/dummy read) and sprite DMA isn't runnnig, perform a dummy read
 				assert(_needHalt || _needDummyRead);
 				processCycle();
-				if(!skipDummyReads) {
-					_memoryManager->Read(readAddress, MemoryOperationType::DmaRead);
-				}
+				_memoryManager->Read(readAddress, MemoryOperationType::DmaRead);
 				EndCpuCycle(true);
 			}
 		} else {
@@ -449,16 +425,14 @@ void NesCpu::ProcessPendingDma(uint16_t readAddress, MemoryOperationType opType)
 			} else {
 				//Align to read cycle before starting sprite DMA (or align to perform DMC read)
 				processCycle();
-				if(!skipDummyReads) {
-					_memoryManager->Read(readAddress, MemoryOperationType::DmaRead);
-				}
+				_memoryManager->Read(readAddress, MemoryOperationType::DmaRead);
 				EndCpuCycle(true);
 			}
 		}
 	}
 }
 
-uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool enableInternalRegReads, bool isNesBehavior)
+uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool enableInternalRegReads)
 {
 	//This is to reproduce a CPU bug that can occur during DMA which can cause the 2A03 to read from
 	//its internal registers (4015, 4016, 4017) at the same time as the DMA unit reads a byte from
@@ -499,15 +473,7 @@ uint8_t NesCpu::ProcessDmaRead(uint16_t addr, uint16_t& prevReadAddress, bool en
 
 			case 0x4016:
 			case 0x4017:
-				if(_console->GetRegion() == ConsoleRegion::Pal || (isNesBehavior && prevReadAddress == internalAddr)) {
-					//Reading from the same input register twice in a row, skip the read entirely to avoid
-					//triggering a bit loss from the read, since the controller won't react to this read
-					//Return the same value as the last read, instead
-					//On PAL, the behavior is unknown - for now, don't cause any bit deletions
-					val = _memoryManager->GetOpenBus();
-				} else {
-					val = _memoryManager->Read(internalAddr, MemoryOperationType::DmaRead);
-				}
+				val = _memoryManager->Read(internalAddr, MemoryOperationType::DmaRead);
 
 				if(!isSameAddress) {
 					//The DMA unit is reading from a different address, read from it too (external bus)

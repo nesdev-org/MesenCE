@@ -1,10 +1,9 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Debugger.Utilities;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,19 +13,19 @@ using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels;
 
-public class NesHeaderEditViewModel : DisposableViewModel
+public partial class NesHeaderEditViewModel : DisposableViewModel
 {
 	public NesHeader Header { get; }
 
-	[Reactive] public bool IsBatteryCheckboxEnabled { get; private set; }
-	[Reactive] public bool IsVsSystemVisible { get; private set; }
-	[Reactive] public bool IsNes20 { get; private set; }
+	[ObservableProperty] public partial bool IsBatteryCheckboxEnabled { get; private set; }
+	[ObservableProperty] public partial bool IsVsSystemVisible { get; private set; }
+	[ObservableProperty] public partial bool IsNes20 { get; private set; }
 
-	[Reactive] public Enum[]? AvailableSystemTypes { get; private set; } = null;
-	[Reactive] public Enum[]? AvailableTimings { get; private set; } = null;
+	[ObservableProperty] public partial Enum[]? AvailableSystemTypes { get; private set; } = null;
+	[ObservableProperty] public partial Enum[]? AvailableTimings { get; private set; } = null;
 
-	[Reactive] public string HeaderBytes { get; private set; } = "";
-	[Reactive] public string ErrorMessage { get; private set; } = "";
+	[ObservableProperty] public partial string HeaderBytes { get; private set; } = "";
+	[ObservableProperty] public partial string ErrorMessage { get; private set; } = "";
 
 	private RomInfo _romInfo;
 	private byte[] _prgRom;
@@ -54,14 +53,14 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		_romInfo = EmuApi.GetRomInfo();
 		Header = NesHeader.FromBytes(headerBytes);
 
-		AddDisposable(this.WhenAnyValue(x => x.Header.SaveRam, x => x.Header.ChrRamBattery).Subscribe(x => {
+		AddDisposable(Header.ObserveProp([nameof(Header.SaveRam), nameof(Header.ChrRamBattery)], () => {
 			IsBatteryCheckboxEnabled = Header.SaveRam == MemorySizes.None && Header.ChrRamBattery == MemorySizes.None;
 			if(!IsBatteryCheckboxEnabled) {
 				Header.HasBattery = true;
 			}
 		}));
 
-		AddDisposable(this.WhenAnyValue(x => x.Header.System, x => x.Header.FileType).Subscribe(x => {
+		AddDisposable(Header.ObserveProp([nameof(Header.System), nameof(Header.FileType)], () => {
 			bool isVsSystem = Header.System == TvSystem.VsSystem;
 			IsVsSystemVisible = isVsSystem && Header.FileType == NesFileType.Nes2_0;
 			if(!IsVsSystemVisible) {
@@ -70,7 +69,7 @@ public class NesHeaderEditViewModel : DisposableViewModel
 			}
 		}));
 
-		AddDisposable(this.WhenAnyValue(x => x.Header.FileType).Subscribe(x => {
+		AddDisposable(Header.ObserveProp(nameof(Header.FileType), () => {
 			IsNes20 = Header.FileType == NesFileType.Nes2_0;
 
 			if(IsNes20) {
@@ -171,34 +170,34 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		MB
 	}
 
-	public class NesHeader : ViewModelBase
+	public partial class NesHeader : ViewModelBase
 	{
 		private static Dictionary<UInt64, int> _validSizeValues = new Dictionary<UInt64, int>();
 
-		[Reactive] public NesFileType FileType { get; set; }
+		[ObservableProperty] public partial NesFileType FileType { get; set; }
 
-		[Reactive] public uint MapperId { get; set; }
-		[Reactive] public uint SubmapperId { get; set; }
+		[ObservableProperty] public partial uint MapperId { get; set; }
+		[ObservableProperty] public partial uint SubmapperId { get; set; }
 
-		[Reactive] public UInt64 PrgRom { get; set; }
-		[Reactive] public RomSizeUnit PrgRomUnit { get; set; }
-		[Reactive] public UInt64 ChrRom { get; set; }
-		[Reactive] public RomSizeUnit ChrRomUnit { get; set; }
+		[ObservableProperty] public partial UInt64 PrgRom { get; set; }
+		[ObservableProperty] public partial RomSizeUnit PrgRomUnit { get; set; }
+		[ObservableProperty] public partial UInt64 ChrRom { get; set; }
+		[ObservableProperty] public partial RomSizeUnit ChrRomUnit { get; set; }
 
-		[Reactive] public MirroringType Mirroring { get; set; }
+		[ObservableProperty] public partial MirroringType Mirroring { get; set; }
 
-		[Reactive] public FrameTiming Timing { get; set; }
-		[Reactive] public TvSystem System { get; set; }
-		[Reactive] public bool HasTrainer { get; set; }
-		[Reactive] public bool HasBattery { get; set; }
-		[Reactive] public VsPpuType VsPpu { get; set; }
-		[Reactive] public VsSystemType VsSystem { get; set; }
-		[Reactive] public GameInputType InputType { get; set; }
+		[ObservableProperty] public partial FrameTiming Timing { get; set; }
+		[ObservableProperty] public partial TvSystem System { get; set; }
+		[ObservableProperty] public partial bool HasTrainer { get; set; }
+		[ObservableProperty] public partial bool HasBattery { get; set; }
+		[ObservableProperty] public partial VsPpuType VsPpu { get; set; }
+		[ObservableProperty] public partial VsSystemType VsSystem { get; set; }
+		[ObservableProperty] public partial GameInputType InputType { get; set; }
 
-		[Reactive] public MemorySizes WorkRam { get; set; } = MemorySizes.None;
-		[Reactive] public MemorySizes SaveRam { get; set; } = MemorySizes.None;
-		[Reactive] public MemorySizes ChrRam { get; set; } = MemorySizes.None;
-		[Reactive] public MemorySizes ChrRamBattery { get; set; } = MemorySizes.None;
+		[ObservableProperty] public partial MemorySizes WorkRam { get; set; } = MemorySizes.None;
+		[ObservableProperty] public partial MemorySizes SaveRam { get; set; } = MemorySizes.None;
+		[ObservableProperty] public partial MemorySizes ChrRam { get; set; } = MemorySizes.None;
+		[ObservableProperty] public partial MemorySizes ChrRamBattery { get; set; } = MemorySizes.None;
 
 		static NesHeader()
 		{
@@ -715,8 +714,15 @@ public class NesHeaderEditViewModel : DisposableViewModel
 		CityPatrolmanLightgun = 0x2F, //not supported yet
 		SharpC1CassetteInterface = 0x30, //not supported yet
 		StandardControllerWithSwappedButtons = 0x31, //not supported yet
-		ExcaliborSudokuPad = 0x32, //not supported yet
+		ExcaliburSudokuPad = 0x32, //not supported yet
 		AblPinball = 0x33, //not supported yet
-		GoldenNuggetCasino = 0x34 //not supported yet
+		GoldenNuggetCasino = 0x34, //not supported yet
+		KedaKeyboard = 0x35, //not supported yet
+		SuborKeyboardMouse3 = 0x36, //not supported yet (note: mouse on $4017)
+		PortTestController = 0x37, //not supported yet
+		BandaiMultiGamePlayer = 0x38, //not supported yet
+		VenomTVDance = 0x39, //not supported yet
+		LgTvRemote = 0x3A, //not supported yet
+		FcnsController = 0x3B
 	}
 }

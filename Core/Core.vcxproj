@@ -492,6 +492,7 @@
     <ClInclude Include="NES\Input\KonamiHyperShot.h" />
     <ClInclude Include="NES\Input\OekaKidsTablet.h" />
     <ClInclude Include="NES\Input\PachinkoController.h" />
+    <ClInclude Include="NES\Input\FcnsController.h" />
     <ClInclude Include="NES\Input\PartyTap.h" />
     <ClInclude Include="NES\Input\PowerPad.h" />
     <ClInclude Include="NES\Input\SuborKeyboard.h" />

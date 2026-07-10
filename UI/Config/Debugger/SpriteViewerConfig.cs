@@ -1,27 +1,27 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
 
 namespace Mesen.Config
 {
-	public class SpriteViewerConfig : BaseWindowConfig<SpriteViewerConfig>
+	public partial class SpriteViewerConfig : BaseWindowConfig<SpriteViewerConfig>
 	{
-		[Reactive] public bool ShowSettingsPanel { get; set; } = true;
+		[ObservableProperty] public partial bool ShowSettingsPanel { get; set; } = true;
 
-		[Reactive] public bool ShowOutline { get; set; } = false;
-		[Reactive] public bool ShowOffscreenRegions { get; set; } = false;
-		[Reactive] public SpriteBackground Background { get; set; } = SpriteBackground.Gray;
+		[ObservableProperty] public partial bool ShowOutline { get; set; } = false;
+		[ObservableProperty] public partial bool ShowOffscreenRegions { get; set; } = false;
+		[ObservableProperty] public partial SpriteBackground Background { get; set; } = SpriteBackground.Gray;
 
-		[Reactive] public SpriteViewerSource Source { get; set; } = SpriteViewerSource.SpriteRam;
-		[Reactive] public int SourceOffset { get; set; } = 0;
+		[ObservableProperty] public partial SpriteViewerSource Source { get; set; } = SpriteViewerSource.SpriteRam;
+		[ObservableProperty] public partial int SourceOffset { get; set; } = 0;
 
-		[Reactive] public bool DimOffscreenSprites { get; set; } = true;
-		[Reactive] public bool ShowListView { get; set; } = false;
-		[Reactive] public double ListViewHeight { get; set; } = 100;
-		[Reactive] public List<int> ColumnWidths { get; set; } = new();
+		[ObservableProperty] public partial bool DimOffscreenSprites { get; set; } = true;
+		[ObservableProperty] public partial bool ShowListView { get; set; } = false;
+		[ObservableProperty] public partial double ListViewHeight { get; set; } = 100;
+		[ObservableProperty] public partial List<int> ColumnWidths { get; set; } = new();
 
-		[Reactive] public double ImageScale { get; set; } = 2;
-		[Reactive] public RefreshTimingConfig RefreshTiming { get; set; } = new();
+		[ObservableProperty] public partial double ImageScale { get; set; } = 2;
+		[ObservableProperty] public partial RefreshTimingConfig RefreshTiming { get; set; } = new();
 
 		public SpriteViewerConfig()
 		{

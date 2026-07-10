@@ -683,38 +683,40 @@ template<class T> void NesPpu<T>::WriteVram(uint16_t addr, uint8_t value)
 
 template<class T> void NesPpu<T>::LoadTileInfo()
 {
-	if(IsRenderingEnabled()) {
-		switch(_cycle & 0x07) {
-			case 1: {
-				((T*)this)->StoreTileInformation(); //Used by HD packs
+	switch(_cycle & 0x07) {
+		case 0:
+			//This is the last dot of the 8-dot sequence (e.g dot 8, 16, etc.)
+			//Replace bottom 8 bits of the BG shifters
+			_highBitShift &= 0xFF00;
+			_highBitShift |= _tile.HighByte;
+			_lowBitShift &= 0xFF00;
+			_lowBitShift |= _tile.LowByte;
 
-				_previousTilePalette = _currentTilePalette;
-				_currentTilePalette = _tile.PaletteOffset;
+			_previousTilePalette = _currentTilePalette;
+			_currentTilePalette = _tile.PaletteOffset;
+			((T*)this)->PushTileInformation(); //Used by HD packs
+			break;
 
-				_highBitShift &= 0xFF00; // This shift register pulls in 1's, so we need to mask away the lower 8 bits before bringing in the data from the tile fetch.
-				_highBitShift |= _tile.HighByte;
-				_lowBitShift &= 0xFF00; // Similar to the high bit plane, it's possible there are 1's in the lower 8 bits if you toggle rendering at the right time.
-				_lowBitShift |= _tile.LowByte;
-
-				uint8_t tileIndex = ReadVram(GetNameTableAddr());
-				_tile.TileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
-				break;
-			}
-
-			case 3: {
-				uint8_t shift = ((_videoRamAddr >> 4) & 0x04) | (_videoRamAddr & 0x02);
-				_tile.PaletteOffset = ((ReadVram(GetAttributeAddr()) >> shift) & 0x03) << 2;
-				break;
-			}
-
-			case 5:
-				_tile.LowByte = ReadVram(_tile.TileAddr);
-				break;
-
-			case 7:
-				_tile.HighByte = ReadVram(_tile.TileAddr + 8);
-				break;
+		case 1: {
+			uint8_t tileIndex = ReadVram(GetNameTableAddr());
+			_tile.TileAddr = (tileIndex << 4) | (_videoRamAddr >> 12) | _control.BackgroundPatternAddr;
+			((T*)this)->StoreTileInformation(); //Used by HD packs
+			break;
 		}
+
+		case 3: {
+			uint8_t shift = ((_videoRamAddr >> 4) & 0x04) | (_videoRamAddr & 0x02);
+			_tile.PaletteOffset = ((ReadVram(GetAttributeAddr()) >> shift) & 0x03) << 2;
+			break;
+		}
+
+		case 5:
+			_tile.LowByte = ReadVram(_tile.TileAddr);
+			break;
+
+		case 7:
+			_tile.HighByte = ReadVram(_tile.TileAddr + 8);
+			break;
 	}
 }
 
@@ -765,6 +767,9 @@ template<class T> void NesPpu<T>::LoadSprite(uint8_t spriteY, uint8_t tileIndex,
 
 		if(!extraSprite) {
 			_spriteShifterList[_spriteIndex] = (((uint16_t)spriteX + 1) << 4) | _spriteIndex;
+
+			//Clear expired flag to indicate that the counter was reloaded
+			_expiredSpriteShifters &= ~(1 << _spriteIndex);
 		}
 
 		_spriteCount++;
@@ -830,6 +835,8 @@ template<class T> void NesPpu<T>::ShiftTileRegisters()
 {
 	_lowBitShift <<= 1;
 	_highBitShift <<= 1;
+
+	//The high bit shifter is filled with 1s as it shifts (the low bit shifter is not)
 	_highBitShift |= 1;
 }
 
@@ -915,32 +922,48 @@ template<class T> uint8_t NesPpu<T>::GetPixelColor()
 	return ((offset + ((_cycle - 1) & 0x07) < 8) ? _previousTilePalette : _currentTilePalette) + backgroundColor;
 }
 
+template<class T> void NesPpu<T>::ProcessRenderingDisabledPixel()
+{
+	//Duplicated logic from ProcessScanlineImpl, only called when rendering is disabled
+	if(_scanline >= 0) {
+		ProcessSpriteShifters();
+		((T*)this)->DrawPixel();
+	} else if(_cycle == 1) {
+		_statusFlags.VerticalBlank = false;
+		_console->GetCpu()->ClearNmiFlag();
+	}
+}
+
 template<class T> void NesPpu<T>::ProcessScanlineImpl()
 {
 	//Only called for cycle 1+
 	if(_cycle <= 256) {
-		LoadTileInfo();
+		if(_prevRenderingEnabled) {
+			//Process visible pixels when rendering is enabled
+			//Portions are duplicated in ProcessRenderingDisabledPixel for performance reasons
+			if(_scanline >= 0) {
+				//"Secondary OAM clear and sprite evaluation do not occur on the pre-render line"
+				ProcessSpriteShifters();
 
-		if(_prevRenderingEnabled && (_cycle & 0x07) == 0) {
-			IncHorizontalScrolling();
-			if(_cycle == 256) {
-				IncVerticalScrolling();
-			}
-		}
+				((T*)this)->DrawPixel();
 
-		if(_scanline >= 0) {
-			//"Secondary OAM clear and sprite evaluation do not occur on the pre-render line"
-			ProcessSpriteEvaluation();
-
-			((T*)this)->DrawPixel();
-
-			if(_prevRenderingEnabled) {
+				ProcessSpriteEvaluation();
 				ShiftTileRegisters();
+			} else if(_cycle == 1) {
+				//Pre-render scanline logic
+				_statusFlags.VerticalBlank = false;
+				_console->GetCpu()->ClearNmiFlag();
 			}
-		} else if(_cycle == 1) {
-			//Pre-render scanline logic
-			_statusFlags.VerticalBlank = false;
-			_console->GetCpu()->ClearNmiFlag();
+
+			if((_cycle & 0x07) == 0) {
+				IncHorizontalScrolling();
+				if(_cycle == 256) {
+					IncVerticalScrolling();
+				}
+			}
+			LoadTileInfo();
+		} else {
+			ProcessRenderingDisabledPixel();
 		}
 	} else if(_cycle >= 257 && _cycle <= 320) {
 		if(_prevRenderingEnabled) {
@@ -987,27 +1010,35 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 			}
 		}
 	} else if(_cycle >= 321 && _cycle <= 336) {
-		LoadTileInfo();
-
-		if(_cycle == 321) {
-			if(_prevRenderingEnabled) {
+		if(_prevRenderingEnabled) {
+			if(_cycle == 321) {
 				//Do the final increment, which follows the last set of 8 sprite fetch dots.
 				_secondaryOamAddr++;
+			} else if(_prevRenderingEnabled && (_cycle == 328 || _cycle == 336)) {
+				IncHorizontalScrolling();
 			}
-		} else if(_prevRenderingEnabled && (_cycle == 328 || _cycle == 336)) {
-			_lowBitShift <<= 8;
-			_highBitShift <<= 8;
-			IncHorizontalScrolling();
+			ShiftTileRegisters();
+			LoadTileInfo();
 		}
 	} else if(_cycle == 337) {
 		if(IsRenderingEnabled()) {
 			_tile.TileAddr = ReadVram(GetNameTableAddr());
 		}
 	} else if(_cycle == 339) {
+		_activeSpriteShifters = 0;
+
 		if(IsRenderingEnabled()) {
 			_tile.TileAddr = ReadVram(GetNameTableAddr());
 
-			_activeSpriteShifters = 0;
+			//Set sprite shifters to "count" mode (only if rendering is enabled)
+			//Only do this if the shifter did not finish counting already (which can happen in
+			//some scenarios when rendering is disabled mid-scanline, etc.)
+			for(int i = 0; i < 8; i++) {
+				uint8_t bit = (1 << (_spriteShifterList[i] & 0x07));
+				if(_spriteShifterList[i] != NesPpu::SpriteShifterDone && !(_expiredSpriteShifters & bit)) {
+					_countingSpriteShifters |= bit;
+				}
+			}
 
 			if(_scanline == -1 && _cycle == 339 && (_frameCount & 0x01) && _region == ConsoleRegion::Ntsc && GetPpuModel() == PpuModel::Ppu2C02) {
 				//This behavior is NTSC-specific - PAL frames are always the same number of cycles
@@ -1023,10 +1054,19 @@ template<class T> void NesPpu<T>::ProcessScanlineImpl()
 				}
 				_nextSpriteShifterCycle++;
 			}
-		} else {
-			//If rendering is off, the sprites aren't put into counting mode, so make sure they're output+shift in case they got pattern data.
-			_activeSpriteShifters = 0xFF;
 		}
+
+		for(int i = 0; i < 8; i++) {
+			//Any shifter that's not in count mode should be active at the start of the
+			//next scanline and output pixels starting from X=0 (if rendering is enabled)
+			if(_spriteShifterList[i] != NesPpu::SpriteShifterDone) {
+				uint8_t bit = (1 << (_spriteShifterList[i] & 0x07));
+				if(!(_countingSpriteShifters & bit)) {
+					_activeSpriteShifters |= bit;
+				}
+			}
+		}
+
 		UpdateProcessSpritesFlag();
 	}
 }
@@ -1053,148 +1093,155 @@ template<class T> void NesPpu<T>::ProcessSpriteEvaluationStart()
 	_lastVisibleSpriteAddr = _firstVisibleSpriteAddr;
 }
 
-template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
+template<class T> void NesPpu<T>::ProcessSpriteShifters()
 {
 	//Handle sprite shifter counting.
 	if(_nextSpriteShifterCycle == _cycle) {
 		while((uint32_t)(_spriteShifterList[_nextSpriteShifter] >> 4) == _cycle) {
-			_activeSpriteShifters |= (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
-			_spriteShifterList[_nextSpriteShifter] = BaseNesPpu::SpriteShifterDone;
+			uint8_t bit = (1 << (_spriteShifterList[_nextSpriteShifter] & 7));
+			if(_countingSpriteShifters & bit) {
+				//If shifter was in count mode, turn off count mode,
+				//set the expired flag (counting is done) and enable "shift" mode
+				_activeSpriteShifters |= bit;
+				_expiredSpriteShifters |= bit;
+				_countingSpriteShifters &= ~bit;
+			}
 			_nextSpriteShifter++;
 		}
 		_nextSpriteShifterCycle = _spriteShifterList[_nextSpriteShifter] >> 4;
 	}
+}
 
-	if(_prevRenderingEnabled) {
-		if(_cycle < 65) {
-			//Clear secondary OAM at between cycle 1 and 64
-			_oamCopybuffer = 0xFF;
-			_secondarySpriteRam[_secondaryOamAddr & 0x1F] = 0xFF;
+template<class T> void NesPpu<T>::ProcessSpriteEvaluation()
+{
+	if(_cycle < 65) {
+		//Clear secondary OAM at between cycle 1 and 64
+		_oamCopybuffer = 0xFF;
+		_secondarySpriteRam[_secondaryOamAddr & 0x1F] = 0xFF;
 
-			_secondaryOamAddr += !(_cycle & 1);
+		_secondaryOamAddr += !(_cycle & 1);
+	} else {
+		if(_cycle & 0x01) {
+			if(_cycle == 65) {
+				ProcessSpriteEvaluationStart();
+			}
+
+			//Read a byte from the primary OAM on odd cycles
+			_oamCopybuffer = ReadSpriteRam(_spriteRamAddr);
 		} else {
-			if(_cycle & 0x01) {
-				if(_cycle == 65) {
-					ProcessSpriteEvaluationStart();
+			uint8_t spriteAddrH = _spriteRamAddr >> 2;
+			uint8_t spriteAddrL = _spriteRamAddr & 3;
+
+			//(Not entirely confirmed - but matches observed behavior)
+			//For early PPUs (2C02B and earlier), after sprite eval wraps back to the start of OAM,
+			//all subsequent sprites appear to be considered as "out of range", causing only their
+			//Y coordinate to be copied to secondary OAM, and then skipping to the next sprite.
+			//However, if the last Y position copied to secondary OAM by this process happens to be
+			//"in range", it will be end up being shown as a sprite. The sprite's remaining 3 bytes
+			//will be $FF (because secondary OAM was cleared at the start of the scanline), causing
+			//it to display pixels from sprite tile $FF at X=255, with h+v mirroring and sprite palette 3.
+			if(_oamCopyDone && !_settings->GetNesConfig().EnablePpuSpriteEvalBug) {
+				spriteAddrH = (spriteAddrH + 1) & 0x3F;
+				//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
+				_oamCopybuffer = _secondarySpriteRam[_secondaryOamAddr & 0x1F];
+			} else {
+				if(!_spriteInRange && _scanline >= _oamCopybuffer && _scanline < _oamCopybuffer + (_control.LargeSprites ? 16 : 8)) {
+					_spriteInRange = !_oamCopyDone;
 				}
 
-				//Read a byte from the primary OAM on odd cycles
-				_oamCopybuffer = ReadSpriteRam(_spriteRamAddr);
-			} else {
-				uint8_t spriteAddrH = _spriteRamAddr >> 2;
-				uint8_t spriteAddrL = _spriteRamAddr & 3;
+				if(_secondaryOamAddr < 0x20) {
+					//Copy 1 byte to secondary OAM
+					_secondarySpriteRam[_secondaryOamAddr] = _oamCopybuffer;
 
-				//(Not entirely confirmed - but matches observed behavior)
-				//For early PPUs (2C02B and earlier), after sprite eval wraps back to the start of OAM,
-				//all subsequent sprites appear to be considered as "out of range", causing only their
-				//Y coordinate to be copied to secondary OAM, and then skipping to the next sprite.
-				//However, if the last Y position copied to secondary OAM by this process happens to be
-				//"in range", it will be end up being shown as a sprite. The sprite's remaining 3 bytes
-				//will be $FF (because secondary OAM was cleared at the start of the scanline), causing
-				//it to display pixels from sprite tile $FF at X=255, with h+v mirroring and sprite palette 3.
-				if(_oamCopyDone && !_settings->GetNesConfig().EnablePpuSpriteEvalBug) {
-					spriteAddrH = (spriteAddrH + 1) & 0x3F;
-					//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
-					_oamCopybuffer = _secondarySpriteRam[_secondaryOamAddr & 0x1F];
-				} else {
-					if(!_spriteInRange && _scanline >= _oamCopybuffer && _scanline < _oamCopybuffer + (_control.LargeSprites ? 16 : 8)) {
-						_spriteInRange = !_oamCopyDone;
-					}
+					if(_spriteInRange) {
+						if(_cycle == 66) {
+							//If the first Y coordinate we load is in range, set the sprite 0 flag
+							//This happens even if this isn't actually the first sprite in OAM
+							//(i.e because OAMADDR was not 0 when evaluation started)
+							_sprite0Added = true;
+						}
 
-					if(_secondaryOamAddr < 0x20) {
-						//Copy 1 byte to secondary OAM
-						_secondarySpriteRam[_secondaryOamAddr] = _oamCopybuffer;
+						spriteAddrL++;
+						_secondaryOamAddr++;
 
-						if(_spriteInRange) {
-							if(_cycle == 66) {
-								//If the first Y coordinate we load is in range, set the sprite 0 flag
-								//This happens even if this isn't actually the first sprite in OAM
-								//(i.e because OAMADDR was not 0 when evaluation started)
-								_sprite0Added = true;
-							}
-
-							spriteAddrL++;
-							_secondaryOamAddr++;
-
-							if(spriteAddrL >= 4) {
-								spriteAddrH = (spriteAddrH + 1) & 0x3F;
-								spriteAddrL = 0;
-
-								if(spriteAddrH == 0) {
-									_oamCopyDone = true;
-								}
-							}
-
-							//Note: Using "(_secondaryOamAddr & 0x03) == 0" instead of "spriteAddrL == 0" is required
-							//to replicate a hardware bug noticed in oam_flicker_test_reenable when disabling & re-enabling
-							//rendering on a single scanline
-							//TODO This should actually be using a timer (which runs even with rendering off) rather than the OAM2 address.
-							if((_secondaryOamAddr & 0x03) == 0) {
-								//Done copying all 4 bytes
-								_spriteInRange = false;
-								_lastVisibleSpriteAddr = (spriteAddrH - 1) * 4;
-
-								if(spriteAddrL != 0) {
-									//Normally, if the sprite eval started on a non-multiple-of-4 address, it would
-									//resync here and start reading the first byte of next entry as the Y value.
-									//But if the last byte read/copied, interpreted as a Y coordinate, has a value
-									//that makes it fall "in range" with the current scanline, then the lower 2 bits
-									//of the address aren't reset, which means the next sprite will also be interpreted incorrectly
-									bool inRange = (_scanline >= _oamCopybuffer && _scanline < _oamCopybuffer + (_control.LargeSprites ? 16 : 8));
-									if(!inRange) {
-										spriteAddrL = 0;
-									}
-								}
-							}
-						} else {
-							//Nothing to copy, skip to next sprite
+						if(spriteAddrL >= 4) {
 							spriteAddrH = (spriteAddrH + 1) & 0x3F;
 							spriteAddrL = 0;
+
 							if(spriteAddrH == 0) {
 								_oamCopyDone = true;
 							}
 						}
-					} else {
-						//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
-						_oamCopybuffer = _secondarySpriteRam[_secondaryOamAddr & 0x1F];
 
-						//8 sprites have been found, check next sprite for overflow + emulate PPU bug
-						if(_oamCopyDone) {
-							//Skip to next sprite (this scenario only happens when the X=255 sprite bug emulation is enabled)
-							spriteAddrH = (spriteAddrH + 1) & 0x3F;
-							spriteAddrL = 0;
-						} else if(_spriteInRange) {
-							//Sprite is visible, consider this to be an overflow
-							_statusFlags.SpriteOverflow = true;
-							spriteAddrL = (spriteAddrL + 1);
-							if(spriteAddrL == 4) {
-								spriteAddrH = (spriteAddrH + 1) & 0x3F;
-								spriteAddrL = 0;
-							}
+						//Note: Using "(_secondaryOamAddr & 0x03) == 0" instead of "spriteAddrL == 0" is required
+						//to replicate a hardware bug noticed in oam_flicker_test_reenable when disabling & re-enabling
+						//rendering on a single scanline
+						//TODO This should actually be using a timer (which runs even with rendering off) rather than the OAM2 address.
+						if((_secondaryOamAddr & 0x03) == 0) {
+							//Done copying all 4 bytes
+							_spriteInRange = false;
+							_lastVisibleSpriteAddr = (spriteAddrH - 1) * 4;
 
-							if(_overflowBugCounter == 0) {
-								_overflowBugCounter = 3;
-							} else if(_overflowBugCounter > 0) {
-								_overflowBugCounter--;
-								if(_overflowBugCounter == 0) {
-									//"After it finishes "fetching" this sprite(and setting the overflow flag), it realigns back at the beginning of this line and then continues here on the next sprite"
-									_oamCopyDone = true;
+							if(spriteAddrL != 0) {
+								//Normally, if the sprite eval started on a non-multiple-of-4 address, it would
+								//resync here and start reading the first byte of next entry as the Y value.
+								//But if the last byte read/copied, interpreted as a Y coordinate, has a value
+								//that makes it fall "in range" with the current scanline, then the lower 2 bits
+								//of the address aren't reset, which means the next sprite will also be interpreted incorrectly
+								bool inRange = (_scanline >= _oamCopybuffer && _scanline < _oamCopybuffer + (_control.LargeSprites ? 16 : 8));
+								if(!inRange) {
 									spriteAddrL = 0;
 								}
 							}
-						} else {
-							//Sprite isn't on this scanline, trigger sprite evaluation bug - increment both H & L at the same time
-							spriteAddrH = (spriteAddrH + 1) & 0x3F;
-							spriteAddrL = (spriteAddrL + 1) & 0x03;
+						}
+					} else {
+						//Nothing to copy, skip to next sprite
+						spriteAddrH = (spriteAddrH + 1) & 0x3F;
+						spriteAddrL = 0;
+						if(spriteAddrH == 0) {
+							_oamCopyDone = true;
+						}
+					}
+				} else {
+					//"As seen above, a side effect of the OAM write disable signal is to turn writes to the secondary OAM into reads from it."
+					_oamCopybuffer = _secondarySpriteRam[_secondaryOamAddr & 0x1F];
 
-							if(spriteAddrH == 0) {
+					//8 sprites have been found, check next sprite for overflow + emulate PPU bug
+					if(_oamCopyDone) {
+						//Skip to next sprite (this scenario only happens when the X=255 sprite bug emulation is enabled)
+						spriteAddrH = (spriteAddrH + 1) & 0x3F;
+						spriteAddrL = 0;
+					} else if(_spriteInRange) {
+						//Sprite is visible, consider this to be an overflow
+						_statusFlags.SpriteOverflow = true;
+						spriteAddrL = (spriteAddrL + 1);
+						if(spriteAddrL == 4) {
+							spriteAddrH = (spriteAddrH + 1) & 0x3F;
+							spriteAddrL = 0;
+						}
+
+						if(_overflowBugCounter == 0) {
+							_overflowBugCounter = 3;
+						} else if(_overflowBugCounter > 0) {
+							_overflowBugCounter--;
+							if(_overflowBugCounter == 0) {
+								//"After it finishes "fetching" this sprite(and setting the overflow flag), it realigns back at the beginning of this line and then continues here on the next sprite"
 								_oamCopyDone = true;
+								spriteAddrL = 0;
 							}
+						}
+					} else {
+						//Sprite isn't on this scanline, trigger sprite evaluation bug - increment both H & L at the same time
+						spriteAddrH = (spriteAddrH + 1) & 0x3F;
+						spriteAddrL = (spriteAddrL + 1) & 0x03;
+
+						if(spriteAddrH == 0) {
+							_oamCopyDone = true;
 						}
 					}
 				}
-				_spriteRamAddr = (spriteAddrL & 0x03) | (spriteAddrH << 2);
 			}
+			_spriteRamAddr = (spriteAddrL & 0x03) | (spriteAddrH << 2);
 		}
 	}
 }
@@ -1654,6 +1701,8 @@ template<class T> void NesPpu<T>::Serialize(Serializer& s)
 		SV(_nextSpriteShifter);
 		SV(_nextSpriteShifterCycle);
 		SV(_activeSpriteShifters);
+		SV(_countingSpriteShifters);
+		SV(_expiredSpriteShifters);
 		SV(_dotSkipped);
 		SV(_processSprites);
 

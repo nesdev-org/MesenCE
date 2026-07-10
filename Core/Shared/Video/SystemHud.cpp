@@ -3,9 +3,8 @@
 #include "Shared/Video/DebugHud.h"
 #include "Shared/Movies/MovieManager.h"
 #include "Shared/MessageManager.h"
-#include "Shared/BaseControlManager.h"
 #include "Shared/Video/DrawStringCommand.h"
-#include "Shared/Interfaces/IMessageManager.h"
+#include "Utilities/StringUtilities.h"
 
 SystemHud::SystemHud(Emulator* emu)
 {
@@ -78,7 +77,7 @@ void SystemHud::ShowFpsCounter(DebugHud* hud, uint32_t screenWidth, int lineNumb
 {
 	int yPos = 10 + 10 * lineNumber;
 
-	string fpsString = string("FPS: ") + std::to_string(_currentFPS); // +" / " + std::to_string(_currentRenderedFPS);
+	string fpsString = string("FPS: ") + StringUtilities::ToString(_currentFPS, 2);
 	uint32_t length = DrawStringCommand::MeasureString(fpsString).X;
 	DrawString(hud, screenWidth, fpsString, screenWidth - 8 - length, yPos);
 }
@@ -287,21 +286,14 @@ void SystemHud::UpdateHud()
 			if(_lastFrameCount > frameCount) {
 				_currentFPS = 0;
 			} else {
-				_currentFPS = (int)(std::round((double)(frameCount - _lastFrameCount) / (_fpsTimer.GetElapsedMS() / 1000)));
-				_currentRenderedFPS = (int)(std::round((double)(_renderedFrameCount - _lastRenderedFrameCount) / (_fpsTimer.GetElapsedMS() / 1000)));
+				_currentFPS = (std::round((double)(frameCount - _lastFrameCount) / (_fpsTimer.GetElapsedMS() / 1000) * 100)) / 100;
 			}
 			_lastFrameCount = frameCount;
-			_lastRenderedFrameCount = _renderedFrameCount;
 			_fpsTimer.Reset();
 		}
 
 		if(_currentFPS > 5000) {
 			_currentFPS = 0;
 		}
-		if(_currentRenderedFPS > 5000) {
-			_currentRenderedFPS = 0;
-		}
-
-		_renderedFrameCount++;
 	}
 }

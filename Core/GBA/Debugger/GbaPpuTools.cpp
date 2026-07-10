@@ -511,8 +511,6 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 	int16_t centerY = 0;
 
 	for(int y = 0; y < sprite.Height; y++) {
-		uint8_t yOffset = vMirror ? (sprite.Height - y - 1) : y;
-
 		if(transformEnabled) {
 			uint16_t transformAddr = (sprite.TransformParamIndex << 5) + 6;
 			pa = oam[transformAddr] | (oam[transformAddr + 1] << 8);
@@ -525,6 +523,7 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 
 			int32_t originX = -(centerX << (uint8_t)doubleSize);
 			int32_t originY = -(centerY << (uint8_t)doubleSize);
+			uint8_t yOffset = vMirror ? (sprite.Height - y - 1) : y;
 
 			xValue = originX * pa + (originY + yOffset) * pb;
 			yValue = originX * pc + (originY + yOffset) * pd;
@@ -542,7 +541,7 @@ void GbaPpuTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 				yValue += pc;
 			} else {
 				xRender = hMirror ? (width - x - 1) : x;
-				yRender = vMirror ? (height - yOffset - 1) : yOffset;
+				yRender = vMirror ? (height - y - 1) : y;
 			}
 
 			if(xRender >= width || yRender >= height) {

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Media;
 using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,28 +10,28 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class ScriptWindowConfig : BaseWindowConfig<ScriptWindowConfig>
+	public partial class ScriptWindowConfig : BaseWindowConfig<ScriptWindowConfig>
 	{
 		private const int MaxRecentScripts = 10;
 
-		[Reactive] public List<string> RecentScripts { get; set; } = new List<string>();
+		[ObservableProperty] public partial List<string> RecentScripts { get; set; } = new List<string>();
 
-		[Reactive] public int Zoom { get; set; } = 100;
+		[ObservableProperty] public partial int Zoom { get; set; } = 100;
 
-		[Reactive] public double LogWindowHeight { get; set; } = 100;
+		[ObservableProperty] public partial double LogWindowHeight { get; set; } = 100;
 
-		[Reactive] public ScriptStartupBehavior ScriptStartupBehavior { get; set; } = ScriptStartupBehavior.ShowTutorial;
-		[Reactive] public bool SaveScriptBeforeRun { get; set; } = true;
-		[Reactive] public bool AutoStartScriptOnLoad { get; set; } = true;
-		[Reactive] public bool AutoReloadScriptWhenFileChanges { get; set; } = true;
-		[Reactive] public bool AutoRestartScriptAfterPowerCycle { get; set; } = true;
+		[ObservableProperty] public partial ScriptStartupBehavior ScriptStartupBehavior { get; set; } = ScriptStartupBehavior.ShowTutorial;
+		[ObservableProperty] public partial bool SaveScriptBeforeRun { get; set; } = true;
+		[ObservableProperty] public partial bool AutoStartScriptOnLoad { get; set; } = true;
+		[ObservableProperty] public partial bool AutoReloadScriptWhenFileChanges { get; set; } = true;
+		[ObservableProperty] public partial bool AutoRestartScriptAfterPowerCycle { get; set; } = true;
 
-		[Reactive] public bool AllowIoOsAccess { get; set; } = false;
-		[Reactive] public bool AllowNetworkAccess { get; set; } = false;
+		[ObservableProperty] public partial bool AllowIoOsAccess { get; set; } = false;
+		[ObservableProperty] public partial bool AllowNetworkAccess { get; set; } = false;
 
-		[Reactive] public bool ShowLineNumbers { get; set; } = false;
+		[ObservableProperty] public partial bool ShowLineNumbers { get; set; } = false;
 
-		[Reactive] public UInt32 ScriptTimeout { get; set; } = 1;
+		[ObservableProperty] public partial UInt32 ScriptTimeout { get; set; } = 1;
 
 		public void AddRecentScript(string scriptFile)
 		{

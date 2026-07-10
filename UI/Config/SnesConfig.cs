@@ -1,5 +1,5 @@
 ﻿using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,67 +9,67 @@ using System.Threading.Tasks;
 
 namespace Mesen.Config
 {
-	public class SnesConfig : BaseConfig<SnesConfig>
+	public partial class SnesConfig : BaseConfig<SnesConfig>
 	{
-		[Reactive] public ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
+		[ObservableProperty] public partial ConsoleOverrideConfig ConfigOverrides { get; set; } = new();
 
 		//Input
-		[Reactive] public SnesControllerConfig Port1 { get; set; } = new SnesControllerConfig();
-		[Reactive] public SnesControllerConfig Port2 { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port1 { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port2 { get; set; } = new SnesControllerConfig();
 
-		[Reactive] public SnesControllerConfig Port1A { get; set; } = new SnesControllerConfig();
-		[Reactive] public SnesControllerConfig Port1B { get; set; } = new SnesControllerConfig();
-		[Reactive] public SnesControllerConfig Port1C { get; set; } = new SnesControllerConfig();
-		[Reactive] public SnesControllerConfig Port1D { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port1A { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port1B { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port1C { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port1D { get; set; } = new SnesControllerConfig();
 
-		[Reactive] public SnesControllerConfig Port2A { get; set; } = new SnesControllerConfig();
-		[Reactive] public SnesControllerConfig Port2B { get; set; } = new SnesControllerConfig();
-		[Reactive] public SnesControllerConfig Port2C { get; set; } = new SnesControllerConfig();
-		[Reactive] public SnesControllerConfig Port2D { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port2A { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port2B { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port2C { get; set; } = new SnesControllerConfig();
+		[ObservableProperty] public partial SnesControllerConfig Port2D { get; set; } = new SnesControllerConfig();
 
-		[Reactive] public bool AllowInvalidInput { get; set; } = false;
+		[ObservableProperty] public partial bool AllowInvalidInput { get; set; } = false;
 
 		[ValidValues(ConsoleRegion.Auto, ConsoleRegion.Ntsc, ConsoleRegion.Pal)]
-		[Reactive] public ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
+		[ObservableProperty] public partial ConsoleRegion Region { get; set; } = ConsoleRegion.Auto;
 
 		//Video
-		[Reactive] public SnesHighResBlendMode HighResBlendMode { get; set; } = SnesHighResBlendMode.None;
-		[Reactive] public bool HideBgLayer1 { get; set; } = false;
-		[Reactive] public bool HideBgLayer2 { get; set; } = false;
-		[Reactive] public bool HideBgLayer3 { get; set; } = false;
-		[Reactive] public bool HideBgLayer4 { get; set; } = false;
-		[Reactive] public bool HideSprites { get; set; } = false;
-		[Reactive] public bool DisableFrameSkipping { get; set; } = false;
-		[Reactive] public bool ForceFixedResolution { get; set; } = false;
+		[ObservableProperty] public partial SnesHighResBlendMode HighResBlendMode { get; set; } = SnesHighResBlendMode.None;
+		[ObservableProperty] public partial bool HideBgLayer1 { get; set; } = false;
+		[ObservableProperty] public partial bool HideBgLayer2 { get; set; } = false;
+		[ObservableProperty] public partial bool HideBgLayer3 { get; set; } = false;
+		[ObservableProperty] public partial bool HideBgLayer4 { get; set; } = false;
+		[ObservableProperty] public partial bool HideSprites { get; set; } = false;
+		[ObservableProperty] public partial bool DisableFrameSkipping { get; set; } = false;
+		[ObservableProperty] public partial bool ForceFixedResolution { get; set; } = false;
 
-		[Reactive] public OverscanConfig Overscan { get; set; } = new() { Top = 7, Bottom = 8 };
+		[ObservableProperty] public partial OverscanConfig Overscan { get; set; } = new() { Top = 7, Bottom = 8 };
 
 		//Audio
-		[Reactive] public DspInterpolationType InterpolationType { get; set; } = DspInterpolationType.Gauss;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel1Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel2Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel3Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel4Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel5Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel6Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel7Vol { get; set; } = 100;
-		[Reactive][MinMax(0, 100)] public UInt32 Channel8Vol { get; set; } = 100;
+		[ObservableProperty] public partial DspInterpolationType InterpolationType { get; set; } = DspInterpolationType.Gauss;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel1Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel2Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel3Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel4Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel5Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel6Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel7Vol { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 100)] public partial UInt32 Channel8Vol { get; set; } = 100;
 
 		//Emulation
-		[Reactive] public bool EnableRandomPowerOnState { get; set; } = false;
-		[Reactive] public bool EnableStrictBoardMappings { get; set; } = false;
-		[Reactive] public RamState RamPowerOnState { get; set; } = RamState.Random;
-		[Reactive][MinMax(-999, 999)] public Int32 SpcClockSpeedAdjustment { get; set; } = 40;
+		[ObservableProperty] public partial bool EnableRandomPowerOnState { get; set; } = false;
+		[ObservableProperty] public partial bool EnableStrictBoardMappings { get; set; } = false;
+		[ObservableProperty] public partial RamState RamPowerOnState { get; set; } = RamState.Random;
+		[ObservableProperty][MinMax(-999, 999)] public partial Int32 SpcClockSpeedAdjustment { get; set; } = 40;
 
 		//Overclocking
-		[Reactive][MinMax(0, 1000)] public UInt32 PpuExtraScanlinesBeforeNmi { get; set; } = 0;
-		[Reactive][MinMax(0, 1000)] public UInt32 PpuExtraScanlinesAfterNmi { get; set; } = 0;
-		[Reactive][MinMax(100, 1000)] public UInt32 GsuClockSpeed { get; set; } = 100;
+		[ObservableProperty][MinMax(0, 1000)] public partial UInt32 PpuExtraScanlinesBeforeNmi { get; set; } = 0;
+		[ObservableProperty][MinMax(0, 1000)] public partial UInt32 PpuExtraScanlinesAfterNmi { get; set; } = 0;
+		[ObservableProperty][MinMax(100, 1000)] public partial UInt32 GsuClockSpeed { get; set; } = 100;
 
 		//BSX
-		[Reactive] public bool BsxUseCustomTime { get; set; } = false;
-		[Reactive] public DateTimeOffset BsxCustomDate { get; set; } = new DateTimeOffset(1995, 1, 1, 0, 0, 0, TimeSpan.Zero);
-		[Reactive] public TimeSpan BsxCustomTime { get; set; } = TimeSpan.Zero;
+		[ObservableProperty] public partial bool BsxUseCustomTime { get; set; } = false;
+		[ObservableProperty] public partial DateTimeOffset BsxCustomDate { get; set; } = new DateTimeOffset(1995, 1, 1, 0, 0, 0, TimeSpan.Zero);
+		[ObservableProperty] public partial TimeSpan BsxCustomTime { get; set; } = TimeSpan.Zero;
 
 		public void ApplyConfig()
 		{
@@ -77,13 +77,13 @@ namespace Mesen.Config
 
 			ConfigApi.SetSnesConfig(new InteropSnesConfig() {
 				Port1 = Port1.ToInterop(),
-				Port1A = Port1A.ToInterop(),
+				Port1A = Port1.ToInterop(Port1A.Type),
 				Port1B = Port1B.ToInterop(),
 				Port1C = Port1C.ToInterop(),
 				Port1D = Port1D.ToInterop(),
 
 				Port2 = Port2.ToInterop(),
-				Port2A = Port2A.ToInterop(),
+				Port2A = Port2.ToInterop(Port2A.Type),
 				Port2B = Port2B.ToInterop(),
 				Port2C = Port2C.ToInterop(),
 				Port2D = Port2D.ToInterop(),

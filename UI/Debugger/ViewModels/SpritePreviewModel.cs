@@ -4,41 +4,41 @@ using Avalonia.Platform;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class SpritePreviewModel : ViewModelBase
+	public partial class SpritePreviewModel : ViewModelBase
 	{
-		[Reactive] public int SpriteIndex { get; set; }
-		[Reactive] public int X { get; set; }
-		[Reactive] public int Y { get; set; }
-		[Reactive] public int RawX { get; set; }
-		[Reactive] public int RawY { get; set; }
-		[Reactive] public int PreviewX { get; set; }
-		[Reactive] public int PreviewY { get; set; }
-		[Reactive] public int Width { get; set; }
-		[Reactive] public int Height { get; set; }
-		[Reactive] public int TileIndex { get; set; }
-		[Reactive] public int TileAddress { get; set; }
-		[Reactive] public DebugSpritePriority Priority { get; set; }
-		[Reactive] public DebugSpriteMode Mode { get; set; }
-		[Reactive] public int Bpp { get; set; }
-		[Reactive] public TileFormat Format { get; set; }
-		[Reactive] public int Palette { get; set; }
-		[Reactive] public int PaletteAddress { get; set; }
-		[Reactive] public SpriteVisibility Visibility { get; set; }
-		[Reactive] public string? Flags { get; set; }
+		[ObservableProperty] public partial int SpriteIndex { get; set; }
+		[ObservableProperty] public partial int X { get; set; }
+		[ObservableProperty] public partial int Y { get; set; }
+		[ObservableProperty] public partial int RawX { get; set; }
+		[ObservableProperty] public partial int RawY { get; set; }
+		[ObservableProperty] public partial int PreviewX { get; set; }
+		[ObservableProperty] public partial int PreviewY { get; set; }
+		[ObservableProperty] public partial int Width { get; set; }
+		[ObservableProperty] public partial int Height { get; set; }
+		[ObservableProperty] public partial int TileIndex { get; set; }
+		[ObservableProperty] public partial int TileAddress { get; set; }
+		[ObservableProperty] public partial DebugSpritePriority Priority { get; set; }
+		[ObservableProperty] public partial DebugSpriteMode Mode { get; set; }
+		[ObservableProperty] public partial int Bpp { get; set; }
+		[ObservableProperty] public partial TileFormat Format { get; set; }
+		[ObservableProperty] public partial int Palette { get; set; }
+		[ObservableProperty] public partial int PaletteAddress { get; set; }
+		[ObservableProperty] public partial SpriteVisibility Visibility { get; set; }
+		[ObservableProperty] public partial string? Flags { get; set; }
 
-		[Reactive] public NullableBoolean HorizontalMirror { get; set; }
-		[Reactive] public NullableBoolean VerticalMirror { get; set; }
-		[Reactive] public NullableBoolean MosaicEnabled { get; set; }
-		[Reactive] public NullableBoolean TransformEnabled { get; set; }
-		[Reactive] public NullableBoolean DoubleSize { get; set; }
-		[Reactive] public sbyte TransformParamIndex { get; set; }
-		[Reactive] public bool UseExtendedVram { get; set; }
-		[Reactive] public NullableBoolean UseSecondTable { get; set; }
+		[ObservableProperty] public partial NullableBoolean HorizontalMirror { get; set; }
+		[ObservableProperty] public partial NullableBoolean VerticalMirror { get; set; }
+		[ObservableProperty] public partial NullableBoolean MosaicEnabled { get; set; }
+		[ObservableProperty] public partial NullableBoolean TransformEnabled { get; set; }
+		[ObservableProperty] public partial NullableBoolean DoubleSize { get; set; }
+		[ObservableProperty] public partial sbyte TransformParamIndex { get; set; }
+		[ObservableProperty] public partial bool UseExtendedVram { get; set; }
+		[ObservableProperty] public partial NullableBoolean UseSecondTable { get; set; }
 
 		public UInt32 TileCount { get; set; }
 		public UInt32 WrapWidth { get; set; }
@@ -47,9 +47,9 @@ namespace Mesen.Debugger.ViewModels
 
 		private UInt32[] _rawPreview = new UInt32[128 * 128];
 
-		[Reactive] public DynamicBitmap? SpritePreview { get; set; }
-		[Reactive] public double SpritePreviewZoom { get; set; }
-		[Reactive] public bool FadePreview { get; set; }
+		[ObservableProperty] public partial DynamicBitmap? SpritePreview { get; set; }
+		[ObservableProperty] public partial double SpritePreviewZoom { get; set; }
+		[ObservableProperty] public partial bool FadePreview { get; set; }
 
 		public int RealWidth => Width / (DoubleSize == NullableBoolean.True ? 2 : 1);
 		public int RealHeight => Height / (DoubleSize == NullableBoolean.True ? 2 : 1);

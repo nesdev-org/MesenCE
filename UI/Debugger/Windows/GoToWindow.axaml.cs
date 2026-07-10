@@ -9,7 +9,7 @@ using Mesen.Interop;
 using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.Views;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Globalization;
 
@@ -43,9 +43,6 @@ namespace Mesen.Debugger.Windows
 			_memType = memType;
 
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()

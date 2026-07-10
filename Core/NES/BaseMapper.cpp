@@ -730,9 +730,6 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 	if(_chrRomSize == 0) {
 		//Assume there is CHR RAM if no CHR ROM exists
 		InitializeChrRam(totalChrRam);
-
-		//Map CHR RAM to 0x0000-0x1FFF by default when no CHR ROM exists
-		SetPpuMemoryMapping(0x0000, 0x1FFF, 0, ChrMemoryType::ChrRam);
 	} else if(totalChrRam >= 0) {
 		InitializeChrRam(totalChrRam);
 	} else if(GetChrRamSize()) {
@@ -749,6 +746,11 @@ void BaseMapper::Initialize(NesConsole* console, RomData& romData)
 	}
 
 	UpdatePageSizes();
+
+	if(_chrRomSize == 0 && _chrRamSize > 0) {
+		//Map CHR RAM to 0x0000-0x1FFF by default when no CHR ROM exists
+		SetPpuMemoryMapping(0x0000, 0x1FFF, 0, ChrMemoryType::ChrRam);
+	}
 
 	SetupDefaultWorkRam();
 

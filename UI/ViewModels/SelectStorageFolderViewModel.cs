@@ -1,9 +1,9 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Metadata;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Utilities;
 using Mesen.ViewModels;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,16 +11,26 @@ using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class SelectStorageFolderViewModel : ViewModelBase
+	public partial class SelectStorageFolderViewModel : ViewModelBase
 	{
-		[Reactive] public bool StoreInUserProfile { get; set; }
-		[Reactive] public bool IsCopying { get; set; }
-		[Reactive] public int CopyProgress { get; set; }
-		[Reactive] public string DestinationFolder { get; private set; } = "";
+		[ObservableProperty] public partial bool StoreInUserProfile { get; set; }
+		[ObservableProperty] public partial bool IsCopying { get; set; }
+		[ObservableProperty] public partial int CopyProgress { get; set; }
+		[ObservableProperty] public partial string DestinationFolder { get; private set; } = "";
 
 		public SelectStorageFolderViewModel()
 		{
-			this.WhenAnyValue(x => x.StoreInUserProfile).Subscribe(x => DestinationFolder = x ? ConfigManager.DefaultDocumentsFolder : ConfigManager.DefaultPortableFolder);
+			UpdateDestinationFolder();
+		}
+
+		partial void OnStoreInUserProfileChanged(bool value)
+		{
+			UpdateDestinationFolder();
+		}
+
+		private void UpdateDestinationFolder()
+		{
+			DestinationFolder = StoreInUserProfile ? ConfigManager.DefaultDocumentsFolder : ConfigManager.DefaultPortableFolder;
 		}
 
 		private void GetFilesToCopy(string source, string target, List<string> sourceFiles, List<string> targetFiles)

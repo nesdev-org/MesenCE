@@ -1,22 +1,20 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Controls;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
-	public class PceConfigViewModel : DisposableViewModel
+	public partial class PceConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public PcEngineConfig Config { get; set; }
-		[Reactive] public PcEngineConfig OriginalConfig { get; set; }
-		[Reactive] public PceConfigTab SelectedTab { get; set; } = 0;
+		[ObservableProperty] public partial PcEngineConfig Config { get; set; }
+		[ObservableProperty] public partial PcEngineConfig OriginalConfig { get; set; }
+		[ObservableProperty] public partial PceConfigTab SelectedTab { get; set; } = 0;
 
 		public PceInputConfigViewModel Input { get; private set; }
 

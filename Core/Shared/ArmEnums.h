@@ -15,6 +15,7 @@ enum class ArmOpCategory
 	BlockDataTransfer,
 	SingleDataSwap,
 	SoftwareInterrupt,
+	CoprocessorTransfer,
 	InvalidOp,
 };
 

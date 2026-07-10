@@ -23,7 +23,7 @@ protected:
 
 	void SelectChrPage(uint16_t slot, uint16_t page, ChrMemoryType memoryType = ChrMemoryType::Default) override
 	{
-		if((_chrMode && slot >= 4) || (!_chrMode && slot < 4)) {
+		if(slot >= 4) {
 			page |= 0x100;
 		}
 		BaseMapper::SelectChrPage(slot, page);

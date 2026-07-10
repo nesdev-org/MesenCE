@@ -1,7 +1,7 @@
 ﻿using Mesen.Debugger;
 using Mesen.Debugger.Utilities;
 using Mesen.Interop;
-using ReactiveUI.Fody.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,11 +10,11 @@ using System.Text;
 
 namespace Mesen.ViewModels
 {
-	public class SaveSpcFileViewModel : ViewModelBase
+	public partial class SaveSpcFileViewModel : ViewModelBase
 	{
-		[Reactive] public string GameTitle { get; set; } = "";
-		[Reactive] public string SongTitle { get; set; } = "";
-		[Reactive] public string SongArtist { get; set; } = "";
+		[ObservableProperty] public partial string GameTitle { get; set; } = "";
+		[ObservableProperty] public partial string SongTitle { get; set; } = "";
+		[ObservableProperty] public partial string SongArtist { get; set; } = "";
 
 		public SaveSpcFileViewModel()
 		{

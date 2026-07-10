@@ -490,6 +490,7 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			break;
 
 		case 0x4025:
+			//TODO D0 (_resetTransfer) can forcefully stop the drive motor during write mode, regardless of motor state?
 			_resetTransfer = !(value & 0x01); // 0 = reset transfer
 			_motorOn = !(value & 0x02); // 0 = start motor
 			_readMode = value & 0x04;
@@ -580,8 +581,8 @@ uint8_t Fds::ReadRegister(uint16_t addr)
 				return value;
 
 			case 0x4033:
-				//Always return good battery status in bit 7
-				return _extConWriteReg | 0x80;
+				//"The drive power/battery bit must be checked while the motor is on, otherwise it will always be read as 0."
+				return _motorOn ? _extConWriteReg | 0x80 : _extConWriteReg;
 		}
 	}
 
@@ -730,7 +731,7 @@ vector<MapperStateEntry> Fds::GetMapperStateEntries()
 
 	entries.push_back(MapperStateEntry("", "External Connector"));
 	entries.push_back(MapperStateEntry("$4026/$4033.0-6", "External Connector Value", _extConWriteReg, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4033.7", "Drive Powered", true, MapperStateValueType::Bool));
+	entries.push_back(MapperStateEntry("$4033.7", "Drive Powered", _motorOn, MapperStateValueType::Bool));
 
 	_audio->GetMapperStateEntries(entries);
 

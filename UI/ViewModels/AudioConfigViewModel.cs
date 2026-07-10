@@ -1,21 +1,19 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Utilities;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 
 namespace Mesen.ViewModels
 {
-	public class AudioConfigViewModel : DisposableViewModel
+	public partial class AudioConfigViewModel : DisposableViewModel
 	{
-		[Reactive] public AudioConfig Config { get; set; }
-		[Reactive] public AudioConfig OriginalConfig { get; set; }
-		[Reactive] public List<string> AudioDevices { get; set; } = new();
-		[Reactive] public bool ShowLatencyWarning { get; set; } = false;
+		[ObservableProperty] public partial AudioConfig Config { get; set; }
+		[ObservableProperty] public partial AudioConfig OriginalConfig { get; set; }
+		[ObservableProperty] public partial List<string> AudioDevices { get; set; } = new();
+		[ObservableProperty] public partial bool ShowLatencyWarning { get; set; } = false;
 
 		public AudioConfigViewModel()
 		{
@@ -31,7 +29,7 @@ namespace Mesen.ViewModels
 				Config.AudioDevice = AudioDevices[0];
 			}
 
-			AddDisposable(this.WhenAnyValue(x => x.Config.AudioLatency).Subscribe(x => {
+			AddDisposable(Config.ObserveProp(nameof(Config.AudioLatency), () => {
 				ShowLatencyWarning = Config.AudioLatency <= 55;
 			}));
 

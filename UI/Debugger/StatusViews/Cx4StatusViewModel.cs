@@ -1,51 +1,50 @@
 ﻿using Avalonia.Collections;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Text;
 
 namespace Mesen.Debugger.StatusViews
 {
-	public class Cx4StatusViewModel : BaseConsoleStatusViewModel
+	public partial class Cx4StatusViewModel : BaseConsoleStatusViewModel
 	{
-		[Reactive] public UInt32 Reg0 { get; set; }
-		[Reactive] public UInt32 Reg1 { get; set; }
-		[Reactive] public UInt32 Reg2 { get; set; }
-		[Reactive] public UInt32 Reg3 { get; set; }
-		[Reactive] public UInt32 Reg4 { get; set; }
-		[Reactive] public UInt32 Reg5 { get; set; }
-		[Reactive] public UInt32 Reg6 { get; set; }
-		[Reactive] public UInt32 Reg7 { get; set; }
-		[Reactive] public UInt32 Reg8 { get; set; }
-		[Reactive] public UInt32 Reg9 { get; set; }
-		[Reactive] public UInt32 Reg10 { get; set; }
-		[Reactive] public UInt32 Reg11 { get; set; }
-		[Reactive] public UInt32 Reg12 { get; set; }
-		[Reactive] public UInt32 Reg13 { get; set; }
-		[Reactive] public UInt32 Reg14 { get; set; }
-		[Reactive] public UInt32 Reg15 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg0 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg1 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg2 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg3 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg4 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg5 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg6 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg7 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg8 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg9 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg10 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg11 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg12 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg13 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg14 { get; set; }
+		[ObservableProperty] public partial UInt32 Reg15 { get; set; }
 
-		[Reactive] public UInt16 RegPb { get; set; }
-		[Reactive] public UInt16 RegP { get; set; }
-		[Reactive] public byte RegPc { get; set; }
-		[Reactive] public byte RegSp { get; set; }
+		[ObservableProperty] public partial UInt16 RegPb { get; set; }
+		[ObservableProperty] public partial UInt16 RegP { get; set; }
+		[ObservableProperty] public partial byte RegPc { get; set; }
+		[ObservableProperty] public partial byte RegSp { get; set; }
 
-		[Reactive] public UInt32 RegMdr { get; set; }
-		[Reactive] public UInt32 RegMar { get; set; }
-		[Reactive] public UInt32 RegDpr { get; set; }
+		[ObservableProperty] public partial UInt32 RegMdr { get; set; }
+		[ObservableProperty] public partial UInt32 RegMar { get; set; }
+		[ObservableProperty] public partial UInt32 RegDpr { get; set; }
 
-		[Reactive] public UInt32 RegA { get; set; }
-		[Reactive] public UInt64 RegMult { get; set; }
+		[ObservableProperty] public partial UInt32 RegA { get; set; }
+		[ObservableProperty] public partial UInt64 RegMult { get; set; }
 
-		[Reactive] public UInt32 RomBuffer { get; set; }
-		[Reactive] public UInt32 RamBuffer { get; set; }
+		[ObservableProperty] public partial UInt32 RomBuffer { get; set; }
+		[ObservableProperty] public partial UInt32 RamBuffer { get; set; }
 
-		[Reactive] public bool FlagZero { get; set; }
-		[Reactive] public bool FlagCarry { get; set; }
-		[Reactive] public bool FlagNegative { get; set; }
-		[Reactive] public bool FlagOverflow { get; set; }
-		[Reactive] public bool FlagIrq { get; set; }
+		[ObservableProperty] public partial bool FlagZero { get; set; }
+		[ObservableProperty] public partial bool FlagCarry { get; set; }
+		[ObservableProperty] public partial bool FlagNegative { get; set; }
+		[ObservableProperty] public partial bool FlagOverflow { get; set; }
+		[ObservableProperty] public partial bool FlagIrq { get; set; }
 
 		public Cx4StatusViewModel()
 		{

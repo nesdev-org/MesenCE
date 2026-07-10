@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm.Controls;
@@ -16,7 +17,6 @@ using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,42 +25,42 @@ using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class DebuggerWindowViewModel : DisposableViewModel
+	public partial class DebuggerWindowViewModel : DisposableViewModel
 	{
-		[Reactive] public string Title { get; private set; } = "Debugger";
-		[Reactive] public WindowIcon? Icon { get; private set; } = null;
-		[Reactive] public bool IsMainCpuDebugger { get; private set; } = true;
+		[ObservableProperty] public partial string Title { get; private set; } = "Debugger";
+		[ObservableProperty] public partial WindowIcon? Icon { get; private set; } = null;
+		[ObservableProperty] public partial bool IsMainCpuDebugger { get; private set; } = true;
 
-		[Reactive] public DebuggerConfig Config { get; private set; }
+		[ObservableProperty] public partial DebuggerConfig Config { get; private set; }
 
-		[Reactive] public DebuggerOptionsViewModel Options { get; private set; }
+		[ObservableProperty] public partial DebuggerOptionsViewModel Options { get; private set; }
 
-		[Reactive] public DisassemblyViewModel Disassembly { get; private set; }
-		[Reactive] public BreakpointListViewModel BreakpointList { get; private set; }
-		[Reactive] public WatchListViewModel WatchList { get; private set; }
-		[Reactive] public BaseConsoleStatusViewModel? ConsoleStatus { get; private set; }
-		[Reactive] public LabelListViewModel LabelList { get; private set; }
-		[Reactive] public FunctionListViewModel? FunctionList { get; private set; }
-		[Reactive] public CallStackViewModel CallStack { get; private set; }
-		[Reactive] public SourceViewViewModel? SourceView { get; private set; }
-		[Reactive] public MemoryMappingViewModel? MemoryMappings { get; private set; }
-		[Reactive] public FindResultListViewModel FindResultList { get; private set; }
-		[Reactive] public ControllerListViewModel ControllerList { get; private set; }
+		[ObservableProperty] public partial DisassemblyViewModel Disassembly { get; private set; }
+		[ObservableProperty] public partial BreakpointListViewModel BreakpointList { get; private set; }
+		[ObservableProperty] public partial WatchListViewModel WatchList { get; private set; }
+		[ObservableProperty] public partial BaseConsoleStatusViewModel? ConsoleStatus { get; private set; }
+		[ObservableProperty] public partial LabelListViewModel LabelList { get; private set; }
+		[ObservableProperty] public partial FunctionListViewModel? FunctionList { get; private set; }
+		[ObservableProperty] public partial CallStackViewModel CallStack { get; private set; }
+		[ObservableProperty] public partial SourceViewViewModel? SourceView { get; private set; }
+		[ObservableProperty] public partial MemoryMappingViewModel? MemoryMappings { get; private set; }
+		[ObservableProperty] public partial FindResultListViewModel FindResultList { get; private set; }
+		[ObservableProperty] public partial ControllerListViewModel ControllerList { get; private set; }
 
-		[Reactive] public DebuggerDockFactory DockFactory { get; private set; }
-		[Reactive] public IRootDock DockLayout { get; private set; }
+		[ObservableProperty] public partial DebuggerDockFactory DockFactory { get; private set; }
+		[ObservableProperty] public partial IRootDock DockLayout { get; private set; }
 
-		[Reactive] public string BreakReason { get; private set; } = "";
-		[Reactive] public string BreakElapsedCycles { get; private set; } = "";
-		[Reactive] public string BreakElapsedCyclesTooltip { get; private set; } = "";
-		[Reactive] public string CdlStats { get; private set; } = "";
+		[ObservableProperty] public partial string BreakReason { get; private set; } = "";
+		[ObservableProperty] public partial string BreakElapsedCycles { get; private set; } = "";
+		[ObservableProperty] public partial string BreakElapsedCyclesTooltip { get; private set; } = "";
+		[ObservableProperty] public partial string CdlStats { get; private set; } = "";
 
-		[Reactive] public List<ContextMenuAction> ToolbarItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> ToolbarItems { get; private set; } = new();
 
-		[Reactive] public List<ContextMenuAction> FileMenuItems { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> SearchMenuItems { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> OptionMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> FileMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> DebugMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> SearchMenuItems { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> OptionMenuItems { get; private set; } = new();
 
 		public CpuType CpuType { get; private set; }
 		private UInt64 _masterClock = 0;

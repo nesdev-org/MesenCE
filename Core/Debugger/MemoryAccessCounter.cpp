@@ -106,4 +106,5 @@ template void MemoryAccessCounter::ProcessMemoryWrite<4>(AddressInfo& addressInf
 
 template void MemoryAccessCounter::ProcessMemoryExec<1>(AddressInfo& addressInfo, uint64_t masterClock);
 template void MemoryAccessCounter::ProcessMemoryExec<2>(AddressInfo& addressInfo, uint64_t masterClock);
+template void MemoryAccessCounter::ProcessMemoryExec<3>(AddressInfo& addressInfo, uint64_t masterClock);
 template void MemoryAccessCounter::ProcessMemoryExec<4>(AddressInfo& addressInfo, uint64_t masterClock);

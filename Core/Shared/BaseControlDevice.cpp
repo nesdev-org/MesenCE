@@ -95,6 +95,23 @@ void BaseControlDevice::DrawController(InputHud& hud)
 	hud.EndDrawController();
 }
 
+void BaseControlDevice::SetPreviousRead(uint64_t cycle, uint8_t value)
+{
+	//Used by the NES core specifically
+	_prevReadCycle = cycle;
+	_prevReadValue = value;
+}
+
+uint8_t BaseControlDevice::GetPreviousReadValue()
+{
+	return _prevReadValue;
+}
+
+uint64_t BaseControlDevice::GetPreviousReadCycle()
+{
+	return _prevReadCycle;
+}
+
 void BaseControlDevice::SetRawState(ControlDeviceState state)
 {
 	auto lock = _stateLock.AcquireSafe();
@@ -335,4 +352,9 @@ void BaseControlDevice::Serialize(Serializer& s)
 	auto lock = _stateLock.AcquireSafe();
 	SV(_strobe);
 	SVVector(_state.State);
+
+	if(s.GetFormat() != SerializeFormat::Map) {
+		SV(_prevReadCycle);
+		SV(_prevReadValue);
+	}
 }

@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Debugger.Utilities;
 using Mesen.Debugger.Windows;
@@ -7,36 +8,33 @@ using Mesen.Localization;
 using Mesen.Utilities;
 using Mesen.ViewModels;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Mesen.Debugger.ViewModels
 {
-	public class AssemblerWindowViewModel : DisposableViewModel
+	public partial class AssemblerWindowViewModel : DisposableViewModel
 	{
 		public AssemblerConfig Config { get; }
 
-		[Reactive] public string Code { get; set; } = "";
-		[Reactive] public string ByteCodeView { get; set; } = "";
-		[Reactive] public int StartAddress { get; set; }
-		[Reactive] public int BytesUsed { get; set; }
+		[ObservableProperty] public partial string Code { get; set; } = "";
+		[ObservableProperty] public partial string ByteCodeView { get; set; } = "";
+		[ObservableProperty] public partial int StartAddress { get; set; }
+		[ObservableProperty] public partial int BytesUsed { get; set; }
 
-		[Reactive] public bool HasWarning { get; set; }
-		[Reactive] public bool IsIdentical { get; set; }
-		[Reactive] public bool OriginalSizeExceeded { get; set; }
-		[Reactive] public bool MaxSizeExceeded { get; set; }
+		[ObservableProperty] public partial bool HasWarning { get; set; }
+		[ObservableProperty] public partial bool IsIdentical { get; set; }
+		[ObservableProperty] public partial bool OriginalSizeExceeded { get; set; }
+		[ObservableProperty] public partial bool MaxSizeExceeded { get; set; }
 
-		[Reactive] public bool OkEnabled { get; set; } = false;
-		[Reactive] public List<AssemblerError> Errors { get; set; } = new List<AssemblerError>();
+		[ObservableProperty] public partial bool OkEnabled { get; set; } = false;
+		[ObservableProperty] public partial List<AssemblerError> Errors { get; set; } = new List<AssemblerError>();
 
-		[Reactive] public List<ContextMenuAction> FileMenuActions { get; private set; } = new();
-		[Reactive] public List<ContextMenuAction> OptionsMenuActions { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> FileMenuActions { get; private set; } = new();
+		[ObservableProperty] public partial List<ContextMenuAction> OptionsMenuActions { get; private set; } = new();
 
 		public CpuType CpuType { get; }
 		private List<byte> _bytes = new();
@@ -45,12 +43,12 @@ namespace Mesen.Debugger.ViewModels
 
 		private int _originalAddress = -1;
 		private byte[] _originalCode = Array.Empty<byte>();
-		[Reactive] public int OriginalByteCount { get; private set; } = 0;
+		[ObservableProperty] public partial int OriginalByteCount { get; private set; } = 0;
 
 		[Obsolete("For designer only")]
 		public AssemblerWindowViewModel() : this(CpuType.Snes) { }
 
-		public AssemblerWindowViewModel(CpuType cpuType)
+		public AssemblerWindowViewModel(CpuType cpuType, int address = -1, string code = "", int byteCount = -1)
 		{
 			Config = ConfigManager.Config.Debug.Assembler;
 			CpuType = cpuType;
@@ -59,9 +57,21 @@ namespace Mesen.Debugger.ViewModels
 				return;
 			}
 
+			if(address >= 0) {
+				OriginalByteCount = byteCount;
+				_originalAddress = address;
+
+				StartAddress = address;
+				Code = code;
+
+				if(OriginalByteCount > 0) {
+					_originalCode = DebugApi.GetMemoryValues(CpuType.ToMemoryType(), (uint)StartAddress, (uint)(StartAddress + OriginalByteCount - 1));
+				}
+			}
+
 			MaxAddress = DebugApi.GetMemorySize(CpuType.ToMemoryType()) - 1;
 
-			AddDisposable(this.WhenAnyValue(x => x.Code, x => x.StartAddress).Subscribe(_ => {
+			AddDisposable(this.ObserveProp([nameof(Code), nameof(StartAddress)], () => {
 				UpdateAssembly(Code);
 			}));
 		}
@@ -86,20 +96,6 @@ namespace Mesen.Debugger.ViewModels
 					OnClick = () => DebuggerConfigWindow.Open(DebugConfigWindowTab.FontAndColors, wnd)
 				}
 			});
-		}
-
-		public void InitEditCode(int address, string code, int byteCount)
-		{
-			OriginalByteCount = byteCount;
-			_originalAddress = address;
-
-			using var delayNotifs = DelayChangeNotifications();
-			StartAddress = address;
-			Code = code;
-
-			if(OriginalByteCount > 0) {
-				_originalCode = DebugApi.GetMemoryValues(CpuType.ToMemoryType(), (uint)StartAddress, (uint)(StartAddress + OriginalByteCount - 1));
-			}
 		}
 
 		private void UpdateAssembly(string code)

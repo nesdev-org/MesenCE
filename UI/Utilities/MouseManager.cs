@@ -27,7 +27,6 @@ namespace Mesen.Utilities
 
 		private DispatcherTimer _timer = new DispatcherTimer(DispatcherPriority.Normal);
 
-		private Control _renderer;
 		private bool _usesSoftwareRenderer;
 		private MainMenuView _mainMenu;
 		private MainWindow _wnd;
@@ -38,10 +37,9 @@ namespace Mesen.Utilities
 		private bool _closeMenuPending = false;
 		private DateTime _lastMouseMove = DateTime.Now;
 
-		public MouseManager(MainWindow wnd, Control renderer, MainMenuView mainMenu, bool usesSoftwareRenderer)
+		public MouseManager(MainWindow wnd, MainMenuView mainMenu, bool usesSoftwareRenderer)
 		{
 			_wnd = wnd;
-			_renderer = renderer;
 			_mainMenu = mainMenu;
 			_usesSoftwareRenderer = usesSoftwareRenderer;
 
@@ -72,7 +70,7 @@ namespace Mesen.Utilities
 					if(MainWindowViewModel.Instance.AudioPlayer == null) {
 						//Only give renderer focus when the audio player isn't active
 						//Otherwise clicking on the audio player's buttons does nothing
-						_renderer.Focus();
+						_wnd.Renderer.Focus();
 					}
 					_closeMenuPending = false;
 				} else {
@@ -82,8 +80,8 @@ namespace Mesen.Utilities
 				_closeMenuPending = false;
 			}
 
-			PixelPoint rendererTopLeft = _renderer.PointToScreen(new Point());
-			PixelRect rendererScreenRect = new PixelRect(rendererTopLeft, PixelSize.FromSize(_renderer.Bounds.Size, LayoutHelper.GetLayoutScale(_wnd) / InputApi.GetPixelScale()));
+			PixelPoint rendererTopLeft = _wnd.Renderer.PointToScreen(new Point());
+			PixelRect rendererScreenRect = new PixelRect(rendererTopLeft, PixelSize.FromSize(_wnd.Renderer.Bounds.Size, LayoutHelper.GetLayoutScale(_wnd) / InputApi.GetPixelScale()));
 
 			if(_prevPositionX != mouseState.XPosition || _prevPositionY != mouseState.YPosition) {
 				//Send mouse movement x/y values to core
@@ -108,7 +106,7 @@ namespace Mesen.Utilities
 
 			if(rendererScreenRect.Contains(mousePos)) {
 				//Send mouse state to emulation core
-				Point rendererPos = _renderer.PointToClient(mousePos) * LayoutHelper.GetLayoutScale(_wnd) / InputApi.GetPixelScale();
+				Point rendererPos = _wnd.Renderer.PointToClient(mousePos) * LayoutHelper.GetLayoutScale(_wnd) / InputApi.GetPixelScale();
 				InputApi.SetMousePosition(rendererPos.X / rendererScreenRect.Width, rendererPos.Y / rendererScreenRect.Height);
 
 				bool buttonPressed = (mouseState.LeftButton || mouseState.RightButton || mouseState.MiddleButton || mouseState.Button4 || mouseState.Button5);
@@ -149,7 +147,7 @@ namespace Mesen.Utilities
 			InputApi.SetCursorImage(icon);
 			if(_usesSoftwareRenderer && !OperatingSystem.IsMacOS()) {
 				//On MacOS, also setting the cursor on the renderer causes the cursor visibility to act oddly
-				_renderer.Cursor = new Cursor(icon.ToStandardCursorType());
+				_wnd.Renderer.Cursor = new Cursor(icon.ToStandardCursorType());
 			}
 		}
 
@@ -252,8 +250,8 @@ namespace Mesen.Utilities
 		private void CaptureMouse()
 		{
 			if(!_mouseCaptured && AllowMouseCapture) {
-				PixelPoint topLeft = _renderer.PointToScreen(new Point());
-				PixelRect rendererScreenRect = new PixelRect(topLeft, PixelSize.FromSize(_renderer.Bounds.Size, LayoutHelper.GetLayoutScale(_wnd)));
+				PixelPoint topLeft = _wnd.Renderer.PointToScreen(new Point());
+				PixelRect rendererScreenRect = new PixelRect(topLeft, PixelSize.FromSize(_wnd.Renderer.Bounds.Size, LayoutHelper.GetLayoutScale(_wnd)));
 
 				if(InputApi.CaptureMouse(topLeft.X, topLeft.Y, rendererScreenRect.Width, rendererScreenRect.Height, GetRendererHandle())) {
 					DisplayMessageHelper.DisplayMessage("Input", ResourceHelper.GetMessage("MouseModeEnabled"));
@@ -272,7 +270,7 @@ namespace Mesen.Utilities
 
 		private IntPtr GetRendererHandle()
 		{
-			return _usesSoftwareRenderer ? IntPtr.Zero : (_renderer as NativeRenderer)!.Handle;
+			return _usesSoftwareRenderer ? IntPtr.Zero : (_wnd.Renderer as NativeRenderer)!.Handle;
 		}
 
 		public void Dispose()

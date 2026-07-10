@@ -1,39 +1,47 @@
 ﻿using Avalonia.Controls;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Interop;
 using Mesen.Utilities;
 using Mesen.Windows;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text;
 
 namespace Mesen.ViewModels
 {
-	public class CheatEditWindowViewModel : DisposableViewModel
+	public partial class CheatEditWindowViewModel : DisposableViewModel
 	{
 		public CheatCode Cheat { get; }
 
-		[ObservableAsProperty] public string ConvertedCodes { get; } = "";
-		[Reactive] public bool ShowInvalidCodeHint { get; private set; } = false;
-		[Reactive] public bool OkButtonEnabled { get; private set; } = false;
+		[ObservableProperty] public partial string ConvertedCodes { get; private set; } = "";
+		[ObservableProperty] public partial bool ShowInvalidCodeHint { get; private set; } = false;
+		[ObservableProperty] public partial bool OkButtonEnabled { get; private set; } = false;
 
-		[Reactive] public Enum[] AvailableCheatTypes { get; private set; } = Array.Empty<Enum>();
-
-		private MainWindowViewModel MainWndModel { get; }
+		[ObservableProperty] public partial Enum[] AvailableCheatTypes { get; private set; } = Array.Empty<Enum>();
 
 		[Obsolete("For designer only")]
-		public CheatEditWindowViewModel() : this(new CheatCode()) { }
+		public CheatEditWindowViewModel() : this(new CheatCode(), () => { }) { }
 
-		public CheatEditWindowViewModel(CheatCode cheat)
+		public CheatEditWindowViewModel(CheatCode cheat, Action closeWindow)
 		{
 			Cheat = cheat;
-			MainWndModel = MainWindowViewModel.Instance;
 
-			AddDisposable(this.WhenAnyValue(x => x.Cheat.Codes, x => x.Cheat.Type).Select(x => {
+			AvailableCheatTypes = Enum.GetValues<CheatType>().Where(e => MainWindowViewModel.Instance.RomInfo.CpuTypes.Contains(e.ToCpuType())).Cast<Enum>().ToArray();
+			if(!AvailableCheatTypes.Contains(Cheat.Type)) {
+				Cheat.Type = (CheatType)AvailableCheatTypes[0];
+			}
+
+			//Close popup window if the loaded game changes
+			string romPath = MainWindowViewModel.Instance.RomInfo.RomPath;
+			AddDisposable(MainWindowViewModel.Instance.ObserveProp(nameof(RomInfo), () => {
+				if(romPath != MainWindowViewModel.Instance.RomInfo.RomPath) {
+					closeWindow();
+				}
+			}));
+
+			AddDisposable(Cheat.ObserveProp([nameof(CheatCode.Codes), nameof(CheatCode.Type)], () => {
 				string[] codes = cheat.Codes.Split(Environment.NewLine);
 				StringBuilder sb = new StringBuilder();
 				bool hasInvalidCode = false;
@@ -66,18 +74,7 @@ namespace Mesen.ViewModels
 				ShowInvalidCodeHint = hasInvalidCode;
 				OkButtonEnabled = hasValidCode && !hasInvalidCode;
 
-				return sb.ToString();
-			}).ToPropertyEx(this, x => x.ConvertedCodes));
-
-			if(Design.IsDesignMode) {
-				return;
-			}
-
-			AddDisposable(this.WhenAnyValue(x => x.MainWndModel.RomInfo).Subscribe(romInfo => {
-				AvailableCheatTypes = Enum.GetValues<CheatType>().Where(e => romInfo.CpuTypes.Contains(e.ToCpuType())).Cast<Enum>().ToArray();
-				if(!AvailableCheatTypes.Contains(Cheat.Type)) {
-					Cheat.Type = (CheatType)AvailableCheatTypes[0];
-				}
+				ConvertedCodes = sb.ToString();
 			}));
 		}
 	}

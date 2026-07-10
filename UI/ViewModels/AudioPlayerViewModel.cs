@@ -1,7 +1,7 @@
-﻿using Mesen.Config;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Config;
 using Mesen.Interop;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using Mesen.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,18 +11,18 @@ using System.Threading.Tasks;
 
 namespace Mesen.ViewModels
 {
-	public class AudioPlayerViewModel : ViewModelBase
+	public partial class AudioPlayerViewModel : DisposableViewModel
 	{
-		[Reactive] public AudioPlayerConfig Config { get; set; }
-		[Reactive] public bool IsPaused { get; set; }
+		[ObservableProperty] public partial AudioPlayerConfig Config { get; set; }
+		[ObservableProperty] public partial bool IsPaused { get; set; }
 
 		public AudioPlayerViewModel()
 		{
 			Config = ConfigManager.Config.AudioPlayer;
 
-			this.WhenAnyValue(x => x.Config.Volume).Subscribe((vol) => {
+			AddDisposable(Config.ObserveProp(nameof(Config.Volume), () => {
 				Config.ApplyConfig();
-			});
+			}));
 		}
 
 		public void UpdatePauseFlag()

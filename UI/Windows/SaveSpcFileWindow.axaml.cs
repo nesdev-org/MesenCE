@@ -23,9 +23,6 @@ namespace Mesen.Windows
 			DataContext = _model;
 
 			InitializeComponent();
-#if DEBUG
-			this.AttachDevTools();
-#endif
 		}
 
 		private void InitializeComponent()
