@@ -896,7 +896,7 @@ void SnesPpu::RenderScanline()
 	}
 
 	//Render the scanline
-	if(!_skipRender && _drawStartX <= 255 && hPos > 22 && _scanline > 0) {
+	if(!_skipRender && _drawStartX <= 255 && hPos >= 22 && _scanline > 0) {
 		_drawEndX = std::min(hPos - 22, 255);
 
 		if(_state.ForcedBlank) {
@@ -1548,13 +1548,40 @@ void SnesPpu::DebugSendFrame()
 	uint16_t width = _useHighResOutput ? 512 : 256;
 	uint16_t height = _useHighResOutput ? 478 : 239;
 
-	int lastDrawnPixel = _drawEndX * (_useHighResOutput ? 2 : 1);
+	int lastDrawnPixel = (_drawEndX + 1) * (_useHighResOutput ? 2 : 1);
 	int scanline = _overscanFrame ? ((int)_scanline - 1) : ((int)_scanline + 6);
+	int nextScanline = scanline + 1;
+	if(_useHighResOutput) {
+		scanline *= 2;
+		nextScanline *= 2;
+	}
 
-	int offset = std::max(0, lastDrawnPixel + 1 + scanline * width);
-	int pixelsToClear = width * height - offset;
-	if(pixelsToClear > 0) {
-		memset(_currentBuffer + offset, 0, pixelsToClear * sizeof(uint16_t));
+	if(scanline >= 0 && scanline < height) {
+		if(_interlacedFrame) {
+			if(_oddFrame) {
+				scanline++;
+			}
+
+			for(int i = scanline + 2; i < height; i += 2) {
+				memset(_currentBuffer + i * width, 0, width * sizeof(uint16_t));
+			}
+
+			int pixelsToClear = width - lastDrawnPixel;
+			if(pixelsToClear > 0) {
+				memset(_currentBuffer + (scanline + 1) * width - pixelsToClear, 0, pixelsToClear * sizeof(uint16_t));
+			}
+		} else {
+			if(nextScanline < height) {
+				memset(_currentBuffer + nextScanline * width, 0, (height - nextScanline) * width * sizeof(uint16_t));
+			}
+
+			if(lastDrawnPixel < width) {
+				memset(_currentBuffer + (scanline * width) + lastDrawnPixel, 0, (width - lastDrawnPixel) * sizeof(uint16_t));
+				if(_useHighResOutput) {
+					memset(_currentBuffer + ((scanline + 1) * width) + lastDrawnPixel, 0, (width - lastDrawnPixel) * sizeof(uint16_t));
+				}
+			}
+		}
 	}
 
 	RenderedFrame frame(_currentBuffer, width, height, _useHighResOutput ? 0.5 : 1.0, _frameCount);
