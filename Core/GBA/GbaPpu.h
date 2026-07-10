@@ -251,6 +251,23 @@ public:
 		_emu->ProcessPpuCycle<CpuType::Gba>();
 	}
 
+	__forceinline void ExecSleep()
+	{
+		_state.Cycle++;
+		if(_state.Cycle == 308 * 4) {
+			_state.Cycle = 0;
+			_state.Scanline++;
+			if(_state.Scanline == 160) {
+				//Show white screen while in sleep mode
+				std::fill(_currentBuffer, _currentBuffer + GbaConstants::PixelCount, 0x7FFF);
+				SendFrame();
+			} else if(_state.Scanline > 227) {
+				_state.Scanline = 0;
+			}
+		}
+		_emu->ProcessPpuCycle<CpuType::Gba>();
+	}
+
 	bool IsAccessingMemory(uint8_t memType)
 	{
 		return _memoryAccess[_state.Cycle] & memType;

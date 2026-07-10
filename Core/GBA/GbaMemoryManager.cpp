@@ -90,11 +90,9 @@ void GbaMemoryManager::RunPrefetch()
 
 void GbaMemoryManager::ProcessStoppedCycle()
 {
-	//What exactly is disabled when stopped?
-	//This at least works for the games that were tested (but is very likely inaccurate)
+	//According to gbatek, basically everything is disabled while in sleep mode
 	_masterClock++;
-	_ppu->Exec(); //keep PPU running to keep emulation running properly
-	_timer->Exec(_masterClock);
+	_ppu->ExecSleep();
 }
 
 void GbaMemoryManager::ProcessPendingUpdates(bool allowStartDma)
@@ -750,7 +748,11 @@ bool GbaMemoryManager::HasPendingIrq()
 bool GbaMemoryManager::IsHaltOver()
 {
 	if(_state.StopMode) {
-		return _controlManager->CheckInputCondition();
+		if(_controlManager->CheckInputCondition()) {
+			_state.StopMode = false;
+			return true;
+		}
+		return false;
 	} else {
 		return (bool)(_state.IrqPending & 0x01);
 	}

@@ -163,7 +163,7 @@ public:
 
 	__forceinline void ProcessDma()
 	{
-		if(_dmaController->HasPendingDma()) {
+		if(_dmaController->HasPendingDma() && !_state.StopMode) {
 			_dmaController->RunPendingDma(true);
 		}
 	}
