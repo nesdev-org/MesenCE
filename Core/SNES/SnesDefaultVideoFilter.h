@@ -11,6 +11,7 @@ private:
 	VideoConfig _videoConfig = {};
 
 	SnesHighResBlendMode _highResBlendMode = SnesHighResBlendMode::None;
+	SnesColorCorrectionMode _colorCorrection = SnesColorCorrectionMode::None;
 	bool _forceFixedRes = false;
 
 	void InitLookupTable();
