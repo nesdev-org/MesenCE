@@ -27,6 +27,7 @@ private:
 	uint64_t _clockCounter = 0;
 	int16_t _prevOutputLeft = 0;
 	int16_t _prevOutputRight = 0;
+	bool _altNoiseMode = false;
 
 	void RunNoise(SmsNoiseChannelState& noise);
 

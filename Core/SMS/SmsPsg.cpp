@@ -8,6 +8,7 @@ SmsPsg::SmsPsg(Emulator* emu, SmsConsole* console)
 	_console = console;
 	_soundMixer = emu->GetSoundMixer();
 	_settings = emu->GetSettings();
+	_altNoiseMode = _console->GetModel() == SmsModel::ColecoVision || _console->GetModel() == SmsModel::Sg;
 
 	_state.Noise.Lfsr = 0x8000;
 	_state.Noise.Volume = 0x0F;
@@ -49,9 +50,15 @@ void SmsPsg::RunNoise(SmsNoiseChannelState& noise)
 		}
 
 		if(noise.LfsrInputBit) {
-			bool useBit3 = noise.Control & 0x04;
-			uint16_t newBit = (noise.Lfsr & 0x01) ^ (useBit3 & ((noise.Lfsr >> 3) & 0x01));
-			noise.Lfsr = (newBit << 15) | (noise.Lfsr >> 1);
+			if(_altNoiseMode) {
+				bool useBit1 = noise.Control & 0x04;
+				uint16_t newBit = (noise.Lfsr & 0x01) ^ (useBit1 & ((noise.Lfsr >> 1) & 0x01));
+				noise.Lfsr = (newBit << 14) | (noise.Lfsr >> 1);
+			} else {
+				bool useBit3 = noise.Control & 0x04;
+				uint16_t newBit = (noise.Lfsr & 0x01) ^ (useBit3 & ((noise.Lfsr >> 3) & 0x01));
+				noise.Lfsr = (newBit << 15) | (noise.Lfsr >> 1);
+			}
 			noise.Output = noise.Lfsr & 0x01;
 		}
 	}
