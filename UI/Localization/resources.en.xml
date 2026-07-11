@@ -273,6 +273,7 @@
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
 
 			<Control ID="lblHighResBlendMode">High resolution blend mode: </Control>
+			<Control ID="lblColorCorrection">Color correction: </Control>
 			<Control ID="chkHideBgLayer1">Hide background layer 1</Control>
 			<Control ID="chkHideBgLayer2">Hide background layer 2</Control>
 			<Control ID="chkHideBgLayer3">Hide background layer 3</Control>
@@ -2493,6 +2494,11 @@ E
 			<Value ID="None">None (default)</Value>
 			<Value ID="BlendAll">Blend entire screen</Value>
 			<Value ID="BlendEvenOdd">Blend even/odd columns (fake transparency)</Value>
+		</Enum>
+		<Enum ID="SnesColorCorrectionMode">
+			<Value ID="None">None (default)</Value>
+			<Value ID="NtscBlackLevel">NTSC-U black level</Value>
+			<Value ID="DeepBlackBoost">Deep black boost (ares)</Value>
 		</Enum>
 		<Enum ID="PceConsoleType">
 			<Value ID="Auto">Auto (recommended)</Value>
