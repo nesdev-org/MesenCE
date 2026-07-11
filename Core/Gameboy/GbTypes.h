@@ -168,7 +168,7 @@ struct GbPpuFetcher
 
 struct GbPpuState : public BaseState
 {
-	uint8_t Scanline;
+	uint16_t Scanline;
 	uint16_t Cycle;
 	uint16_t IdleCycles;
 	PpuMode Mode;

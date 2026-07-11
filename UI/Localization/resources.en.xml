@@ -375,7 +375,11 @@
 			<Control ID="lblRamPowerOnState">Default power on state for RAM: </Control>
 			<Control ID="grpGeneral">General</Control>
 			<Control ID="chkAllowInvalidInput">Allow invalid input (e.g Down + Up or Left + Right at the same time)</Control>
-			
+
+			<Control ID="grpOverclocking">Overclocking</Control>
+			<Control ID="lblOverclockHint">Overclocking can help reduce or remove slowdowns in games (but it can also cause issues). To overclock, increase the value below.&#13;Note: Overclocking is not available in SGB mode.</Control>
+			<Control ID="lblOverclockScanlineCount">Additional scanlines:</Control>
+
 			<Control ID="tpgVideo">Video</Control>
 			<Control ID="lblGameboyPalette">Game Boy (DMG) Palette</Control>
 			<Control ID="lblGbBackground">Background:</Control>
@@ -393,7 +397,8 @@
 			<Control ID="chkGbcAdjustColors">Enable GBC LCD color emulation</Control>
 			<Control ID="chkDisableBackground">Disable background</Control>
 			<Control ID="chkDisableSprites">Disable sprites</Control>
-
+			<Control ID="chkRemoveSpriteLimit">Remove sprite limit</Control>
+			
 			<Control ID="lblMiscSettings">Miscellaneous Settings</Control>
 			<Control ID="chkHideSgbBorders">Hide Super Game Boy borders</Control>
 

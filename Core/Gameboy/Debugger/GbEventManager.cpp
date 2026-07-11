@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "Gameboy/Debugger/GbEventManager.h"
+#include "Gameboy/GbConstants.h"
 #include "Gameboy/GbCpu.h"
 #include "Gameboy/GbPpu.h"
-#include "Gameboy/Gameboy.h"
 #include "Debugger/DebugTypes.h"
 #include "Debugger/Debugger.h"
 #include "Debugger/DebugBreakHelper.h"
@@ -15,8 +15,8 @@ GbEventManager::GbEventManager(Debugger* debugger, GbCpu* cpu, GbPpu* ppu)
 	_cpu = cpu;
 	_ppu = ppu;
 
-	_ppuBuffer = new uint16_t[456 * GbEventManager::ScreenHeight];
-	memset(_ppuBuffer, 0, 456 * GbEventManager::ScreenHeight * sizeof(uint16_t));
+	_ppuBuffer = new uint16_t[GbConstants::EventViewerBufferSize];
+	memset(_ppuBuffer, 0, GbConstants::EventViewerBufferSize * sizeof(uint16_t));
 }
 
 GbEventManager::~GbEventManager()
@@ -137,9 +137,9 @@ uint32_t GbEventManager::TakeEventSnapshot(bool forAutoRefresh)
 	uint16_t scanline = _ppu->GetState().Scanline;
 
 	if(scanline >= GbEventManager::VBlankScanline || scanline == 0) {
-		memcpy(_ppuBuffer, _ppu->GetEventViewerBuffer(), 456 * GbEventManager::ScreenHeight * sizeof(uint16_t));
+		memcpy(_ppuBuffer, _ppu->GetEventViewerBuffer(), GbConstants::EventViewerBufferSize * sizeof(uint16_t));
 	} else {
-		uint32_t size = 456 * GbEventManager::ScreenHeight;
+		uint32_t size = GbConstants::EventViewerBufferSize;
 		uint32_t offset = 456 * scanline;
 		memcpy(_ppuBuffer, _ppu->GetEventViewerBuffer(), offset * sizeof(uint16_t));
 		memcpy(_ppuBuffer + offset, _ppu->GetPreviousEventViewerBuffer() + offset, (size - offset) * sizeof(uint16_t));
@@ -150,7 +150,7 @@ uint32_t GbEventManager::TakeEventSnapshot(bool forAutoRefresh)
 	_snapshotScanline = scanline;
 	_snapshotCycle = cycle;
 	_forAutoRefresh = forAutoRefresh;
-	_scanlineCount = GbEventManager::ScreenHeight;
+	_scanlineCount = _ppu->GetScanlineCount();
 	return _scanlineCount;
 }
 
@@ -165,10 +165,19 @@ FrameInfo GbEventManager::GetDisplayBufferSize()
 void GbEventManager::DrawScreen(uint32_t* buffer)
 {
 	uint16_t* src = _ppuBuffer;
-	for(uint32_t y = 0, len = GbEventManager::ScreenHeight * 2; y < len; y++) {
+	for(uint32_t y = 0, len = GbConstants::ScreenHeight * 2; y < len; y++) {
 		for(uint32_t x = 0; x < GbEventManager::ScanlineWidth; x++) {
 			int srcOffset = (y >> 1) * 456 + (x >> 1);
 			buffer[y * GbEventManager::ScanlineWidth + x] = ColorUtilities::Rgb555ToArgb(src[srcOffset]);
 		}
 	}
+
+	//Draw 4-dot hblank at the start of vblank (+ mark all overclock scanlines as hblank)
+	uint32_t* start = buffer + GbEventManager::ScanlineWidth * GbConstants::ScreenHeight * 2;
+	uint32_t len = 8;
+	if(_scanlineCount > 154) {
+		uint16_t ocScanlines = _scanlineCount - 154;
+		len += ocScanlines * GbEventManager::ScanlineWidth * 2;
+	}
+	std::fill(start, start + len, ColorUtilities::Rgb555ToArgb(0x18C6));
 }

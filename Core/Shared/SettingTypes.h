@@ -431,10 +431,13 @@ struct GameboyConfig
 
 	bool DisableBackground = false;
 	bool DisableSprites = false;
+	bool RemoveSpriteLimit = false;
 	bool HideSgbBorders = false;
 
 	RamState RamPowerOnState = RamState::Random;
 	bool AllowInvalidInput = false;
+
+	uint32_t OverclockScanlineCount = 0;
 
 	uint32_t BgColors[4] = { 0xFFFFFF, 0xB0B0B0, 0x686868, 0x000000 };
 	uint32_t Obj0Colors[4] = { 0xFFFFFF, 0xB0B0B0, 0x686868, 0x000000 };

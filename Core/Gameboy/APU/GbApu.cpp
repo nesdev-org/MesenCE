@@ -76,6 +76,10 @@ void GbApu::Run()
 	uint64_t clockCount = _gameboy->GetApuCycleCount();
 	uint32_t clocksToRun = (uint32_t)(clockCount - _prevClockCount);
 	_prevClockCount = clockCount;
+	if(!_apuEnabled) {
+		//During overclock scanlines, the APU doesn't run
+		return;
+	}
 
 	GameboyConfig& cfg = _settings->GetGameboyConfig();
 
@@ -525,6 +529,7 @@ void GbApu::Serialize(Serializer& s)
 	SV(_prevClockCount);
 	SV(_skipFirstEventCounter);
 	SV(_powerOnCycle);
+	SV(_apuEnabled);
 
 	SV(_square1);
 	SV(_square2);
