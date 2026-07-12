@@ -2,11 +2,9 @@
 #include "SNES/SnesPpu.h"
 #include "SNES/SnesConsole.h"
 #include "SNES/SnesMemoryManager.h"
-#include "SNES/SnesCpu.h"
 #include "SNES/Spc.h"
 #include "SNES/InternalRegisters.h"
 #include "SNES/SnesControlManager.h"
-#include "SNES/SnesDmaController.h"
 #include "SNES/Debugger/SnesPpuTools.h"
 #include "Debugger/Debugger.h"
 #include "Shared/Emulator.h"
@@ -452,14 +450,7 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock)
 			_spriteEvalEnd = 0;
 			_spriteFetchingDone = false;
 
-			memset(_hasSpritePriority, 0, sizeof(_hasSpritePriority));
 			memcpy(_spritePriority, _spritePriorityCopy, sizeof(_spritePriority));
-			for(int i = 0; i < 255; i++) {
-				if(_spritePriority[i] < 4) {
-					_hasSpritePriority[_spritePriority[i]] = true;
-				}
-			}
-
 			memcpy(_spritePalette, _spritePaletteCopy, sizeof(_spritePalette));
 			memcpy(_spriteColors, _spriteColorsCopy, sizeof(_spriteColors));
 
@@ -568,12 +559,19 @@ void SnesPpu::UpdateNmiScanline()
 	}
 
 	SnesConfig snesCfg = _settings->GetSnesConfig();
-	_overclockEnabled = snesCfg.PpuExtraScanlinesBeforeNmi > 0 || snesCfg.PpuExtraScanlinesAfterNmi > 0;
+	uint32_t beforeNmi = snesCfg.PpuExtraScanlinesBeforeNmi;
+	uint32_t afterNmi = snesCfg.PpuExtraScanlinesAfterNmi;
+	if(_emu->GetRomInfo().Format == RomFormat::Gb) {
+		//Disable overclocking for SGB (does not work properly)
+		beforeNmi = 0;
+		afterNmi = 0;
+	}
 
-	_adjustedVblankEndScanline = _baseVblankEndScanline + snesCfg.PpuExtraScanlinesBeforeNmi;
-	_vblankEndScanline = _baseVblankEndScanline + snesCfg.PpuExtraScanlinesAfterNmi + snesCfg.PpuExtraScanlinesBeforeNmi;
+	_overclockEnabled = beforeNmi > 0 || afterNmi > 0;
+	_adjustedVblankEndScanline = _baseVblankEndScanline + beforeNmi;
+	_vblankEndScanline = _baseVblankEndScanline + afterNmi + beforeNmi;
 	_vblankStartScanline = _state.OverscanMode ? 240 : 225;
-	_nmiScanline = _vblankStartScanline + snesCfg.PpuExtraScanlinesBeforeNmi;
+	_nmiScanline = _vblankStartScanline + beforeNmi;
 }
 
 uint16_t SnesPpu::GetRealScanline()
@@ -644,6 +642,7 @@ void SnesPpu::FetchSpriteData()
 	if(_fetchSpriteStart == 0) {
 		memset(_spritePriorityCopy, 0xFF, sizeof(_spritePriorityCopy));
 
+		_orgSpriteCount = _spriteCount;
 		_spriteTileCount = 0;
 		_currentSprite.Index = 0xFF;
 
@@ -679,6 +678,10 @@ void SnesPpu::FetchSpriteData()
 				FetchSpritePosition(_oamTimeIndex);
 			}
 		}
+	}
+
+	if(!_state.ForcedBlank && _fetchSpriteEnd >= 69 && _settings->GetSnesConfig().RemoveSpriteLimit) {
+		LoadExtraSprites();
 	}
 }
 
@@ -794,6 +797,43 @@ void SnesPpu::FetchSpriteTile(bool secondCycle)
 	}
 }
 
+void SnesPpu::LoadExtraSprites()
+{
+	//_timeOver can get set by calling FetchSpriteAttributes, keep a copy of its orignal value.
+	bool timeOver = _timeOver;
+
+	//Allow going over the 34 8px tile limit
+	if(!_spriteFetchingDone) {
+		FetchSpriteTile(false);
+		FetchSpriteTile(true);
+	}
+
+	while(_spriteCount > 0) {
+		uint8_t i = _spriteIndexes[_spriteCount - 1];
+		FetchSpritePosition(i);
+		FetchSpriteAttributes((i << 2) | 0x02);
+		FetchSpriteTile(false);
+		FetchSpriteTile(true);
+	}
+
+	if(_spriteFetchingDone && _orgSpriteCount == 32) {
+		//Allow going over the 32 sprite limit
+		uint8_t lastIndex = _spriteIndexes[31];
+		for(uint8_t i = lastIndex + 1; i < 0x80; i++) {
+			FetchSpritePosition(i);
+			if(_currentSprite.IsVisible(_scanline, _state.ObjInterlace)) {
+				while(_currentSprite.ColumnOffset > 0) {
+					FetchSpriteAttributes((i << 2) | 0x02);
+					FetchSpriteTile(false);
+					FetchSpriteTile(true);
+				}
+			}
+		}
+	}
+
+	_timeOver = timeOver;
+}
+
 void SnesPpu::RenderMode0()
 {
 	constexpr uint8_t spritePriorities[4] = { 3, 6, 9, 12 };
@@ -896,7 +936,7 @@ void SnesPpu::RenderScanline()
 	}
 
 	//Render the scanline
-	if(!_skipRender && _drawStartX <= 255 && hPos > 22 && _scanline > 0) {
+	if(!_skipRender && _drawStartX <= 255 && hPos >= 22 && _scanline > 0) {
 		_drawEndX = std::min(hPos - 22, 255);
 
 		if(_state.ForcedBlank) {
@@ -1548,13 +1588,40 @@ void SnesPpu::DebugSendFrame()
 	uint16_t width = _useHighResOutput ? 512 : 256;
 	uint16_t height = _useHighResOutput ? 478 : 239;
 
-	int lastDrawnPixel = _drawEndX * (_useHighResOutput ? 2 : 1);
+	int lastDrawnPixel = (_drawEndX + 1) * (_useHighResOutput ? 2 : 1);
 	int scanline = _overscanFrame ? ((int)_scanline - 1) : ((int)_scanline + 6);
+	int nextScanline = scanline + 1;
+	if(_useHighResOutput) {
+		scanline *= 2;
+		nextScanline *= 2;
+	}
 
-	int offset = std::max(0, lastDrawnPixel + 1 + scanline * width);
-	int pixelsToClear = width * height - offset;
-	if(pixelsToClear > 0) {
-		memset(_currentBuffer + offset, 0, pixelsToClear * sizeof(uint16_t));
+	if(scanline >= 0 && scanline < height) {
+		if(_interlacedFrame) {
+			if(_oddFrame) {
+				scanline++;
+			}
+
+			for(int i = scanline + 2; i < height; i += 2) {
+				memset(_currentBuffer + i * width, 0, width * sizeof(uint16_t));
+			}
+
+			int pixelsToClear = width - lastDrawnPixel;
+			if(pixelsToClear > 0) {
+				memset(_currentBuffer + (scanline + 1) * width - pixelsToClear, 0, pixelsToClear * sizeof(uint16_t));
+			}
+		} else {
+			if(nextScanline < height) {
+				memset(_currentBuffer + nextScanline * width, 0, (height - nextScanline) * width * sizeof(uint16_t));
+			}
+
+			if(lastDrawnPixel < width) {
+				memset(_currentBuffer + (scanline * width) + lastDrawnPixel, 0, (width - lastDrawnPixel) * sizeof(uint16_t));
+				if(_useHighResOutput) {
+					memset(_currentBuffer + ((scanline + 1) * width) + lastDrawnPixel, 0, (width - lastDrawnPixel) * sizeof(uint16_t));
+				}
+			}
+		}
 	}
 
 	RenderedFrame frame(_currentBuffer, width, height, _useHighResOutput ? 0.5 : 1.0, _frameCount);
@@ -2432,8 +2499,31 @@ void SnesPpu::Serialize(Serializer& s)
 		SV(_vOffset);
 		SV(_fetchBgStart);
 		SV(_fetchBgEnd);
+
+		SV(_currentSprite.X);
+		SV(_currentSprite.Y);
+		SV(_currentSprite.Index);
+		SV(_currentSprite.Width);
+		SV(_currentSprite.Height);
+		SV(_currentSprite.HorizontalMirror);
+		SV(_currentSprite.Priority);
+		SV(_currentSprite.Palette);
+		SV(_currentSprite.ColumnOffset);
+		SV(_currentSprite.DrawX);
+		SV(_currentSprite.FetchAddress);
+		SV(_currentSprite.ChrData[0]);
+		SV(_currentSprite.ChrData[1]);
+		SV(_oamEvaluationIndex);
+		SV(_oamTimeIndex);
 		SV(_fetchSpriteStart);
 		SV(_fetchSpriteEnd);
+		SV(_spriteEvalStart);
+		SV(_spriteEvalEnd);
+		SV(_spriteFetchingDone);
+		SVArray(_spriteIndexes, 32);
+		SV(_spriteCount);
+		SV(_orgSpriteCount);
+		SV(_spriteTileCount);
 	}
 
 	if(!s.IsSaving() && _interlacedFrame && _emu->GetRewindManager()->IsRewinding()) {

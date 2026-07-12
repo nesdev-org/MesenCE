@@ -118,24 +118,7 @@ void RecordedRomTest::Record(string filename, bool reset)
 		_emu->Lock();
 		Reset();
 
-		EmuSettings* settings = _emu->GetSettings();
-		settings->GetEmulationConfig().RunAheadFrames = 0;
-
-		settings->GetSnesConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetNesConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetGameboyConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetPcEngineConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetSmsConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetCvConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetGbaConfig().RamPowerOnState = RamState::AllZeros;
-
-		settings->GetSnesConfig().DisableFrameSkipping = true;
-		settings->GetPcEngineConfig().DisableFrameSkipping = true;
-		settings->GetGbaConfig().DisableFrameSkipping = true;
-
-		settings->GetGbaConfig().SkipBootScreen = false;
-		settings->GetWsConfig().UseBootRom = true;
-		settings->GetWsConfig().LcdShowIcons = true;
+		UpdateSettings();
 
 		//Start recording movie alongside with screenshots
 		RecordMovieOptions options;
@@ -211,23 +194,7 @@ RomTestResult RecordedRomTest::Run(string filename)
 			settings->GetNesConfig().Region = ConsoleRegion::Auto;
 		}
 
-		settings->GetEmulationConfig().RunAheadFrames = 0;
-
-		settings->GetSnesConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetNesConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetGameboyConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetPcEngineConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetSmsConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetCvConfig().RamPowerOnState = RamState::AllZeros;
-		settings->GetGbaConfig().RamPowerOnState = RamState::AllZeros;
-
-		settings->GetSnesConfig().DisableFrameSkipping = true;
-		settings->GetPcEngineConfig().DisableFrameSkipping = true;
-		settings->GetGbaConfig().DisableFrameSkipping = true;
-
-		settings->GetGbaConfig().SkipBootScreen = false;
-		settings->GetWsConfig().UseBootRom = true;
-		settings->GetWsConfig().LcdShowIcons = true;
+		UpdateSettings();
 
 		_emu->Lock();
 		//Start playing movie
@@ -262,6 +229,34 @@ RomTestResult RecordedRomTest::Run(string filename)
 
 	result.ErrorCode = -1;
 	return result;
+}
+
+void RecordedRomTest::UpdateSettings()
+{
+	EmuSettings* settings = _emu->GetSettings();
+	settings->GetEmulationConfig().RunAheadFrames = 0;
+
+	settings->GetSnesConfig().RamPowerOnState = RamState::AllZeros;
+	settings->GetNesConfig().RamPowerOnState = RamState::AllZeros;
+	settings->GetGameboyConfig().RamPowerOnState = RamState::AllZeros;
+	settings->GetPcEngineConfig().RamPowerOnState = RamState::AllZeros;
+	settings->GetSmsConfig().RamPowerOnState = RamState::AllZeros;
+	settings->GetCvConfig().RamPowerOnState = RamState::AllZeros;
+	settings->GetGbaConfig().RamPowerOnState = RamState::AllZeros;
+
+	settings->GetSnesConfig().DisableFrameSkipping = true;
+	settings->GetPcEngineConfig().DisableFrameSkipping = true;
+	settings->GetGbaConfig().DisableFrameSkipping = true;
+
+	settings->GetGbaConfig().SkipBootScreen = false;
+	settings->GetWsConfig().UseBootRom = true;
+	settings->GetWsConfig().LcdShowIcons = true;
+
+	settings->GetNesConfig().RemoveSpriteLimit = false;
+	settings->GetSnesConfig().RemoveSpriteLimit = false;
+	settings->GetGameboyConfig().RemoveSpriteLimit = false;
+	settings->GetPcEngineConfig().RemoveSpriteLimit = false;
+	settings->GetSmsConfig().RemoveSpriteLimit = false;
 }
 
 void RecordedRomTest::Stop()

@@ -113,9 +113,10 @@ void EmuSettings::Serialize(Serializer& s)
 		case ConsoleType::Gameboy:
 			SV(_gameboy.RamPowerOnState);
 			SV(_gameboy.Controller.Type);
+			SV(_gameboy.LinkedController.Type);
 			SV(_gameboy.Model);
-			SV(_gameboy.UseSgb2);
 			SV(_gameboy.UseLocalLinkCable);
+			SV(_gameboy.OverclockScanlineCount);
 			break;
 
 		case ConsoleType::PcEngine:

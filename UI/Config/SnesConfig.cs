@@ -41,6 +41,7 @@ namespace Mesen.Config
 		[ObservableProperty] public partial bool HideSprites { get; set; } = false;
 		[ObservableProperty] public partial bool DisableFrameSkipping { get; set; } = false;
 		[ObservableProperty] public partial bool ForceFixedResolution { get; set; } = false;
+		[ObservableProperty] public partial bool RemoveSpriteLimit { get; set; } = false;
 
 		[ObservableProperty] public partial OverscanConfig Overscan { get; set; } = new() { Top = 7, Bottom = 8 };
 
@@ -102,6 +103,7 @@ namespace Mesen.Config
 
 				DisableFrameSkipping = DisableFrameSkipping,
 				ForceFixedResolution = ForceFixedResolution,
+				RemoveSpriteLimit = RemoveSpriteLimit,
 
 				Overscan = Overscan.ToInterop(),
 
@@ -162,6 +164,7 @@ namespace Mesen.Config
 		[MarshalAs(UnmanagedType.I1)] public bool HideSprites;
 		[MarshalAs(UnmanagedType.I1)] public bool DisableFrameSkipping;
 		[MarshalAs(UnmanagedType.I1)] public bool ForceFixedResolution;
+		[MarshalAs(UnmanagedType.I1)] public bool RemoveSpriteLimit;
 
 		public InteropOverscanDimensions Overscan;
 

@@ -48,6 +48,7 @@ private:
 	void ValidateFrame();
 	void SaveFrame();
 	void Save();
+	void UpdateSettings();
 
 public:
 	RecordedRomTest(Emulator* console, bool inBackground);

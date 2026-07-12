@@ -115,6 +115,7 @@ public:
 	void ProcessEndOfFrame();
 
 	void RunApu();
+	void SetApuEnabled(bool enabled);
 
 	void RunLinkedConsole();
 	bool IsPrimaryConsole();

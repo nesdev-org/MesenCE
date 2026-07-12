@@ -651,6 +651,12 @@ void Gameboy::RunApu()
 	_apu->Run();
 }
 
+void Gameboy::SetApuEnabled(bool enabled)
+{
+	_apu->Run();
+	_apu->SetEnabled(enabled);
+}
+
 BaseControlManager* Gameboy::GetControlManager()
 {
 	return _controlManager.get();
