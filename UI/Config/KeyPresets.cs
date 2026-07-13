@@ -17,7 +17,7 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode("A");
 			m.Right = InputApi.GetKeyCode("D");
 
-			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
+			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesBlueRetroController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode(";");
 				m.Y = InputApi.GetKeyCode("M");
 				m.L = InputApi.GetKeyCode("U");
@@ -83,7 +83,7 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode("Left Arrow");
 			m.Right = InputApi.GetKeyCode("Right Arrow");
 
-			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
+			if(type == ControllerType.SnesController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesBlueRetroController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode("X");
 				m.Y = InputApi.GetKeyCode("Z");
 				m.L = InputApi.GetKeyCode("Q");
@@ -155,7 +155,7 @@ namespace Mesen.Config
 			m.Left = InputApi.GetKeyCode(prefix + "Left");
 			m.Right = InputApi.GetKeyCode(prefix + "Right");
 
-			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
+			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesBlueRetroController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode(prefix + "Y");
 				m.Y = InputApi.GetKeyCode(prefix + "X");
 				m.L = InputApi.GetKeyCode(prefix + "L1");
@@ -202,7 +202,7 @@ namespace Mesen.Config
 			m.Down = InputApi.GetKeyCode(prefix + "DPad Down");
 			m.Left = InputApi.GetKeyCode(prefix + "DPad Left");
 			m.Right = InputApi.GetKeyCode(prefix + "DPad Right");
-			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesNttDataKeypad) {
+			if(type == ControllerType.SnesController || type == ControllerType.PceAvenuePad6 || type == ControllerType.GbaController || type == ControllerType.SnesRumbleController || type == ControllerType.SnesBlueRetroController || type == ControllerType.SnesNttDataKeypad) {
 				m.X = InputApi.GetKeyCode(prefix + "But4");
 				m.Y = InputApi.GetKeyCode(prefix + "But1");
 				m.L = InputApi.GetKeyCode(prefix + "But5");

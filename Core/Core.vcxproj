@@ -33,6 +33,7 @@
     <ClInclude Include="SNES\Input\AsciiTurboFileTwinStf.h" />
     <ClInclude Include="SNES\Input\AsciiTurboFileTwinTf2.h" />
     <ClInclude Include="Shared\Utilities\AvMergeUtilities.h" />
+    <ClInclude Include="SNES\Input\SnesBlueRetroController.h" />
     <ClInclude Include="SNES\Input\SnesNttDataKeypad.h" />
     <ClInclude Include="SMS\Input\ColecoVisionController.h" />
     <ClInclude Include="Debugger\AddressInfo.h" />
@@ -878,6 +879,7 @@
     <ClCompile Include="NES\Loaders\StudyBoxLoader.cpp" />
     <ClCompile Include="NES\Loaders\UnifLoader.cpp" />
     <ClCompile Include="NES\Mappers\Homebrew\Rainbow.cpp" />
+    <ClCompile Include="SNES\Input\SnesBlueRetroController.cpp" />
     <ClCompile Include="SNES\Input\SnesNttDataKeypad.cpp" />
     <ClCompile Include="Shared\Utilities\emu2413.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PGO Profile|x64'">NotUsing</PrecompiledHeader>

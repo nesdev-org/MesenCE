@@ -97,7 +97,7 @@ private:
 	string GetKey(const char* name, int index)
 	{
 		string valName = NormalizeName(name, index);
-#ifdef DEBUG
+#ifdef _DEBUG
 		if(valName.empty()) {
 			throw std::runtime_error("invalid value name");
 		}
@@ -228,7 +228,7 @@ private:
 
 	__forceinline void CheckDuplicateKey(string& key)
 	{
-#ifdef DEBUG
+#ifdef _DEBUG
 		if(!_usedKeys.emplace(key).second) {
 			throw std::runtime_error("Duplicate key");
 		}

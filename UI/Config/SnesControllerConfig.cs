@@ -87,6 +87,7 @@ namespace Mesen.Config
 
 				case ControllerType.SnesController:
 				case ControllerType.SnesRumbleController:
+				case ControllerType.SnesBlueRetroController:
 					base.ClearKeys(type);
 					break;
 			}

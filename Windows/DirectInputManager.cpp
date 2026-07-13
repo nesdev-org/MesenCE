@@ -393,10 +393,10 @@ optional<int16_t> DirectInputManager::GetAxisPosition(int port, int axis)
 	DIJOYSTATE2& state = _joysticks[port].state;
 
 	switch(axis - 128 - 16) {
-		case 0x00: return state.lX;
-		case 0x01: return state.lY;
-		case 0x02: return state.lRx;
-		case 0x03: return state.lRy;
+		case 0x00: return state.lY;
+		case 0x01: return state.lX;
+		case 0x02: return state.lRy;
+		case 0x03: return state.lRx;
 		case 0x04: return state.lZ;
 		case 0x05: return state.lRz;
 		default: return std::nullopt;

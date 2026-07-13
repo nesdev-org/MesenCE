@@ -7,6 +7,7 @@
 #include "Shared/EmuSettings.h"
 #include "SNES/Input/SnesController.h"
 #include "SNES/Input/SnesRumbleController.h"
+#include "SNES/Input/SnesBlueRetroController.h"
 #include "SNES/Input/SnesMouse.h"
 #include "SNES/Input/Multitap.h"
 #include "SNES/Input/SuperScope.h"
@@ -61,6 +62,10 @@ shared_ptr<BaseControlDevice> SnesControlManager::CreateControllerDevice(Control
 
 		case ControllerType::SnesRumbleController:
 			device.reset(new SnesRumbleController(_emu, _console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
+			break;
+
+		case ControllerType::SnesBlueRetroController:
+			device.reset(new SnesBlueRetroController(_emu, _console, port, port == 0 ? cfg.Port1.Keys : cfg.Port2.Keys));
 			break;
 
 		case ControllerType::SnesNttDataKeypad:

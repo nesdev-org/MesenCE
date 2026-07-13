@@ -3000,6 +3000,9 @@
     <ClInclude Include="Shared\Utilities\S3511ARtc.h">
       <Filter>Shared\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="SNES\Input\SnesBlueRetroController.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Video\RotateFilter.cpp">
@@ -3373,6 +3376,9 @@
     </ClCompile>
     <ClCompile Include="WS\Carts\WsRtc.cpp">
       <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="SNES\Input\SnesBlueRetroController.cpp">
+      <Filter>SNES\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
