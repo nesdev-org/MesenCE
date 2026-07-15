@@ -209,6 +209,13 @@ void Emulator::RunFrameWithRunAhead()
 
 	//Run a single frame and save the state (no audio/video)
 	_isRunAheadFrame = true;
+
+	//Poll controllers again to try to ensure that the next frame starts with
+	//the current inputs instead of the inputs from the save state that just loaded.
+	//Depending on the timing at which each core polls inputs, this prevents
+	//adding a frame's worth of input lag (NES core was not affected by this)
+	_console->GetControlManager()->UpdateInputState();
+
 	_console->RunFrame();
 	Serialize(runAheadState, false, 0);
 

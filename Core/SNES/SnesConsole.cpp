@@ -53,6 +53,10 @@ void SnesConsole::Release()
 
 void SnesConsole::RunFrame()
 {
+	if(_emu->IsRunAheadFrame()) {
+		_ppu->ProcessRunAheadFrameStart();
+	}
+
 	UpdateRegion();
 
 	_frameRunning = true;
