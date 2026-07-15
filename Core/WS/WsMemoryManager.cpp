@@ -54,11 +54,6 @@ void WsMemoryManager::RefreshMappings()
 	}
 }
 
-void WsMemoryManager::SetCartFlash(WsRegisterAccess cartFlash)
-{
-	_cartFlash = cartFlash;
-}
-
 void WsMemoryManager::Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly)
 {
 	uint8_t* src = (uint8_t*)_emu->GetMemory(type).Memory;
@@ -98,9 +93,6 @@ void WsMemoryManager::Unmap(uint32_t start, uint32_t end)
 
 uint8_t WsMemoryManager::DebugRead(uint32_t addr)
 {
-	if(((int)_cartFlash & (int)WsRegisterAccess::Read) && addr >= 0x10000) {
-		return _cart->ReadMemory(addr);
-	}
 	uint8_t* handler = _reads[addr >> 12];
 	if(handler) {
 		return handler[addr & 0xFFF];
@@ -110,10 +102,6 @@ uint8_t WsMemoryManager::DebugRead(uint32_t addr)
 
 void WsMemoryManager::DebugWrite(uint32_t addr, uint8_t value)
 {
-	if(((int)_cartFlash & (int)WsRegisterAccess::Write) && addr >= 0x10000) {
-		_cart->WriteMemory(addr, value);
-		return;
-	}
 	uint8_t* handler = _writes[addr >> 12];
 	if(handler) {
 		handler[addr & 0xFFF] = value;
@@ -442,10 +430,7 @@ uint8_t WsMemoryManager::GetIrqVector()
 void WsMemoryManager::OnBeforeBreak()
 {
 	_eeprom->Run();
-	WsEeprom* cartEeprom = _cart->GetEeprom();
-	if(cartEeprom) {
-		cartEeprom->Run();
-	}
+	_cart->OnBeforeBreak();
 }
 
 AddressInfo WsMemoryManager::GetAbsoluteAddress(uint32_t relAddr)

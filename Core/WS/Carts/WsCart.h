@@ -4,43 +4,62 @@
 #include "Utilities/ISerializable.h"
 #include "Shared/MemoryType.h"
 
+class Emulator;
 class WsConsole;
 class WsMemoryManager;
 class WsEeprom;
-class WsRtc;
 
 class WsCart : public ISerializable
 {
 protected:
 	WsCartState _state = {};
 
+	Emulator* _emu = nullptr;
 	WsMemoryManager* _memoryManager = nullptr;
-	WsEeprom* _cartEeprom = nullptr;
-	WsRtc* _cartRtc = nullptr;
 
 	uint8_t* _prgRom = nullptr;
 	uint32_t _prgRomSize = 0;
 	uint8_t* _saveRam = nullptr;
 	uint32_t _saveRamSize = 0;
 
+	bool _hasCustomReadHandler = false;
+	bool _hasCustomWriteHandler = false;
+
 	void Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly);
 	void Unmap(uint32_t start, uint32_t end);
 
-	uint32_t GetPhysicalAddress(uint32_t addr);
+	virtual bool InternalReadCart(uint32_t addr, uint8_t& value) { return false; }
+	virtual bool InternalWriteCart(uint32_t addr, uint8_t value) { return false; }
 
 public:
 	WsCart();
 	virtual ~WsCart() {}
 
-	virtual void Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* cartRtc, uint8_t* prgRom, uint32_t prgRomSize, uint8_t* saveRam, uint32_t saveRamSize);
+	virtual void LoadBattery();
+	virtual void SaveBattery();
+
+	void Init(Emulator* emu, WsCartType cartType, WsMemoryManager* memoryManager, uint8_t* prgRom, uint32_t prgRomSize, uint8_t* saveRam, uint32_t saveRamSize);
 	virtual void RefreshMappings();
 
-	WsCartState& GetState() { return _state; }
-	WsEeprom* GetEeprom() { return _cartEeprom; }
-	WsRtc* GetRtc() { return _cartRtc; }
+	virtual void OnBeforeBreak() {}
 
-	virtual uint8_t ReadMemory(uint32_t addr);
-	virtual void WriteMemory(uint32_t addr, uint8_t value);
+	WsCartState& GetState() { return _state; }
+
+	__forceinline bool ReadCart(uint32_t addr, uint8_t& value)
+	{
+		if(_hasCustomReadHandler) {
+			return InternalReadCart(addr, value);
+		}
+		return false;
+	}
+
+	__forceinline bool WriteCart(uint32_t addr, uint8_t value)
+	{
+		if(_hasCustomWriteHandler) {
+			return InternalWriteCart(addr, value);
+		}
+		return false;
+	}
 
 	virtual uint8_t ReadPort(uint16_t port);
 	virtual void WritePort(uint16_t port, uint8_t value);

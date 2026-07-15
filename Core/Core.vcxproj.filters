@@ -3003,6 +3003,15 @@
     <ClInclude Include="SNES\Input\SnesBlueRetroController.h">
       <Filter>SNES\Input</Filter>
     </ClInclude>
+    <ClInclude Include="WS\Carts\WsCartBandai2003.h">
+      <Filter>WS\Carts</Filter>
+    </ClInclude>
+    <ClInclude Include="WS\Carts\WsCartWonderWitch.h">
+      <Filter>WS\Carts</Filter>
+    </ClInclude>
+    <ClInclude Include="WS\Carts\WsCartBandai2001.h">
+      <Filter>WS\Carts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Video\RotateFilter.cpp">
@@ -3379,6 +3388,15 @@
     </ClCompile>
     <ClCompile Include="SNES\Input\SnesBlueRetroController.cpp">
       <Filter>SNES\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="WS\Carts\WsCartWonderWitch.cpp">
+      <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="WS\Carts\WsCartBandai2003.cpp">
+      <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="WS\Carts\WsCartBandai2001.cpp">
+      <Filter>WS\Carts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

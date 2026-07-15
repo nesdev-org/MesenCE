@@ -786,6 +786,9 @@
     <ClInclude Include="WS\APU\WsApuCh4.h" />
     <ClInclude Include="WS\APU\WsHyperVoice.h" />
     <ClInclude Include="WS\Carts\WsCart.h" />
+    <ClInclude Include="WS\Carts\WsCartBandai2001.h" />
+    <ClInclude Include="WS\Carts\WsCartBandai2003.h" />
+    <ClInclude Include="WS\Carts\WsCartWonderWitch.h" />
     <ClInclude Include="WS\Carts\WsRtc.h" />
     <ClInclude Include="WS\Debugger\DummyWsCpu.h" />
     <ClInclude Include="WS\Debugger\WsAssembler.h" />
@@ -1102,7 +1105,9 @@
     <ClCompile Include="Shared\Audio\WaveRecorder.cpp" />
     <ClCompile Include="WS\APU\WsApu.cpp" />
     <ClCompile Include="WS\Carts\WsCart.cpp" />
-    <ClCompile Include="WS\Carts\WsCartFlash.cpp" />
+    <ClCompile Include="WS\Carts\WsCartBandai2001.cpp" />
+    <ClCompile Include="WS\Carts\WsCartBandai2003.cpp" />
+    <ClCompile Include="WS\Carts\WsCartWonderWitch.cpp" />
     <ClCompile Include="WS\Carts\WsRtc.cpp" />
     <ClCompile Include="WS\Debugger\DummyWsCpu.cpp" />
     <ClCompile Include="WS\Debugger\WsDebugger.cpp" />

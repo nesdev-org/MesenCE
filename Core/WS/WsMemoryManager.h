@@ -40,7 +40,6 @@ private:
 
 	WsMemoryManagerState _state = {};
 
-	WsRegisterAccess _cartFlash;
 	uint8_t* _reads[256] = {};
 	uint8_t* _writes[256] = {};
 
@@ -58,7 +57,6 @@ public:
 
 	uint8_t GetUnmappedPort();
 
-	void SetCartFlash(WsRegisterAccess cartFlash);
 	void Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly);
 	void Unmap(uint32_t start, uint32_t end);
 
@@ -72,13 +70,13 @@ public:
 	__forceinline uint8_t InternalRead(uint32_t addr)
 	{
 		uint8_t value = 0x90;
-		if(((int)_cartFlash & (int)WsRegisterAccess::Read) && addr >= 0x10000) {
-			value = _cart->ReadMemory(addr);
-		} else {
-			uint8_t* handler = _reads[addr >> 12];
-			if(handler) {
-				value = handler[addr & 0xFFF];
-			}
+		if(_cart->ReadCart(addr, value)) {
+			return value;
+		}
+
+		uint8_t* handler = _reads[addr >> 12];
+		if(handler) {
+			value = handler[addr & 0xFFF];
 		}
 
 		//TODOWS open bus
@@ -88,13 +86,13 @@ public:
 	__forceinline void InternalWrite(uint32_t addr, uint8_t value)
 	{
 		//TODOWS open bus
-		if(((int)_cartFlash & (int)WsRegisterAccess::Write) && addr >= 0x10000) {
-			_cart->WriteMemory(addr, value);
-		} else {
-			uint8_t* handler = _writes[addr >> 12];
-			if(handler) {
-				handler[addr & 0xFFF] = value;
-			}
+		if(_cart->WriteCart(addr, value)) {
+			return;
+		}
+
+		uint8_t* handler = _writes[addr >> 12];
+		if(handler) {
+			handler[addr & 0xFFF] = value;
 		}
 	}
 
