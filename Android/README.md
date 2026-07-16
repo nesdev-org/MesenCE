@@ -36,10 +36,10 @@ The APK is written to `Android/app/build/outputs/apk/debug/`.
 ## Current scope
 
 The native shell initializes the MesenCE emulator, SDL video/audio devices and
-Android lifecycle handling. It can accept a ROM path through SDL's native
-arguments, but the file picker, touch controls and Android settings UI are not
-part of this first milestone. Those will be added after the 32-bit native
-build is green on a real device.
+Android lifecycle handling. The activity now includes an `ACTION_OPEN_DOCUMENT`
+ROM picker (the selected `content://` file is copied into app-private storage)
+and a basic NES/SNES-style touch layout. The Android settings UI and advanced
+controller mappings remain future work.
 
 Do not remove the ABI guard while adding other architectures: each ABI needs
 its own validation pass for the emulator's JIT-sensitive code and third-party

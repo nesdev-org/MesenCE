@@ -64,7 +64,10 @@ target_compile_options(mesen-core PRIVATE
 target_link_libraries(mesen-core PRIVATE SDL2::SDL2 log)
 
 # SDLActivity looks for libmain.so and calls its SDL_main entry point.
-add_library(main SHARED main.cpp)
+add_library(main SHARED
+    main.cpp
+    AndroidKeyManager.cpp
+)
 target_include_directories(main PRIVATE
     "${MESEN_ROOT}"
     "${MESEN_ROOT}/Core"
