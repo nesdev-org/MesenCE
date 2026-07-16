@@ -8,7 +8,9 @@ android {
 
     defaultConfig {
         applicationId "ca.mesen.android"
-        minSdk 23
+        // SDL's Android project supports API 19, which covers older Android TV
+        // devices that cannot install an API 23+ package.
+        minSdk 19
         targetSdk 34
         versionCode 1
         versionName "0.1.0"
