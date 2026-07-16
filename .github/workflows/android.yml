@@ -44,3 +44,10 @@ jobs:
       - name: Assemble armeabi-v7a APK
         working-directory: Android
         run: ./gradlew :app:assembleDebug
+
+      - name: Upload armeabi-v7a APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MesenCE-android-armeabi-v7a-debug
+          path: Android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
