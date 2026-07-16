@@ -639,7 +639,7 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
         String[] names = entries.toArray(new String[0]);
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Elige una ROM dentro de " + archive.name)
-                .setItems(names, (which, ignored) -> loadZipEntryAsync(groupId, archive, names[which]))
+                .setItems(names, (ignored, which) -> loadZipEntryAsync(groupId, archive, names[which]))
                 .setNegativeButton("Cancelar", null)
                 .create();
         dialog.setOnShowListener(ignored -> {
