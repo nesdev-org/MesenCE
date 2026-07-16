@@ -34,6 +34,11 @@ buttons and activate them with OK. After a game starts, a connected gamepad
 gets priority and the touch controls are hidden; without a gamepad, the
 on-screen controls remain available.
 
+The **Archivos comprimidos / ZIP** section scans `.zip` files separately. A
+ZIP with one supported ROM starts directly; if it contains several ROMs, the
+Android TV dialog lets you choose which entry to load. The selected entry is
+extracted into app-private storage before the native emulator is called.
+
 ## Build
 
 Open `Android/` in Android Studio and select the `armeabi-v7a` variant, or run

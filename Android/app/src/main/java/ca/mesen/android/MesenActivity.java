@@ -1,5 +1,6 @@
 package ca.mesen.android;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,6 +45,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Android shell for MesenCE. The native emulator remains behind SDL, while
@@ -54,6 +57,13 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
     private static final int OPEN_FOLDER_REQUEST = 1002;
     private static final String PREFS_NAME = "mesence_android";
     private static final String FOLDER_PREFIX = "folder_";
+    private static final String ZIP_EXTENSION = ".zip";
+    private static final String[] ROM_EXTENSIONS = {
+            ".nes", ".fds", ".qd", ".unif", ".unf", ".nsf", ".nsfe", ".studybox",
+            ".sfc", ".swc", ".fig", ".smc", ".bs", ".st", ".spc",
+            ".gb", ".gbc", ".gbx", ".gbs", ".pce", ".sgx", ".cue", ".hes",
+            ".sms", ".gg", ".sg", ".col", ".gba", ".ws", ".wsc", ".pc2"
+    };
 
     // Values match Core/Shared/KeyDefinitions.h.
     private static final int KEY_UP = 24;
@@ -116,6 +126,7 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
         groups.put("pce", new ConsoleGroup("pce", "PC Engine / TurboGrafx", ".pce", ".sgx", ".hes"));
         groups.put("sms", new ConsoleGroup("sms", "Master System / Game Gear", ".sms", ".gg", ".sg"));
         groups.put("ws", new ConsoleGroup("ws", "WonderSwan", ".ws", ".wsc"));
+        groups.put("zip", new ConsoleGroup("zip", "Archivos comprimidos / ZIP", ZIP_EXTENSION));
     }
 
     private Button makeTouchButton(String label, int keyCode) {
@@ -339,21 +350,26 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
     }
 
     private String folderName(Uri treeUri) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            Cursor cursor = getContentResolver().query(treeUri,
-                    new String[]{DocumentsContract.Document.COLUMN_DISPLAY_NAME}, null, null, null);
-            if (cursor != null) {
-                try {
-                    if (cursor.moveToFirst()) {
-                        String name = cursor.getString(0);
-                        if (name != null && !name.isEmpty()) {
-                            return name;
+        try {
+            if (Build.VERSION.SDK_INT >= 21) {
+                Cursor cursor = getContentResolver().query(treeUri,
+                        new String[]{DocumentsContract.Document.COLUMN_DISPLAY_NAME}, null, null, null);
+                if (cursor != null) {
+                    try {
+                        if (cursor.moveToFirst()) {
+                            String name = cursor.getString(0);
+                            if (name != null && !name.isEmpty()) {
+                                return name;
+                            }
                         }
+                    } finally {
+                        cursor.close();
                     }
-                } finally {
-                    cursor.close();
                 }
             }
+        } catch (RuntimeException ignored) {
+            // A few Android TV document providers reject querying a tree URI.
+            // The URI itself is still usable for the recursive child query.
         }
         String segment = treeUri.getLastPathSegment();
         return segment == null ? "seleccionada" : segment;
@@ -382,15 +398,19 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
     }
 
     private String displayName(Uri uri) {
-        Cursor cursor = getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    return cursor.getString(0);
+        try {
+            Cursor cursor = getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        return cursor.getString(0);
+                    }
+                } finally {
+                    cursor.close();
                 }
-            } finally {
-                cursor.close();
             }
+        } catch (RuntimeException ignored) {
+            // Fall back to the URI segment below when a provider has no metadata.
         }
         String segment = uri.getLastPathSegment();
         return segment == null ? "selected-rom" : segment;
@@ -432,6 +452,28 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
             }
         }
         return false;
+    }
+
+    private boolean isZipFile(String name) {
+        return name.toLowerCase(Locale.US).endsWith(ZIP_EXTENSION);
+    }
+
+    private boolean isAnyRomFile(String name) {
+        String lower = name.toLowerCase(Locale.US);
+        for (String extension : ROM_EXTENSIONS) {
+            if (lower.endsWith(extension)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private File romDirectory(String groupId) throws IOException {
+        File directory = new File(new File(getFilesDir(), "roms"), groupId == null ? "other" : groupId);
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new IOException("Unable to create ROM directory");
+        }
+        return directory;
     }
 
     private List<RomEntry> scanTree(Uri treeUri, Set<String> extensions) {
@@ -515,7 +557,129 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
         }, "mesence-scan-" + group.id).start();
     }
 
+    private List<String> listZipRoms(Uri uri) throws IOException {
+        ArrayList<String> entries = new ArrayList<>();
+        try (InputStream input = getContentResolver().openInputStream(uri);
+             ZipInputStream zip = input == null ? null : new ZipInputStream(input)) {
+            if (zip == null) {
+                throw new IOException("Unable to open ZIP archive");
+            }
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                if (!entry.isDirectory() && entry.getName() != null && isAnyRomFile(entry.getName())) {
+                    entries.add(entry.getName());
+                }
+            }
+        }
+        Collections.sort(entries, String.CASE_INSENSITIVE_ORDER);
+        return entries;
+    }
+
+    private String extractZipRom(Uri uri, String innerName, String groupId) throws IOException {
+        String outputName = innerName;
+        int slash = outputName.lastIndexOf('/');
+        if (slash >= 0) {
+            outputName = outputName.substring(slash + 1);
+        }
+        File destination = new File(romDirectory(groupId), safeFileName(outputName));
+        try (InputStream input = getContentResolver().openInputStream(uri);
+             ZipInputStream zip = input == null ? null : new ZipInputStream(input)) {
+            if (zip == null) {
+                throw new IOException("Unable to open ZIP archive");
+            }
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                if (entry.isDirectory() || !innerName.equals(entry.getName())) {
+                    continue;
+                }
+                try (FileOutputStream output = new FileOutputStream(destination)) {
+                    byte[] buffer = new byte[64 * 1024];
+                    int count;
+                    while ((count = zip.read(buffer)) != -1) {
+                        output.write(buffer, 0, count);
+                    }
+                }
+                return destination.getAbsolutePath();
+            }
+        }
+        throw new IOException("ROM entry not found in ZIP archive");
+    }
+
+    private void finishRomLoad(boolean success, Exception error) {
+        if (success) {
+            gameRunning = true;
+            menuOverlay.setVisibility(View.GONE);
+            menuStatus.setText("Juego iniciado");
+            setTouchControlsVisible(!hasPhysicalController());
+        } else {
+            menuStatus.setText("No se pudo cargar la ROM");
+            Toast.makeText(this, error == null ? "MesenCE no pudo cargar esta ROM" : "No se pudo copiar la ROM",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void loadZipEntryAsync(String groupId, RomEntry archive, String innerName) {
+        menuStatus.setText("Cargando " + innerName + "…");
+        new Thread(() -> {
+            boolean loaded = false;
+            Exception failure = null;
+            try {
+                String path = extractZipRom(archive.uri, innerName, groupId);
+                loaded = nativeLoadRom(path);
+            } catch (Exception exception) {
+                failure = exception;
+            }
+            final boolean success = loaded;
+            final Exception error = failure;
+            runOnUiThread(() -> finishRomLoad(success, error));
+        }, "mesence-load-zip-rom").start();
+    }
+
+    private void showZipEntries(String groupId, RomEntry archive, List<String> entries) {
+        String[] names = entries.toArray(new String[0]);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Elige una ROM dentro de " + archive.name)
+                .setItems(names, (which, ignored) -> loadZipEntryAsync(groupId, archive, names[which]))
+                .setNegativeButton("Cancelar", null)
+                .create();
+        dialog.setOnShowListener(ignored -> {
+            if (dialog.getListView() != null && dialog.getListView().getChildCount() > 0) {
+                dialog.getListView().getChildAt(0).requestFocus();
+            }
+        });
+        dialog.show();
+    }
+
+    private void loadZipAsync(String groupId, RomEntry archive) {
+        menuStatus.setText("Leyendo " + archive.name + "…");
+        new Thread(() -> {
+            List<String> entries = null;
+            Exception failure = null;
+            try {
+                entries = listZipRoms(archive.uri);
+            } catch (Exception exception) {
+                failure = exception;
+            }
+            final List<String> found = entries;
+            final Exception error = failure;
+            runOnUiThread(() -> {
+                if (error != null || found == null || found.isEmpty()) {
+                    finishRomLoad(false, error == null ? new IOException("ZIP sin ROM compatible") : error);
+                } else if (found.size() == 1) {
+                    loadZipEntryAsync(groupId, archive, found.get(0));
+                } else {
+                    menuStatus.setText("Elige una ROM dentro del ZIP");
+                    showZipEntries(groupId, archive, found);
+                }
+            });
+        }, "mesence-list-zip-roms").start();
+    }
+
     private void loadRomAsync(String groupId, RomEntry entry) {
+        if (isZipFile(entry.name)) {
+            loadZipAsync(groupId, entry);
+            return;
+        }
         menuStatus.setText("Cargando " + entry.name + "…");
         new Thread(() -> {
             boolean loaded = false;
@@ -528,18 +692,7 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
             }
             final boolean success = loaded;
             final Exception error = failure;
-            runOnUiThread(() -> {
-                if (success) {
-                    gameRunning = true;
-                    menuOverlay.setVisibility(View.GONE);
-                    menuStatus.setText("Juego iniciado");
-                    setTouchControlsVisible(!hasPhysicalController());
-                } else {
-                    menuStatus.setText("No se pudo cargar la ROM");
-                    Toast.makeText(this, error == null ? "MesenCE no pudo cargar esta ROM" : "No se pudo copiar la ROM",
-                            Toast.LENGTH_LONG).show();
-                }
-            });
+            runOnUiThread(() -> finishRomLoad(success, error));
         }, "mesence-load-rom").start();
     }
 
@@ -631,21 +784,29 @@ public final class MesenActivity extends SDLActivity implements InputManager.Inp
         Uri uri = data.getData();
         if (requestCode == OPEN_FOLDER_REQUEST && pendingFolderGroupId != null && Build.VERSION.SDK_INT >= 21) {
             try {
-                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            } catch (SecurityException ignored) {
+                int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                if (takeFlags != 0) {
+                    getContentResolver().takePersistableUriPermission(uri, takeFlags);
+                }
+            } catch (RuntimeException ignored) {
                 // Some TV document providers do not offer persistable permissions.
             }
             String groupId = pendingFolderGroupId;
             pendingFolderGroupId = null;
-            folderUris.put(groupId, uri);
-            preferences.edit().putString(FOLDER_PREFIX + groupId, uri.toString()).apply();
-            TextView label = folderLabels.get(groupId);
-            if (label != null) {
-                label.setText("Carpeta: " + folderName(uri));
-            }
-            ConsoleGroup group = groups.get(groupId);
-            if (group != null) {
-                scanGroup(group);
+            try {
+                folderUris.put(groupId, uri);
+                preferences.edit().putString(FOLDER_PREFIX + groupId, uri.toString()).apply();
+                TextView label = folderLabels.get(groupId);
+                if (label != null) {
+                    label.setText("Carpeta: " + folderName(uri));
+                }
+                ConsoleGroup group = groups.get(groupId);
+                if (group != null) {
+                    scanGroup(group);
+                }
+            } catch (RuntimeException exception) {
+                folderUris.remove(groupId);
+                Toast.makeText(this, "No se pudo leer esa carpeta en este Android TV", Toast.LENGTH_LONG).show();
             }
         } else if (requestCode == OPEN_ROM_REQUEST) {
             String groupId = pendingFolderGroupId == null ? "other" : pendingFolderGroupId;
