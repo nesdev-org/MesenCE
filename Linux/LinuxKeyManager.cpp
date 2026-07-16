@@ -83,7 +83,9 @@ optional<int16_t> LinuxKeyManager::GetAxisPosition(uint16_t key)
 	if(key >= LinuxKeyManager::BaseGamepadIndex) {
 		uint8_t port = (key - LinuxKeyManager::BaseGamepadIndex) / 0x100;
 		uint8_t button = (key - LinuxKeyManager::BaseGamepadIndex) % 0x100;
-		return _controllers[port]->GetAxisPosition(button);
+		if(_controllers.size() > port) {
+			return _controllers[port]->GetAxisPosition(button);
+		}
 	}
 	return std::nullopt;
 }

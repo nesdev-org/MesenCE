@@ -163,7 +163,9 @@ optional<int16_t> MacOSKeyManager::GetAxisPosition(uint16_t key)
 	if(key >= MacOSKeyManager::BaseGamepadIndex) {
 		uint8_t port = (key - MacOSKeyManager::BaseGamepadIndex) / 0x100;
 		uint8_t button = (key - MacOSKeyManager::BaseGamepadIndex) % 0x100;
-		return _controllers[port]->GetAxisPosition(button);
+		if(_controllers.size() > port) {
+			return _controllers[port]->GetAxisPosition(button);
+		}
 	}
 	return std::nullopt;
 }
