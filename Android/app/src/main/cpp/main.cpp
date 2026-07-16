@@ -8,6 +8,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include <string>
 
 #include "AndroidKeyManager.h"
 #include "Core/Shared/Emulator.h"
@@ -23,8 +24,14 @@ namespace
 {
 std::mutex g_emuMutex;
 std::condition_variable g_emuReady;
+std::condition_variable g_romRequestCompleted;
 Emulator* g_emu = nullptr;
 AndroidKeyManager* g_inputManager = nullptr;
+std::string g_romRequestPath;
+bool g_romRequestQueued = false;
+bool g_romRequestInFlight = false;
+bool g_romRequestResult = false;
+bool g_shuttingDown = false;
 
 void Log(const char* message)
 {
@@ -38,6 +45,29 @@ bool LoadRomFromArguments(Emulator& emu, int argc, char** argv)
 	}
 
 	return emu.LoadRom((VirtualFile)argv[1], VirtualFile());
+}
+
+void ProcessRomRequest(Emulator& emu)
+{
+	std::string path;
+	{
+		std::lock_guard<std::mutex> lock(g_emuMutex);
+		if(!g_romRequestQueued) {
+			return;
+		}
+		path = g_romRequestPath;
+		g_romRequestQueued = false;
+	}
+
+	// LoadRom touches the video/audio devices and starts the emulation thread.
+	// Run it on SDL's main thread so the Java picker never races those devices.
+	bool loaded = emu.LoadRom((VirtualFile)path, VirtualFile());
+	{
+		std::lock_guard<std::mutex> lock(g_emuMutex);
+		g_romRequestResult = loaded;
+		g_romRequestInFlight = false;
+	}
+	g_romRequestCompleted.notify_all();
 }
 
 void ConfigureTouchInput(Emulator& emu)
@@ -88,17 +118,30 @@ extern "C" JNIEXPORT jboolean JNICALL Java_ca_mesen_android_MesenActivity_native
 	}
 
 	bool loaded = false;
+	std::string romPath(pathChars);
+	env->ReleaseStringUTFChars(path, pathChars);
 	{
 		std::unique_lock<std::mutex> lock(g_emuMutex);
 		// SDL starts its native thread from SDLActivity.onCreate(). The Java
-		// document picker can be opened immediately, so wait for Emulator to be
-		// published instead of silently dropping the first ROM load request.
-		g_emuReady.wait_for(lock, std::chrono::seconds(10), [] { return g_emu != nullptr; });
-		if(g_emu != nullptr) {
-			loaded = g_emu->LoadRom((VirtualFile)pathChars, VirtualFile());
+		// document picker can be opened immediately, so wait until all native
+		// devices are ready instead of racing the renderer during first load.
+		if(!g_emuReady.wait_for(lock, std::chrono::seconds(10), [] {
+			return g_emu != nullptr || g_shuttingDown;
+		}) || g_emu == nullptr || g_shuttingDown || g_romRequestInFlight) {
+			return JNI_FALSE;
 		}
+
+		g_romRequestPath = romPath;
+		g_romRequestResult = false;
+		g_romRequestInFlight = true;
+		g_romRequestQueued = true;
 	}
-	env->ReleaseStringUTFChars(path, pathChars);
+	std::unique_lock<std::mutex> lock(g_emuMutex);
+	if(g_romRequestCompleted.wait_for(lock, std::chrono::seconds(60), [] {
+		return !g_romRequestInFlight || g_shuttingDown;
+	})) {
+		loaded = g_romRequestResult && !g_shuttingDown;
+	}
 	return loaded ? JNI_TRUE : JNI_FALSE;
 }
 
@@ -147,14 +190,15 @@ extern "C" int SDL_main(int argc, char** argv)
 	KeyManager::SetSettings(emu.GetSettings());
 	KeyManager::RegisterKeyManager(&inputManager);
 	ConfigureTouchInput(emu);
+	SdlRenderer renderer(&emu, window);
+	SdlSoundManager soundManager(&emu);
 	{
 		std::lock_guard<std::mutex> lock(g_emuMutex);
+		g_shuttingDown = false;
 		g_emu = &emu;
 		g_inputManager = &inputManager;
 	}
 	g_emuReady.notify_all();
-	SdlRenderer renderer(&emu, window);
-	SdlSoundManager soundManager(&emu);
 
 	if(!LoadRomFromArguments(emu, argc, argv)) {
 		Log("No ROM supplied. Use the Open ROM button to select a game.");
@@ -163,6 +207,7 @@ extern "C" int SDL_main(int argc, char** argv)
 	bool running = true;
 	SDL_Event event = {};
 	while(running) {
+		ProcessRomRequest(emu);
 		while(SDL_PollEvent(&event) != 0) {
 			switch(event.type) {
 				case SDL_QUIT:
@@ -183,9 +228,15 @@ extern "C" int SDL_main(int argc, char** argv)
 
 	{
 		std::lock_guard<std::mutex> lock(g_emuMutex);
+		g_shuttingDown = true;
+		g_romRequestQueued = false;
+		g_romRequestInFlight = false;
+		g_romRequestResult = false;
 		g_emu = nullptr;
 		g_inputManager = nullptr;
 	}
+	g_emuReady.notify_all();
+	g_romRequestCompleted.notify_all();
 	emu.Stop(true);
 	emu.Release();
 	SDL_DestroyWindow(window);

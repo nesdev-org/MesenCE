@@ -89,6 +89,17 @@ bool SdlRenderer::Init()
 
 	uint32_t baseFlags = _vsyncEnabled ? SDL_RENDERER_PRESENTVSYNC : 0;
 
+	#ifdef __ANDROID__
+	// Older Android TV GPUs often report an accelerated renderer but crash
+	// when the first streaming ARGB texture is created. Mesen's 256x240
+	// software path is light enough for these devices and is much safer; keep
+	// accelerated rendering as a fallback for unusual SDL drivers.
+	_sdlRenderer = SDL_CreateRenderer(_sdlWindow, -1, baseFlags | SDL_RENDERER_SOFTWARE);
+	if(!_sdlRenderer) {
+		LogSdlError("[SDL] Failed to create software renderer on Android.");
+		_sdlRenderer = SDL_CreateRenderer(_sdlWindow, -1, baseFlags | SDL_RENDERER_ACCELERATED);
+	}
+	#else
 	_sdlRenderer = SDL_CreateRenderer(_sdlWindow, -1, baseFlags | SDL_RENDERER_ACCELERATED);
 	if(!_sdlRenderer) {
 		LogSdlError("[SDL] Failed to create accelerated renderer.");
@@ -99,6 +110,11 @@ bool SdlRenderer::Init()
 			LogSdlError("[SDL] Failed to create software renderer.");
 			return false;
 		}
+	}
+	#endif
+	if(!_sdlRenderer) {
+		LogSdlError("[SDL] Failed to create any renderer.");
+		return false;
 	}
 
 	return true;
