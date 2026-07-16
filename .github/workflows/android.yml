@@ -41,9 +41,6 @@ jobs:
       - name: Install Android build tools
         run: sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
       - name: Assemble armeabi-v7a APK
         working-directory: Android
         run: ./gradlew :app:assembleDebug
