@@ -190,3 +190,9 @@ packages/*
 
 TestHelper/*
 UI/Dependencies.zip
+
+# Android/Gradle build output
+Android/.gradle/
+Android/build/
+Android/app/build/
+Android/local.properties

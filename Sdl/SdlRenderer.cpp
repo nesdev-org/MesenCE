@@ -40,6 +40,21 @@ void SdlRenderer::SetFullscreenMode(FullscreenSettings settings)
 
 bool SdlRenderer::Init()
 {
+	#ifdef __ANDROID__
+	if(SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
+		LogSdlError("[SDL] Failed to initialize Android video subsystem.");
+		return false;
+	}
+
+	// SDLActivity owns the Android surface.  The native entry point creates
+	// the SDL window and passes it through this constructor so the renderer
+	// never tries to wrap an X11/Win32 handle on Android.
+	_sdlWindow = static_cast<SDL_Window*>(_windowHandle);
+	if(!_sdlWindow) {
+		LogSdlError("[SDL] Android SDL window is not available.");
+		return false;
+	}
+	#else
 	const char* originalHint = SDL_GetHint("SDL_VIDEODRIVER");
 	SDL_SetHint("SDL_VIDEODRIVER", "x11");
 	if(SDL_InitSubSystem(SDL_INIT_VIDEO) != 0) {
@@ -66,6 +81,7 @@ bool SdlRenderer::Init()
 			MessageManager::Log("[SDL] Window creation succeeded with default driver.");
 		}
 	}
+	#endif
 
 	if(SDL_GL_LoadLibrary(NULL) != 0) {
 		LogSdlError("[SDL] Failed to initialize OpenGL, attempting to continue with initialization.");

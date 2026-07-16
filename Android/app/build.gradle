@@ -1,0 +1,57 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "ca.mesen.android"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "ca.mesen.android"
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName "0.1.0"
+
+        // The first Android target is intentionally 32-bit ARM only.
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+                arguments "-DMESEN_ANDROID_ABI=armeabi-v7a"
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            jniDebuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file("src/main/cpp/CMakeLists.txt")
+            version "3.22.1"
+        }
+    }
+
+    // SDLActivity is kept in the pinned SDL2 submodule so the Java and native
+    // sides use the same SDL release.
+    sourceSets {
+        main.java.srcDirs += [
+            "src/main/java",
+            "../third_party/SDL/android-project/app/src/main/java"
+        ]
+    }
+}
+
+dependencies {
+}

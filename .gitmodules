@@ -1,0 +1,4 @@
+[submodule "Android/third_party/SDL"]
+	path = Android/third_party/SDL
+	url = https://github.com/libsdl-org/SDL.git
+	ignore = dirty

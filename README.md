@@ -29,6 +29,11 @@ The latest stable version is available from the [releases page on GitHub](https:
 
 See [COMPILING.md](COMPILING.md)
 
+## Android (32-bit ARM)
+
+The initial Android port is in [Android/README.md](Android/README.md). It
+targets `armeabi-v7a` only and requires the SDL2 submodule to be initialized.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)

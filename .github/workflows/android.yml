@@ -1,0 +1,49 @@
+name: Build MesenCE Android (32-bit)
+
+on:
+  push:
+    paths:
+      - "Android/**"
+      - "Core/**"
+      - "Lua/**"
+      - "SevenZip/**"
+      - "Sdl/**"
+      - "Utilities/**"
+      - ".github/workflows/android.yml"
+  pull_request:
+    paths:
+      - "Android/**"
+      - "Core/**"
+      - "Lua/**"
+      - "SevenZip/**"
+      - "Sdl/**"
+      - "Utilities/**"
+      - ".github/workflows/android.yml"
+
+jobs:
+  android-armv7:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository and SDL2 submodule
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Assemble armeabi-v7a APK
+        working-directory: Android
+        run: ./gradlew :app:assembleDebug
