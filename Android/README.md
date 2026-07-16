@@ -22,6 +22,10 @@ SDL2 is pinned as `Android/third_party/SDL` at the 2.30.9 release. Its Java
 `SDLActivity` is compiled into this app and its native library is built by the
 same CMake invocation as MesenCE.
 
+The app's minimum Android version is API 19 (Android 4.4), allowing the
+32-bit build to install on older Android TV devices. The native ABI remains
+`armeabi-v7a` only.
+
 ## Build
 
 Open `Android/` in Android Studio and select the `armeabi-v7a` variant, or run
