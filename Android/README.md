@@ -26,6 +26,14 @@ The app's minimum Android version is API 19 (Android 4.4), allowing the
 32-bit build to install on older Android TV devices. The native ABI remains
 `armeabi-v7a` only.
 
+On Android 5.0 and newer, the first screen is a ROM library. Each console has
+its own **Elegir carpeta** button; MesenCE scans that folder (including its
+subfolders) for supported ROM extensions and adds the games to the list. The
+library uses normal Android focus navigation, so a TV remote can move between
+buttons and activate them with OK. After a game starts, a connected gamepad
+gets priority and the touch controls are hidden; without a gamepad, the
+on-screen controls remain available.
+
 ## Build
 
 Open `Android/` in Android Studio and select the `armeabi-v7a` variant, or run

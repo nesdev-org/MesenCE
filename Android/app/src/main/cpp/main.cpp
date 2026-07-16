@@ -5,6 +5,8 @@
 #include <jni.h>
 #endif
 
+#include <chrono>
+#include <condition_variable>
 #include <mutex>
 
 #include "AndroidKeyManager.h"
@@ -20,6 +22,7 @@
 namespace
 {
 std::mutex g_emuMutex;
+std::condition_variable g_emuReady;
 Emulator* g_emu = nullptr;
 AndroidKeyManager* g_inputManager = nullptr;
 
@@ -86,7 +89,11 @@ extern "C" JNIEXPORT jboolean JNICALL Java_ca_mesen_android_MesenActivity_native
 
 	bool loaded = false;
 	{
-		std::lock_guard<std::mutex> lock(g_emuMutex);
+		std::unique_lock<std::mutex> lock(g_emuMutex);
+		// SDL starts its native thread from SDLActivity.onCreate(). The Java
+		// document picker can be opened immediately, so wait for Emulator to be
+		// published instead of silently dropping the first ROM load request.
+		g_emuReady.wait_for(lock, std::chrono::seconds(10), [] { return g_emu != nullptr; });
 		if(g_emu != nullptr) {
 			loaded = g_emu->LoadRom((VirtualFile)pathChars, VirtualFile());
 		}
@@ -145,6 +152,7 @@ extern "C" int SDL_main(int argc, char** argv)
 		g_emu = &emu;
 		g_inputManager = &inputManager;
 	}
+	g_emuReady.notify_all();
 	SdlRenderer renderer(&emu, window);
 	SdlSoundManager soundManager(&emu);
 
