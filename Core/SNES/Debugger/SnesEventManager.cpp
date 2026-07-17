@@ -167,7 +167,7 @@ uint32_t SnesEventManager::TakeEventSnapshot(bool forAutoRefresh)
 	_overscanMode = _ppu->GetState().OverscanMode;
 	_useHighResOutput = _ppu->IsHighResOutput();
 
-	if(scanline >= _ppu->GetNmiScanline() || scanline == 0) {
+	if(scanline >= _ppu->GetVblankStart() || scanline == 0) {
 		memcpy(_ppuBuffer, _ppu->GetScreenBuffer(), (_useHighResOutput ? (512 * 478) : (256 * 239)) * sizeof(uint16_t));
 	} else {
 		uint16_t adjustedScanline = scanline + (_overscanMode ? 0 : 7);

@@ -15,7 +15,7 @@
 #include "Utilities/Serializer.h"
 #include "Shared/MemoryOperationType.h"
 
-Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize)
+Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize, bool isFx3)
 {
 	_emu = console->GetEmulator();
 	_console = console;
@@ -23,11 +23,10 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize)
 	_cpu = console->GetCpu();
 	_settings = _emu->GetSettings();
 
-	_clockMultiplier = std::max(1u, _settings->GetSnesConfig().GsuClockSpeed / 100);
-
-	_state = {};
+	_state.Fx3 = isFx3;
 	_state.ProgramReadBuffer = 0x01; //Run a NOP on first cycle
 
+	UpdateClockMultiplier();
 	_console->InitializeRam(_cache, 512);
 
 	_gsuRamSize = gsuRamSize;
@@ -48,27 +47,39 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize)
 	}
 
 	//GSU registers in CPU memory space
-	cpuMappings->RegisterHandler(0x00, 0x3F, 0x3000, 0x3FFF, this);
-	cpuMappings->RegisterHandler(0x80, 0xBF, 0x3000, 0x3FFF, this);
+	_maxPrgRomBank = 0x5F;
+	uint8_t maxPrgRomBankH = 0xDF;
+	if(isFx3) {
+		cpuMappings->RegisterHandler(0x00, 0x3F, 0x7000, 0x7FFF, this);
+		cpuMappings->RegisterHandler(0x80, 0xBF, 0x7000, 0x7FFF, this);
+		_maxPrgRomBank = 0x6F;
+		maxPrgRomBankH = 0xFF;
+	} else {
+		cpuMappings->RegisterHandler(0x00, 0x3F, 0x3000, 0x3FFF, this);
+		cpuMappings->RegisterHandler(0x80, 0xBF, 0x3000, 0x3FFF, this);
 
-	for(int i = 0; i < 0x3F; i++) {
-		cpuMappings->RegisterHandler(i, i, 0x6000, 0x7FFF, _gsuCpuRamHandlers);
-		cpuMappings->RegisterHandler(i + 0x80, i + 0x80, 0x6000, 0x7FFF, _gsuCpuRamHandlers);
+		for(int i = 0; i < 0x3F; i++) {
+			cpuMappings->RegisterHandler(i, i, 0x6000, 0x7FFF, _gsuCpuRamHandlers);
+			cpuMappings->RegisterHandler(i + 0x80, i + 0x80, 0x6000, 0x7FFF, _gsuCpuRamHandlers);
+		}
 	}
+
 	cpuMappings->RegisterHandler(0x70, 0x71, 0x0000, 0xFFFF, _gsuCpuRamHandlers);
-	cpuMappings->RegisterHandler(0xF0, 0xF1, 0x0000, 0xFFFF, _gsuCpuRamHandlers);
+	if(!isFx3) {
+		cpuMappings->RegisterHandler(0xF0, 0xF1, 0x0000, 0xFFFF, _gsuCpuRamHandlers);
+	}
 
 	cpuMappings->RegisterHandler(0x00, 0x3F, 0x8000, 0xFFFF, _gsuCpuRomHandlers);
 	cpuMappings->RegisterHandler(0x80, 0xBF, 0x8000, 0xFFFF, _gsuCpuRomHandlers);
 
-	cpuMappings->RegisterHandler(0x40, 0x5F, 0x0000, 0xFFFF, _gsuCpuRomHandlers);
-	cpuMappings->RegisterHandler(0xC0, 0xDF, 0x0000, 0xFFFF, _gsuCpuRomHandlers);
+	cpuMappings->RegisterHandler(0x40, _maxPrgRomBank, 0x0000, 0xFFFF, _gsuCpuRomHandlers);
+	cpuMappings->RegisterHandler(0xC0, maxPrgRomBankH, 0x0000, 0xFFFF, _gsuCpuRomHandlers);
 
 	//GSU mappings
 	_mappings.RegisterHandler(0x00, 0x3F, 0x8000, 0xFFFF, prgRomHandlers);
 	_mappings.RegisterHandler(0x00, 0x3F, 0x0000, 0x7FFF, prgRomHandlers); //Mirror
 
-	_mappings.RegisterHandler(0x40, 0x5F, 0x0000, 0xFFFF, prgRomHandlers);
+	_mappings.RegisterHandler(0x40, _maxPrgRomBank, 0x0000, 0xFFFF, prgRomHandlers);
 	_mappings.RegisterHandler(0x70, 0x71, 0x0000, 0xFFFF, _gsuRamHandlers);
 }
 
@@ -79,7 +90,17 @@ Gsu::~Gsu()
 
 void Gsu::ProcessEndOfFrame()
 {
+	UpdateClockMultiplier();
+}
+
+void Gsu::UpdateClockMultiplier()
+{
 	uint8_t clockMultiplier = std::max(1u, _settings->GetSnesConfig().GsuClockSpeed / 100);
+	if(_state.Fx3) {
+		//The FX3 runs around 4x faster than the original GSU
+		clockMultiplier *= 4;
+	}
+
 	if(_clockMultiplier != clockMultiplier) {
 		_state.CycleCount = (uint64_t)((double)_state.CycleCount / _clockMultiplier * clockMultiplier);
 		_clockMultiplier = clockMultiplier;
@@ -274,7 +295,7 @@ void Gsu::InitProgramCache(uint16_t cacheAddr)
 {
 	uint16_t dest = (cacheAddr & 0x01F0);
 
-	if(_state.ProgramBank <= 0x5F) {
+	if(_state.ProgramBank <= _maxPrgRomBank) {
 		WaitRomOperation();
 		WaitForRomAccess();
 	} else {
@@ -319,7 +340,7 @@ uint8_t Gsu::ReadProgramByte(MemoryOperationType opType)
 		_emu->ProcessMemoryRead<CpuType::Gsu>(_lastOpAddr, _cache[cacheAddr], opType);
 		return _cache[cacheAddr];
 	} else {
-		if(_state.ProgramBank <= 0x5F) {
+		if(_state.ProgramBank <= _maxPrgRomBank) {
 			WaitRomOperation();
 			WaitForRomAccess();
 		} else {
@@ -427,28 +448,6 @@ void Gsu::WriteRam(uint16_t addr, uint8_t value)
 	_state.RamWriteValue = value;
 }
 
-void Gsu::Step(uint64_t cycles)
-{
-	_state.CycleCount += cycles;
-
-	if(_state.RomDelay) {
-		_state.RomDelay -= std::min<uint8_t>((uint8_t)cycles, _state.RomDelay);
-		if(_state.RomDelay == 0) {
-			WaitForRomAccess();
-			_state.RomReadBuffer = ReadGsu((_state.RomBank << 16) | _state.R[14], MemoryOperationType::Read);
-			_state.SFR.RomReadPending = false;
-		}
-	}
-
-	if(_state.RamDelay) {
-		_state.RamDelay -= std::min<uint8_t>((uint8_t)cycles, _state.RamDelay);
-		if(_state.RamDelay == 0) {
-			WaitForRamAccess();
-			WriteGsu(0x700000 | (_state.RamBank << 16) | _state.RamWriteAddress, _state.RamWriteValue, MemoryOperationType::Write);
-		}
-	}
-}
-
 void Gsu::Reset()
 {
 	_state = {};
@@ -465,8 +464,10 @@ void Gsu::Reset()
 uint8_t Gsu::Read(uint32_t addr)
 {
 	addr &= 0x33FF;
-	if(_state.SFR.Running && addr != 0x3030 && addr != 0x3031 && addr != 0x303B) {
+	if(_state.SFR.Running && addr != 0x3030 && addr != 0x3031 && addr != 0x303B && (_state.Fx3 && (addr != 0x301E && addr != 0x301F))) {
 		//"During GSU operation, only SFR, SCMR, and VCR may be accessed."
+		//Additionally, on the FX3, reading R15 while running is allowed.
+		//The FX3 hardware has no IRQs and the CPU needs to poll R15 to know when execution stops.
 		return 0;
 	}
 
@@ -490,7 +491,7 @@ uint8_t Gsu::Read(uint32_t addr)
 
 		case 0x3034: return _state.ProgramBank;
 		case 0x3036: return _state.RomBank;
-		case 0x303B: return 0x04; //Version (can be 1 or 4?)
+		case 0x303B: return _state.Fx3 ? 0x52 : 0x04; //Version (can be 1 or 4?)
 		case 0x303C: return _state.RamBank;
 		case 0x303E: return (uint8_t)_state.CacheBase;
 		case 0x303F: return _state.CacheBase >> 8;

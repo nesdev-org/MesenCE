@@ -16,21 +16,22 @@ enum class MemoryOperationType;
 class Gsu : public BaseCoprocessor
 {
 private:
-	Emulator* _emu;
-	SnesConsole* _console;
-	SnesMemoryManager* _memoryManager;
-	SnesCpu* _cpu;
-	EmuSettings* _settings;
-	uint8_t _clockMultiplier;
+	Emulator* _emu = nullptr;
+	SnesConsole* _console = nullptr;
+	SnesMemoryManager* _memoryManager = nullptr;
+	SnesCpu* _cpu = nullptr;
+	EmuSettings* _settings = nullptr;
+	uint8_t _clockMultiplier = 1;
 
-	GsuState _state;
+	GsuState _state = {};
 
-	uint8_t _cache[512];
+	uint8_t _cache[512] = {};
 	bool _cacheValid[32] = {};
 	bool _waitForRomAccess = false;
 	bool _waitForRamAccess = false;
 	bool _stopped = true;
 	bool _r15Changed = false;
+	uint8_t _maxPrgRomBank = 0;
 	uint32_t _lastOpAddr = 0;
 
 	uint32_t _gsuRamSize = 0;
@@ -41,13 +42,13 @@ private:
 	vector<unique_ptr<IMemoryHandler>> _gsuCpuRamHandlers;
 	vector<unique_ptr<IMemoryHandler>> _gsuCpuRomHandlers;
 
-	void Exec();
+	__forceinline void Exec();
 
 	void InitProgramCache(uint16_t cacheAddr);
 
 	uint8_t ReadOperand();
-	uint8_t ReadOpCode();
-	uint8_t ReadProgramByte(MemoryOperationType opType);
+	__forceinline uint8_t ReadOpCode();
+	__forceinline uint8_t ReadProgramByte(MemoryOperationType opType);
 
 	uint16_t ReadSrcReg();
 	void WriteDestReg(uint16_t value);
@@ -66,7 +67,28 @@ private:
 	uint8_t ReadRomBuffer();
 	uint8_t ReadRamBuffer(uint16_t addr);
 	void WriteRam(uint16_t addr, uint8_t value);
-	void Step(uint64_t cycles);
+
+	__forceinline void Step(uint64_t cycles)
+	{
+		_state.CycleCount += cycles;
+
+		if(_state.RomDelay) {
+			_state.RomDelay -= std::min<uint8_t>((uint8_t)cycles, _state.RomDelay);
+			if(_state.RomDelay == 0) {
+				WaitForRomAccess();
+				_state.RomReadBuffer = ReadGsu((_state.RomBank << 16) | _state.R[14], MemoryOperationType::Read);
+				_state.SFR.RomReadPending = false;
+			}
+		}
+
+		if(_state.RamDelay) {
+			_state.RamDelay -= std::min<uint8_t>((uint8_t)cycles, _state.RamDelay);
+			if(_state.RamDelay == 0) {
+				WaitForRamAccess();
+				WriteGsu(0x700000 | (_state.RamBank << 16) | _state.RamWriteAddress, _state.RamWriteValue, MemoryOperationType::Write);
+			}
+		}
+	}
 
 	void STOP();
 	void NOP();
@@ -147,8 +169,16 @@ private:
 	void GetCRamBRomB();
 	void GETB();
 
+	void ClearCharFx3(uint16_t offset);
+	void ProcessClearCommandFx3(uint8_t start, uint8_t end);
+	void ProcessCommandFx3();
+
+	void UpdateClockMultiplier();
+
 public:
-	Gsu(SnesConsole* console, uint32_t gsuRamSize);
+	static constexpr uint8_t Fx3RomType = 0x17;
+
+	Gsu(SnesConsole* console, uint32_t gsuRamSize, bool isFx3);
 	virtual ~Gsu();
 
 	void ProcessEndOfFrame() override;
