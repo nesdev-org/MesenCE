@@ -371,6 +371,15 @@ public class WsRegisterViewer
 			new RegEntry("$C3", "ROM1 Bank", cart.SelectedBanks[3], Format.X8),
 		});
 
+		if(cart.CartType == WsCartType.Bandai2003 || cart.CartType == WsCartType.WonderWitch) {
+			entries.AddRange(new List<RegEntry>() {
+				new RegEntry("$CE.0", "ROM in RAM Bank", cart.RomInRamBank),
+				new RegEntry("$D0", "Extended RAM Bank", cart.ExtSelectedBanks[0], Format.X16),
+				new RegEntry("$D2", "Extended ROM0 Bank", cart.ExtSelectedBanks[1], Format.X16),
+				new RegEntry("$D4", "Extended ROM1 Bank", cart.ExtSelectedBanks[2], Format.X16)
+			});
+		}
+
 		if(ws.CartEeprom.Size != WsEepromSize.Size0) {
 			entries.AddRange(new List<RegEntry>() {
 				new RegEntry("", "Cart EEPROM"),
@@ -383,7 +392,7 @@ public class WsRegisterViewer
 			});
 		}
 
-		if(cart.HasRtc) {
+		if(cart.CartType == WsCartType.Bandai2003 || cart.CartType == WsCartType.WonderWitch) {
 			entries.AddRange(new List<RegEntry>() {
 				new RegEntry("", "Cart RTC"),
 				new RegEntry("$CA.0-3", "Command", ws.CartRtc.Command, Format.X8),

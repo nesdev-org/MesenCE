@@ -443,10 +443,20 @@ struct WsEepromState
 	bool InternalEepromWriteProtected;
 };
 
+enum class WsCartType
+{
+	Bandai2001,
+	Bandai2003,
+	WonderWitch,
+	Unknown
+};
+
 struct WsCartState
 {
-	bool HasRtc;
+	WsCartType CartType;
+	bool RomInRamBank;
 	uint8_t SelectedBanks[4];
+	uint8_t ExtSelectedBanks[3];
 };
 
 struct WsRtcState

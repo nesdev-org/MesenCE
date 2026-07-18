@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "WS/WsCpu.h"
 #include "WS/APU/WsApu.h"
+#include "WS/Carts/WsCart.h"
 #include "WS/WsPpu.h"
 #include "WS/WsTypes.h"
 #include "Utilities/ISerializable.h"
@@ -9,7 +10,6 @@
 class WsConsole;
 class WsTimer;
 class WsControlManager;
-class WsCart;
 class WsSerial;
 class WsDmaController;
 class WsEeprom;
@@ -69,8 +69,12 @@ public:
 
 	__forceinline uint8_t InternalRead(uint32_t addr)
 	{
-		uint8_t* handler = _reads[addr >> 12];
 		uint8_t value = 0x90;
+		if(_cart->ReadCart(addr, value)) {
+			return value;
+		}
+
+		uint8_t* handler = _reads[addr >> 12];
 		if(handler) {
 			value = handler[addr & 0xFFF];
 		}
@@ -82,6 +86,10 @@ public:
 	__forceinline void InternalWrite(uint32_t addr, uint8_t value)
 	{
 		//TODOWS open bus
+		if(_cart->WriteCart(addr, value)) {
+			return;
+		}
+
 		uint8_t* handler = _writes[addr >> 12];
 		if(handler) {
 			handler[addr & 0xFFF] = value;

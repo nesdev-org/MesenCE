@@ -440,11 +440,20 @@ public struct WsEepromState
 	[MarshalAs(UnmanagedType.I1)] public bool InternalEepromWriteProtected;
 }
 
+public enum WsCartType
+{
+	Bandai2001,
+	Bandai2003,
+	WonderWitch,
+	Unknown
+}
+
 public struct WsCartState
 {
-	[MarshalAs(UnmanagedType.I1)] public bool HasRtc;
-	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-	public byte[] SelectedBanks;
+	public WsCartType CartType;
+	[MarshalAs(UnmanagedType.I1)] public bool RomInRamBank;
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)] public byte[] SelectedBanks;
+	[MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)] public byte[] ExtSelectedBanks;
 }
 
 public struct WsRtcState
