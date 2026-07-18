@@ -2,6 +2,12 @@
 #include "pch.h"
 #include "Shared/ControlDeviceState.h"
 
+enum class FrameFlags
+{
+	None = 0,
+	Interlaced = 1
+};
+
 struct RenderedFrame
 {
 	void* FrameBuffer = nullptr;
@@ -11,6 +17,7 @@ struct RenderedFrame
 	double Scale = 1.0;
 	uint32_t FrameNumber = 0;
 	uint32_t VideoPhase = 0;
+	FrameFlags Flags = FrameFlags::None;
 	vector<ControllerData> InputData;
 
 	RenderedFrame()

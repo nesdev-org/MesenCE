@@ -423,13 +423,9 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock)
 
 				if(!_skipRender) {
 					_currentBuffer = _currentBuffer == _outputBuffers[0] ? _outputBuffers[1] : _outputBuffers[0];
-					if(_interlacedFrame) {
-						memcpy(_currentBuffer, GetPreviousScreenBuffer(), 512 * 478 * sizeof(uint16_t));
-					}
 
 					//If we're not skipping this frame, reset the high resolution/interlace flags
-					_useHighResOutput = IsDoubleWidth() || _state.ScreenInterlace;
-					_interlacedFrame = _state.ScreenInterlace;
+					_useHighResOutput = IsDoubleWidth() || _interlacedFrame;
 				}
 			}
 
@@ -468,6 +464,16 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock)
 		hClock = 0;
 
 		_console->GetInternalRegisters()->ProcessAutoJoypad();
+
+		if(_scanline == 240) {
+			if(_interlacedFrame) {
+				switch(_settings->GetSnesConfig().DeinterlaceMode) {
+					case SnesDeinterlaceMode::CurrentField: memset(_currentBuffer, 0, 512 * 478 * sizeof(uint16_t)); break;
+					case SnesDeinterlaceMode::Weave: memcpy(GetPreviousScreenBuffer(), _currentBuffer, 512 * 478 * sizeof(uint16_t)); break;
+				}
+			}
+			_interlacedFrame = _state.ScreenInterlace;
+		}
 
 		if(_scanline == _nmiScanline) {
 			ProcessLocationLatchRequest();
@@ -1464,7 +1470,7 @@ void SnesPpu::ConvertToHiRes()
 		return;
 	}
 
-	bool useHighResOutput = _useHighResOutput || IsDoubleWidth() || _state.ScreenInterlace;
+	bool useHighResOutput = _useHighResOutput || IsDoubleWidth() || _interlacedFrame;
 	if(!useHighResOutput || _useHighResOutput == useHighResOutput || _scanline >= _vblankStartScanline || _scanline == 0) {
 		return;
 	}
@@ -1499,8 +1505,7 @@ void SnesPpu::ApplyHiResMode()
 	if(!_useHighResOutput) {
 		memcpy(_currentBuffer + (scanline << 8) + _drawStartX, _mainScreenBuffer + _drawStartX, (_drawEndX - _drawStartX + 1) << 1);
 	} else {
-		_interlacedFrame |= _state.ScreenInterlace;
-		uint32_t screenY = _state.ScreenInterlace ? (_oddFrame ? ((scanline << 1) + 1) : (scanline << 1)) : (scanline << 1);
+		uint32_t screenY = (_interlacedFrame && _oddFrame) ? ((scanline << 1) + 1) : (scanline << 1);
 		uint32_t baseAddr = (screenY << 9);
 
 		if(IsDoubleWidth()) {
@@ -1516,12 +1521,20 @@ void SnesPpu::ApplyHiResMode()
 			}
 		}
 
-		if(!_state.ScreenInterlace) {
-			//Copy this line's content to the next line (between the current start & end bounds)
-			memcpy(
-				_currentBuffer + baseAddr + 512 + (_drawStartX << 1),
-				_currentBuffer + baseAddr + (_drawStartX << 1),
-				(_drawEndX - _drawStartX + 1) << 2);
+		if(!_interlacedFrame || _settings->GetSnesConfig().DeinterlaceMode == SnesDeinterlaceMode::Bob || _settings->GetSnesConfig().DeinterlaceMode == SnesDeinterlaceMode::BobBlend) {
+			uint32_t len = (_drawEndX - _drawStartX + 1) << 2;
+			uint32_t src = baseAddr + (_drawStartX << 1);
+			uint32_t dst = src + 512;
+
+			if(_interlacedFrame && _oddFrame && _scanline == 1) {
+				//Copy scanline 1 to scanline 0 for bob deinterlacing to avoid a black scanline at the top
+				memcpy(_currentBuffer, _currentBuffer + src, len);
+			}
+
+			if(screenY < 477) {
+				//Copy this line's content to the next line (between the current start & end bounds)
+				memcpy(_currentBuffer + dst, _currentBuffer + src, len);
+			}
 		}
 	}
 }
@@ -1583,6 +1596,9 @@ void SnesPpu::SendFrame()
 	_needFullFrame = false;
 
 	RenderedFrame frame(_currentBuffer, width, height, _useHighResOutput ? 0.5 : 1.0, _frameCount, _console->GetControlManager()->GetPortStates());
+	if(_interlacedFrame) {
+		frame.Flags = FrameFlags::Interlaced;
+	}
 	_emu->GetVideoDecoder()->UpdateFrame(frame, isRewinding, isRewinding);
 
 	if(!_skipRender) {

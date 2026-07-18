@@ -8,16 +8,18 @@ class SnesDefaultVideoFilter : public BaseVideoFilter
 {
 private:
 	uint32_t _calculatedPalette[0x8000] = {};
+	uint16_t* _prevFrame = nullptr;
 	VideoConfig _videoConfig = {};
 
 	SnesHighResBlendMode _highResBlendMode = SnesHighResBlendMode::None;
 	SnesColorCorrectionMode _colorCorrection = SnesColorCorrectionMode::None;
 	bool _forceFixedRes = false;
+	bool _needFrameClear = false;
 
 	void InitLookupTable();
 
 	__forceinline static uint32_t BlendPixels(uint32_t a, uint32_t b);
-	__forceinline uint32_t GetPixel(uint16_t* ppuFrame, uint32_t offset);
+	__forceinline uint32_t GetPixel(uint16_t* ppuFrame, uint32_t offset, bool blendFrames);
 
 	void ApplyBlend(FrameInfo frameInfo, uint32_t* out);
 
@@ -27,6 +29,7 @@ protected:
 
 public:
 	SnesDefaultVideoFilter(Emulator* emu);
+	~SnesDefaultVideoFilter();
 
 	void ApplyFilter(uint16_t* ppuOutputBuffer) override;
 	OverscanDimensions GetOverscan() override;

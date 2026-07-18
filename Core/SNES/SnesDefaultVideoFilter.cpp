@@ -2,12 +2,20 @@
 #include "SNES/SnesDefaultVideoFilter.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
+#include "Shared/RewindManager.h"
 #include "Shared/SettingTypes.h"
 #include "Shared/ColorUtilities.h"
 
 SnesDefaultVideoFilter::SnesDefaultVideoFilter(Emulator* emu) : BaseVideoFilter(emu)
 {
 	InitLookupTable();
+	_prevFrame = new uint16_t[512 * 478];
+	memset(_prevFrame, 0, 512 * 478 * sizeof(uint16_t));
+}
+
+SnesDefaultVideoFilter::~SnesDefaultVideoFilter()
+{
+	delete[] _prevFrame;
 }
 
 FrameInfo SnesDefaultVideoFilter::GetFrameInfo()
@@ -93,23 +101,40 @@ void SnesDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 	uint32_t width = _baseFrameInfo.Width;
 	uint32_t xOffset = overscan.Left;
 	uint32_t yOffset = overscan.Top * width;
+	bool blendFrames =
+		_frame.Flags == FrameFlags::Interlaced &&
+		!_emu->GetRewindManager()->IsRewinding() &&
+		!_emu->IsPaused() &&
+		_emu->GetSettings()->GetSnesConfig().DeinterlaceMode == SnesDeinterlaceMode::BobBlend;
+
+	if(blendFrames && _needFrameClear) {
+		//Clear previous frame buffer to avoid blending with an old frame (e.g if interlace mode is getting enabled/disabled by the game)
+		_needFrameClear = false;
+		std::fill(_prevFrame, _prevFrame + 512 * 478, 0);
+	}
 
 	if(_baseFrameInfo.Width == 256 && _forceFixedRes) {
 		for(uint32_t i = 0; i < frameInfo.Height; i++) {
 			for(uint32_t j = 0; j < frameInfo.Width; j++) {
-				out[i * frameInfo.Width + j] = GetPixel(ppuOutputBuffer, i / 2 * width + j / 2 + yOffset + xOffset);
+				out[i * frameInfo.Width + j] = GetPixel(ppuOutputBuffer, i / 2 * width + j / 2 + yOffset + xOffset, blendFrames);
 			}
 		}
 	} else {
 		for(uint32_t i = 0; i < frameInfo.Height; i++) {
 			for(uint32_t j = 0; j < frameInfo.Width; j++) {
-				out[i * frameInfo.Width + j] = GetPixel(ppuOutputBuffer, i * width + j + yOffset + xOffset);
+				out[i * frameInfo.Width + j] = GetPixel(ppuOutputBuffer, i * width + j + yOffset + xOffset, blendFrames);
 			}
 		}
 	}
 
 	if(_baseFrameInfo.Width == 512) {
 		ApplyBlend(frameInfo, out);
+	}
+
+	if(blendFrames) {
+		std::copy(ppuOutputBuffer, ppuOutputBuffer + 512 * 478, _prevFrame);
+	} else {
+		_needFrameClear = true;
 	}
 }
 
@@ -139,9 +164,13 @@ void SnesDefaultVideoFilter::ApplyBlend(FrameInfo frameInfo, uint32_t* out)
 	}
 }
 
-uint32_t SnesDefaultVideoFilter::GetPixel(uint16_t* ppuFrame, uint32_t offset)
+uint32_t SnesDefaultVideoFilter::GetPixel(uint16_t* ppuFrame, uint32_t offset, bool blendFrames)
 {
-	return _calculatedPalette[ppuFrame[offset]];
+	if(blendFrames) {
+		return BlendPixels(_calculatedPalette[_prevFrame[offset]], _calculatedPalette[ppuFrame[offset]]);
+	} else {
+		return _calculatedPalette[ppuFrame[offset]];
+	}
 }
 
 uint32_t SnesDefaultVideoFilter::BlendPixels(uint32_t a, uint32_t b)
