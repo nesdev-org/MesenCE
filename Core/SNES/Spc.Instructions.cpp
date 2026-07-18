@@ -1,17 +1,13 @@
 #include "pch.h"
 #include "SNES/Spc.h"
 #include "SNES/SnesMemoryManager.h"
+#include "Shared/Audio/SoundMixer.h"
 #include "Shared/Emulator.h"
-#include "Utilities/HexUtilities.h"
 
 void Spc::Run()
 {
 	if(!_enabled) {
 		//Used to temporarily disable the SPC when overclocking is enabled
-		return;
-	} else if(_state.StopState != SnesCpuStopState::Running) {
-		//STOP or SLEEP were executed - execution is stopped forever.
-		_emu->ProcessHaltedCpu<CpuType::Spc>();
 		return;
 	}
 
@@ -301,7 +297,7 @@ void Spc::Exec()
 		case 0xEC: Addr_Abs(); LDY(); break;
 		case 0xED: NOTC(); break;
 		case 0xEE: PLY(); break;
-		case 0xEF: SLEEP(); break;
+		case 0xEF: STOP(); break;
 		case 0xF0: Addr_Rel(); BEQ(); break;
 		case 0xF1: TCALL<15>(); break;
 		case 0xF2: Addr_Dir(); CLR1<7>(); break;
@@ -2180,18 +2176,18 @@ void Spc::NOP()
 	EndOp();
 }
 
-void Spc::SLEEP()
-{
-	//WAI
-	_state.StopState = SnesCpuStopState::WaitingForIrq;
-	EndOp();
-	ExitExecLoop();
-}
-
 void Spc::STOP()
 {
-	//STP
+	//STOP / SLEEP
+	if(_state.StopState == SnesCpuStopState::Running) {
+		//Prevent looping audio when SPC is stopped
+		_emu->GetSoundMixer()->StopAudio();
+	}
+
 	_state.StopState = SnesCpuStopState::Stopped;
 	EndOp();
 	ExitExecLoop();
+
+	//Repeat this instruction endlessly to stop execution
+	_state.PC--;
 }
