@@ -62,11 +62,11 @@ namespace Mesen.Windows
 		private WindowState _prevWindowState;
 
 		//Used to suppress key-repeat keyup events on Linux
-		private Dictionary<Key, IDisposable> _pendingKeyUpEvents = new();
+		private Dictionary<UInt16, IDisposable> _pendingKeyUpEvents = new();
 		private bool _isLinux = false;
 
 		private Stopwatch _stopWatch = Stopwatch.StartNew();
-		private Dictionary<Key, long> _keyPressedStamp = new();
+		private Dictionary<UInt16, long> _keyPressedStamp = new();
 		private bool _focusInMenu;
 		private bool _needRendererReset;
 
@@ -726,15 +726,16 @@ namespace Mesen.Windows
 			}
 
 			if(e.Key != Key.None) {
-				_keyPressedStamp[e.Key] = _stopWatch.ElapsedTicks;
+				UInt16 keyCode = e.GetKeyCode();
+				_keyPressedStamp[keyCode] = _stopWatch.ElapsedTicks;
 
-				if(_isLinux && _pendingKeyUpEvents.TryGetValue(e.Key, out IDisposable? cancelTimer)) {
+				if(_isLinux && _pendingKeyUpEvents.TryGetValue(keyCode, out IDisposable? cancelTimer)) {
 					//Cancel any pending key up event
 					cancelTimer.Dispose();
-					_pendingKeyUpEvents.Remove(e.Key);
+					_pendingKeyUpEvents.Remove(keyCode);
 				}
 
-				InputApi.SetKeyState((UInt16)e.Key, true);
+				InputApi.SetKeyState(keyCode, true);
 			}
 
 			if(e.Key == Key.Tab || e.Key == Key.F10) {
@@ -751,23 +752,24 @@ namespace Mesen.Windows
 			}
 
 			if(e.Key != Key.None) {
-				if(e.Key.IsSpecialKey() && (!_keyPressedStamp.TryGetValue(e.Key, out long stamp) || ((_stopWatch.ElapsedTicks - stamp) * 1000 / Stopwatch.Frequency) < 10)) {
+				UInt16 keyCode = e.GetKeyCode();
+				if(e.IsSpecialKey() && (!_keyPressedStamp.TryGetValue(keyCode, out long stamp) || ((_stopWatch.ElapsedTicks - stamp) * 1000 / Stopwatch.Frequency) < 10)) {
 					//Key up received without key down, or key pressed for less than 10 ms, pretend the key was pressed for 50ms
 					//Some special keys can behave this way (e.g printscreen)
-					InputApi.SetKeyState((UInt16)e.Key, true);
-					DispatcherTimer.RunOnce(() => InputApi.SetKeyState((UInt16)e.Key, false), TimeSpan.FromMilliseconds(50), DispatcherPriority.MaxValue);
-					_keyPressedStamp.Remove(e.Key);
+					InputApi.SetKeyState(keyCode, true);
+					DispatcherTimer.RunOnce(() => InputApi.SetKeyState(keyCode, false), TimeSpan.FromMilliseconds(50), DispatcherPriority.MaxValue);
+					_keyPressedStamp.Remove(keyCode);
 					return;
 				}
 
-				_keyPressedStamp.Remove(e.Key);
+				_keyPressedStamp.Remove(keyCode);
 
 				if(_isLinux) {
 					//Process keyup events after 1ms on Linux to prevent key repeat from triggering key up/down repeatedly
-					IDisposable cancelTimer = DispatcherTimer.RunOnce(() => InputApi.SetKeyState((UInt16)e.Key, false), TimeSpan.FromMilliseconds(1), DispatcherPriority.MaxValue);
-					_pendingKeyUpEvents[e.Key] = cancelTimer;
+					IDisposable cancelTimer = DispatcherTimer.RunOnce(() => InputApi.SetKeyState(keyCode, false), TimeSpan.FromMilliseconds(1), DispatcherPriority.MaxValue);
+					_pendingKeyUpEvents[keyCode] = cancelTimer;
 				} else {
-					InputApi.SetKeyState((UInt16)e.Key, false);
+					InputApi.SetKeyState(keyCode, false);
 				}
 			}
 		}

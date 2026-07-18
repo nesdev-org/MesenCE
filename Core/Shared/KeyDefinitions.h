@@ -197,6 +197,8 @@ struct KeyDefinition
 			{ "OemClear", 171 },
 			{ "DeadCharProcessed", 172 },
 
+			{ "Numpad Enter", 0x1FF },
+
 			{ "Mouse Left", 0x200 },
 			{ "Mouse Right", 0x201 },
 			{ "Mouse Middle", 0x202 },
