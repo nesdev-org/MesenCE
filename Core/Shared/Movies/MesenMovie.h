@@ -11,9 +11,9 @@ class Emulator;
 class BaseControlManager;
 struct CheatCode;
 
-class MesenMovie final : public IMovie, public INotificationListener, public IBatteryProvider, public std::enable_shared_from_this<MesenMovie>
+class MesenMovie : public IMovie, public INotificationListener, public IBatteryProvider, public std::enable_shared_from_this<MesenMovie>
 {
-private:
+protected:
 	Emulator* _emu = nullptr;
 
 	BaseControlManager* _controlManager = nullptr;
@@ -34,9 +34,8 @@ private:
 	bool _loadFailure = false;
 	bool _hasSaveState = false;
 
-private:
 	void ParseSettings(stringstream& data);
-	bool ApplySettings(istream& settingsData);
+	virtual bool ApplySettings(istream& settingsData);
 
 	uint32_t LoadInt(std::unordered_map<string, string>& settings, string name, uint32_t defaultValue = 0);
 	bool LoadBool(std::unordered_map<string, string>& settings, string name);

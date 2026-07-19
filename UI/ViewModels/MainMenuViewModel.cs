@@ -705,7 +705,7 @@ namespace Mesen.ViewModels
 						ActionType = ActionType.Play,
 						IsEnabled = () => IsGameRunning && !RecordApi.MovieRecording() && !RecordApi.MoviePlaying(),
 						OnClick = async () => {
-							string? filename = await FileDialogHelper.OpenFile(ConfigManager.MovieFolder, wnd, FileDialogHelper.MesenMovieExt);
+							string? filename = await FileDialogHelper.OpenFile(ConfigManager.MovieFolder, wnd, FileDialogHelper.MovieFileExt);
 							if(filename != null) {
 								RecordApi.MoviePlay(filename);
 							}

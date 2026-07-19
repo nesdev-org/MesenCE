@@ -138,11 +138,12 @@ namespace Mesen.Utilities
 		public static void LoadFile(string filename)
 		{
 			if(File.Exists(filename)) {
+				string ext = Path.GetExtension(filename).ToLowerInvariant();
 				if(IsPatchFile(filename)) {
 					LoadPatchFile(filename);
-				} else if(Path.GetExtension(filename).ToLowerInvariant() == "." + FileDialogHelper.MesenSaveStateExt) {
+				} else if(ext == "." + FileDialogHelper.MesenSaveStateExt) {
 					EmuApi.LoadStateFile(filename);
-				} else if(EmuApi.IsRunning() && Path.GetExtension(filename).ToLowerInvariant() == "." + FileDialogHelper.MesenMovieExt) {
+				} else if(EmuApi.IsRunning() && (ext == "." + FileDialogHelper.MesenMovieExt || ext == "." + FileDialogHelper.BizHawkMovieExt || ext == "." + FileDialogHelper.GbaHawkMovieExt)) {
 					RecordApi.MoviePlay(filename);
 				} else {
 					LoadRom(filename);

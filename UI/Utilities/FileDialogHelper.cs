@@ -12,7 +12,10 @@ namespace Mesen.Utilities
 		public const string RomExt = "[[ROMFILES]]";
 		public const string FirmwareExt = "[[FIRMWAREFILES]]";
 		public const string LabelFileExt = "[[LABELFILES]]";
+		public const string MovieFileExt = "[[MOVIEFILES]]";
 		public const string MesenMovieExt = "mmo";
+		public const string BizHawkMovieExt = "bk2";
+		public const string GbaHawkMovieExt = "gbmv";
 		public const string TblExt = "tbl";
 		public const string PaletteExt = "pal";
 		public const string TraceExt = "txt";
@@ -75,6 +78,8 @@ namespace Mesen.Utilities
 						filter.Add(new FilePickerFileType("All firmware files") { Patterns = new List<string>() { "*.sfc", "*.pce", "*.nes", "*.bin", "*.rom", "*.col", "*.sms", "*.gg", "*.gba", "*.ws", "*.wsc" } });
 					} else if(ext == FileDialogHelper.LabelFileExt) {
 						filter.Add(new FilePickerFileType("All label files") { Patterns = new List<string>() { "*.mlb", "*.sym", "*.dbg", "*.fns", "*.elf", "*.cdb" } });
+					} else if(ext == FileDialogHelper.MovieFileExt) {
+						filter.Add(new FilePickerFileType("All movies files") { Patterns = new List<string>() { "*.mmo", "*.bk2", "*.gbmv" } });
 					} else {
 						filter.Add(new FilePickerFileType(ext.ToUpper() + " files") { Patterns = new List<string>() { "*." + ext } });
 					}

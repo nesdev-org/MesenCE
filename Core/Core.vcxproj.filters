@@ -3012,6 +3012,9 @@
     <ClInclude Include="WS\Carts\WsCartBandai2001.h">
       <Filter>WS\Carts</Filter>
     </ClInclude>
+    <ClInclude Include="Shared\Movies\BizHawkMovie.h">
+      <Filter>Shared\Movies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Video\RotateFilter.cpp">
@@ -3397,6 +3400,9 @@
     </ClCompile>
     <ClCompile Include="WS\Carts\WsCartBandai2001.cpp">
       <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Movies\BizHawkMovie.cpp">
+      <Filter>Shared\Movies</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
