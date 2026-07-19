@@ -13,7 +13,7 @@ WindowsKeyManager::WindowsKeyManager(Emulator* emu, HWND hWnd)
 
 	//Init XInput buttons
 	vector<string> buttonNames = {
-		"Up", "Down", "Left", "Right", "Start", "Back", "L3", "R3", "L1", "R1", "?", "?", "A", "B", "X", "Y", "L2", "R2", "RT Up", "RT Down", "RT Left", "RT Right", "LT Up", "LT Down", "LT Left", "LT Right", "LT Y", "LT X", "RT Y", "RT X"
+		"Up", "Down", "Left", "Right", "Start", "Back", "L3", "R3", "L1", "R1", "?", "?", "A", "B", "X", "Y", "L2", "R2", "RT Up", "RT Down", "RT Left", "RT Right", "LT Up", "LT Down", "LT Left", "LT Right", "LT Y", "LT X", "RT Y", "RT X", "AL", "AR"
 	};
 
 	for(int i = 0; i < 4; i++) {
@@ -39,7 +39,7 @@ WindowsKeyManager::WindowsKeyManager(Emulator* emu, HWND hWnd)
 		}
 
 		for(int j = 0; j < (int)axisNames.size(); j++) {
-			_keyDefinitions.push_back({ "Joy" + std::to_string(i + 1) + " " + axisNames[j], (uint32_t)(WindowsKeyManager::BaseDirectInputIndex + i * 0x100 + j + diButtonNames.size() + 0x100) });
+			_keyDefinitions.push_back({ "Joy" + std::to_string(i + 1) + " " + axisNames[j], (uint32_t)(WindowsKeyManager::BaseDirectInputIndex + i * 0x100 + j + diButtonNames.size() + 128) });
 		}
 	}
 

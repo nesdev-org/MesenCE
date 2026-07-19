@@ -395,9 +395,11 @@ void Spc::ProcessEndFrame()
 
 	UpdateClockRatio();
 
-	uint16_t sampleCount = _dsp->GetSampleCount();
-	if(sampleCount != 0) {
-		_emu->GetSoundMixer()->PlayAudioBuffer(_dsp->GetSamples(), sampleCount / 2, _spcSampleRate);
+	if(_state.StopState == SnesCpuStopState::Running) {
+		uint16_t sampleCount = _dsp->GetSampleCount();
+		if(sampleCount != 0) {
+			_emu->GetSoundMixer()->PlayAudioBuffer(_dsp->GetSamples(), sampleCount / 2, _spcSampleRate);
+		}
 	}
 	_dsp->ResetOutput();
 }
@@ -479,6 +481,7 @@ void Spc::Serialize(Serializer& s)
 	SV(_state.TimersEnabled);
 	SV(_state.DspReg);
 	SV(_state.RomEnabled);
+	SV(_state.StopState);
 	SV(_clockRatio);
 	SV(_state.TimersDisabled);
 

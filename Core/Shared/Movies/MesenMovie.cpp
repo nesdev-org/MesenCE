@@ -21,6 +21,10 @@ MesenMovie::MesenMovie(Emulator* emu, bool forTest)
 {
 	_emu = emu;
 	_forTest = forTest;
+
+	Serializer backup(0, true);
+	backup.Stream(*emu->GetSettings(), "", -1);
+	backup.SaveTo(_emuSettingsBackup);
 }
 
 MesenMovie::~MesenMovie()
@@ -248,10 +252,6 @@ bool MesenMovie::ApplySettings(istream& settingsData)
 		MessageManager::DisplayMessage("Movies", "MovieIncorrectConsole", string(magic_enum::enum_name<ConsoleType>(consoleType)));
 		return false;
 	}
-
-	Serializer backup(0, true);
-	backup.Stream(*settings, "", -1);
-	backup.SaveTo(_emuSettingsBackup);
 
 	//Load settings
 	s.Stream(*settings, "", -1);

@@ -503,6 +503,8 @@ public struct GsuState : BaseState
 
 	public GsuPixelCache PrimaryCache;
 	public GsuPixelCache SecondaryCache;
+
+	[MarshalAs(UnmanagedType.I1)] public bool Fx3;
 }
 
 public struct Cx4Dma

@@ -70,6 +70,8 @@ void Msu1::Write(uint16_t addr, uint8_t value)
 			} else {
 				LoadTrack();
 			}
+			_paused = true;
+			_repeat = false;
 			break;
 
 		case 0x2006: _volume = value; break;

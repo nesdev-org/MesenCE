@@ -99,4 +99,21 @@ struct GsuState : BaseState
 
 	GsuPixelCache PrimaryCache;
 	GsuPixelCache SecondaryCache;
+
+	bool Fx3;
+};
+
+enum class Fx3Command
+{
+	//These are not used in emulation
+	//They are needed on hardware because the PLOT instruction
+	//behaves differently compared to the GSU 1/2.
+	ChunkyToPlanarA,
+	ChunkyToPlanarB,
+	ChunkyToPlanarC,
+
+	//Use to clear portions of the frame buffer
+	ClearA,
+	ClearB,
+	ClearC,
 };

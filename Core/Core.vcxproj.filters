@@ -3000,6 +3000,21 @@
     <ClInclude Include="Shared\Utilities\S3511ARtc.h">
       <Filter>Shared\Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="SNES\Input\SnesBlueRetroController.h">
+      <Filter>SNES\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="WS\Carts\WsCartBandai2003.h">
+      <Filter>WS\Carts</Filter>
+    </ClInclude>
+    <ClInclude Include="WS\Carts\WsCartWonderWitch.h">
+      <Filter>WS\Carts</Filter>
+    </ClInclude>
+    <ClInclude Include="WS\Carts\WsCartBandai2001.h">
+      <Filter>WS\Carts</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\Movies\BizHawkMovie.h">
+      <Filter>Shared\Movies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Video\RotateFilter.cpp">
@@ -3373,6 +3388,21 @@
     </ClCompile>
     <ClCompile Include="WS\Carts\WsRtc.cpp">
       <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="SNES\Input\SnesBlueRetroController.cpp">
+      <Filter>SNES\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="WS\Carts\WsCartWonderWitch.cpp">
+      <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="WS\Carts\WsCartBandai2003.cpp">
+      <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="WS\Carts\WsCartBandai2001.cpp">
+      <Filter>WS\Carts</Filter>
+    </ClCompile>
+    <ClCompile Include="Shared\Movies\BizHawkMovie.cpp">
+      <Filter>Shared\Movies</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

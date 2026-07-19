@@ -1,10 +1,15 @@
 #include "pch.h"
 #include "SNES/Coprocessors/GSU/Gsu.h"
 #include "SNES/SnesCpu.h"
-#include "SNES/SnesMemoryManager.h"
 
 void Gsu::STOP()
 {
+	if(_state.Fx3) {
+		//The FX3 resets R15 to 0 when done - this allows the CPU to poll R15
+		//to know when it's done running
+		WriteRegister(15, 0);
+	}
+
 	if(!_state.IrqDisabled) {
 		_state.SFR.Irq = true;
 		_cpu->SetIrqSource(SnesIrqSource::Coprocessor);
@@ -199,13 +204,17 @@ void Gsu::ALT3()
 
 void Gsu::MERGE()
 {
-	uint16_t value = (_state.R[7] & 0xFF00) | (_state.R[8] >> 8);
-	WriteDestReg(value);
-	_state.SFR.Carry = (value & 0xE0E0) != 0;
-	_state.SFR.Overflow = (value & 0xC0C0) != 0;
-	_state.SFR.Sign = (value & 0x8080) != 0;
-	_state.SFR.Zero = (value & 0xF0F0) != 0;
-	ResetFlags();
+	if(!_state.Fx3) {
+		uint16_t value = (_state.R[7] & 0xFF00) | (_state.R[8] >> 8);
+		WriteDestReg(value);
+		_state.SFR.Carry = (value & 0xE0E0) != 0;
+		_state.SFR.Overflow = (value & 0xC0C0) != 0;
+		_state.SFR.Sign = (value & 0x8080) != 0;
+		_state.SFR.Zero = (value & 0xF0F0) != 0;
+		ResetFlags();
+	} else {
+		ProcessCommandFx3();
+	}
 }
 
 void Gsu::SWAP()
@@ -732,4 +741,50 @@ uint8_t Gsu::GetColor(uint8_t value)
 	}
 
 	return value;
+}
+
+void Gsu::ClearCharFx3(uint16_t offset)
+{
+	// clang-format off
+	static constexpr uint8_t clearPattern[64] = {
+		0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+		0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00,
+
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+
+		0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
+		0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF
+	};
+	// clang-format on
+
+	if(_gsuRamSize >= (uint32_t)(0x10000 + offset + 64)) {
+		memcpy(_gsuRam + 0x10000 + offset, clearPattern, 64);
+	}
+}
+
+void Gsu::ProcessClearCommandFx3(uint8_t start, uint8_t end)
+{
+	for(uint8_t i = 0; i < 18; i++) {
+		uint16_t offset = i * 64;
+		for(uint8_t j = start; j <= end; j++) {
+			ClearCharFx3(offset + j * 20 * 64);
+		}
+	}
+}
+
+void Gsu::ProcessCommandFx3()
+{
+	switch((Fx3Command)_state.R[0]) {
+		case Fx3Command::ClearA: ProcessClearCommandFx3(0, 8); break;
+		case Fx3Command::ClearB: ProcessClearCommandFx3(9, 17); break;
+		case Fx3Command::ClearC: ProcessClearCommandFx3(18, 26); break;
+
+		default:
+			//Anything else is a no-op
+			break;
+	}
 }

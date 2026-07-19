@@ -292,7 +292,6 @@ private:
 
 	//Other operations
 	void NOP();
-	void SLEEP();
 	void STOP();
 
 	void Idle();

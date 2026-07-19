@@ -1,6 +1,6 @@
 ﻿using Avalonia.Input;
-using Mesen.ViewModels;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
@@ -514,6 +514,7 @@ namespace Mesen.Config
 
 				string shortcut = new KeyGesture(ShortcutKey, modifiers).ToString();
 				shortcut = shortcut.Replace("Oem", "");
+				shortcut = shortcut.Replace("Return", "Enter");
 
 				//Rename D0-D9 to 0-9
 				shortcut = _numberKeyRegex.Replace(shortcut, (Match match) => match.Value.Substring(1));

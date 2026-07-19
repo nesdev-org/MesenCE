@@ -182,6 +182,7 @@ enum class ControllerType
 	SuperScope,
 	Multitap,
 	SnesRumbleController,
+	SnesBlueRetroController,
 	SnesNttDataKeypad,
 	AsciiTurboFileTwinTf2,
 	AsciiTurboFileTwinStf,

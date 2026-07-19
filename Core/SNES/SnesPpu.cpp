@@ -504,8 +504,9 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock)
 				(_settings->GetEmulationSpeed() == 0 || _settings->GetEmulationSpeed() > 150) &&
 				_frameSkipTimer.GetElapsedMS() < 10;
 
-			if(_emu->IsRunAheadFrame()) {
+			if(_isRunAheadFrame) {
 				_skipRender = true;
+				_isRunAheadFrame = false;
 			}
 
 			//Ensure the SPC is re-enabled for the next frame
@@ -516,6 +517,16 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock)
 		return true;
 	}
 	return false;
+}
+
+void SnesPpu::ProcessRunAheadFrameStart()
+{
+	if(_state.Scanline >= _vblankStartScanline) {
+		//If the runahead frame starts during vblank (which it normally should,
+		//except if long DMAs were started before vblank and ended after vblank),
+		//skip rendering for this frame.
+		_isRunAheadFrame = true;
+	}
 }
 
 bool SnesPpu::IsInOverclockedScanline()

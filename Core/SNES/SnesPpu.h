@@ -124,6 +124,7 @@ private:
 	int32_t _debugMode7EndY = 0;
 
 	bool _needFullFrame = false;
+	bool _isRunAheadFrame = false;
 
 	void RenderSprites(const uint8_t priorities[4]);
 
@@ -258,6 +259,7 @@ public:
 	uint8_t* GetSpriteRam();
 
 	void DebugSendFrame();
+	void ProcessRunAheadFrameStart();
 
 	void SetLocationLatchRequest(uint16_t x, uint16_t y);
 	void ProcessLocationLatchRequest();

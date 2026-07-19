@@ -89,6 +89,8 @@ optional<int16_t> XInputManager::GetAxisPosition(uint8_t port, int axis)
 			case 1: return gamepad.sThumbLX;
 			case 2: return gamepad.sThumbRY;
 			case 3: return gamepad.sThumbRX;
+			case 4: return gamepad.bLeftTrigger;
+			case 5: return gamepad.bRightTrigger;
 		}
 	}
 

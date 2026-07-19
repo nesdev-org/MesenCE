@@ -12,7 +12,7 @@ class SmsPsg final : public ISerializable
 private:
 	static constexpr int SampleRate = 96000;
 	static constexpr int MaxSamples = 4000;
-	static constexpr int16_t _volumeLut[16] = { 8192, 6507, 5168, 4105, 3261, 2590, 2058, 1642, 1298, 1031, 819, 651, 517, 410, 326, 0 };
+	static constexpr int16_t _volumeLut[16] = { 8191, 6507, 5168, 4105, 3261, 2590, 2058, 1642, 1298, 1031, 819, 651, 517, 410, 326, 0 };
 
 	int16_t* _soundBuffer = nullptr;
 	blip_t* _leftChannel = nullptr;
@@ -27,6 +27,7 @@ private:
 	uint64_t _clockCounter = 0;
 	int16_t _prevOutputLeft = 0;
 	int16_t _prevOutputRight = 0;
+	bool _altNoiseMode = false;
 
 	void RunNoise(SmsNoiseChannelState& noise);
 

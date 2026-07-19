@@ -106,7 +106,7 @@ private:
 	uint8_t _spriteExtBank = 0;
 	bool _largeSprites = false;
 	uint8_t _oamAddr = 0;
-	uint8_t _oamSpriteLimit;
+	uint8_t _oamSpriteLimit = 0;
 
 	uint8_t _oamExtUpdatePage = 0;
 	uint8_t _oamSlowUpdatePage = 0;

@@ -1,9 +1,42 @@
 #include "pch.h"
 #include "WS/Carts/WsCart.h"
-#include "WS/Carts/WsRtc.h"
 #include "WS/WsMemoryManager.h"
-#include "WS/WsEeprom.h"
+#include "Shared/BatteryManager.h"
+#include "Shared/Emulator.h"
 #include "Utilities/Serializer.h"
+
+WsCart::WsCart()
+{
+	_state.SelectedBanks[0] = 0x3F;
+	_state.SelectedBanks[1] = 0xFF;
+	_state.SelectedBanks[2] = 0xFF;
+	_state.SelectedBanks[3] = 0xFF;
+}
+
+void WsCart::LoadBattery()
+{
+	if(_saveRam) {
+		_emu->GetBatteryManager()->LoadBattery(".sav", _saveRam, _saveRamSize);
+	}
+}
+
+void WsCart::SaveBattery()
+{
+	if(_saveRam) {
+		_emu->GetBatteryManager()->SaveBattery(".sav", _saveRam, _saveRamSize);
+	}
+}
+
+void WsCart::Init(Emulator* emu, WsCartType cartType, WsMemoryManager* memoryManager, uint8_t* prgRom, uint32_t prgRomSize, uint8_t* saveRam, uint32_t saveRamSize)
+{
+	_emu = emu;
+	_memoryManager = memoryManager;
+	_state.CartType = cartType;
+	_prgRom = prgRom;
+	_prgRomSize = prgRomSize;
+	_saveRam = saveRam;
+	_saveRamSize = saveRamSize;
+}
 
 void WsCart::Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly)
 {
@@ -13,22 +46,6 @@ void WsCart::Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset,
 void WsCart::Unmap(uint32_t start, uint32_t end)
 {
 	_memoryManager->Unmap(start, end);
-}
-
-WsCart::WsCart()
-{
-	_state.SelectedBanks[0] = 0xFF;
-	_state.SelectedBanks[1] = 0xFF;
-	_state.SelectedBanks[2] = 0xFF;
-	_state.SelectedBanks[3] = 0xFF;
-}
-
-void WsCart::Init(WsMemoryManager* memoryManager, WsEeprom* cartEeprom, WsRtc* cartRtc)
-{
-	_memoryManager = memoryManager;
-	_cartEeprom = cartEeprom;
-	_cartRtc = cartRtc;
-	_state.HasRtc = cartRtc != nullptr;
 }
 
 void WsCart::RefreshMappings()
@@ -41,12 +58,10 @@ void WsCart::RefreshMappings()
 
 uint8_t WsCart::ReadPort(uint16_t port)
 {
-	if(port < 0xC4) {
+	if(port == 0xC0 || port == 0xCF) {
+		return _state.SelectedBanks[0];
+	} else if(port < 0xC4) {
 		return _state.SelectedBanks[port - 0xC0];
-	} else if(port >= 0xC4 && port < 0xC9 && _cartEeprom) {
-		return _cartEeprom->ReadPort(port - 0xC4);
-	} else if(port >= 0xCA && port < 0xCC && _cartRtc) {
-		return _cartRtc->ReadPort(port);
 	}
 
 	return _memoryManager->GetUnmappedPort();
@@ -54,13 +69,12 @@ uint8_t WsCart::ReadPort(uint16_t port)
 
 void WsCart::WritePort(uint16_t port, uint8_t value)
 {
-	if(port < 0xC4) {
+	if(port == 0xC0) {
+		_state.SelectedBanks[0] = value & 0x3F;
+		_memoryManager->RefreshMappings();
+	} else if(port < 0xC4) {
 		_state.SelectedBanks[port - 0xC0] = value;
 		_memoryManager->RefreshMappings();
-	} else if(port >= 0xC4 && port < 0xC9 && _cartEeprom) {
-		_cartEeprom->WritePort(port - 0xC4, value);
-	} else if(port >= 0xCA && port < 0xCC && _cartRtc) {
-		_cartRtc->WritePort(port, value);
 	}
 }
 

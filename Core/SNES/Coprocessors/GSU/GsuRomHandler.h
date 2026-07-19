@@ -19,7 +19,7 @@ public:
 
 	uint8_t Read(uint32_t addr) override
 	{
-		if(!_state->SFR.Running || !_state->GsuRomAccess) {
+		if(_state->Fx3 || !_state->SFR.Running || !_state->GsuRomAccess) {
 			return _romHandler->Read(addr);
 		}
 
@@ -60,7 +60,7 @@ public:
 
 	AddressInfo GetAbsoluteAddress(uint32_t address) override
 	{
-		if(!_state->SFR.Running || !_state->GsuRomAccess) {
+		if(_state->Fx3 || !_state->SFR.Running || !_state->GsuRomAccess) {
 			return _romHandler->GetAbsoluteAddress(address);
 		} else {
 			return { -1, MemoryType::None };

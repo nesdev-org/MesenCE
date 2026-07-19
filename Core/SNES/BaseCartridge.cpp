@@ -25,7 +25,6 @@
 #include "Shared/BatteryManager.h"
 #include "Shared/MessageManager.h"
 #include "Shared/Emulator.h"
-#include "Shared/RomInfo.h"
 #include "Utilities/HexUtilities.h"
 #include "Utilities/VirtualFile.h"
 #include "Utilities/FolderUtilities.h"
@@ -534,7 +533,7 @@ void BaseCartridge::InitCoprocessor()
 		_sa1 = dynamic_cast<Sa1*>(_coprocessor.get());
 		_needCoprocSync = true;
 	} else if(_coprocessorType == CoprocessorType::GSU) {
-		_coprocessor.reset(new Gsu(_console, _coprocessorRamSize));
+		_coprocessor.reset(new Gsu(_console, _coprocessorRamSize, _cartInfo.RomType == Gsu::Fx3RomType));
 		_gsu = dynamic_cast<Gsu*>(_coprocessor.get());
 		_needCoprocSync = true;
 	} else if(_coprocessorType == CoprocessorType::SDD1) {
@@ -823,7 +822,15 @@ void BaseCartridge::DisplayCartInfo(bool showCorruptedHeaderWarning)
 			case CoprocessorType::DSP2: coProcMessage += "DSP2"; break;
 			case CoprocessorType::DSP3: coProcMessage += "DSP3"; break;
 			case CoprocessorType::DSP4: coProcMessage += "DSP4"; break;
-			case CoprocessorType::GSU: coProcMessage += "Super FX (GSU1/2)"; break;
+
+			case CoprocessorType::GSU:
+				if(_cartInfo.RomType == Gsu::Fx3RomType) {
+					coProcMessage += "Super FX (FX3)";
+				} else {
+					coProcMessage += "Super FX (GSU1/2)";
+				}
+				break;
+
 			case CoprocessorType::OBC1: coProcMessage += "OBC1"; break;
 			case CoprocessorType::RTC: coProcMessage += "RTC"; break;
 			case CoprocessorType::SA1: coProcMessage += "SA1"; break;
