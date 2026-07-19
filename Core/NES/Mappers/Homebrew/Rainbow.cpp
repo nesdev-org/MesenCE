@@ -593,7 +593,9 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 		if(addr >= 0x4282) {
 			_oamCodeLocked = false;
 		}
-		return _oamCode[addr - 0x4280];
+		if(addr - 0x4280 < sizeof(_oamCode)) {
+			return _oamCode[addr - 0x4280];
+		}
 	}
 
 	if(addr >= 0x6000) {
