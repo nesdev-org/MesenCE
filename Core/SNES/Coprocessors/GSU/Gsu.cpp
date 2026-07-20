@@ -23,7 +23,7 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize, bool isFx3)
 	_cpu = console->GetCpu();
 	_settings = _emu->GetSettings();
 
-	_state.Fx3 = isFx3;
+	_isFx3 = isFx3;
 	_state.ProgramReadBuffer = 0x01; //Run a NOP on first cycle
 
 	UpdateClockMultiplier();
@@ -36,14 +36,14 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize, bool isFx3)
 
 	for(uint32_t i = 0; i < _gsuRamSize / 0x1000; i++) {
 		_gsuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_gsuRam, i * 0x1000, _gsuRamSize, MemoryType::GsuWorkRam)));
-		_gsuCpuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRamHandler(_state, _gsuRamHandlers.back().get())));
+		_gsuCpuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRamHandler(_state, isFx3, _gsuRamHandlers.back().get())));
 	}
 
 	//CPU mappings
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 	vector<unique_ptr<IMemoryHandler>>& prgRomHandlers = _console->GetCartridge()->GetPrgRomHandlers();
 	for(unique_ptr<IMemoryHandler>& handler : prgRomHandlers) {
-		_gsuCpuRomHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRomHandler(_state, handler.get())));
+		_gsuCpuRomHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRomHandler(_state, isFx3, handler.get())));
 	}
 
 	//GSU registers in CPU memory space
@@ -96,7 +96,7 @@ void Gsu::ProcessEndOfFrame()
 void Gsu::UpdateClockMultiplier()
 {
 	uint8_t clockMultiplier = std::max(1u, _settings->GetSnesConfig().GsuClockSpeed / 100);
-	if(_state.Fx3) {
+	if(_isFx3) {
 		//The FX3 runs around 4x faster than the original GSU
 		clockMultiplier *= 4;
 	}
@@ -464,7 +464,7 @@ void Gsu::Reset()
 uint8_t Gsu::Read(uint32_t addr)
 {
 	addr &= 0x33FF;
-	if(_state.SFR.Running && addr != 0x3030 && addr != 0x3031 && addr != 0x303B && (_state.Fx3 && (addr != 0x301E && addr != 0x301F))) {
+	if(_state.SFR.Running && addr != 0x3030 && addr != 0x3031 && addr != 0x303B && (_isFx3 && (addr != 0x301E && addr != 0x301F))) {
 		//"During GSU operation, only SFR, SCMR, and VCR may be accessed."
 		//Additionally, on the FX3, reading R15 while running is allowed.
 		//The FX3 hardware has no IRQs and the CPU needs to poll R15 to know when execution stops.
@@ -491,7 +491,7 @@ uint8_t Gsu::Read(uint32_t addr)
 
 		case 0x3034: return _state.ProgramBank;
 		case 0x3036: return _state.RomBank;
-		case 0x303B: return _state.Fx3 ? 0x52 : 0x04; //Version (can be 1 or 4?)
+		case 0x303B: return _isFx3 ? 0x52 : 0x04; //Version (can be 1 or 4?)
 		case 0x303C: return _state.RamBank;
 		case 0x303E: return (uint8_t)_state.CacheBase;
 		case 0x303F: return _state.CacheBase >> 8;
