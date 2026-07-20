@@ -940,8 +940,12 @@ EffectiveAddressInfo GbaDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Gba
 				return {};
 			}
 
+			case GbaThumbOpCategory::MultipleLoadStore: {
+				uint8_t rb = (opCode >> 8) & 0x07;
+				return { (int)state.R[rb], 0, true, MemoryType::GbaMemory };
+			}
+			
 			case GbaThumbOpCategory::InvalidOp:
-			case GbaThumbOpCategory::MultipleLoadStore:
 			case GbaThumbOpCategory::PushPopReg:
 				return {};
 		}
@@ -953,8 +957,12 @@ EffectiveAddressInfo GbaDisUtils::GetEffectiveAddress(DisassemblyInfo& info, Gba
 				return { (int)state.R[rs], 0, true, MemoryType::GbaMemory };
 			}
 
+			case ArmOpCategory::BlockDataTransfer: {
+				uint8_t rn = (opCode >> 16) & 0x0F;
+				return { (int)state.R[rn], 0, true, MemoryType::GbaMemory};
+			}
+			
 			case ArmOpCategory::InvalidOp:
-			case ArmOpCategory::BlockDataTransfer:
 				return {};
 		}
 	}
@@ -1159,7 +1167,10 @@ CdlFlags::CdlFlags GbaDisUtils::GetOpFlags(uint32_t opCode, uint8_t flags, uint3
 	if(pc == prevPc + GbaDisUtils::GetOpSize(opCode, flags)) {
 		return CdlFlags::None;
 	}
-
+	if((prevPc <= 0x3FFF) && (pc > 0x3FFF)) {
+		// don't create label if returning from BIOS to prevent label clutter
+		return CdlFlags::None;	
+	}
 	if(IsJumpToSub(opCode, flags)) {
 		return CdlFlags::SubEntryPoint;
 	} else {
