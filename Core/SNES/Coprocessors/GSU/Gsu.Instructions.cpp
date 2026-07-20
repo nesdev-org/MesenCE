@@ -4,7 +4,7 @@
 
 void Gsu::STOP()
 {
-	if(_state.Fx3) {
+	if(_isFx3) {
 		//The FX3 resets R15 to 0 when done - this allows the CPU to poll R15
 		//to know when it's done running
 		WriteRegister(15, 0);
@@ -204,7 +204,7 @@ void Gsu::ALT3()
 
 void Gsu::MERGE()
 {
-	if(!_state.Fx3) {
+	if(!_isFx3) {
 		uint16_t value = (_state.R[7] & 0xFF00) | (_state.R[8] >> 8);
 		WriteDestReg(value);
 		_state.SFR.Carry = (value & 0xE0E0) != 0;

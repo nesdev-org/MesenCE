@@ -31,6 +31,7 @@ private:
 	bool _waitForRamAccess = false;
 	bool _stopped = true;
 	bool _r15Changed = false;
+	bool _isFx3 = false;
 	uint8_t _maxPrgRomBank = 0;
 	uint32_t _lastOpAddr = 0;
 

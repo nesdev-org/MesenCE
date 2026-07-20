@@ -99,8 +99,6 @@ struct GsuState : BaseState
 
 	GsuPixelCache PrimaryCache;
 	GsuPixelCache SecondaryCache;
-
-	bool Fx3;
 };
 
 enum class Fx3Command
