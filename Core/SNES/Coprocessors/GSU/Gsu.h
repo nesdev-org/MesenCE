@@ -178,6 +178,7 @@ private:
 
 public:
 	static constexpr uint8_t Fx3RomType = 0x17;
+	static constexpr uint8_t Fx3BatteryRomType = 0x18; //FX3 with battery
 
 	Gsu(SnesConsole* console, uint32_t gsuRamSize, bool isFx3);
 	virtual ~Gsu();
