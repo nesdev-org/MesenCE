@@ -3015,6 +3015,9 @@
     <ClInclude Include="Shared\Movies\BizHawkMovie.h">
       <Filter>Shared\Movies</Filter>
     </ClInclude>
+    <ClInclude Include="Shared\Video\BlendFilter.h">
+      <Filter>Shared\Video</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Video\RotateFilter.cpp">

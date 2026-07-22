@@ -1528,7 +1528,7 @@ void SnesPpu::ApplyHiResMode()
 
 			if(_interlacedFrame && _oddFrame && _scanline == 1) {
 				//Copy scanline 1 to scanline 0 for bob deinterlacing to avoid a black scanline at the top
-				memcpy(_currentBuffer, _currentBuffer + src, len);
+				memcpy(_currentBuffer + src - 512, _currentBuffer + src, len);
 			}
 
 			if(screenY < 477) {

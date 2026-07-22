@@ -2,6 +2,7 @@
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
 #include "Shared/MessageManager.h"
+#include "Shared/RewindManager.h"
 #include "Shared/Video/BaseVideoFilter.h"
 #include "Shared/Video/RotateFilter.h"
 #include "Shared/Video/ScaleFilter.h"
@@ -98,11 +99,20 @@ FrameInfo BaseVideoFilter::SendFrame(uint16_t* ppuOutputBuffer, uint32_t frameNu
 	_frameData = frameData;
 	_ppuOutputBuffer = ppuOutputBuffer;
 	_frame = frame;
+
+	//Reset blend flag, specific filter must set each each frame when blending is needed
+	_blendFilter.SetEnabled(false);
+
 	OnBeforeApplyFilter();
 	FrameInfo frameInfo = GetFrameInfo();
 	_frameInfo = frameInfo;
 	UpdateBufferSize();
 	ApplyFilter(ppuOutputBuffer);
+
+	if(_blendFilter.IsEnabled() && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused()) {
+		_blendFilter.ApplyFilter(_outputBuffer, _bufferSize, _frame.FrameNumber);
+	}
+
 	_ppuOutputBuffer = nullptr;
 	return frameInfo;
 }

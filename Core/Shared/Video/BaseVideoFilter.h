@@ -3,6 +3,7 @@
 #include "Utilities/SimpleLock.h"
 #include "Shared/SettingTypes.h"
 #include "Shared/RenderedFrame.h"
+#include "Shared/Video/BlendFilter.h"
 
 class Emulator;
 
@@ -24,6 +25,7 @@ protected:
 	FrameInfo _baseFrameInfo = {};
 	FrameInfo _frameInfo = {};
 	RenderedFrame _frame = {};
+	BlendFilter _blendFilter;
 	void* _frameData = nullptr;
 	uint16_t* _ppuOutputBuffer = nullptr;
 
@@ -37,8 +39,6 @@ protected:
 	bool IsOddFrame();
 	uint32_t GetVideoPhase();
 	uint32_t GetBufferSize();
-
-protected:
 	virtual FrameInfo GetFrameInfo();
 
 public:

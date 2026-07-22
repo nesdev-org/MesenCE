@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "GBA/GbaDefaultVideoFilter.h"
 #include "GBA/GbaConsole.h"
-#include "Shared/Video/DebugHud.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
-#include "Shared/RewindManager.h"
 #include "Shared/SettingTypes.h"
 #include "Shared/ColorUtilities.h"
 
@@ -12,13 +10,6 @@ GbaDefaultVideoFilter::GbaDefaultVideoFilter(Emulator* emu, bool applyNtscFilter
 {
 	InitLookupTable();
 	_applyNtscFilter = applyNtscFilter;
-	_prevFrame = new uint16_t[GbaConstants::PixelCount];
-	memset(_prevFrame, 0, GbaConstants::PixelCount * sizeof(uint16_t));
-}
-
-GbaDefaultVideoFilter::~GbaDefaultVideoFilter()
-{
-	delete[] _prevFrame;
 }
 
 FrameInfo GbaDefaultVideoFilter::GetFrameInfo()
@@ -80,12 +71,7 @@ void GbaDefaultVideoFilter::OnBeforeApplyFilter()
 		_gbaAdjustColors = adjustColors;
 		InitLookupTable();
 	}
-	bool blendFrames = gbaConfig.BlendFrames && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused();
-	if(_blendFrames != blendFrames) {
-		_blendFrames = blendFrames;
-		memset(_prevFrame, 0, GbaConstants::PixelCount * sizeof(uint16_t));
-	}
-
+	_blendFilter.SetEnabled(gbaConfig.BlendFrames);
 	_videoConfig = config;
 }
 
@@ -99,10 +85,6 @@ void GbaDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 		}
 	}
 
-	if(_blendFrames) {
-		std::copy(ppuOutputBuffer, ppuOutputBuffer + GbaConstants::PixelCount, _prevFrame);
-	}
-
 	if(_applyNtscFilter) {
 		_ntscFilter.ApplyFilter(out, GbaConstants::ScreenWidth, GbaConstants::ScreenHeight, IsOddFrame());
 	}
@@ -110,14 +92,5 @@ void GbaDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 
 uint32_t GbaDefaultVideoFilter::GetPixel(uint16_t* ppuFrame, uint32_t offset)
 {
-	if(_blendFrames) {
-		return BlendPixels(_calculatedPalette[_prevFrame[offset] & 0x7FFF], _calculatedPalette[ppuFrame[offset] & 0x7FFF]);
-	} else {
-		return _calculatedPalette[ppuFrame[offset] & 0x7FFF];
-	}
-}
-
-uint32_t GbaDefaultVideoFilter::BlendPixels(uint32_t a, uint32_t b)
-{
-	return ((((a) ^ (b)) & 0xfffefefeL) >> 1) + ((a) & (b));
+	return _calculatedPalette[ppuFrame[offset] & 0x7FFF];
 }

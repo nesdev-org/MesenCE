@@ -19,7 +19,7 @@ private:
 	void InitLookupTable();
 
 	__forceinline static uint32_t BlendPixels(uint32_t a, uint32_t b);
-	__forceinline uint32_t GetPixel(uint16_t* ppuFrame, uint32_t offset, bool blendFrames);
+	__forceinline uint32_t GetPixel(uint16_t* ppuFrame, uint32_t offset);
 
 	void ApplyBlend(FrameInfo frameInfo, uint32_t* out);
 
