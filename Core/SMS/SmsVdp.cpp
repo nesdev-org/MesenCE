@@ -1090,7 +1090,7 @@ void SmsVdp::ShiftSpriteSg(uint8_t sprIndex)
 	_spriteShifters[sprIndex].SpriteX -= 32;
 	int16_t x = _spriteShifters[sprIndex].SpriteX;
 	if(x < 0) {
-		_spriteShifters[sprIndex].TileData[0] <<= -x;
+		_spriteShifters[sprIndex].TileData[0] <<= (-x) >> _state.EnableDoubleSpriteSize;
 	}
 }
 
