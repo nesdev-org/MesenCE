@@ -616,9 +616,6 @@ namespace Mesen.Windows
 
 			_preventFullscreenToggle = true;
 			if(WindowState == WindowState.FullScreen) {
-				if(ConfigManager.Config.Video.EnableVariableRefreshRate && !ConfigManager.Config.Video.UseExclusiveFullscreen && OperatingSystem.IsWindows()) {
-					_needRendererReset = true;
-				}
 				ResetRenderer();
 
 				Task.Run(() => {
