@@ -2518,6 +2518,11 @@ E
 			<Value ID="SuperCdRom">Super CD-ROM²</Value>
 			<Value ID="Arcade">Arcade CD-ROM² (recommended)</Value>
 		</Enum>
+		<Enum ID="PceEventViewerSgxFilter">
+			<Value ID="Both">Show both</Value>
+			<Value ID="Vdc1">VDC1 only</Value>
+			<Value ID="Vdc2">VDC2 only</Value>
+		</Enum>
 		<Enum ID="RamState">
 			<Value ID="Random">Random Values</Value>
 			<Value ID="AllZeros">All 0s</Value>
