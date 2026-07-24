@@ -158,10 +158,12 @@ void PceVpc::Write(uint16_t addr, uint8_t value)
 
 void PceVpc::StVdcWrite(uint16_t addr, uint8_t value)
 {
-	if(_state.StToVdc2Mode) {
-		_vdc2->WriteRegister(addr, value);
-	} else {
-		_vdc1->WriteRegister(addr, value);
+	if(_emu->ProcessMemoryWrite<CpuType::Pce>(_state.StToVdc2Mode ? (addr | 0x10) : addr, value, MemoryOperationType::Write)) {
+		if(_state.StToVdc2Mode) {
+			_vdc2->WriteRegister(addr, value);
+		} else {
+			_vdc1->WriteRegister(addr, value);
+		}
 	}
 }
 

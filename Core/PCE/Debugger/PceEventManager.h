@@ -16,6 +16,13 @@ class PceVpc;
 class Debugger;
 class PceMemoryManager;
 
+enum class PceEventViewerSgxFilter
+{
+	Both,
+	Vdc1,
+	Vdc2
+};
+
 struct PceEventViewerConfig : public BaseEventViewerConfig
 {
 	EventViewerCategoryCfg Irq;
@@ -52,6 +59,10 @@ struct PceEventViewerConfig : public BaseEventViewerConfig
 	EventViewerCategoryCfg ArcadeCardWrites;
 	EventViewerCategoryCfg ArcadeCardReads;
 
+	EventViewerCategoryCfg VpcWrites;
+	EventViewerCategoryCfg VpcReads;
+
+	PceEventViewerSgxFilter SuperGrafxFilter;
 	bool ShowPreviousFrameEvents;
 };
 

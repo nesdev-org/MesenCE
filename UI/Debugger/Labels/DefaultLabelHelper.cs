@@ -335,9 +335,24 @@ namespace Mesen.Debugger.Labels
 
 		private static void SetPceDefaultLabels()
 		{
+			bool isSuperGrafx = DebugApi.GetConsoleState<PceState>(ConsoleType.PcEngine).IsSuperGrafx;
+
 			LabelManager.SetLabel(0x000, MemoryType.PceMemory, "VDC_AR_0000", "Address Register (W) / Status Register (R)");
 			LabelManager.SetLabel(0x002, MemoryType.PceMemory, "VDC_DATA_LO_0002", "Data (low byte)");
 			LabelManager.SetLabel(0x003, MemoryType.PceMemory, "VDC_DATA_HI_0003", "Data (high byte) + Latch");
+
+			if(isSuperGrafx) {
+				LabelManager.SetLabel(0x008, MemoryType.PceMemory, "VPC_PRIO_LO_0008", "Priority Control (LSB)");
+				LabelManager.SetLabel(0x009, MemoryType.PceMemory, "VPC_PRIO_HI_0009", "Priority Control (MSB)");
+				LabelManager.SetLabel(0x00A, MemoryType.PceMemory, "VPC_WND1_LO_000A", "Window 1 (LSB)");
+				LabelManager.SetLabel(0x00B, MemoryType.PceMemory, "VPC_WND1_HI_000B", "Window 1 (MSB)");
+				LabelManager.SetLabel(0x00C, MemoryType.PceMemory, "VPC_WND2_LO_000C", "Window 2 (LSB)");
+				LabelManager.SetLabel(0x00D, MemoryType.PceMemory, "VPC_WND2_HI_000D", "Window 2 (MSB)");
+				LabelManager.SetLabel(0x00E, MemoryType.PceMemory, "VPC_STCTRL_000E", "Store Immediate Control");
+				LabelManager.SetLabel(0x010, MemoryType.PceMemory, "VDC2_AR_0010", "Address Register (W) / Status Register (R)");
+				LabelManager.SetLabel(0x012, MemoryType.PceMemory, "VDC2_DATA_LO_0012", "Data (low byte)");
+				LabelManager.SetLabel(0x013, MemoryType.PceMemory, "VDC2_DATA_HI_0013", "Data (high byte) + Latch");
+			}
 
 			LabelManager.SetLabel(0x400, MemoryType.PceMemory, "VCE_CONTROL_0400", "VCE Control Register");
 			LabelManager.SetLabel(0x402, MemoryType.PceMemory, "VCE_ADDR_LO_0402", "Color Table Address Register (LSB)");

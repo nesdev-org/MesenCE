@@ -5,7 +5,6 @@
 #include "PCE/PceVdc.h"
 #include "PCE/PceVce.h"
 #include "PCE/PceVpc.h"
-#include "PCE/PceMemoryManager.h"
 #include "PCE/PceConstants.h"
 #include "Debugger/DebugTypes.h"
 #include "Debugger/Debugger.h"
@@ -48,10 +47,8 @@ void PceEventManager::AddEvent(DebugEventType type, MemoryOperationInfo& operati
 
 	if(operation.Type == MemoryOperationType::Write && (operation.Address & 0x1FFF) < 0x400) {
 		if(_console->IsSuperGrafx()) {
-			if((operation.Address & 0x1A) == 2) {
+			if((operation.Address & 0x1A) == 2 || (operation.Address & 0x1A) == 0x12) {
 				evt.RegisterId = _vdc->GetState().CurrentReg; //VDC reg
-			} else {
-				//TODOv2 - supergrafx VPC writes, not VDC
 			}
 		} else {
 			if((operation.Address & 0x03) >= 2) {
@@ -125,8 +122,23 @@ EventViewerCategoryCfg PceEventManager::GetEventConfig(DebugEventInfo& evt)
 
 			if(reg <= 0x3FF) {
 				if(isWrite) {
+					uint8_t mask = _console->IsSuperGrafx() ? 0x1F : 0x03;
+					uint8_t vdcReg = reg & mask;
+
+					if(vdcReg >= 0x08 && vdcReg <= 0x0E) {
+						return _config.VpcWrites;
+					}
+
+					bool isVdc2 = (vdcReg & 0x10);
+					if(_console->IsSuperGrafx() && ((_config.SuperGrafxFilter == PceEventViewerSgxFilter::Vdc2 && !isVdc2) || (_config.SuperGrafxFilter == PceEventViewerSgxFilter::Vdc1 && isVdc2))) {
+						return {};
+					}
+
+					if((vdcReg & ~0x14) == 0) {
+						return _config.VdcRegSelectWrites;
+					}
+
 					switch(evt.RegisterId) {
-						case -1: return _config.VdcRegSelectWrites;
 						case 0: return _config.VdcVramWrites;
 						case 1: return _config.VdcVramReads;
 						case 2: return _config.VdcVramWrites;
@@ -154,9 +166,20 @@ EventViewerCategoryCfg PceEventManager::GetEventConfig(DebugEventInfo& evt)
 							return _config.VdcDmaWrites;
 					}
 				} else {
-					if((reg & 0x03) == 0) {
+					uint8_t mask = _console->IsSuperGrafx() ? 0x1F : 0x03;
+					uint8_t vdcReg = reg & mask;
+					if(vdcReg >= 0x08 && vdcReg <= 0x0E) {
+						return _config.VpcReads;
+					}
+
+					bool isVdc2 = (reg & 0x10);
+					if(_console->IsSuperGrafx() && ((_config.SuperGrafxFilter == PceEventViewerSgxFilter::Vdc2 && !isVdc2) || (_config.SuperGrafxFilter == PceEventViewerSgxFilter::Vdc1 && isVdc2))) {
+						return {};
+					}
+
+					if((vdcReg & ~0x14) == 0) {
 						return _config.VdcStatusReads;
-					} else if((reg & 0x03) >= 2) {
+					} else if((vdcReg & ~0x15) == 0x02) {
 						return _config.VdcVramReads;
 					}
 				}
