@@ -294,7 +294,9 @@ void SmsVdpTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& b
 
 		for(int y = 0; y < sprite.Height; y++) {
 			for(int x = 0; x < sprite.Width; x++) {
-				if(spritePosY + y >= 256) {
+				if(sprite.X + x < 0) {
+					continue;
+				} else if(spritePosY + y >= 256) {
 					spritePosY -= 256;
 				}
 
@@ -304,7 +306,6 @@ void SmsVdpTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& b
 						continue;
 					}
 
-					//TODOSMS zoomed sprites support
 					outBuffer[((spritePosY + y) * 256) + sprite.X + x] = color;
 				} else {
 					spritePreview[y * sprite.Width + x] = bgColor;
@@ -378,6 +379,12 @@ void SmsVdpTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 		sprite.Width = sprite.Height;
 	}
 
+	bool doubleSize = state.EnableDoubleSpriteSize && (!state.UseMode4 || _console->GetRevision() != SmsRevision::Sms1);
+	if(doubleSize) {
+		sprite.Width *= 2;
+		sprite.Height *= 2;
+	}
+
 	if(!state.UseMode4 && sprite.Palette == 0) {
 		sprite.Visibility = SpriteVisibility::Disabled;
 	} else if(sprite.Y < state.VisibleScanlineCount || (sprite.Y > state.VisibleScanlineCount && (uint8_t)(sprite.Y + sprite.Height) >= 0)) {
@@ -408,14 +415,17 @@ void SmsVdpTools::GetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* spritePreview
 	sprite.TileAddress = tileStart;
 
 	for(int y = 0; y < sprite.Height; y++) {
-		uint16_t pixelStart = tileStart + y * (state.UseMode4 ? 4 : 1);
+		int yPos = doubleSize ? (y >> 1) : y;
+		uint16_t pixelStart = tileStart + yPos * (state.UseMode4 ? 4 : 1);
 
 		for(int x = 0; x < sprite.Width; x++) {
+			int xPos = doubleSize ? (x >> 1) : x;
+
 			uint8_t color;
 			if(state.UseMode4) {
-				color = GetTilePixelColor<TileFormat::SmsBpp4>(vram, 0x3FFF, pixelStart, x);
+				color = GetTilePixelColor<TileFormat::SmsBpp4>(vram, 0x3FFF, pixelStart, xPos);
 			} else {
-				color = GetTilePixelColor<TileFormat::SmsSgBpp1>(vram, 0x3FFF, pixelStart + (x >= 8 ? 16 : 0), x & 0x07);
+				color = GetTilePixelColor<TileFormat::SmsSgBpp1>(vram, 0x3FFF, pixelStart + (xPos >= 8 ? 16 : 0), xPos & 0x07);
 			}
 
 			uint32_t outOffset = (y * sprite.Width) + x;
