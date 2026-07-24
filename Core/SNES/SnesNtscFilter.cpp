@@ -46,6 +46,8 @@ void SnesNtscFilter::OnBeforeApplyFilter()
 		GenericNtscFilter::InitNtscFilter(_ntscSetup, _emu->GetSettings()->GetVideoConfig());
 		snes_ntsc_init(&_ntscData, &_ntscSetup);
 	}
+
+	_blendFilter.SetEnabled(_frame.Flags == FrameFlags::Interlaced && _emu->GetSettings()->GetSnesConfig().DeinterlaceMode == SnesDeinterlaceMode::BobBlend);
 }
 
 void SnesNtscFilter::ApplyFilter(uint16_t* ppuOutputBuffer)

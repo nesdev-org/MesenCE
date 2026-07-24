@@ -274,6 +274,7 @@
 
 			<Control ID="lblHighResBlendMode">High resolution blend mode: </Control>
 			<Control ID="lblColorCorrection">Color correction: </Control>
+			<Control ID="lblDeinterlaceMode">Deinterlace mode: </Control>
 			<Control ID="chkHideBgLayer1">Hide background layer 1</Control>
 			<Control ID="chkHideBgLayer2">Hide background layer 2</Control>
 			<Control ID="chkHideBgLayer3">Hide background layer 3</Control>
@@ -2506,6 +2507,12 @@ E
 			<Value ID="None">None (default)</Value>
 			<Value ID="NtscBlackLevel">NTSC-U black level</Value>
 			<Value ID="DeepBlackBoost">Deep black boost (ares)</Value>
+		</Enum>
+		<Enum ID="SnesDeinterlaceMode">
+			<Value ID="Weave">Weave (default)</Value>
+			<Value ID="BobBlend">Bob + blend</Value>
+			<Value ID="Bob">Bob</Value>
+			<Value ID="CurrentField">Show current field only</Value>
 		</Enum>
 		<Enum ID="PceConsoleType">
 			<Value ID="Auto">Auto (recommended)</Value>

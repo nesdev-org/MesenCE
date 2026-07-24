@@ -13,8 +13,6 @@ class SmsDefaultVideoFilter : public BaseVideoFilter
 private:
 	uint32_t _calculatedPalette[0x8000] = {};
 	VideoConfig _videoConfig = {};
-	uint16_t _prevFrame[256 * 240] = {};
-	bool _blendFrames = false;
 	SmsConsole* _console = nullptr;
 
 protected:
@@ -27,11 +25,7 @@ protected:
 			InitLookupTable();
 		}
 
-		bool blendFrames = _console->GetModel() == SmsModel::GameGear && smsConfig.GgBlendFrames && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused();
-		if(_blendFrames != blendFrames) {
-			_blendFrames = blendFrames;
-			memset(_prevFrame, 0, 256 * 240 * sizeof(uint16_t));
-		}
+		_blendFilter.SetEnabled(_console->GetModel() == SmsModel::GameGear && smsConfig.GgBlendFrames);
 		_videoConfig = config;
 	}
 
@@ -59,16 +53,7 @@ protected:
 
 	uint32_t GetPixel(uint16_t* vdpFrame, uint32_t offset)
 	{
-		if(_blendFrames) {
-			return BlendPixels(_calculatedPalette[_prevFrame[offset]], _calculatedPalette[vdpFrame[offset]]);
-		} else {
-			return _calculatedPalette[vdpFrame[offset]];
-		}
-	}
-
-	uint32_t BlendPixels(uint32_t a, uint32_t b)
-	{
-		return ((((a) ^ (b)) & 0xfffefefeL) >> 1) + ((a) & (b));
+		return _calculatedPalette[vdpFrame[offset]];
 	}
 
 public:
@@ -97,10 +82,6 @@ public:
 					out[(y * frame.Width) + x] = GetPixel(in, (y + overscan.Top - linesToSkip) * _baseFrameInfo.Width + x + overscan.Left);
 				}
 			}
-		}
-
-		if(_blendFrames) {
-			std::copy(in, in + 256 * 240, _prevFrame);
 		}
 	}
 };

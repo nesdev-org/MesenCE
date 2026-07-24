@@ -10,6 +10,10 @@ SnesDefaultVideoFilter::SnesDefaultVideoFilter(Emulator* emu) : BaseVideoFilter(
 	InitLookupTable();
 }
 
+SnesDefaultVideoFilter::~SnesDefaultVideoFilter()
+{
+}
+
 FrameInfo SnesDefaultVideoFilter::GetFrameInfo()
 {
 	if(_emu->GetRomInfo().Format == RomFormat::Spc) {
@@ -78,6 +82,7 @@ void SnesDefaultVideoFilter::OnBeforeApplyFilter()
 	_highResBlendMode = snesConfig.HighResBlendMode;
 	_colorCorrection = snesConfig.ColorCorrection;
 	_videoConfig = config;
+	_blendFilter.SetEnabled(_frame.Flags == FrameFlags::Interlaced && _emu->GetSettings()->GetSnesConfig().DeinterlaceMode == SnesDeinterlaceMode::BobBlend);
 }
 
 void SnesDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)

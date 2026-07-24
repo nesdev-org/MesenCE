@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "Gameboy/GbDefaultVideoFilter.h"
-#include "Gameboy/GbConstants.h"
 #include "Gameboy/Gameboy.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
-#include "Shared/RewindManager.h"
 #include "Shared/SettingTypes.h"
 #include "Shared/ColorUtilities.h"
 
@@ -12,13 +10,6 @@ GbDefaultVideoFilter::GbDefaultVideoFilter(Emulator* emu, bool applyNtscFilter) 
 {
 	InitLookupTable();
 	_applyNtscFilter = applyNtscFilter;
-	_prevFrame = new uint16_t[GbConstants::LinkedPixelCount];
-	memset(_prevFrame, 0, GbConstants::LinkedPixelCount * sizeof(uint16_t));
-}
-
-GbDefaultVideoFilter::~GbDefaultVideoFilter()
-{
-	delete[] _prevFrame;
 }
 
 FrameInfo GbDefaultVideoFilter::GetFrameInfo()
@@ -84,11 +75,7 @@ void GbDefaultVideoFilter::OnBeforeApplyFilter()
 		_gbcAdjustColors = adjustColors;
 		InitLookupTable();
 	}
-	bool blendFrames = gbConfig.BlendFrames && !_emu->GetRewindManager()->IsRewinding() && !_emu->IsPaused();
-	if(_blendFrames != blendFrames) {
-		_blendFrames = blendFrames;
-		memset(_prevFrame, 0, GbConstants::LinkedPixelCount * sizeof(uint16_t));
-	}
+	_blendFilter.SetEnabled(gbConfig.BlendFrames);
 	_videoConfig = config;
 }
 
@@ -107,10 +94,6 @@ void GbDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 		}
 	}
 
-	if(_blendFrames) {
-		std::copy(ppuOutputBuffer, ppuOutputBuffer + (frame.Width * frame.Height), _prevFrame);
-	}
-
 	if(_applyNtscFilter) {
 		_ntscFilter.ApplyFilter(out, frame.Width, frame.Height, IsOddFrame());
 	}
@@ -118,14 +101,5 @@ void GbDefaultVideoFilter::ApplyFilter(uint16_t* ppuOutputBuffer)
 
 uint32_t GbDefaultVideoFilter::GetPixel(uint16_t* ppuFrame, uint32_t offset)
 {
-	if(_blendFrames) {
-		return BlendPixels(_calculatedPalette[_prevFrame[offset]], _calculatedPalette[ppuFrame[offset]]);
-	} else {
-		return _calculatedPalette[ppuFrame[offset]];
-	}
-}
-
-uint32_t GbDefaultVideoFilter::BlendPixels(uint32_t a, uint32_t b)
-{
-	return ((((a) ^ (b)) & 0xfffefefeL) >> 1) + ((a) & (b));
+	return _calculatedPalette[ppuFrame[offset]];
 }
