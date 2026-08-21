@@ -2,19 +2,11 @@
 
 #include "Common.h"
 #include "Core/Shared/Interfaces/IRenderingDevice.h"
-#include "Core/Shared/Interfaces/IMessageManager.h"
-#include "Utilities/FolderUtilities.h"
 #include "Utilities/SimpleLock.h"
-#include "Utilities/Timer.h"
 
 using namespace DirectX;
 
 class Emulator;
-
-namespace DirectX
-{
-	class SpriteBatch;
-}
 
 struct HudRenderInfo
 {
@@ -41,14 +33,20 @@ private:
 	ID3D11Texture2D* _pTexture = nullptr;
 	ID3D11ShaderResourceView* _pTextureSrv = nullptr;
 
+	ID3D11VertexShader* _pVertexShader = nullptr;
+	ID3D11PixelShader* _pPixelShader = nullptr;
+	ID3D11InputLayout* _pInputLayout = nullptr;
+	ID3D11Buffer* _pVertexBuffer = nullptr;
+	ID3D11SamplerState* _pSamplerLinear = nullptr;
+	ID3D11SamplerState* _pSamplerPoint = nullptr;
+	ID3D11BlendState* _pBlendState = nullptr;
+
 	HudRenderInfo _emuHud = {};
 	HudRenderInfo _scriptHud = {};
 
 	bool _frameChanged = true;
 	SimpleLock _frameLock;
 	SimpleLock _textureLock;
-
-	unique_ptr<SpriteBatch> _spriteBatch;
 
 	const uint32_t _bytesPerPixel = 4;
 	uint32_t _screenBufferSize = 0;
@@ -98,6 +96,11 @@ private:
 	void ResetTextureBuffers();
 
 	DXGI_FORMAT GetTextureFormat();
+
+	template<typename T>
+	void CleanupCom(T& ptr);
+
+	void DrawTexture(ID3D11ShaderResourceView* texture, RECT& destRect);
 
 public:
 	Renderer(Emulator* emu, HWND hWnd);

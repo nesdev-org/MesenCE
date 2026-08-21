@@ -1,6 +1,5 @@
 #include "Common.h"
 #include "Renderer.h"
-#include "DirectXTK/SpriteBatch.h"
 #include "Core/Shared/Emulator.h"
 #include "Core/Shared/Video/VideoDecoder.h"
 #include "Core/Shared/Video/VideoRenderer.h"
@@ -9,6 +8,8 @@
 #include "Core/Shared/EmuSettings.h"
 #include <wrl/client.h>
 #include <dxgi1_6.h>
+
+#define CheckError(msg) if(FAILED(hr)) { LogError(msg, hr); return hr; }
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -172,53 +173,50 @@ void Renderer::Reset()
 	_resetCounter++;
 }
 
+template<typename T>
+void Renderer::CleanupCom(T& ptr)
+{
+	if(ptr) {
+		ptr->Release();
+		ptr = nullptr;
+	}
+}
+
 void Renderer::CleanupDevice()
 {
 	ResetTextureBuffers();
 	ReleaseRenderTargetView();
+
+	CleanupCom(_pVertexShader);
+	CleanupCom(_pPixelShader);
+	CleanupCom(_pInputLayout);
+	CleanupCom(_pVertexBuffer);
+	CleanupCom(_pSamplerLinear);
+	CleanupCom(_pSamplerPoint);
+	CleanupCom(_pBlendState);
+
 	if(_pSwapChain) {
 		_pSwapChain->SetFullscreenState(false, nullptr);
-		_pSwapChain->Release();
-		_pSwapChain = nullptr;
+		CleanupCom(_pSwapChain);
 	}
+
 	if(_pDeviceContext) {
 		_pDeviceContext->ClearState();
 		_pDeviceContext->Flush();
-		_pDeviceContext->Release();
-		_pDeviceContext = nullptr;
+		CleanupCom(_pDeviceContext);
 	}
-	if(_pd3dDevice) {
-		_pd3dDevice->Release();
-		_pd3dDevice = nullptr;
-	}
-	if(_emuHud.Texture) {
-		_emuHud.Texture->Release();
-		_emuHud.Texture = nullptr;
-	}
-	if(_emuHud.Shader) {
-		_emuHud.Shader->Release();
-		_emuHud.Shader = nullptr;
-	}
-	if(_scriptHud.Texture) {
-		_scriptHud.Texture->Release();
-		_scriptHud.Texture = nullptr;
-	}
-	if(_scriptHud.Shader) {
-		_scriptHud.Shader->Release();
-		_scriptHud.Shader = nullptr;
-	}
+
+	CleanupCom(_pd3dDevice);
+	CleanupCom(_emuHud.Texture);
+	CleanupCom(_emuHud.Shader);
+	CleanupCom(_scriptHud.Texture);
+	CleanupCom(_scriptHud.Shader);
 }
 
 void Renderer::ResetTextureBuffers()
 {
-	if(_pTexture) {
-		_pTexture->Release();
-		_pTexture = nullptr;
-	}
-	if(_pTextureSrv) {
-		_pTextureSrv->Release();
-		_pTextureSrv = nullptr;
-	}
+	CleanupCom(_pTexture);
+	CleanupCom(_pTextureSrv);
 
 	delete[] _textureBuffer[0];
 	_textureBuffer[0] = nullptr;
@@ -228,10 +226,7 @@ void Renderer::ResetTextureBuffers()
 
 void Renderer::ReleaseRenderTargetView()
 {
-	if(_pRenderTargetView) {
-		_pRenderTargetView->Release();
-		_pRenderTargetView = nullptr;
-	}
+	CleanupCom(_pRenderTargetView);
 }
 
 HRESULT Renderer::CreateRenderTargetView()
@@ -239,10 +234,7 @@ HRESULT Renderer::CreateRenderTargetView()
 	// Create a render target view
 	ID3D11Texture2D* pBackBuffer = nullptr;
 	HRESULT hr = _pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-	if(FAILED(hr)) {
-		LogError("SwapChain::GetBuffer() failed.", hr);
-		return hr;
-	}
+	CheckError("SwapChain::GetBuffer() failed.");
 
 	D3D11_RENDER_TARGET_VIEW_DESC desc = {};
 	desc.Format = GetTextureFormat();
@@ -251,10 +243,7 @@ HRESULT Renderer::CreateRenderTargetView()
 
 	hr = _pd3dDevice->CreateRenderTargetView(pBackBuffer, &desc, &_pRenderTargetView);
 	pBackBuffer->Release();
-	if(FAILED(hr)) {
-		LogError("D3DDevice::CreateRenderTargetView() failed.", hr);
-		return hr;
-	}
+	CheckError("D3DDevice::CreateRenderTargetView() failed.");
 
 	_pDeviceContext->OMSetRenderTargets(1, &_pRenderTargetView, nullptr);
 
@@ -286,9 +275,6 @@ HRESULT Renderer::CreateEmuTextureBuffers()
 	if(!_pTextureSrv) {
 		return S_FALSE;
 	}
-
-	_spriteBatch.reset(new SpriteBatch(_pDeviceContext));
-
 	return S_OK;
 }
 
@@ -340,10 +326,7 @@ HRESULT Renderer::InitDeviceLegacy()
 		}
 	}
 
-	if(FAILED(hr)) {
-		LogError("D3D11CreateDeviceAndSwapChain() failed.", hr);
-		return hr;
-	}
+	CheckError("D3D11CreateDeviceAndSwapChain() failed.");
 
 	return InitDeviceCommon();
 }
@@ -435,10 +418,7 @@ HRESULT Renderer::InitDevice()
 		hr = factory->CreateSwapChainForHwnd(_pd3dDevice, _hWnd, &sd, _fullscreen == FullscreenMode::Exclusive ? &sdFullscreen : nullptr, nullptr, (IDXGISwapChain1**)&_pSwapChain);
 	}
 
-	if(FAILED(hr)) {
-		LogError("CreateSwapChainForHwnd() failed.", hr);
-		return hr;
-	}
+	CheckError("CreateSwapChainForHwnd() failed.");
 
 	return InitDeviceCommon();
 }
@@ -452,10 +432,7 @@ HRESULT Renderer::InitDeviceCommon()
 			LogError("SetFullscreenState(true) failed.", hr);
 			MessageManager::Log("Switching back to windowed mode");
 			hr = _pSwapChain->SetFullscreenState(FALSE, NULL);
-			if(FAILED(hr)) {
-				LogError("SetFullscreenState(false) failed.", hr);
-				return hr;
-			}
+			CheckError("SetFullscreenState(false) failed.");
 		} else {
 			//Get actual monitor resolution (which might differ from the one that was requested)
 			HMONITOR monitor = MonitorFromWindow(_hWnd, MONITOR_DEFAULTTOPRIMARY);
@@ -487,6 +464,96 @@ HRESULT Renderer::InitDeviceCommon()
 	if(FAILED(hr)) {
 		return hr;
 	}
+
+	string shaderCode = R"(
+struct VS_IN
+{
+	float3 pos : POSITION;
+	float2 tex : TEXCOORD;
+};
+
+struct PS_IN 
+{
+	float4 pos : SV_POSITION;
+	float2 tex : TEXCOORD;
+};
+
+PS_IN VS(VS_IN input)
+{ 
+	PS_IN output;
+	output.pos = float4(input.pos, 1.0f);
+	output.tex = input.tex;
+	return output;
+}
+
+Texture2D tex : register(t0);
+SamplerState samp : register(s0);
+
+float4 PS(PS_IN input) : SV_Target
+{
+	return tex.Sample(samp, input.tex);
+}
+)";
+
+	ID3DBlob* vsBlob = nullptr;
+	hr = D3DCompile(shaderCode.c_str(), shaderCode.size(), nullptr, nullptr, nullptr, "VS", "vs_4_0", 0, 0, &vsBlob, nullptr);
+	CheckError("D3DCompile (Vertex Shader) failed.");
+	hr = _pd3dDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &_pVertexShader);
+	CheckError("CreateVertexShader failed.");
+
+	ID3DBlob* psBlob = nullptr;
+	hr = D3DCompile(shaderCode.c_str(), shaderCode.size(), nullptr, nullptr, nullptr, "PS", "ps_4_0", 0, 0, &psBlob, nullptr);
+	CheckError("D3DCompile (Pixel Shader) failed.");
+
+	hr = _pd3dDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &_pPixelShader);
+	CheckError("CreatePixelShader failed.");
+
+	D3D11_INPUT_ELEMENT_DESC layout[] = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+	hr = _pd3dDevice->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &_pInputLayout);
+	CheckError("CreateInputLayout failed.");
+
+	vsBlob->Release();
+	psBlob->Release();
+
+	//Vertex buffer
+	D3D11_BUFFER_DESC bd = {};
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = sizeof(float) * 5 * 4; // 4 vertices * (3 pos + 2 tex)
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	hr = _pd3dDevice->CreateBuffer(&bd, nullptr, &_pVertexBuffer);
+	CheckError("CreateBuffer failed.");
+
+	//Samplers
+	D3D11_SAMPLER_DESC sampDesc = {};
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+
+	//Used when bilinear interpolation is turned on
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	hr = _pd3dDevice->CreateSamplerState(&sampDesc, &_pSamplerLinear);
+	CheckError("CreateSampleState failed.");
+
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	hr = _pd3dDevice->CreateSamplerState(&sampDesc, &_pSamplerPoint);
+	CheckError("CreateSampleState failed.");
+
+	//Blend state for HUD
+	D3D11_BLEND_DESC blendDesc = {};
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	hr = _pd3dDevice->CreateBlendState(&blendDesc, &_pBlendState);
+	CheckError("CreateBlendState failed.");
 
 	return S_OK;
 }
@@ -555,6 +622,38 @@ void Renderer::UpdateFrame(RenderedFrame& frame)
 	}
 }
 
+void Renderer::DrawTexture(ID3D11ShaderResourceView* texture, RECT& destRect)
+{
+	float left = (float)destRect.left / _realScreenWidth * 2.0f - 1.0f;
+	float right = (float)destRect.right / _realScreenWidth * 2.0f - 1.0f;
+	float top = 1.0f - (float)destRect.top / _realScreenHeight * 2.0f;
+	float bottom = 1.0f - (float)destRect.bottom / _realScreenHeight * 2.0f;
+
+	// clang-format off
+	float vertices[] = {
+		left, bottom, 0.0f, 0.0f, 1.0f,
+		left, top, 0.0f, 0.0f, 0.0f,
+		right, bottom, 0.0f, 1.0f, 1.0f,
+		right, top, 0.0f, 1.0f, 0.0f
+	};
+	// clang-format on
+
+	D3D11_MAPPED_SUBRESOURCE mapped;
+	_pDeviceContext->Map(_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	memcpy(mapped.pData, vertices, sizeof(vertices));
+	_pDeviceContext->Unmap(_pVertexBuffer, 0);
+
+	UINT stride = sizeof(float) * 5;
+	UINT offset = 0;
+	_pDeviceContext->IASetVertexBuffers(0, 1, &_pVertexBuffer, &stride, &offset);
+	_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	_pDeviceContext->IASetInputLayout(_pInputLayout);
+	_pDeviceContext->VSSetShader(_pVertexShader, nullptr, 0);
+	_pDeviceContext->PSSetShader(_pPixelShader, nullptr, 0);
+	_pDeviceContext->PSSetShaderResources(0, 1, &texture);
+	_pDeviceContext->Draw(4, 0);
+}
+
 void Renderer::DrawScreen()
 {
 	//Swap buffers - emulator always writes to _textureBuffer[0], screen always draws _textureBuffer[1]
@@ -598,7 +697,7 @@ void Renderer::DrawScreen()
 	destRect.right = _screenWidth + _leftMargin;
 	destRect.bottom = _screenHeight + _topMargin;
 
-	_spriteBatch->Draw(_pTextureSrv, destRect);
+	DrawTexture(_pTextureSrv, destRect);
 }
 
 bool Renderer::CreateHudTexture(HudRenderInfo& hud, uint32_t newWidth, uint32_t newHeight)
@@ -674,7 +773,7 @@ void Renderer::DrawHud(HudRenderInfo& hud, RenderSurfaceInfo& hudSurface)
 	destRect.right = _screenWidth + _leftMargin;
 	destRect.bottom = _screenHeight + _topMargin;
 
-	_spriteBatch->Draw(hud.Shader, destRect);
+	DrawTexture(hud.Shader, destRect);
 }
 
 void Renderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud)
@@ -701,16 +800,17 @@ void Renderer::Render(RenderSurfaceInfo& emuHud, RenderSurfaceInfo& scriptHud)
 	// Clear the back buffer
 	_pDeviceContext->ClearRenderTargetView(_pRenderTargetView, Colors::Black);
 
+	_pDeviceContext->OMSetBlendState(_pBlendState, nullptr, 0xFFFFFFFF);
+
 	//Draw screen
-	_spriteBatch->Begin(SpriteSortMode_Immediate, cfg.UseBilinearInterpolation);
+	ID3D11SamplerState* sampler = cfg.UseBilinearInterpolation ? _pSamplerLinear : _pSamplerPoint;
+	_pDeviceContext->PSSetSamplers(0, 1, &sampler);
 	DrawScreen();
-	_spriteBatch->End();
 
 	//Draw HUD
-	_spriteBatch->Begin(SpriteSortMode_Immediate, false);
+	_pDeviceContext->PSSetSamplers(0, 1, &_pSamplerPoint);
 	DrawHud(_scriptHud, scriptHud);
 	DrawHud(_emuHud, emuHud);
-	_spriteBatch->End();
 
 	// Present the information rendered to the back buffer to the front buffer (the screen)
 	HRESULT hr = _pSwapChain->Present((cfg.VerticalSync && !_allowTearing) ? 1 : 0, _allowTearing ? DXGI_PRESENT_ALLOW_TEARING : 0);
