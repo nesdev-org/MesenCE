@@ -122,9 +122,17 @@ struct VideoConfig
 	bool DisableHighPrecisionFramePacing = false;
 };
 
+enum class WindowsAudioBackend
+{
+	Wasapi,
+	DirectSound
+};
+
 struct AudioConfig
 {
+	WindowsAudioBackend WindowsAudio = WindowsAudioBackend::Wasapi;
 	const char* AudioDevice = nullptr;
+
 	bool EnableAudio = true;
 	bool DisableDynamicSampleRate = false;
 
@@ -897,7 +905,7 @@ struct DebugConfig
 	bool GbaBreakOnNopLoad = false;
 	bool GbaBreakOnInvalidOpCode = false;
 	bool GbaBreakOnUnalignedMemAccess = false;
-	GbaDisassemblyMode GbaDisMode;
+	GbaDisassemblyMode GbaDisMode = {};
 
 	bool WsBreakOnInvalidOpCode = false;
 

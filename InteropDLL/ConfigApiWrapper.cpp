@@ -8,7 +8,6 @@
 #include "Utilities/StringUtilities.h"
 
 extern unique_ptr<Emulator> _emu;
-extern unique_ptr<IAudioDevice> _soundManager;
 
 extern "C"
 {
@@ -105,7 +104,7 @@ extern "C"
 
 	DllExport void __stdcall GetAudioDevices(char* outDeviceList, uint32_t maxLength)
 	{
-		StringUtilities::CopyToBuffer(_soundManager ? _soundManager->GetAvailableDevices() : "", outDeviceList, maxLength);
+		StringUtilities::CopyToBuffer(_emu->GetSoundManager() ? _emu->GetSoundManager()->GetAvailableDevices() : "", outDeviceList, maxLength);
 	}
 
 	DllExport void __stdcall SetEmulationFlag(EmulationFlags flag, bool enabled)

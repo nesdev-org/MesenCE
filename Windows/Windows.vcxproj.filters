@@ -5,16 +5,19 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="DirectInputManager.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="WasapiSoundManager.h" />
     <ClInclude Include="WindowsKeyManager.h" />
     <ClInclude Include="XInputManager.h" />
+    <ClInclude Include="DirectSoundManager.h" />
+    <ClInclude Include="SoundManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DirectInputManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="WasapiSoundManager.cpp" />
     <ClCompile Include="WindowsKeyManager.cpp" />
     <ClCompile Include="WindowsMouseManager.cpp" />
     <ClCompile Include="XInputManager.cpp" />
+    <ClCompile Include="DirectSoundManager.cpp" />
   </ItemGroup>
 </Project>

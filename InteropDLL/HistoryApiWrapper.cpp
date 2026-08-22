@@ -75,7 +75,7 @@ extern "C"
 		}
 
 #ifdef _WIN32
-		_historySoundManager.reset(new SoundManager(_historyPlayer.get(), (HWND)windowHandle));
+		_historySoundManager.reset(SoundManager::Create(_historyPlayer.get(), (HWND)windowHandle));
 #elif __APPLE__
 		_historySoundManager.reset(new SdlSoundManager(_historyPlayer.get()));
 #else

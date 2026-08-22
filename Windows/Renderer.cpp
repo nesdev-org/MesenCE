@@ -292,7 +292,7 @@ void Renderer::LogError(const char* msg, HRESULT hr)
 
 	string errorMsg(messageBuffer, size);
 	LocalFree(messageBuffer);
-	MessageManager::Log(string(msg) + " Error: " + errorMsg + " (" + std::to_string(hr) + ")");
+	MessageManager::Log("[DX11] " + string(msg) + " Error: " + errorMsg + " (" + std::to_string(hr) + ")");
 }
 
 HRESULT Renderer::InitDeviceLegacy()

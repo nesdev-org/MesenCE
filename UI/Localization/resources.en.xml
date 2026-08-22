@@ -20,8 +20,9 @@
 			<Control ID="chkEnableAudio">Enable Audio</Control>
 			<Control ID="lblSampleRate">Sample Rate:</Control>
 			<Control ID="lblLatencyMs">ms</Control>
-			<Control ID="lblLatencyWarning">Low values may cause sound problems</Control>
+			<Control ID="lblLatencyWarning">A lower latency reduces the delay between video and audio, but may cause audio glitches if set too low.&#13;&#13;On Windows:&#13;  -WASAPI is recommended and allows lower latency values (as low as 20-30 ms).&#13;  -DirectSound usually requires 50-60+ ms of latency.</Control>
 			<Control ID="lblAudioLatency">Latency:</Control>
+			<Control ID="lblAudioDriver">Driver:</Control>
 			<Control ID="lblAudioDevice">Device:</Control>
 			<Control ID="lblVolume">Volume:</Control>
 			<Control ID="grpVolume">Volume</Control>
@@ -2551,6 +2552,10 @@ E
 			<Value ID="StartWithoutSaveData">Power on</Value>
 			<Value ID="StartWithSaveData">Power on, with save data</Value>
 			<Value ID="CurrentState">Current state</Value>
+		</Enum>
+		<Enum ID="WindowsAudioBackend">
+			<Value ID="Wasapi">WASAPI (default)</Value>
+			<Value ID="DirectSound">DirectSound (legacy)</Value>
 		</Enum>
 		<Enum ID="AudioSampleRate">
 			<Value ID="_11025">11,025 Hz</Value>

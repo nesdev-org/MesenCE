@@ -197,8 +197,12 @@ VideoConfig& EmuSettings::GetVideoConfig()
 
 void EmuSettings::SetAudioConfig(AudioConfig& config)
 {
+	bool needAudioReset = config.WindowsAudio != _audio.WindowsAudio;
 	_audio = config;
 	ProcessString(_audioDevice, &_audio.AudioDevice);
+	if(needAudioReset) {
+		_emu->InitAudio();
+	}
 }
 
 AudioConfig& EmuSettings::GetAudioConfig()

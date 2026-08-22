@@ -13,7 +13,9 @@ namespace Mesen.ViewModels
 		[ObservableProperty] public partial AudioConfig Config { get; set; }
 		[ObservableProperty] public partial AudioConfig OriginalConfig { get; set; }
 		[ObservableProperty] public partial List<string> AudioDevices { get; set; } = new();
-		[ObservableProperty] public partial bool ShowLatencyWarning { get; set; } = false;
+		[ObservableProperty] public partial bool IsLatencyWarning { get; set; } = false;
+
+		public bool IsWindows { get; }
 
 		public AudioConfigViewModel()
 		{
@@ -24,16 +26,35 @@ namespace Mesen.ViewModels
 				return;
 			}
 
+			IsWindows = OperatingSystem.IsWindows();
+
+			UpdateAudioDevices();
+
+			AddDisposable(Config.ObserveProp(nameof(Config.AudioLatency), () => {
+				UpdateLatencyWarning();
+			}));
+
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
+				Config.ApplyConfig();
+				if(e.PropertyName == nameof(Config.WindowsAudio)) {
+					UpdateAudioDevices();
+					UpdateLatencyWarning();
+				}
+			}));
+		}
+
+		private void UpdateLatencyWarning()
+		{
+			int warningLimit = IsWindows && Config.WindowsAudio == WindowsAudioBackend.Wasapi ? 25 : 55;
+			IsLatencyWarning = Config.AudioLatency < warningLimit;
+		}
+
+		private void UpdateAudioDevices()
+		{
 			AudioDevices = ConfigApi.GetAudioDevices();
 			if(AudioDevices.Count > 0 && !AudioDevices.Contains(Config.AudioDevice)) {
 				Config.AudioDevice = AudioDevices[0];
 			}
-
-			AddDisposable(Config.ObserveProp(nameof(Config.AudioLatency), () => {
-				ShowLatencyWarning = Config.AudioLatency <= 55;
-			}));
-
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
 		}
 	}
 }
