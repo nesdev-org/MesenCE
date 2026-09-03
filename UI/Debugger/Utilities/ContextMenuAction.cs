@@ -885,5 +885,21 @@ namespace Mesen.Debugger.Utilities
 		ResetProfilerData,
 		[IconFile("Copy")]
 		CopyToClipboard,
+
+		[IconFile("Television")]
+		Shader,
+		[IconFile("Folder")]
+		ShaderFolder,
+		[IconFile("Folder")]
+		LoadShader,
+		[IconFile("Close")]
+		ClearShader,
+		RecentShaders,
+		AllShaders,
+		[IconFile("Settings")]
+		ShaderSettings,
+		[IconFile("Help")]
+		NoShadersFound,
+		OpenShaderFolder
 	}
 }

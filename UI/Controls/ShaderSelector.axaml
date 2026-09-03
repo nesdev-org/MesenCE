@@ -1,0 +1,26 @@
+<UserControl 
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:c="using:Mesen.Controls"
+	xmlns:l="using:Mesen.Localization"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="50"
+	x:Name="root"
+	HorizontalAlignment="Stretch"
+	x:Class="Mesen.Controls.ShaderSelector"
+>
+	<DockPanel DataContext="{Binding ElementName=root}">
+		<c:IconButton
+			DockPanel.Dock="Right"
+			Icon="Assets/Settings.png"
+			Click="BtnSettings_OnClick"
+			VerticalAlignment="Stretch"
+		/>
+		<TextBox
+			IsReadOnly="True"
+			Focusable="False"
+			Text="{Binding DisplayValue}"
+		/>
+	</DockPanel>
+</UserControl>

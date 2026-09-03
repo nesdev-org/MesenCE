@@ -1,7 +1,6 @@
-#Welcome to what must be the most terrible makefile ever (but hey, it works)
-#Both clang & gcc work fine - clang seems to output faster code
-#.NET 6 (and its dev tools) must be installed to compile the UI.
-#The emulation core also requires SDL2.
+#Both clang & gcc work, but clang produces faster code
+#The .NET 10 SDK must be installed to compile.
+#For macOS, SDL2 is also required.
 #Run "make" to build, "make run" to run
 
 UNAME_S := $(shell uname -s)
@@ -23,13 +22,13 @@ else
 	PROFILE_USE_FLAG := -fprofile-instr-use=$(CURDIR)/PGOHelper/pgo.profdata
 endif
 
-SDL2LIB := $(shell sdl2-config --libs)
-SDL2INC := $(shell sdl2-config --cflags)
-
 LINKCHECKUNRESOLVED := -Wl,-z,defs
 
 LINKOPTIONS :=
 MESENOS :=
+
+SDL2LIB :=
+SDL2INC :=
 
 ifeq ($(UNAME_S),Linux)
 	MESENOS := linux
@@ -42,6 +41,8 @@ ifeq ($(UNAME_S),Darwin)
 	LTO := false
 	STATICLINK := false
 	LINKCHECKUNRESOLVED :=
+	SDL2LIB := $(shell sdl2-config --libs)
+	SDL2INC := $(shell sdl2-config --cflags)
 endif
 
 MESENFLAGS += -m64
@@ -145,9 +146,6 @@ COREOBJ := $(CORESRC:.cpp=.o)
 UTILSRC := $(shell find Utilities -name '*.cpp' -o -name '*.c')
 UTILOBJ := $(addsuffix .o,$(basename $(UTILSRC)))
 
-SDLSRC := $(shell find Sdl -name '*.cpp')
-SDLOBJ := $(SDLSRC:.cpp=.o)
-
 SEVENZIPSRC := $(shell find SevenZip -name '*.c')
 SEVENZIPOBJ := $(SEVENZIPSRC:.c=.o)
 
@@ -155,18 +153,22 @@ LUASRC := $(shell find Lua -name '*.c')
 LUAOBJ := $(LUASRC:.c=.o)
 
 ifeq ($(MESENOS),linux)
-	LINUXSRC := $(shell find Linux -name '*.cpp')
+	LINUXSRC := $(shell find Linux -name '*.cpp')	
 else
 	LINUXSRC :=
 endif
 LINUXOBJ := $(LINUXSRC:.cpp=.o)
 
 ifeq ($(MESENOS),osx)
-	MACOSSRC := $(shell find MacOS -name '*.mm')
+	MACOSSRC := $(shell find MacOS -name '*.mm')	
+	SDLSRC := $(shell find Sdl -name '*.cpp')
 else
 	MACOSSRC :=
+	SDLSRC :=
 endif
+
 MACOSOBJ := $(MACOSSRC:.mm=.o)
+SDLOBJ := $(SDLSRC:.cpp=.o)
 
 DLLSRC := $(shell find InteropDLL -name '*.cpp')
 DLLOBJ := $(DLLSRC:.cpp=.o)
@@ -178,12 +180,6 @@ else
 	LIBEVDEVSRC := $(shell find Linux/libevdev -name '*.c')
 	LIBEVDEVOBJ := $(LIBEVDEVSRC:.c=.o)
 	LIBEVDEVINC := -I../
-endif
-
-ifeq ($(MESENOS),linux)
-	X11LIB := -lX11
-else
-	X11LIB :=
 endif
 
 FSLIB := -lstdc++fs
@@ -214,7 +210,7 @@ ui: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
 core: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
 
 pgohelper: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
-	mkdir -p PGOHelper/$(OBJFOLDER) && cd PGOHelper/$(OBJFOLDER) && $(CXX) $(CXXFLAGS) $(LINKCHECKUNRESOLVED) -o pgohelper ../PGOHelper.cpp ../../bin/pgohelperlib.so -pthread $(FSLIB) $(SDL2LIB) $(LIBEVDEVLIB) $(X11LIB)
+	mkdir -p PGOHelper/$(OBJFOLDER) && cd PGOHelper/$(OBJFOLDER) && $(CXX) $(CXXFLAGS) $(LINKCHECKUNRESOLVED) -o pgohelper ../PGOHelper.cpp ../../bin/pgohelperlib.so -pthread $(FSLIB) $(SDL2LIB) $(LIBEVDEVLIB)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -228,7 +224,7 @@ pgohelper: InteropDLL/$(OBJFOLDER)/$(SHAREDLIB)
 InteropDLL/$(OBJFOLDER)/$(SHAREDLIB): $(SEVENZIPOBJ) $(LUAOBJ) $(UTILOBJ) $(COREOBJ) $(SDLOBJ) $(LIBEVDEVOBJ) $(LINUXOBJ) $(DLLOBJ) $(MACOSOBJ)
 	mkdir -p bin
 	mkdir -p InteropDLL/$(OBJFOLDER)
-	$(CXX) $(CXXFLAGS) $(LINKOPTIONS) $(LINKCHECKUNRESOLVED) -shared -o $(SHAREDLIB) $(DLLOBJ) $(SEVENZIPOBJ) $(LUAOBJ) $(LINUXOBJ) $(MACOSOBJ) $(LIBEVDEVOBJ) $(UTILOBJ) $(SDLOBJ) $(COREOBJ) $(SDL2INC) -pthread $(FSLIB) $(SDL2LIB) $(LIBEVDEVLIB) $(X11LIB)
+	$(CXX) $(CXXFLAGS) $(LINKOPTIONS) $(LINKCHECKUNRESOLVED) -shared -o $(SHAREDLIB) $(DLLOBJ) $(SEVENZIPOBJ) $(LUAOBJ) $(LINUXOBJ) $(MACOSOBJ) $(LIBEVDEVOBJ) $(UTILOBJ) $(SDLOBJ) $(COREOBJ) $(SDL2INC) -pthread $(FSLIB) $(SDL2LIB) $(LIBEVDEVLIB)
 	cp $(SHAREDLIB) bin/pgohelperlib.so
 	mv $(SHAREDLIB) InteropDLL/$(OBJFOLDER)
 
