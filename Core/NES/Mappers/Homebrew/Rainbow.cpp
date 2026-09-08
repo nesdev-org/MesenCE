@@ -114,7 +114,7 @@ uint8_t Rainbow::ReadRam(uint16_t addr)
 		if(_cpuIrqAckOn4011) {
 			AckCpuIrq();
 		}
-		return (_audio->GetLastOutput() << 1);
+		return _audio->GetLastOutput4011(_console->GetMemoryManager()->GetOpenBus());
 	}
 	return BaseMapper::InternalRead(addr);
 }
@@ -264,7 +264,11 @@ void Rainbow::ProcessCpuClock()
 {
 	BaseProcessCpuClock();
 
-	_jitterCounter++;
+	if(_slIrqPending) {
+		_jitterCounter++;
+	} else {
+		_jitterCounter = 0;
+	}
 	_parityCounter = !_parityCounter;
 
 	_audio->Clock();
@@ -322,6 +326,10 @@ uint8_t Rainbow::MapperReadVram(uint16_t addr, MemoryOperationType memoryOperati
 		}
 	}
 
+	if(!_inFrame) {
+		_windowPosY = _windowScrollY;
+	}
+
 	_ppuReadCounter++;
 	DetectScanlineStart(addr);
 
@@ -346,6 +354,7 @@ uint8_t Rainbow::MapperReadVram(uint16_t addr, MemoryOperationType memoryOperati
 			_ntFetchCounter++;
 			if(_ntFetchCounter == 33) {
 				_inHBlank = true;
+				_windowPosY = _windowPosY == 239 ? 0 : _windowPosY + 1;
 			}
 			_inWindow = false;
 
@@ -358,14 +367,12 @@ uint8_t Rainbow::MapperReadVram(uint16_t addr, MemoryOperationType memoryOperati
 
 		uint8_t shift = 0;
 		if(_inWindow) {
-			uint8_t scanline = _ntFetchCounter >= 49 ? _scanlineCounter + 1 : _scanlineCounter;
-			uint8_t windowScanline = (scanline + _windowScrollY) % 240;
 			uint8_t column = (_ntFetchCounter + 1) % 50;
-			uint16_t ntAddr = ((windowScanline / 8 * 32) + ((column + _windowScrollX) & 0x1F));
+			uint16_t ntAddr = ((_windowPosY / 8 * 32) + ((column + _windowScrollX) & 0x1F));
 			if(!isAttributeFetch) {
 				addr = ntAddr;
 			} else {
-				addr = 0x3C0 + (((windowScanline >> 2) & 0xF8) | (((column + _windowScrollX) & 0x1F) >> 2));
+				addr = 0x3C0 + (((_windowPosY >> 2) & 0xF8) | (((column + _windowScrollX) & 0x1F) >> 2));
 				shift = ((ntAddr >> 4) & 0x04) | (ntAddr & 0x02);
 			}
 		}
@@ -402,13 +409,11 @@ uint8_t Rainbow::MapperReadVram(uint16_t addr, MemoryOperationType memoryOperati
 		//Tile data fetches
 		bool isBgFetch = _ntFetchCounter < 33 || _ntFetchCounter >= 49;
 		if(_inWindow && isBgFetch) {
-			uint8_t scanline = _ntFetchCounter >= 49 ? _scanlineCounter + 1 : _scanlineCounter;
-			uint8_t windowScanline = (scanline + _windowScrollY) % 240;
 			if(_overrideTileFetch) {
-				uint32_t fetchAddr = (addr & 0xFF8) | (windowScanline & 0x07) | ((_extData & 0x3F) << 12) | (_bgExtModeOffset << 18);
+				uint32_t fetchAddr = (addr & 0xFF8) | (_windowPosY & 0x07) | ((_extData & 0x3F) << 12) | (_bgExtModeOffset << 18);
 				return ReadChr(fetchAddr, addr);
 			} else {
-				uint32_t fetchAddr = (addr & 0x1FF8) | (windowScanline & 0x07);
+				uint32_t fetchAddr = (addr & 0x1FF8) | (_windowPosY & 0x07);
 				return InternalReadVram(fetchAddr);
 			}
 		} else if(_overrideTileFetch && isBgFetch) {
@@ -448,18 +453,16 @@ uint8_t Rainbow::ReadChr(uint32_t fetchAddr, uint16_t ppuAddr)
 		default:
 		case 0: return _chrRomSize ? _chrRom[fetchAddr & (_chrRomSize - 1)] : 0;
 		case 1: return _chrRamSize ? _chrRam[fetchAddr & (_chrRamSize - 1)] : 0;
-		case 2: return _mapperRam[fetchAddr & 0x1FFF];
+		case 2: return _mapperRam[fetchAddr & 0x0FFF];
 		case 3: return GetNametable((ppuAddr & 0x400) >> 10)[ppuAddr & 0x3FF];
 	}
 }
 
 void Rainbow::UpdateIrqStatus()
 {
-	bool active = (_cpuIrqEnabled && _cpuIrqPending) || (_slIrqEnabled && _slIrqPending);
+	_wifiIrqPending = _wifiIrqEnabled && _dataReceived;
+	bool active = (_cpuIrqEnabled && _cpuIrqPending) || (_slIrqEnabled && _slIrqPending) || _wifiIrqPending;
 	if(active) {
-		if(!_console->GetCpu()->HasIrqSource(IRQSource::External)) {
-			_jitterCounter = 0;
-		}
 		_console->GetCpu()->SetIrqSource(IRQSource::External);
 	} else {
 		_console->GetCpu()->ClearIrqSource(IRQSource::External);
@@ -531,14 +534,6 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 		case 0x4100: return _highMode | (_lowMode << 7);
 		case 0x4120: return _chrMode | ((uint8_t)_windowEnabled << 4) | ((uint8_t)_spriteExtMode << 5) | (_chrSource << 6);
 
-		case 0x412A:
-		case 0x412B:
-		case 0x412C:
-		case 0x412D:
-			return _ntControl[addr - 0x412A].ToByte();
-
-		case 0x412F: return _windowControl.ToByte();
-
 		case 0x4150: return (uint8_t)_scanlineCounter;
 
 		case 0x4151:
@@ -551,7 +546,8 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 		case 0x4154: return _jitterCounter;
 		case 0x4157: return ((uint8_t)_parityCounter << 7);
 
-		case 0x415F: {
+		case 0x415F:
+		{
 			uint8_t value = _mapperRam[_fpgaRamAddr];
 			_fpgaRamAddr = (_fpgaRamAddr + _fpgaRamInc) & 0x1FFF;
 			return value;
@@ -559,10 +555,10 @@ uint8_t Rainbow::ReadRegister(uint16_t addr)
 
 		case 0x4160: return MAPPER_VERSION;
 		case 0x4161:
-			return (
-				(uint8_t)_wifiIrqPending |
-				((uint8_t)_cpuIrqPending << 6) |
-				((uint8_t)_slIrqPending << 7));
+			return
+				uint8_t(_wifiIrqEnabled && _dataReceived) |
+				(uint8_t(_cpuIrqEnabled && _cpuIrqPending) << 6) |
+				(uint8_t(_slIrqEnabled && _slIrqPending) << 7);
 
 		case 0x4280: GenerateOamSlowUpdate(); break;
 		case 0x4282: GenerateExtUpdate(); break;
@@ -631,6 +627,7 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value)
 
 		case 0x4120:
 			_chrMode = value & 0x07;
+			if(_chrMode > 4) _chrMode = 4;
 			_windowEnabled = value & 0x10;
 			_spriteExtMode = value & 0x20;
 			_chrSource = (value & 0xC0) >> 6;
@@ -641,18 +638,21 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value)
 
 		case 0x4124: _fillModeTileIndex = value; break;
 		case 0x4125: _fillModeAttrIndex = value & 0x03; break;
-		case 0x412E: _windowBank = value; break;
+		case 0x412E: _windowBank = value & 0x03; break;
 
 		case 0x412F:
-			_windowControl.BgExtMode = value & 0x01;
-			_windowControl.AttrExtMode = value & 0x02;
+			_windowControl.AttrExtMode = value & 0x01;
+			_windowControl.BgExtMode = value & 0x02;
 			_windowControl.FpgaRamSrc = (value & 0x0C) >> 2;
 			_windowControl.FillMode = value & 0x20;
 			_windowControl.Source = (value & 0xC0) >> 6; //todo this is writeable/readable but ignored?
 			break;
 
 		case 0x4150: _slIrqScanline = value; break;
-		case 0x4151: _slIrqEnabled = true; break;
+		case 0x4151:
+			_slIrqEnabled = true;
+			UpdateIrqStatus();
+			break;
 
 		case 0x4152:
 			_slIrqEnabled = false;
@@ -707,11 +707,22 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value)
 		case 0x4172: _windowY1 = value; break;
 		case 0x4173: _windowY2 = value; break;
 		case 0x4174: _windowScrollX = value & 0x1F; break;
-		case 0x4175: _windowScrollY = value; break;
+		case 0x4175:
+			if(value < 240) _windowScrollY = value;
+			else _windowScrollY = 239;
+			break;
 
 		case 0x4190:
 			_espEnabled = value & 0x01;
 			_wifiIrqEnabled = value & 0x02;
+
+			if(!_espEnabled) {
+				_dataReceived = false;
+				_dataSent = true;
+			}
+
+			UpdateIrqStatus();
+
 			break;
 
 		case 0x4191: _dataReceived = false; break;
@@ -785,16 +796,16 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 		case 2: source = "PRG-RAM"; break;
 		case 3: source = "FPGA RAM"; break;
 	}
-	entries.push_back(MapperStateEntry("$4116.6-7", "PRG-RAM Bank 0 Source", source));
+	entries.push_back(MapperStateEntry("$4106.6-7", "PRG-RAM Bank 0 Source", source));
 
 	entries.push_back(MapperStateEntry("$4107/17", "PRG-RAM Bank 1", _lowBanks[1], MapperStateValueType::Number16));
-	switch((_lowBanks[0] & 0xC000) >> 14) {
+	switch((_lowBanks[1] & 0xC000) >> 14) {
 		case 0:
 		case 1: source = "PRG-ROM"; break;
 		case 2: source = "PRG-RAM"; break;
 		case 3: source = "FPGA RAM"; break;
 	}
-	entries.push_back(MapperStateEntry("$4117.6-7", "PRG-RAM Bank 1 Source", source));
+	entries.push_back(MapperStateEntry("$4107.6-7", "PRG-RAM Bank 1 Source", source));
 
 	for(int i = 0; i < 8; i++) {
 		entries.push_back(MapperStateEntry(
@@ -804,7 +815,7 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 			MapperStateValueType::Number16));
 
 		entries.push_back(MapperStateEntry(
-			HexUtilities::ToHex(0x4118 + i) + ".7",
+			HexUtilities::ToHex(0x4108 + i) + ".7",
 			"ROM Bank " + std::to_string(i) + " Source",
 			(string)((_highBanks[i] & 0x8000) ? "RAM" : "ROM")));
 	}
@@ -901,7 +912,7 @@ vector<MapperStateEntry> Rainbow::GetMapperStateEntries()
 	entries.push_back(MapperStateEntry("$4172", "Start Scanline", _windowY1, MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4173", "End Scanline", _windowY2, MapperStateValueType::Number8));
 	entries.push_back(MapperStateEntry("$4174.0-4", "Scroll X", _windowScrollX, MapperStateValueType::Number8));
-	entries.push_back(MapperStateEntry("$4175", "Scroll Y", _windowScrollX, MapperStateValueType::Number8));
+	entries.push_back(MapperStateEntry("$4175", "Scroll Y", _windowScrollY, MapperStateValueType::Number8));
 
 	entries.push_back(MapperStateEntry("", "Wi-Fi"));
 	entries.push_back(MapperStateEntry("$4190.0", "ESP Enabled", _espEnabled));
@@ -950,7 +961,7 @@ uint8_t Rainbow::DebugReadChr(ExtModeConfig& cfg, uint32_t addr)
 		default:
 		case 0: return _chrRomSize ? _chrRom[addr & (_chrRomSize - 1)] : 0;
 		case 1: return _chrRamSize ? _chrRam[addr & (_chrRamSize - 1)] : 0;
-		case 2: return cfg.ExtRam[addr & 0x1FFF];
+		case 2: return cfg.ExtRam[addr & 0x0FFF];
 		case 3: return GetNametable((addr & 0x400) >> 10)[addr & 0x3FF];
 	}
 }
@@ -1050,6 +1061,7 @@ void Rainbow::Serialize(Serializer& s)
 	SV(_windowY2);
 	SV(_windowScrollX);
 	SV(_windowScrollY);
+	SV(_windowPosY);
 	SV(_inWindow);
 	SV(_slIrqEnabled);
 	SV(_slIrqPending);

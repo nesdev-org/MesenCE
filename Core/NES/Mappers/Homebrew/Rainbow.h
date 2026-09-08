@@ -63,6 +63,7 @@ private:
 	uint8_t _windowY2 = 0;
 	uint8_t _windowScrollX = 0;
 	uint8_t _windowScrollY = 0;
+	uint8_t _windowPosY = 0;
 	bool _inWindow = false;
 
 	bool _slIrqEnabled = false;
