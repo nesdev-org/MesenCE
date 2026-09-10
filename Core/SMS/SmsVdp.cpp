@@ -616,7 +616,7 @@ void SmsVdp::ProcessScanlineEvents()
 
 		case 316:
 			//horizontal irq
-			if(_state.Scanline <= 191 || _state.Scanline == _scanlineCount - 1) {
+			if(_state.Scanline < _state.VisibleScanlineCount || _state.Scanline == _scanlineCount - 1) {
 				if(_state.ScanlineCounterLatch-- == 0) {
 					_state.ScanlineCounterLatch = _state.ScanlineCounter;
 					_state.ScanlineIrqPending = true;
