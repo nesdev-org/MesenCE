@@ -26,6 +26,12 @@ endif
 SDL2LIB := $(shell sdl2-config --libs)
 SDL2INC := $(shell sdl2-config --cflags)
 
+ifeq ($(UNAME_S),Darwin)
+	SDL2_LIB_PATH := $(shell pkg-config --variable=libdir sdl2)
+	LINKOPTIONS += -Wl,-rpath,$(SDL2_LIB_PATH)
+	LDFLAGS += -Wl,-install_name,@loader_path/../lib/$(SHAREDLIB)
+endif
+
 LINKCHECKUNRESOLVED := -Wl,-z,defs
 
 LINKOPTIONS :=
@@ -111,7 +117,19 @@ ifneq ($(STATICLINK),false)
 endif
 
 ifeq ($(MESENOS),osx)
-	LINKOPTIONS += -framework Foundation -framework Cocoa -framework GameController -framework CoreHaptics -Wl,-rpath,/opt/local/lib
+    BREW_SDL2 := $(shell brew --prefix sdl2 2>/dev/null)
+    
+    ifneq ($(BREW_SDL2),)
+        SDL2_LIB_PATH := $(BREW_SDL2)/lib
+    else
+        SDL2_LIB_PATH := /usr/local/lib
+    endif
+
+    ifneq ($(wildcard $(SDL2_LIB_PATH)),)
+        LINKOPTIONS += -Wl,-rpath,$(SDL2_LIB_PATH)
+    endif
+
+    LINKOPTIONS += -framework Foundation -framework Cocoa -framework GameController -framework CoreHaptics
 endif
 
 CXXFLAGS = -fPIC -Wall --std=c++17 $(MESENFLAGS) $(SDL2INC) -I $(realpath ./) -I $(realpath ./Core) -I $(realpath ./Utilities) -I $(realpath ./Sdl) -I $(realpath ./Linux) -I $(realpath ./MacOS)
