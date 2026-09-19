@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Controls;
+using Mesen.Localization;
 using Mesen.Utilities;
 using System;
 using System.Collections.Generic;

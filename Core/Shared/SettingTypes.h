@@ -534,6 +534,7 @@ struct PcEngineConfig
 
 	RamState RamPowerOnState = RamState::Random;
 	bool EnableRandomPowerOnState = false;
+	uint32_t AdpcmClockSpeed = 32100;
 
 	uint32_t ChannelVol[6] = { 100, 100, 100, 100, 100, 100 };
 	uint32_t CdAudioVolume = 100;
