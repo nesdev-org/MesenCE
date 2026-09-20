@@ -27,8 +27,7 @@ namespace Mesen.ViewModels
 		public Enum[] AvailableRegionsGg => new Enum[] {
 			ConsoleRegion.Auto,
 			ConsoleRegion.Ntsc,
-			ConsoleRegion.NtscJapan,
-			ConsoleRegion.Pal
+			ConsoleRegion.NtscJapan
 		};
 
 		public SmsConfigViewModel()
