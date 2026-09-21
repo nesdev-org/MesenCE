@@ -141,7 +141,7 @@ void PceScsiBus::ProcessDataInPhase()
 			_dataBuffer.pop_front();
 			SetSignals(Req);
 		} else {
-			if(_state.SectorsToRead == 0) {
+			if(_state.SectorsToRead == 0 && _readSectorCounter == 0) {
 				//If this is the last sector to read, set status phase (after a delay, which will trigger an irq)
 				QueueDriveUpdate(ScsiUpdateType::SetGoodStatus, 1000);
 			}
@@ -234,13 +234,8 @@ uint64_t PceScsiBus::GetSectorLoadTime()
 void PceScsiBus::CmdRead()
 {
 	uint32_t sector = _cmdBuffer[3] | (_cmdBuffer[2] << 8) | ((_cmdBuffer[1] & 0x1F) << 16);
-	uint8_t sectorsToRead = _cmdBuffer[4];
 
-	if(sectorsToRead == 0) {
-		LogCommand("Read - No sectors to read");
-		SetStatusMessage(ScsiStatus::Good, 0);
-		return;
-	} else if(sector >= _disc->DiscSectorCount) {
+	if(sector >= _disc->DiscSectorCount) {
 		LogCommand("Read - invalid sector, command ignored: " + std::to_string(sector));
 		SetStatusMessage(ScsiStatus::Good, 0);
 		return;
@@ -251,7 +246,9 @@ void PceScsiBus::CmdRead()
 	_readSectorCounter = seekTime + GetSectorLoadTime();
 	_needExec = true;
 	_state.Sector = sector;
-	_state.SectorsToRead = sectorsToRead;
+
+	//When the number of sectors is set to 0, the drive will read 256 sectors.
+	_state.SectorsToRead = _cmdBuffer[4];
 
 	//Set the phase to "data in" right away
 	//Ys IV appears to expect this to happen relatively quickly after
@@ -263,7 +260,7 @@ void PceScsiBus::CmdRead()
 	_cdrom->GetAudioPlayer().SetIdle();
 	if(_emu->IsDebugging()) {
 		uint32_t seekTimeMs = (double)seekTime / _console->GetMasterClockRate() * 1000;
-		LogCommand("Read - Sector: " + std::to_string(_state.Sector) + " to " + std::to_string(_state.Sector + _state.SectorsToRead - 1) +
+		LogCommand("Read - Sector: " + std::to_string(_state.Sector) + " to " + std::to_string(_state.Sector + (_state.SectorsToRead ? _state.SectorsToRead : 256) - 1) +
 			" - Seek time (" + std::to_string(fromSector) + "->" + std::to_string(sector) + "): " + std::to_string(seekTimeMs) + " ms");
 	}
 }
