@@ -282,7 +282,6 @@ void DirectSoundManager::ProcessEndOfFrame()
 	_secondaryBuffer->GetCurrentPosition(&currentPlayCursor, &safeWriteCursor);
 	ValidateWriteCursor(safeWriteCursor);
 
-	uint32_t emulationSpeed = _emu->GetSettings()->GetEmulationSpeed();
 	_secondaryBuffer->SetFrequency((DWORD)(_sampleRate));
 
 	ProcessLatency(currentPlayCursor, _lastWriteOffset);
@@ -290,7 +289,7 @@ void DirectSoundManager::ProcessEndOfFrame()
 	AudioConfig& cfg = _emu->GetSettings()->GetAudioConfig();
 	SetAudioDevice(cfg.AudioDevice);
 
-	if(_averageLatency > 0 && emulationSpeed <= 100 && emulationSpeed > 0 && std::abs(_averageLatency - cfg.AudioLatency) > 50) {
+	if(_averageLatency > 0 && !_emu->GetSettings()->IsFastForward() && std::abs(_averageLatency - cfg.AudioLatency) > 50) {
 		//Latency is way off (over 50ms gap), stop audio & start again
 		Stop();
 	}
