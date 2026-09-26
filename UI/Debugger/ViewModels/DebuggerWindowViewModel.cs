@@ -807,7 +807,7 @@ namespace Mesen.Debugger.ViewModels
 						ActionType = ActionType.SaveCdl,
 						Shortcut = () => ConfigManager.Config.Debug.Shortcuts.Get(DebuggerShortcut.SaveCdl),
 						OnClick = async () => {
-							string? filename = await FileDialogHelper.SaveFile(ConfigManager.DebuggerFolder, EmuApi.GetRomInfo().GetRomName() + ".cdl", wnd, FileDialogHelper.CdlExt);
+							string? filename = await FileDialogHelper.SaveFile(ConfigManager.DebuggerFolder, EmuApi.GetRomInfo().GetRomName(), wnd, FileDialogHelper.CdlExt);
 							if(filename != null) {
 								DebugApi.SaveCdlFile(CpuType.GetPrgRomMemoryType(), filename);
 							}
