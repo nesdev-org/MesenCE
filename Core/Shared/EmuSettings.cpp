@@ -510,6 +510,12 @@ OverscanDimensions EmuSettings::GetOverscan()
 	return OverscanDimensions {};
 }
 
+bool EmuSettings::IsFastForward()
+{
+	uint32_t speed = GetEmulationSpeed();
+	return speed == 0 || speed > 100;
+}
+
 uint32_t EmuSettings::GetEmulationSpeed()
 {
 	if(CheckFlag(EmulationFlags::MaximumSpeed)) {

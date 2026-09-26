@@ -119,6 +119,7 @@ public:
 	vector<KeyCombination> GetShortcutSupersets(EmulatorShortcut shortcut, int keySetIndex);
 
 	OverscanDimensions GetOverscan();
+	bool IsFastForward();
 	uint32_t GetEmulationSpeed();
 	double GetAspectRatio(ConsoleRegion region, FrameInfo baseFrameSize);
 

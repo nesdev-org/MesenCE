@@ -181,9 +181,9 @@ bool WasapiSoundManager::Initialize(uint32_t sampleRate, bool isStereo)
 	waveFormat.nAvgBytesPerSec = waveFormat.nSamplesPerSec * waveFormat.nBlockAlign;
 	waveFormat.cbSize = 0;
 
-	//Make the buffer at least 200ms long, or 2x the size of the requested latency (whichever is bigger)
+	//Make the buffer at least 100ms long, or 2x the size of the requested latency (whichever is bigger)
 	int32_t latency = _emu->GetSettings()->GetAudioConfig().AudioLatency;
-	REFERENCE_TIME bufferDuration = (REFERENCE_TIME)std::max(100, latency) * 10000 * 2;
+	REFERENCE_TIME bufferDuration = (REFERENCE_TIME)std::max(50, latency) * 10000 * 2;
 
 	//Init in shared mode
 	hr = _audioClient->Initialize(
@@ -267,8 +267,7 @@ void WasapiSoundManager::ProcessEndOfFrame()
 	AudioConfig& cfg = _emu->GetSettings()->GetAudioConfig();
 	SetAudioDevice(cfg.AudioDevice);
 
-	uint32_t emulationSpeed = _emu->GetSettings()->GetEmulationSpeed();
-	if(_averageLatency > 0 && emulationSpeed <= 100 && emulationSpeed > 0 && std::abs(_averageLatency - cfg.AudioLatency) > 50) {
+	if(_averageLatency > 0 && !_emu->GetSettings()->IsFastForward() && std::abs(_averageLatency - cfg.AudioLatency) > 50) {
 		//Latency is way off (over 50ms gap), stop audio & start again
 		Stop();
 	}
@@ -301,8 +300,21 @@ void WasapiSoundManager::PlayBuffer(int16_t* soundBuffer, uint32_t sampleCount, 
 		_bufferUnderrunEventCount++;
 	}
 
+	if(_waitForHalfBuffer && _emu->GetSettings()->IsFastForward() && paddingFrames > 0 && (_bufferFrameCount / paddingFrames) < 2) {
+		//Waiting for the buffer to be half-empty until new audio data is sent again
+		return;
+	}
+	_waitForHalfBuffer = false;
+
 	UINT32 availableFrames = _bufferFrameCount - paddingFrames;
 	UINT32 framesToWrite = std::min(sampleCount, availableFrames);
+
+	if(sampleCount >= availableFrames && _emu->GetSettings()->IsFastForward()) {
+		//This write will fill the buffer. When fast forwarding, use this as a trigger
+		//to stop sending new audio until the buffer is half empty again.
+		//This makes the audio sound better while fast forwarding
+		_waitForHalfBuffer = true;
+	}
 
 	if(framesToWrite > 0) {
 		uint8_t* data = nullptr;
