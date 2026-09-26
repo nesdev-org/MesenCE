@@ -37,24 +37,32 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize, bool isFx3)
 
 	for(uint32_t i = 0; i < _gsuRamSize / 0x1000; i++) {
 		_gsuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new RamHandler(_gsuRam, i * 0x1000, _gsuRamSize, MemoryType::GsuWorkRam)));
-		_gsuCpuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRamHandler(_state, isFx3, _gsuRamHandlers.back().get())));
+		if(!isFx3) {
+			_gsuCpuRamHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRamHandler(_state, _gsuRamHandlers.back().get())));
+		}
 	}
 
 	//CPU mappings
 	MemoryMappings* cpuMappings = _memoryManager->GetMemoryMappings();
 	vector<unique_ptr<IMemoryHandler>>& prgRomHandlers = _console->GetCartridge()->GetPrgRomHandlers();
-	for(unique_ptr<IMemoryHandler>& handler : prgRomHandlers) {
-		_gsuCpuRomHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRomHandler(_state, isFx3, handler.get())));
+	if(!isFx3) {
+		for(unique_ptr<IMemoryHandler>& handler : prgRomHandlers) {
+			_gsuCpuRomHandlers.push_back(unique_ptr<IMemoryHandler>(new GsuRomHandler(_state, handler.get())));
+		}
 	}
 
-	//GSU registers in CPU memory space
 	_maxPrgRomBank = 0x5F;
-	uint8_t maxPrgRomBankH = 0xDF;
 	if(isFx3) {
 		cpuMappings->RegisterHandler(0x00, 0x3F, 0x7000, 0x7FFF, this);
 		cpuMappings->RegisterHandler(0x80, 0xBF, 0x7000, 0x7FFF, this);
+
+		cpuMappings->RegisterHandler(0x70, 0x71, 0x0000, 0xFFFF, _gsuRamHandlers);
+
+		cpuMappings->RegisterHandler(0x00, 0x3F, 0x8000, 0xFFFF, prgRomHandlers);
+		cpuMappings->RegisterHandler(0x40, 0x6F, 0x0000, 0xFFFF, prgRomHandlers);
+		cpuMappings->RegisterHandler(0x80, 0xBF, 0x8000, 0xFFFF, prgRomHandlers);
+		cpuMappings->RegisterHandler(0xC0, 0xFF, 0x0000, 0xFFFF, prgRomHandlers);
 		_maxPrgRomBank = 0x6F;
-		maxPrgRomBankH = 0xFF;
 	} else {
 		cpuMappings->RegisterHandler(0x00, 0x3F, 0x3000, 0x3FFF, this);
 		cpuMappings->RegisterHandler(0x80, 0xBF, 0x3000, 0x3FFF, this);
@@ -63,18 +71,26 @@ Gsu::Gsu(SnesConsole* console, uint32_t gsuRamSize, bool isFx3)
 			cpuMappings->RegisterHandler(i, i, 0x6000, 0x7FFF, _gsuCpuRamHandlers);
 			cpuMappings->RegisterHandler(i + 0x80, i + 0x80, 0x6000, 0x7FFF, _gsuCpuRamHandlers);
 		}
+		cpuMappings->RegisterHandler(0x70, 0x71, 0x0000, 0xFFFF, _gsuCpuRamHandlers);
+
+		cpuMappings->RegisterHandler(0x00, 0x3F, 0x8000, 0xFFFF, _gsuCpuRomHandlers);
+		cpuMappings->RegisterHandler(0x40, 0x5F, 0x0000, 0xFFFF, _gsuCpuRomHandlers);
+
+		if(prgRomHandlers.size() <= 0x100) {
+			//GSU1 mappings (80-FF)
+			cpuMappings->RegisterHandler(0x80, 0xBF, 0x8000, 0xFFFF, prgRomHandlers);
+			cpuMappings->RegisterHandler(0xC0, 0xDF, 0x0000, 0xFFFF, prgRomHandlers);
+			cpuMappings->RegisterHandler(0xF0, 0xF1, 0x0000, 0xFFFF, _gsuCpuRamHandlers);
+		} else {
+			//GSU2 mappings (80-FF)
+			if(prgRomHandlers.size() > 0x200) {
+				cpuMappings->RegisterHandler(0x80, 0xBF, 0x8000, 0xFFFF, prgRomHandlers, 0, 0x200);
+			}
+			if(prgRomHandlers.size() > 0x400) {
+				cpuMappings->RegisterHandler(0xC0, 0xFF, 0x0000, 0xFFFF, prgRomHandlers, 0, 0x400);
+			}
+		}
 	}
-
-	cpuMappings->RegisterHandler(0x70, 0x71, 0x0000, 0xFFFF, _gsuCpuRamHandlers);
-	if(!isFx3) {
-		cpuMappings->RegisterHandler(0xF0, 0xF1, 0x0000, 0xFFFF, _gsuCpuRamHandlers);
-	}
-
-	cpuMappings->RegisterHandler(0x00, 0x3F, 0x8000, 0xFFFF, _gsuCpuRomHandlers);
-	cpuMappings->RegisterHandler(0x80, 0xBF, 0x8000, 0xFFFF, _gsuCpuRomHandlers);
-
-	cpuMappings->RegisterHandler(0x40, _maxPrgRomBank, 0x0000, 0xFFFF, _gsuCpuRomHandlers);
-	cpuMappings->RegisterHandler(0xC0, maxPrgRomBankH, 0x0000, 0xFFFF, _gsuCpuRomHandlers);
 
 	//GSU mappings
 	_mappings.RegisterHandler(0x00, 0x3F, 0x8000, 0xFFFF, prgRomHandlers);
