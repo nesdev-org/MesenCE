@@ -9,19 +9,17 @@ class GsuRomHandler : public IMemoryHandler
 private:
 	GsuState* _state;
 	IMemoryHandler* _romHandler;
-	bool _isFx3;
 
 public:
-	GsuRomHandler(GsuState& state, bool isFx3, IMemoryHandler* romHandler) : IMemoryHandler(MemoryType::SnesPrgRom)
+	GsuRomHandler(GsuState& state, IMemoryHandler* romHandler) : IMemoryHandler(MemoryType::SnesPrgRom)
 	{
 		_romHandler = romHandler;
 		_state = &state;
-		_isFx3 = isFx3;
 	}
 
 	uint8_t Read(uint32_t addr) override
 	{
-		if(_isFx3 || !_state->SFR.Running || !_state->GsuRomAccess) {
+		if(!_state->SFR.Running || !_state->GsuRomAccess) {
 			return _romHandler->Read(addr);
 		}
 
@@ -62,7 +60,7 @@ public:
 
 	AddressInfo GetAbsoluteAddress(uint32_t address) override
 	{
-		if(_isFx3 || !_state->SFR.Running || !_state->GsuRomAccess) {
+		if(!_state->SFR.Running || !_state->GsuRomAccess) {
 			return _romHandler->GetAbsoluteAddress(address);
 		} else {
 			return { -1, MemoryType::None };
