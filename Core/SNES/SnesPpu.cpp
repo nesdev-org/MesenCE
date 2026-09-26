@@ -445,6 +445,10 @@ bool SnesPpu::ProcessEndOfScanline(uint16_t& hClock)
 			_spriteEvalStart = 0;
 			_spriteEvalEnd = 0;
 			_spriteFetchingDone = false;
+			_state.Mode7.HScrollLatchLoaded = false;
+			_state.Mode7.VScrollLatchLoaded = false;
+			_state.Mode7.CenterXLatchLoaded = false;
+			_state.Mode7.CenterYLatchLoaded = false;
 
 			memcpy(_spritePriority, _spritePriorityCopy, sizeof(_spritePriority));
 			memcpy(_spritePalette, _spritePaletteCopy, sizeof(_spritePalette));
@@ -1208,14 +1212,16 @@ void SnesPpu::RenderTilemapMode7()
 
 	if(_drawStartX == 0) {
 		//Keep the same scroll offsets for the entire scanline
-		_state.Mode7.HScrollLatch = _state.Mode7.HScroll;
-		_state.Mode7.VScrollLatch = _state.Mode7.VScroll;
+		ProcessMode7Latch(_state.Mode7.HScrollLatch, _state.Mode7.HScroll, _state.Mode7.HScrollLatchLoaded);
+		ProcessMode7Latch(_state.Mode7.VScrollLatch, _state.Mode7.VScroll, _state.Mode7.VScrollLatchLoaded);
+		ProcessMode7Latch(_state.Mode7.CenterXLatch, _state.Mode7.CenterX, _state.Mode7.CenterXLatchLoaded);
+		ProcessMode7Latch(_state.Mode7.CenterYLatch, _state.Mode7.CenterY, _state.Mode7.CenterYLatchLoaded);
 	}
 
 	int32_t hScroll = ((int32_t)_state.Mode7.HScrollLatch << 19) >> 19;
 	int32_t vScroll = ((int32_t)_state.Mode7.VScrollLatch << 19) >> 19;
-	int32_t centerX = ((int32_t)_state.Mode7.CenterX << 19) >> 19;
-	int32_t centerY = ((int32_t)_state.Mode7.CenterY << 19) >> 19;
+	int32_t centerX = ((int32_t)_state.Mode7.CenterXLatch << 19) >> 19;
+	int32_t centerY = ((int32_t)_state.Mode7.CenterYLatch << 19) >> 19;
 	uint16_t realY = _state.Mode7.VerticalMirroring ? (255 - _scanline) : _scanline;
 
 	if(applyMosaic) {
@@ -2099,6 +2105,7 @@ void SnesPpu::Write(uint32_t addr, uint8_t value)
 		case 0x210D:
 			//M7HOFS - Mode 7 BG Horizontal Scroll
 			//BG1HOFS - BG1 Horizontal Scroll
+			ProcessMode7Latch(_state.Mode7.HScrollLatch, _state.Mode7.HScroll, _state.Mode7.HScrollLatchLoaded);
 			_state.Mode7.HScroll = ((value << 8) | (_state.Mode7.ValueLatch)) & 0x1FFF;
 			_state.Mode7.ValueLatch = value;
 
@@ -2117,6 +2124,7 @@ void SnesPpu::Write(uint32_t addr, uint8_t value)
 		case 0x210E:
 			//M7VOFS - Mode 7 BG Vertical Scroll
 			//BG1VOFS - BG1 Vertical Scroll
+			ProcessMode7Latch(_state.Mode7.VScrollLatch, _state.Mode7.VScroll, _state.Mode7.VScrollLatchLoaded);
 			_state.Mode7.VScroll = ((value << 8) | (_state.Mode7.ValueLatch)) & 0x1FFF;
 			_state.Mode7.ValueLatch = value;
 
@@ -2206,12 +2214,14 @@ void SnesPpu::Write(uint32_t addr, uint8_t value)
 
 		case 0x211F:
 			//M7X - Mode 7 Center X
+			ProcessMode7Latch(_state.Mode7.CenterXLatch, _state.Mode7.CenterX, _state.Mode7.CenterXLatchLoaded);
 			_state.Mode7.CenterX = ((value << 8) | _state.Mode7.ValueLatch);
 			_state.Mode7.ValueLatch = value;
 			break;
 
 		case 0x2120:
 			//M7Y - Mode 7 Center Y
+			ProcessMode7Latch(_state.Mode7.CenterYLatch, _state.Mode7.CenterY, _state.Mode7.CenterYLatchLoaded);
 			_state.Mode7.CenterY = ((value << 8) | _state.Mode7.ValueLatch);
 			_state.Mode7.ValueLatch = value;
 			break;
@@ -2369,6 +2379,16 @@ void SnesPpu::Write(uint32_t addr, uint8_t value)
 	}
 }
 
+void SnesPpu::ProcessMode7Latch(int16_t& latch, int16_t newValue, bool& latchLoaded)
+{
+	if(!latchLoaded && _memoryManager->GetHClock() >= 44) {
+		//This is latched on dot ~10, if a write occurs between dot 11 & the start
+		//of pixel output latch the previous value before writing the new value.
+		latch = newValue;
+		latchLoaded = true;
+	}
+}
+
 void SnesPpu::Serialize(Serializer& s)
 {
 	SV(_state.ForcedBlank);
@@ -2427,12 +2447,9 @@ void SnesPpu::Serialize(Serializer& s)
 	SV(_state.WindowMaskSub[2]);
 	SV(_state.WindowMaskSub[3]);
 	SV(_state.WindowMaskSub[4]);
-	SV(_state.Mode7.CenterX);
-	SV(_state.Mode7.CenterY);
 	SV(_state.ExtBgEnabled);
 	SV(_state.Mode7.FillWithTile0);
 	SV(_state.Mode7.HorizontalMirroring);
-	SV(_state.Mode7.HScroll);
 	SV(_state.Mode7.LargeMap);
 	SV(_state.Mode7.Matrix[0]);
 	SV(_state.Mode7.Matrix[1]);
@@ -2440,7 +2457,23 @@ void SnesPpu::Serialize(Serializer& s)
 	SV(_state.Mode7.Matrix[3]);
 	SV(_state.Mode7.ValueLatch);
 	SV(_state.Mode7.VerticalMirroring);
+
 	SV(_state.Mode7.VScroll);
+	SV(_state.Mode7.VScrollLatch);
+	SV(_state.Mode7.VScrollLatchLoaded);
+
+	SV(_state.Mode7.HScroll);
+	SV(_state.Mode7.HScrollLatch);
+	SV(_state.Mode7.HScrollLatchLoaded);
+
+	SV(_state.Mode7.CenterX);
+	SV(_state.Mode7.CenterXLatch);
+	SV(_state.Mode7.CenterXLatchLoaded);
+
+	SV(_state.Mode7.CenterY);
+	SV(_state.Mode7.CenterYLatch);
+	SV(_state.Mode7.CenterYLatchLoaded);
+
 	SV(_state.CgramAddressLatch);
 	SV(_state.CgramWriteBuffer);
 	SV(_state.InternalOamAddress);
@@ -2563,6 +2596,8 @@ void SnesPpu::RandomizeState()
 	_state.ScreenBrightness = _settings->GetRandomValue(0x0F);
 	_state.Mode7.CenterX = _settings->GetRandomValue(0xFFFF);
 	_state.Mode7.CenterY = _settings->GetRandomValue(0xFFFF);
+	_state.Mode7.CenterXLatch = _settings->GetRandomValue(0xFFFF);
+	_state.Mode7.CenterYLatch = _settings->GetRandomValue(0xFFFF);
 	_state.Mode7.FillWithTile0 = _settings->GetRandomBool();
 	_state.Mode7.HorizontalMirroring = _settings->GetRandomBool();
 	_state.Mode7.HScroll = _settings->GetRandomValue(0x1FFF);

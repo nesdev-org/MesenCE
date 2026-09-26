@@ -94,8 +94,14 @@ struct Mode7Config
 	bool VerticalMirroring = false;
 
 	//Holds the scroll values at the start of a scanline for the entire scanline
+	bool HScrollLatchLoaded = false;
+	bool VScrollLatchLoaded = false;
+	bool CenterXLatchLoaded = false;
+	bool CenterYLatchLoaded = false;
 	int16_t HScrollLatch = 0;
 	int16_t VScrollLatch = 0;
+	int16_t CenterXLatch = 0;
+	int16_t CenterYLatch = 0;
 };
 
 struct WindowConfig
