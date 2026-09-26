@@ -196,6 +196,7 @@ public class NesRegisterViewer
 			new RegEntry("--", "Timer", dmc.Timer),
 			new RegEntry("--", "Frequency", Math.Round(dmc.SampleRate).ToString("0."), null),
 			new RegEntry("--", "Bytes Remaining", dmc.BytesRemaining),
+			new RegEntry("--", "Bits Remaining", dmc.BitsRemaining),
 			new RegEntry("--", "Next sample address", dmc.NextSampleAddr, Format.X16),
 		});
 

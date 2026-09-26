@@ -341,6 +341,7 @@ struct ApuDmcState
 	uint16_t Period;
 	uint16_t Timer;
 	uint16_t BytesRemaining;
+	uint8_t BitsRemaining;
 
 	uint8_t OutputVolume;
 };
