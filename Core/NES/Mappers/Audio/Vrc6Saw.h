@@ -82,4 +82,17 @@ public:
 			return _accumulator >> 3;
 		}
 	}
+
+	void GetMapperStateEntries(vector<MapperStateEntry>& entries, double clockRate)
+	{
+		double frequency = clockRate / (14 * (_frequency + 1));
+		entries.push_back(MapperStateEntry("$B002.7", "Enabled", _enabled, MapperStateValueType::Bool));
+
+		entries.push_back(MapperStateEntry("$B000.0-5", "Accumulator Rate", _accumulatorRate, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "Accumulator", _accumulator, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "Step", _step, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "Timer", _timer, MapperStateValueType::Number32));
+		entries.push_back(MapperStateEntry("$B001/$B002.0-3", "Frequency", std::to_string(frequency) + " Hz"));
+		entries.push_back(MapperStateEntry("$9003", "Frequency Shift", _frequencyShift, MapperStateValueType::Number8));
+	}
 };
