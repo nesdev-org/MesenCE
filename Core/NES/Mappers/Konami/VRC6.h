@@ -318,7 +318,7 @@ public:
 		entries.push_back(MapperStateEntry("$B003.0-1", "PPU Banking mode", _bankingMode & 3, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$B003.2-3", "Mirroring", (_bankingMode & 0x0C) >> 2, MapperStateValueType::Number8));
 		entries.push_back(MapperStateEntry("$B003.4", "Nametables from CHR ROM", _bankingMode & 0x10, MapperStateValueType::Number8));
-		entries.push_back(MapperStateEntry("$B003.7", "PRG RAM Enable", _bankingMode & 0x80 , MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry("$B003.7", "PRG RAM Enable", _bankingMode & 0x80, MapperStateValueType::Bool));
 
 		entries.push_back(MapperStateEntry("$D000-3/$E000-3", "CHR Banks"));
 		entries.push_back(MapperStateEntry("--", "R0", _chrRegisters[0], MapperStateValueType::Number8));
