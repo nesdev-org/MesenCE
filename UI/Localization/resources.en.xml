@@ -1185,6 +1185,7 @@
 			<Control ID="chkShowOffscreenRegions">Show offscreen regions</Control>
 			<Control ID="chkDimOffscreenSprites">Dim offscreen sprites (grid)</Control>
 			<Control ID="lblBackground">Background:</Control>
+			<Control ID="lblFilter">Filter:</Control>
 			<Control ID="lblDataSource">Data Source</Control>
 			<Control ID="lblSource">Source:</Control>
 			<Control ID="lblSourceOffset">Offset:</Control>
@@ -3181,6 +3182,11 @@ E
 		<Enum ID="SpriteViewerSource">
 			<Value ID="SpriteRam">Sprite RAM</Value>
 			<Value ID="CpuMemory">CPU Memory</Value>
+		</Enum>
+		<Enum ID="SpriteViewerFilter">
+			<Value ID="Both">VDC1 + VDC2</Value>
+			<Value ID="DefaultOnly">VDC1 only</Value>
+			<Value ID="ExtendedOnly">VDC2 only</Value>
 		</Enum>
 		<Enum ID="DebugSpritePriority">
 			<Value ID="Undefined">-</Value>

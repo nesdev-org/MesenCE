@@ -139,7 +139,7 @@ void PceVdcTools::GetSpritePreview(GetSpritePreviewOptions options, BaseState& b
 		std::fill(outBuffer + i * 1024 + 32, outBuffer + i * 1024 + 32 + screenWidth, bgColor);
 	}
 
-	int spriteCount = _console->IsSuperGrafx() ? 128 : 64;
+	int spriteCount = _console->IsSuperGrafx() ? (options.Filter != SpriteViewerFilter::Both ? 64 : 128) : 64;
 
 	for(int i = spriteCount - 1; i >= 0; i--) {
 		DebugSpriteInfo& sprite = sprites[i];
@@ -299,9 +299,14 @@ void PceVdcTools::InternalGetSpriteInfo(DebugSpriteInfo& sprite, uint32_t* sprit
 void PceVdcTools::GetSpriteList(GetSpritePreviewOptions options, BaseState& baseState, BaseState& ppuToolsState, uint8_t* vram, uint8_t* oamRam, uint32_t* palette, DebugSpriteInfo outBuffer[], uint32_t* spritePreviews, uint32_t* screenPreview)
 {
 	PceVdcState& state = ((PceVideoState&)baseState).Vdc;
-	for(int i = 0, len = _console->IsSuperGrafx() ? 128 : 64; i < len; i++) {
+
+	int firstSprite = _console->IsSuperGrafx() ? (options.Filter == SpriteViewerFilter::ExtendedOnly ? 64 : 0) : 0;
+	int spriteCount = _console->IsSuperGrafx() ? (options.Filter != SpriteViewerFilter::Both ? 64 : 128) : 64;
+
+	for(int i = 0; i < spriteCount; i++) {
 		outBuffer[i].Init();
-		GetSpriteInfo(state, outBuffer[i], spritePreviews + (i * _spritePreviewSize), i, options, vram, oamRam, palette);
+		GetSpriteInfo(state, outBuffer[i], spritePreviews + (i * _spritePreviewSize), i + firstSprite, options, vram, oamRam, palette);
+		outBuffer[i].SpriteIndex -= firstSprite;
 	}
 
 	GetSpritePreview(options, baseState, outBuffer, spritePreviews, palette, screenPreview);
@@ -312,9 +317,10 @@ DebugSpritePreviewInfo PceVdcTools::GetSpritePreviewInfo(GetSpritePreviewOptions
 	PceVdcState& state = ((PceVideoState&)baseState).Vdc;
 
 	DebugSpritePreviewInfo info = {};
+	int spriteCount = _console->IsSuperGrafx() ? (options.Filter != SpriteViewerFilter::Both ? 64 : 128) : 64;
 	info.Height = 1024;
 	info.Width = 1024;
-	info.SpriteCount = _console->IsSuperGrafx() ? 128 : 64;
+	info.SpriteCount = spriteCount;
 	info.CoordOffsetX = 0;
 	info.CoordOffsetY = 0;
 
