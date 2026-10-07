@@ -224,6 +224,8 @@ private:
 
 	__noinline void FillInterlacedFrame();
 
+	void ProcessMode7Latch(int16_t& latch, int16_t newValue, bool& latchLoaded);
+
 public:
 	SnesPpu(Emulator* emu, SnesConsole* console);
 	virtual ~SnesPpu();
