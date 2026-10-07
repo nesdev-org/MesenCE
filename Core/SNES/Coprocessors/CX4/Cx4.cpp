@@ -259,7 +259,7 @@ uint8_t Cx4::GetAccessDelay(uint32_t addr)
 		}
 	}
 
-	return 1;
+	return 0;
 }
 
 uint8_t Cx4::ReadCx4(uint32_t addr)
