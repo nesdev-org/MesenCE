@@ -22,6 +22,14 @@ MacOSGameController::MacOSGameController(Emulator* emu, GCController* controller
 	_controller = [controller retain];
 	_input = [[_controller extendedGamepad] retain];
 
+	//Menu/Options/Home are system gesture buttons by default, which makes macOS delay their input
+	//until it has ruled out a gesture (e.g screenshot)
+	if(@available(macOS 11.0, *)) {
+		[_input buttonMenu].preferredSystemGestureState = GCSystemGestureStateDisabled;
+		if([_input buttonOptions]) [_input buttonOptions].preferredSystemGestureState = GCSystemGestureStateDisabled;
+		if([_input buttonHome]) [_input buttonHome].preferredSystemGestureState = GCSystemGestureStateDisabled;
+	}
+
 	[_input setValueChangedHandler:^ void (GCExtendedGamepad* input, GCControllerElement* element) {
 		if([input buttonA] == element) _buttonState[0] = [((GCControllerButtonInput*) element) isPressed];
 		if([input buttonB] == element) _buttonState[1] = [((GCControllerButtonInput*) element) isPressed];

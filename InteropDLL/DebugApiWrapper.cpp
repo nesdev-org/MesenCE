@@ -30,6 +30,10 @@ extern unique_ptr<Emulator> _emu;
 template<typename T>
 T WrapDebuggerCall(std::function<T(Debugger* debugger)> func)
 {
+	if(!_emu) {
+		//Emulator was already released (e.g. a debug window closing during shutdown)
+		return {};
+	}
 	DebuggerRequest dbgRequest = _emu->GetDebugger(true);
 	if(dbgRequest.GetDebugger()) {
 		return func(dbgRequest.GetDebugger());
@@ -41,6 +45,9 @@ T WrapDebuggerCall(std::function<T(Debugger* debugger)> func)
 template<>
 void WrapDebuggerCall(std::function<void(Debugger* debugger)> func)
 {
+	if(!_emu) {
+		return;
+	}
 	DebuggerRequest dbgRequest = _emu->GetDebugger(true);
 	if(dbgRequest.GetDebugger()) {
 		func(dbgRequest.GetDebugger());
