@@ -32,9 +32,11 @@ public:
 		return (uint8_t)((array[(position / 8) % byteCount] >> (position % 8)) & 0x01);
 	}
 
-	//mask must not equal 0.
+	//Returns 0 when mask == 0 (otherwise the index of the lowest set bit).
 	__forceinline static uint32_t GetLowestBitIndex(uint32_t mask)
-	{
+		if(!mask) {
+			return 0;
+		}
 #ifdef _MSC_VER
 		unsigned long index;
 		_BitScanForward(&index, mask);
@@ -42,11 +44,12 @@ public:
 #else
 		return (uint32_t)__builtin_ctz(mask);
 #endif
-	}
-
-	//mask must not equal 0.
+	//Returns 0 when mask == 0 (otherwise the index of the highest set bit).
 	__forceinline static uint32_t GetHighestBitIndex(uint32_t mask)
 	{
+		if(!mask) {
+			return 0;
+		}
 #ifdef _MSC_VER
 		unsigned long index;
 		_BitScanReverse(&index, mask);
