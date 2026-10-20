@@ -8,6 +8,7 @@ using Mesen.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 
@@ -32,8 +33,25 @@ namespace Mesen.Debugger.ViewModels
 
 		private bool IsPropertyAllowedOnPlatform(object propertyOwner, string propertyName, CpuType cpuType)
 		{
-			// Retrieve the method information for MyMethod
-			PropertyInfo? propertyInfo = propertyOwner.GetType().GetProperty(propertyName);
+			Type ownerType = propertyOwner.GetType();
+
+			// This here stinks quite a bit. This is only here to silence a warning on GetProperty().
+			// This could be solved differently, but this here feels like the least invasive solution.
+			if (ownerType == typeof(TraceLogOutputCpuDependentConfig)) {
+				ownerType = typeof(TraceLogOutputCpuDependentConfig);
+			} else if(ownerType == typeof(TraceLogOutputSharedConfig)) {
+				ownerType = typeof(TraceLogOutputSharedConfig);
+			} else if(ownerType == typeof(TraceLogOutputFileConfig)) {
+				ownerType = typeof(TraceLogOutputFileConfig);
+			} else if(ownerType == typeof(TraceLogOutputNetworkSocketConfig)) {
+				ownerType = typeof(TraceLogOutputNetworkSocketConfig);
+			} else if(ownerType == typeof(TraceLogOutputConfig)) {
+				ownerType = typeof(TraceLogOutputConfig);
+			} else {
+				return true;
+			}
+
+			PropertyInfo? propertyInfo = ownerType.GetProperty(propertyName);
 
 			if(propertyInfo == null) {
 				return false;
@@ -84,14 +102,18 @@ namespace Mesen.Debugger.ViewModels
 		}
 
 		// This could be useful in other places as well, so maybe it should move to another location later.
-		private static List<Enum> FilterEnumByPlatform<T>(CpuType cpuType) where T : struct, Enum
+		private static List<Enum> FilterEnumByPlatform<
+			[DynamicallyAccessedMembers(
+				DynamicallyAccessedMemberTypes.PublicConstructors |
+				DynamicallyAccessedMemberTypes.PublicMethods |
+				DynamicallyAccessedMemberTypes.PublicFields |
+				DynamicallyAccessedMemberTypes.PublicNestedTypes |
+				DynamicallyAccessedMemberTypes.PublicProperties |
+				DynamicallyAccessedMemberTypes.PublicEvents)] T
+			>(CpuType cpuType) where T : struct, Enum
 		{
-			return FilterEnumByPlatform<T>(typeof(T), cpuType);
-		}
-
-		private static List<Enum> FilterEnumByPlatform<T>(Type enumType, CpuType cpuType) where T : struct, Enum
-		{
-			T[] values = Enum.GetValuesAsUnderlyingType(enumType) as T[] ?? [];
+			Type enumType = typeof(T);
+			T[] values = Enum.GetValues<T>();
 
 			List<Enum> result = new();
 
