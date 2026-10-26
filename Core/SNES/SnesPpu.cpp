@@ -147,7 +147,7 @@ void SnesPpu::GetTilemapData(uint8_t layerIndex, uint8_t columnIndex)
 	LayerConfig& config = _state.Layers[layerIndex];
 
 	uint16_t vScroll = config.VScroll;
-	uint16_t hScroll = hiResMode ? (config.HScroll << 1) : config.HScroll;
+	uint16_t hScroll = config.HScroll;
 	if(_hOffset || _vOffset) {
 		uint16_t enableBit = layerIndex == 0 ? 0x2000 : 0x4000;
 		if(_state.BgMode == 4) {
@@ -165,9 +165,6 @@ void SnesPpu::GetTilemapData(uint8_t layerIndex, uint8_t columnIndex)
 				vScroll = (_vOffset & 0x3FF);
 			}
 		}
-	}
-	if(hiResMode) {
-		hScroll >>= 1;
 	}
 
 	uint16_t realY = IsDoubleHeight() ? (_oddFrame ? ((_scanline << 1) + 1) : (_scanline << 1)) : _scanline;
