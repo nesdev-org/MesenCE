@@ -188,7 +188,7 @@ void Fds::UpdateIrqState()
 
 uint8_t Fds::ReadRam(uint16_t addr)
 {
-	_dramAccessed = (addr >= 0x6000 && addr < 0xE000);
+	_dramAccessed |= (addr >= 0x6000 && addr < 0xE000);
 
 	if(addr == 0xE18C && !_gameStarted && (_memoryManager->DebugRead(0x100) & 0xC0)) {
 		//$E18B is the NMI entry point (using $E18C due to dummy reads)
@@ -255,7 +255,7 @@ uint8_t Fds::ReadRam(uint16_t addr)
 
 void Fds::WriteRam(uint16_t addr, uint8_t value)
 {
-	_dramAccessed = (addr >= 0x6000 && addr < 0xE000);
+	_dramAccessed |= (addr >= 0x6000 && addr < 0xE000);
 	BaseMapper::WriteRam(addr, value);
 }
 
@@ -682,12 +682,6 @@ void Fds::Serialize(Serializer& s)
 	SV(_successiveChecks);
 	SV(_previousDiskNumber);
 	SV(_crcAccumulator);
-	SV(_timerIrqPending);
-	SV(_watchdogIrqPending);
-	SV(_watchdogIrqEnabled);
-	SV(_dramAccessed);
-	SV(_dramRow);
-	SV(_watchdogTimer);
 
 	if(s.IsSaving()) {
 		for(int i = 0; i < (int)_fdsDiskSides.size(); i++) {
@@ -695,6 +689,25 @@ void Fds::Serialize(Serializer& s)
 			SVVectorI(ipsData);
 		}
 	} else {
+		if(!s.ContainsKey("_timerIrqPending")) {
+			//Backwards compatibility with savetates that predate the watchdog's discovery
+			_timerIrqPending = _cpu->HasIrqSource(IRQSource::External); //External source was previously reserved for the timer IRQ
+			_watchdogIrqPending = false;
+			//$4023.D7 is missing, so assume based on $4023.D0 state
+			//(most commercial games don't touch the BIOS init value of $83)
+			_watchdogIrqEnabled = _diskRegEnabled;
+			_dramAccessed = false;
+			_dramRow = 0;
+			_watchdogTimer = 4095;
+		} else {
+			SV(_timerIrqPending);
+			SV(_watchdogIrqPending);
+			SV(_watchdogIrqEnabled);
+			SV(_dramAccessed);
+			SV(_dramRow);
+			SV(_watchdogTimer);
+		}
+
 		for(int i = 0; i < (int)_fdsDiskSides.size(); i++) {
 			vector<uint8_t> ipsData;
 			SVVectorI(ipsData);
