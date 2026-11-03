@@ -161,6 +161,8 @@ void AudioPlayerHud::Draw(uint32_t frameCounter, double fps)
 				double silenceLength = (double)(frameCounter - _lastAudioFrame) / fps;
 				if(audioCfg.AudioPlayerAutoDetectSilence && silenceLength >= audioCfg.AudioPlayerSilenceDelay) {
 					//Silence detected, move to next track
+					_lastAudioFrame = frameCounter;
+					_prevFps = fps;
 					MoveToNextTrack();
 				}
 			}
