@@ -150,8 +150,16 @@ void Fds::ClockIrq()
 		}
 	}
 
-	//DRAM refresh watchdog
+	//DRAM refresh watchdog: https://forums.nesdev.org/viewtopic.php?t=26359
 	if(_diskRegEnabled) {
+		//"IRQ is asserted when the [12-bit] cycle timer underflows while $4023.D7 = 1."
+		if(_watchdogTimer == 0) {
+			_watchdogTimer = 4095;
+			_watchdogIrqPending = _watchdogIrqEnabled;
+		} else {
+			_watchdogTimer--;
+		}
+
 		//7-bit refresh counter: "...increment on every CPU cycle spent accessing memory outside of PRG-RAM,
 		// pause on CPU cycles accessing PRG-RAM"
 		if(!_dramAccessed) {
@@ -161,28 +169,17 @@ void Fds::ClockIrq()
 			} else {
 				_dramRow++;
 			}
-		} else {
-			_dramAccessed = false;
-		}
-
-		//"IRQ is asserted when the [12-bit] cycle timer underflows while $4023.D7 = 1."
-		if(_watchdogTimer == 0) {
-			_watchdogTimer = 4095;
-			//TODO Does the pending flag stay set after an underflow?
-			//(i.e. would enabling the IRQ afterwards assert IRQ?)
-			_watchdogIrqPending = true;
-		} else {
-			_watchdogTimer--;
 		}
 	}
+	_dramAccessed = false;
 }
 
 void Fds::UpdateIrqState()
 {
-	if(_timerIrqPending || (_watchdogIrqEnabled && _watchdogIrqPending)) {
-		_cpu->SetIrqSource(IRQSource::External);
-	} else if(!_timerIrqPending && !_watchdogIrqPending) {
+	if(!(_timerIrqPending || _watchdogIrqPending)) {
 		_cpu->ClearIrqSource(IRQSource::External);
+	} else {
+		_cpu->SetIrqSource(IRQSource::External);
 	}
 }
 
@@ -493,6 +490,10 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 			_soundRegEnabled = value & 0x02;
 			_watchdogIrqEnabled = value & 0x80;
 
+			if(!_watchdogIrqEnabled) {
+				_watchdogIrqPending = false;
+			}
+
 			if(!_diskRegEnabled) {
 				_irqEnabled = false;
 
@@ -516,9 +517,10 @@ void Fds::WriteRegister(uint16_t addr, uint8_t value)
 
 				_timerIrqPending = false;
 				_watchdogIrqPending = false;
-				_cpu->ClearIrqSource(IRQSource::External);
 				_cpu->ClearIrqSource(IRQSource::FdsDisk);
 			}
+
+			UpdateIrqState();
 
 			/**TODO Determine/implement audio reset behaviour, should probably go in FdsAudio:
 			 - Proper method of resetting modulation state ($4085 write below doesn't always work)
