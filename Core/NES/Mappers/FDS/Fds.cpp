@@ -145,6 +145,7 @@ void Fds::ClockIrq()
 			if(!_irqRepeatEnabled) {
 				_irqEnabled = false;
 			}
+			UpdateIrqState();
 		} else {
 			_irqCounter--;
 		}
@@ -156,6 +157,7 @@ void Fds::ClockIrq()
 		if(_watchdogTimer == 0) {
 			_watchdogTimer = 4095;
 			_watchdogIrqPending = _watchdogIrqEnabled;
+			UpdateIrqState();
 		} else {
 			_watchdogTimer--;
 		}
@@ -185,7 +187,7 @@ void Fds::UpdateIrqState()
 
 uint8_t Fds::ReadRam(uint16_t addr)
 {
-	_dramAccessed |= (addr >= 0x6000 && addr < 0xE000);
+	_dramAccessed = (addr >= 0x6000 && addr < 0xE000);
 
 	if(addr == 0xE18C && !_gameStarted && (_memoryManager->DebugRead(0x100) & 0xC0)) {
 		//$E18B is the NMI entry point (using $E18C due to dummy reads)
@@ -252,7 +254,7 @@ uint8_t Fds::ReadRam(uint16_t addr)
 
 void Fds::WriteRam(uint16_t addr, uint8_t value)
 {
-	_dramAccessed |= (addr >= 0x6000 && addr < 0xE000);
+	_dramAccessed = (addr >= 0x6000 && addr < 0xE000);
 	BaseMapper::WriteRam(addr, value);
 }
 
@@ -318,7 +320,7 @@ void Fds::ProcessCpuClock()
 	BaseProcessCpuClock();
 
 	ClockIrq();
-	UpdateIrqState();
+
 	_audio->Clock();
 
 	if(_diskNumber == Fds::NoDiskInserted || !_motorOn) {
@@ -686,12 +688,19 @@ void Fds::Serialize(Serializer& s)
 	SV(_crcAccumulator);
 
 	if(s.IsSaving()) {
+		SV(_timerIrqPending);
+		SV(_watchdogIrqPending);
+		SV(_watchdogIrqEnabled);
+		SV(_dramAccessed);
+		SV(_dramRow);
+		SV(_watchdogTimer);
+
 		for(int i = 0; i < (int)_fdsDiskSides.size(); i++) {
 			vector<uint8_t> ipsData = IpsPatcher::CreatePatch(_orgDiskSides[i], _fdsDiskSides[i]);
 			SVVectorI(ipsData);
 		}
 	} else {
-		if(!s.ContainsKey("_timerIrqPending")) {
+		if(!s.ContainsKey("timerIrqPending")) {
 			//Backwards compatibility with savetates that predate the watchdog's discovery
 			_timerIrqPending = _cpu->HasIrqSource(IRQSource::External); //External source was previously reserved for the timer IRQ
 			_watchdogIrqPending = false;
