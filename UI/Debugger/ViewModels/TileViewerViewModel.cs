@@ -48,6 +48,9 @@ namespace Mesen.Debugger.ViewModels
 		[ObservableProperty] public partial int GridSizeX { get; set; } = 8;
 		[ObservableProperty] public partial int GridSizeY { get; set; } = 8;
 
+		[ObservableProperty] public partial int MaxColumnCount { get; set; } = 256;
+		[ObservableProperty] public partial int MaxRowCount { get; set; } = 256;
+
 		[ObservableProperty] public partial Rect SelectionRect { get; set; }
 
 		[ObservableProperty] public partial List<PictureViewerLine>? PageDelimiters { get; set; }
@@ -63,8 +66,8 @@ namespace Mesen.Debugger.ViewModels
 		public List<object> FileMenuActions { get; } = new();
 		public List<object> ViewMenuActions { get; } = new();
 
-		public int ColumnCount => Math.Clamp(Config.ColumnCount, 4, 256);
-		public int RowCount => Math.Clamp(Config.RowCount, 4, 256);
+		public int ColumnCount => Math.Clamp(Config.ColumnCount, 4, MaxColumnCount);
+		public int RowCount => Math.Clamp(Config.RowCount, 4, MaxRowCount);
 
 		private BaseState? _ppuState;
 		private object _updateLock = new();
@@ -216,16 +219,23 @@ namespace Mesen.Debugger.ViewModels
 			}));
 
 			AddDisposable(Config.ObserveProp([nameof(Config.ColumnCount), nameof(Config.RowCount), nameof(Config.Format)], () => {
-				//Enforce min/max values for column/row counts
-				Config.ColumnCount = ColumnCount;
-				Config.RowCount = RowCount;
+				//Process this after the field is done updating the value (otherwise updating the
+				//column/row count here won't properly update the value shown in the UI)
+				Dispatcher.UIThread.Post(() => {
+					//Enforce min/max values for column/row counts
+					Config.ColumnCount = ColumnCount;
+					Config.RowCount = RowCount;
 
-				ApplyColumnRowCountRestrictions();
-				AddressIncrement = ColumnCount * RowCount * 8 * 8 * Config.Format.GetBitsPerPixel() / 8;
+					//Allow up to 64k tiles to be shown by dynamically changing the max row/column count
+					MaxColumnCount = 65536 / RowCount;
+					MaxRowCount = 65536 / ColumnCount;
 
-				RefreshData();
+					ApplyColumnRowCountRestrictions();
+					AddressIncrement = ColumnCount * RowCount * 8 * 8 * Config.Format.GetBitsPerPixel() / 8;
+
+					RefreshData();
+				}, DispatcherPriority.MaxValue);
 			}));
-
 
 			AddDisposable(Config.ObserveProp(nameof(Config.Source), () => {
 				MaximumAddress = Math.Max(0, DebugApi.GetMemorySize(Config.Source) - 1);

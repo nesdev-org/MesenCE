@@ -1,5 +1,5 @@
-﻿using Mesen.Interop;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using System.Collections.Generic;
 
 namespace Mesen.Config
@@ -13,6 +13,7 @@ namespace Mesen.Config
 		[ObservableProperty] public partial SpriteBackground Background { get; set; } = SpriteBackground.Gray;
 
 		[ObservableProperty] public partial SpriteViewerSource Source { get; set; } = SpriteViewerSource.SpriteRam;
+		[ObservableProperty] public partial SpriteViewerFilter Filter { get; set; } = SpriteViewerFilter.Both;
 		[ObservableProperty] public partial int SourceOffset { get; set; } = 0;
 
 		[ObservableProperty] public partial bool DimOffscreenSprites { get; set; } = true;

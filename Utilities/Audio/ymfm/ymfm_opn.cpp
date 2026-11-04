@@ -143,26 +143,23 @@ bool opn_registers_base<IsOpnA>::write(uint16_t index, uint8_t data, uint32_t &c
 	assert(index < REGISTERS);
 
 	// writes in the 0xa0-af/0x1a0-af region are handled as latched pairs
-	// borrow unused registers 0xb8-bf/0x1b8-bf as temporary holding locations
+	// borrow unused registers 0xb8-bf as temporary holding locations
 	if ((index & 0xf0) == 0xa0)
 	{
 		if (bitfield(index, 0, 2) == 3)
 			return false;
 
 		uint32_t latchindex = 0xb8 | bitfield(index, 3);
-		if (IsOpnA)
-			latchindex |= index & 0x100;
 
 		// writes to the upper half just latch (only low 6 bits matter)
 		if (bitfield(index, 2))
-			m_regdata[latchindex] = data | 0x80;
+			m_regdata[latchindex] = data & 0x3f;
 
-		// writes to the lower half only commit if the latch is there
-		else if (bitfield(m_regdata[latchindex], 7))
+		// writes to the lower half also apply said latch
+		else
 		{
 			m_regdata[index] = data;
-			m_regdata[index | 4] = m_regdata[latchindex] & 0x3f;
-			m_regdata[latchindex] = 0;
+			m_regdata[index | 4] = m_regdata[latchindex];
 		}
 		return false;
 	}

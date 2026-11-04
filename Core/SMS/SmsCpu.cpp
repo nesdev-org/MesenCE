@@ -56,9 +56,14 @@ void SmsCpu::Exec()
 		_state.IFF1 = false;
 		ExecCycles(4);
 		IncrementR();
+
+#ifndef DUMMYCPU
 		uint16_t originalPc = _state.PC;
+#endif
 		RST(0x66);
+#ifndef DUMMYCPU
 		_emu->ProcessInterrupt<CpuType::Sms>(originalPc, _state.PC, true);
+#endif
 	} else if(_state.IFF1 && _state.ActiveIrqs && opCode != 0xFB) {
 		//Process IRQs if enabled, but not if the previous op was EI (0xFB)
 		if(_state.Halted) {
@@ -71,7 +76,9 @@ void SmsCpu::Exec()
 		_state.IFF2 = false;
 		ExecCycles(6);
 		IncrementR();
+#ifndef DUMMYCPU
 		uint16_t originalPc = _state.PC;
+#endif
 		if(_state.IM == 2) {
 			ExecCycles(1);
 			uint16_t addr = (_state.I << 8) | _memoryManager->GetOpenBus();
@@ -84,8 +91,10 @@ void SmsCpu::Exec()
 			//TODOSMS interrupt mode 0 is not implemented
 			RST(0x38);
 		}
+#ifndef DUMMYCPU
 		_console->RefreshRamCheats();
 		_emu->ProcessInterrupt<CpuType::Sms>(originalPc, _state.PC, false);
+#endif
 	}
 }
 

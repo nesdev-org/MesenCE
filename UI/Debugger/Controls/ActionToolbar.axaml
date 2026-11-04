@@ -27,6 +27,7 @@
 			<Setter Property="Opacity" Value="0.5" />
 		</Style>
 		<Style Selector="Button:disabled > ContentPresenter">
+			<Setter Property="BorderBrush" Value="Transparent" />
 			<Setter Property="Background" Value="Transparent" />
 		</Style>
 		<Style Selector="Button Image">
@@ -81,6 +82,7 @@
 					<Button.ContextMenu>
 						<ContextMenu
 							IsEnabled="{Binding SubActions, Converter={x:Static ObjectConverters.IsNotNull}}"
+							Placement="BottomEdgeAlignedLeft"
 							Name="ActionMenu"
 							ItemsSource="{Binding SubActions}"
 						/>

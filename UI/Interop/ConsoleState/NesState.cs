@@ -318,6 +318,7 @@ public struct NesApuDmcState
 	public UInt16 Period;
 	public UInt16 Timer;
 	public UInt16 BytesRemaining;
+	public byte BitsRemaining;
 
 	public byte OutputVolume;
 }

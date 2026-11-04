@@ -257,7 +257,7 @@ void PceAdpcm::Write(uint16_t addr, uint8_t value)
 		case 0x0D: SetControl(value); break;
 		case 0x0E: {
 			_state.PlaybackRate = value;
-			double freq = 32000.0 / (16 - (_state.PlaybackRate & 0x0F));
+			double freq = (double)_emu->GetSettings()->GetPcEngineConfig().AdpcmClockSpeed / (16 - (_state.PlaybackRate & 0x0F));
 			_clocksPerSample = PceConstants::MasterClockRate / freq;
 			break;
 		}
@@ -349,9 +349,11 @@ void PceAdpcm::PlaySample()
 
 void PceAdpcm::MixAudio(int16_t* out, uint32_t sampleCount, uint32_t sampleRate)
 {
-	double freq = 32000.0 / (16 - (_state.PlaybackRate & 0x0F));
+	PcEngineConfig& cfg = _emu->GetSettings()->GetPcEngineConfig();
+
+	double freq = (double)cfg.AdpcmClockSpeed / (16 - (_state.PlaybackRate & 0x0F));
 	double volume = _cdrom->GetAudioFader().GetVolume(PceAudioFaderTarget::Adpcm);
-	_resampler.SetVolume(_emu->GetSettings()->GetPcEngineConfig().AdpcmVolume / 100.0 * volume);
+	_resampler.SetVolume(cfg.AdpcmVolume / 100.0 * volume);
 	_resampler.SetSampleRates(freq, sampleRate);
 	_resampler.Resample<true>(_samplesToPlay.data(), (uint32_t)_samplesToPlay.size() / 2, out, sampleCount, _state.Playing);
 	_samplesToPlay.clear();

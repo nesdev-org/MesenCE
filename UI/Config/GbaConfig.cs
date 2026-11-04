@@ -1,5 +1,5 @@
-﻿using Mesen.Interop;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,8 +42,6 @@ namespace Mesen.Config
 
 		public void ApplyConfig()
 		{
-			ConfigManager.Config.Video.ApplyConfig();
-
 			ConfigApi.SetGbaConfig(new InteropGbaConfig() {
 				Controller = Controller.ToInterop(),
 

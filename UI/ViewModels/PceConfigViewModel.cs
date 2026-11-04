@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mesen.Config;
 using Mesen.Controls;
+using Mesen.Localization;
 using Mesen.Utilities;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,10 @@ namespace Mesen.ViewModels
 			PalettePresets.Add(new() { Name = "Linear RGB333", Palette = linearPalette });
 
 			AddDisposable(Input);
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
+				Config.ApplyConfig();
+				ConfigManager.Config.Video.ApplyConfig();
+			}));
 		}
 
 		UInt32 To8Bit(UInt32 color)

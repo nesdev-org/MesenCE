@@ -47,8 +47,6 @@ namespace Mesen.Config
 
 		public void ApplyConfig()
 		{
-			ConfigManager.Config.Video.ApplyConfig();
-
 			ConfigApi.SetGameboyConfig(new InteropGameboyConfig() {
 				Controller = Controller.ToInterop(),
 				LinkedController = LinkedController.ToInterop(),

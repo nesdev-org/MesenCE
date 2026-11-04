@@ -96,12 +96,10 @@
 	  <None Remove="Styles\AvaloniaEditStyles.xaml" />
 	  <None Remove="Styles\AvaloniaMenuItemStyles.xaml" />
 	  <None Remove="Styles\AvaloniaNumericUpDownStyles.xaml" />
-	  <None Remove="Styles\AvaloniaScrollViewerStyles.xaml" />
 	  <None Remove="Styles\DataBoxStyles.xaml" />
 	  <None Remove="Styles\DebugStatusStyles.xaml" />
 	  <None Remove="Styles\DockStyles.xaml" />
 	  <None Remove="Styles\MesenStyles.Light.xaml" />
-	  <None Remove="Styles\StartupStyles.xaml" />
 	  <None Remove="Utilities\DipSwitchDefinitions.xml" />
 	</ItemGroup>
 	<PropertyGroup Label="Avalonia">
@@ -146,6 +144,9 @@
     </Compile>
     <Compile Update="Controls\HelpTooltip.axaml.cs">
       <DependentUpon>HelpTooltip.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\ShaderSelector.axaml.cs">
+      <DependentUpon>ShaderSelector.axaml</DependentUpon>
     </Compile>
     <Compile Update="Controls\SoftwareRendererView.axaml.cs">
       <DependentUpon>SoftwareRendererView.axaml</DependentUpon>
@@ -495,6 +496,9 @@
     <Compile Update="Windows\CheatEditWindow.axaml.cs">
       <DependentUpon>CheatEditWindow.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Windows\ShaderConfigWindow.axaml.cs">
+      <DependentUpon>ShaderConfigWindow.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Windows\HistoryViewerRangePickerWindow.axaml.cs">
       <DependentUpon>HistoryViewerRangePickerWindow.axaml</DependentUpon>
     </Compile>
@@ -595,9 +599,6 @@
 	  <AvaloniaResource Include="Styles\DockStyles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </AvaloniaResource>
-	  <AvaloniaResource Include="Styles\AvaloniaScrollViewerStyles.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </AvaloniaResource>
 	  <AvaloniaResource Include="Styles\AvaloniaNumericUpDownStyles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </AvaloniaResource>
@@ -620,9 +621,6 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </AvaloniaResource>
 	  <AvaloniaResource Include="Styles\MesenStyles.Light.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </AvaloniaResource>
-	  <AvaloniaResource Include="Styles\StartupStyles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </AvaloniaResource>
 	  <AvaloniaResource Include="Styles\MesenStyles.Dark.xaml">

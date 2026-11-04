@@ -79,6 +79,18 @@
 					</c:OptionSection>
 
 					<c:OptionSection Header="{l:Translate lblMiscSettings}">
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="{l:Translate lblAdpcmClockSpeed}" />
+							<c:MesenNumericUpDown
+								Minimum="32000"
+								Maximum="32200"
+								Value="{Binding Config.AdpcmClockSpeed}"
+								MinWidth="65"
+								Margin="5 0"
+							/>
+							<TextBlock Text="{l:Translate lblAdpcmClockSpeedDefault}" />
+						</StackPanel>
+
 						<c:CheckBoxWarning IsChecked="{Binding Config.EnableCdRomForHuCardGames}" Text="{l:Translate chkEnableCdRomForHuCardGames}" />
 						<c:CheckBoxWarning IsChecked="{Binding Config.DisableCdRomSaveRamForHuCardGames}" Text="{l:Translate chkDisableCdRomSaveRamForHuCardGames}" IsVisible="{Binding !Config.EnableCdRomForHuCardGames}" />
 						<c:CheckBoxWarning IsChecked="False" Text="{l:Translate chkDisableCdRomSaveRamForHuCardGames}" IsEnabled="False" IsVisible="{Binding Config.EnableCdRomForHuCardGames}" />

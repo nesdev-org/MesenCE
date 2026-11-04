@@ -1245,9 +1245,17 @@ namespace Mesen.Interop
 		[MarshalAs(UnmanagedType.I1)] public bool UseGrayscalePalette;
 	}
 
+	public enum SpriteViewerFilter
+	{
+		Both,
+		DefaultOnly,
+		ExtendedOnly,
+	}
+
 	public struct GetSpritePreviewOptions
 	{
 		public SpriteBackground Background;
+		public SpriteViewerFilter Filter;
 	}
 
 	public struct GetPaletteInfoOptions

@@ -33,7 +33,10 @@ namespace Mesen.ViewModels
 				return;
 			}
 
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
+				Config.ApplyConfig();
+				ConfigManager.Config.Video.ApplyConfig();
+			}));
 		}
 
 		private async void OpenSetup(Button btn, ControllerType type)

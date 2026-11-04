@@ -564,20 +564,28 @@ void NesConsole::InitializeInputDevices(GameInputType inputType, GameSystem syst
 		//VS Duck Hunt, etc. need the zapper in the first port
 		log("[Input] VS Zapper connected");
 		port1 = ControllerType::NesZapper;
-	} else if(inputType == GameInputType::Zapper) {
-		log("[Input] Zapper connected");
+	} else if(inputType == GameInputType::Zapper1) {
+		log("[Input] Zapper connected ($4017)");
 		if(isFamicom) {
 			expDevice = ControllerType::FamicomZapper;
 		} else {
 			port2 = ControllerType::NesZapper;
 		}
+	} else if(inputType == GameInputType::Zapper2) {
+		log("[Input] Zapper connected ($4016)");
+		port1 = ControllerType::NesZapper;
 	} else if(inputType == GameInputType::FourScore) {
-		log("[Input] Four score connected");
+		log("[Input] Four Score connected");
 		port1 = ControllerType::FourScore;
 		port2 = ControllerType::FourScore;
 	} else if(inputType == GameInputType::FourPlayerAdapter) {
-		log("[Input] Four player adapter connected");
+		log("[Input] Simple Four player adapter connected");
 		expDevice = ControllerType::TwoPlayerAdapter;
+	} else if(inputType == GameInputType::EightPlayers) {
+		log("[Input] Four Score + Hori Four player adapter connected");
+		port1 = ControllerType::FourScore;
+		port2 = ControllerType::FourScore;
+		expDevice = ControllerType::FourPlayerAdapter;
 	} else if(inputType == GameInputType::ArkanoidControllerFamicom || inputType == GameInputType::DoubleArkanoidController) {
 		log("[Input] Arkanoid controller (Famicom) connected");
 		expDevice = ControllerType::FamicomArkanoidController;
@@ -638,14 +646,21 @@ void NesConsole::InitializeInputDevices(GameInputType inputType, GameSystem syst
 		log("[Input] 2 SNES controllers connected");
 		port1 = ControllerType::SnesController;
 		port2 = ControllerType::SnesController;
+	} else if(inputType == GameInputType::SnesMouse1) {
+		log("[Input] SNES mouse connected ($4016)");
+		port1 = ControllerType::SnesMouse;
+	} else if(inputType == GameInputType::SnesMouse2) {
+		log("[Input] SNES mouse connected ($4017)");
+		port2 = ControllerType::SnesMouse;
 	} else if(inputType == GameInputType::FcnsController) {
 		log("[Input] FCNS controller connected");
 		expDevice = ControllerType::FcnsController;
+	} else if(inputType == GameInputType::HoriTrack) {
+		log("[Input] Hori Track connected");
+		expDevice = ControllerType::HoriTrack;
 	} else {
 		log("[Input] 2 NES controllers connected");
 	}
-
-	isFamicom = (system == GameSystem::Famicom || system == GameSystem::FDS || system == GameSystem::Dendy);
 
 	NesConfig& cfg = GetNesConfig();
 	cfg.Port1.Type = port1;

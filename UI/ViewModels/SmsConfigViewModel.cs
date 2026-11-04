@@ -27,8 +27,7 @@ namespace Mesen.ViewModels
 		public Enum[] AvailableRegionsGg => new Enum[] {
 			ConsoleRegion.Auto,
 			ConsoleRegion.Ntsc,
-			ConsoleRegion.NtscJapan,
-			ConsoleRegion.Pal
+			ConsoleRegion.NtscJapan
 		};
 
 		public SmsConfigViewModel()
@@ -42,7 +41,10 @@ namespace Mesen.ViewModels
 			}
 
 			AddDisposable(Input);
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
+				Config.ApplyConfig();
+				ConfigManager.Config.Video.ApplyConfig();
+			}));
 		}
 	}
 

@@ -66,6 +66,15 @@
 							Grid.Column="1" Grid.Row="0"
 							SelectedItem="{Binding Config.Background}"
 						/>
+
+						<TextBlock Grid.Column="0" Grid.Row="1" Text="{l:Translate lblFilter}" IsVisible="{Binding ShowFilter}" />
+						<c:EnumComboBox
+							HorizontalAlignment="Left"
+							Width="120"
+							Grid.Column="1" Grid.Row="1"
+							SelectedItem="{Binding Config.Filter}"
+							IsVisible="{Binding ShowFilter}"
+						/>
 					</Grid>
 					
 					<c:OptionSection Header="{l:Translate lblDataSource}">

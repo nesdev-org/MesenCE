@@ -103,24 +103,35 @@ public abstract class ElfImporter
 		int index = name.IndexOf("_Z");
 		if(index >= 0) {
 			List<string> parts = new();
-			int i = 0;
 
-			while(true) {
-				while(i < name.Length && (name[i] < '0' || name[i] > '9')) {
+			//Start after "_Z" marker
+			int i = index + 2;
+
+			bool nested = false;
+			if(i < name.Length && name[i] == 'N') {
+				nested = true;
+				i++;
+			}
+
+			while(i < name.Length) {
+				if(nested && name[i] == 'E') {
+					//End of nested sequence, stop parsing here (info about function parameters, etc. can follow)
+					break;
+				}
+
+				while(i < name.Length && !char.IsAsciiDigit(name[i])) {
 					i++;
 				}
 
 				bool hasLen = false;
 				int start = i;
-				while(i < name.Length && name[i] >= '0' && name[i] <= '9') {
+				while(i < name.Length && char.IsAsciiDigit(name[i])) {
 					i++;
 					hasLen = true;
 				}
 
 				if(hasLen) {
-					int val = int.Parse(name.AsSpan(start, i - start));
-
-					if(i + val <= name.Length) {
+					if(int.TryParse(name.AsSpan(start, i - start), out int val) && val > 0 && i + val <= name.Length) {
 						string part = name.Substring(i, val);
 						if(!string.IsNullOrWhiteSpace(part) && part != "_GLOBAL__N_1") {
 							parts.Add(part);

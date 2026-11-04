@@ -1,5 +1,5 @@
-﻿using Mesen.Interop;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -133,8 +133,6 @@ namespace Mesen.Config
 
 		public void ApplyConfig()
 		{
-			ConfigManager.Config.Video.ApplyConfig();
-
 			UInt32[] palette = new UInt32[512];
 			Array.Copy(UserPalette, palette, UserPalette.Length);
 			bool isFullPalette = UserPalette.Length == 512;

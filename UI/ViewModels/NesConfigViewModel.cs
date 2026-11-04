@@ -61,7 +61,10 @@ namespace Mesen.ViewModels
 			_listener.OnNotification += Listener_OnNotification;
 
 			AddDisposable(Input);
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
+				Config.ApplyConfig();
+				ConfigManager.Config.Video.ApplyConfig();
+			}));
 		}
 
 		private void Listener_OnNotification(NotificationEventArgs e)

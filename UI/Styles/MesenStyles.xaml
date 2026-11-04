@@ -1,7 +1,7 @@
 <Styles
 	xmlns="https://github.com/avaloniaui"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:sys="clr-namespace:System;assembly=netstandard"	
+	xmlns:sys="clr-namespace:System;assembly=netstandard"
 	xmlns:c="using:Mesen.Controls"
 	xmlns:du="using:Mesen.Debugger.Utilities"
 >
@@ -17,7 +17,6 @@
 	<StyleInclude Source="/Styles/AvaloniaContextMenuStyles.xaml" />
 	<StyleInclude Source="/Styles/AvaloniaMenuItemStyles.xaml" />
 	<StyleInclude Source="/Styles/AvaloniaNumericUpDownStyles.xaml" />
-	<StyleInclude Source="/Styles/AvaloniaScrollViewerStyles.xaml" />
 	<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
 	
 	<Design.PreviewWith>
@@ -104,7 +103,7 @@
 		
 		<!-- Menu items -->
 		<Thickness x:Key="MenuFlyoutPresenterThemePadding">0</Thickness>
-		<Thickness x:Key="MenuFlyoutScrollerMargin">0</Thickness>
+		<Thickness x:Key="MenuFlyoutScrollerMargin">1</Thickness>
 		<Thickness x:Key="MenuIconPresenterMargin">0,0,10,0</Thickness>
 		<Thickness x:Key="MenuFlyoutSeparatorThemePadding">30,2,0,2</Thickness>
 		<Thickness x:Key="MenuInputGestureTextMargin">27,2,0,0</Thickness>
@@ -169,7 +168,7 @@
 		<Setter Property="ItemsSource" Value="{Binding SubActions, DataType={x:Type du:BaseMenuAction}}" />
 		<Setter Property="Command" Value="{Binding ClickCommand, DataType={x:Type du:BaseMenuAction}}" />
 	</Style>
-	
+
 	<Style Selector="Button:pressed, RepeatButton:pressed, ToggleButton:pressed">
 		<Setter Property="RenderTransform" Value="scale(1)" />
 	</Style>
@@ -181,22 +180,43 @@
 
 	<Style Selector="MenuItem">
 		<Setter Property="Height" Value="22" />
-		<Setter Property="Margin" Value="1" />
 		<Setter Property="Padding" Value="8 2" />
 		<Setter Property="BorderBrush" Value="Transparent" />
 		<Setter Property="BorderThickness" Value="1" />
 	</Style>
 
-	<Style Selector="MenuItem[Header=-]">
-		<Setter Property="Height" Value="4" />
+	<Style Selector="MenuItem[Header=-][Tag=]">
+		<Setter Property="Height" Value="8" />
 	</Style>
-	
+
+	<Style Selector="Menu#ActionMenu MenuItem MenuItem[Header=-], ContextMenu#ActionMenu MenuItem[Header=-]">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate>
+					<Panel IsVisible="{TemplateBinding IsVisible}" Margin="30 0 0 0">
+						<Rectangle
+							Stroke="{StaticResource MesenGrayBorderColor}"
+							StrokeThickness="1"
+							Height="1"
+						/>
+						<TextBlock
+							HorizontalAlignment="Left"
+							VerticalAlignment="Center"
+							Text="{TemplateBinding Tag}"
+							Background="{DynamicResource MenuFlyoutPresenterBackground}"
+						/>
+					</Panel>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+		
 	<Style Selector="MenuItem > Separator, ContextMenu > Separator">
 		<Setter Property="Background" Value="{DynamicResource MesenMenuSeparatorBackground}" />
 	</Style>
 
 	<Style Selector="MenuItem > MenuItem">
-		<Setter Property="Height" Value="20" />
+		<Setter Property="Height" Value="22" />
 		<Setter Property="Padding" Value="2 0" />
 	</Style>
 
@@ -290,6 +310,10 @@
 
 	<Style Selector="ScrollBar">
 		<Setter Property="Cursor" Value="Arrow" />
+	</Style>
+	
+	<Style Selector="ScrollBar:vertical,ScrollBar:horizontal">
+		<Setter Property="ContextFlyout" Value="{x:Null}" />
 	</Style>
 	
 	<Style Selector="ScrollContentPresenter ScrollBar">

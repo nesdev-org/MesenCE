@@ -86,9 +86,6 @@ void VsControlManager::RemapControllerButtons()
 		//But don't swap the start/select buttons
 		BaseControlDevice::SwapButtons(controllers[0], NesController::Buttons::Start, controllers[1], NesController::Buttons::Start);
 		BaseControlDevice::SwapButtons(controllers[0], NesController::Buttons::Select, controllers[1], NesController::Buttons::Select);
-	} else if(inputType == GameInputType::VsSystemSwapAB) {
-		//Swap buttons P1 A & P2 B (Pinball (Japan))
-		BaseControlDevice::SwapButtons(controllers[0], NesController::Buttons::B, controllers[1], NesController::Buttons::A);
 	}
 
 	//Swap Start/Select for all configurations (makes it more intuitive)

@@ -20,8 +20,9 @@
 			<Control ID="chkEnableAudio">Enable Audio</Control>
 			<Control ID="lblSampleRate">Sample Rate:</Control>
 			<Control ID="lblLatencyMs">ms</Control>
-			<Control ID="lblLatencyWarning">Low values may cause sound problems</Control>
+			<Control ID="lblLatencyWarning">A lower latency reduces the delay between video and audio, but may cause audio glitches if set too low.&#13;&#13;On Windows:&#13;  -WASAPI is recommended and allows lower latency values (25-35 ms).&#13;  -DirectSound usually requires 50-60+ ms of latency.</Control>
 			<Control ID="lblAudioLatency">Latency:</Control>
+			<Control ID="lblAudioDriver">Driver:</Control>
 			<Control ID="lblAudioDevice">Device:</Control>
 			<Control ID="lblVolume">Volume:</Control>
 			<Control ID="grpVolume">Volume</Control>
@@ -191,6 +192,8 @@
 			<Control ID="mnuPresetSVideo">S-Video</Control>
 			<Control ID="mnuPresetRgb">RGB</Control>
 			<Control ID="mnuPresetMonochrome">Monochrome</Control>
+			
+			<Control ID="lblShaderSettings">Shader settings</Control>
 
 			<Control ID="tpgAdvanced">Advanced</Control>
 			<Control ID="lblScreenRotation">Screen Rotation:</Control>
@@ -226,8 +229,13 @@
 			<Control ID="lblHeader">Global settings overrides</Control>
 
 			<Control ID="chkOverrideVideoFilter">Override video filter:</Control>
+			<Control ID="chkOverrideShader">Override shader:</Control>
 			<Control ID="chkOverrideAspectRatio">Override aspect ratio:</Control>
 			<Control ID="lblCustomRatio">Custom Ratio: </Control>
+		</Form>
+
+		<Form ID="ShaderSelector">
+			<Control ID="btnLoadShader">Load shader...</Control>
 		</Form>
 
 		<Form ID="SnesConfigView">
@@ -490,6 +498,8 @@
 			<Control ID="chkRandomPowerOnState">Randomize power-on state</Control>
 			<Control ID="chkEnableCdRomForHuCardGames">Enable CD-ROM emulation when running HuCard games</Control>
 			<Control ID="chkDisableCdRomSaveRamForHuCardGames">Disable CD-ROM save RAM when running HuCard games</Control>
+			<Control ID="lblAdpcmClockSpeed">ADPCM playback speed: </Control>
+			<Control ID="lblAdpcmClockSpeedDefault">Hz (default: 32100 Hz)</Control>
 			<Control ID="chkUseHuC6280aAudio">Use HuC6280A audio (reduces popping)</Control>
 			
 			<Control ID="tpgInput">Input</Control>
@@ -976,6 +986,13 @@
 			<Control ID="btnCancel">Cancel</Control>
 		</Form>
 
+		<Form ID="ShaderConfigWindow">
+			<Control ID="wndTitle">Shader Settings</Control>
+			<Control ID="btnReset">Reset to Defaults</Control>
+			<Control ID="btnOk">OK</Control>
+			<Control ID="btnCancel">Cancel</Control>
+		</Form>
+		
 		<Form ID="SelectRomWindow">
 			<Control ID="wndTitle">Select rom...</Control>
 			<Control ID="lblSearch">Search:</Control>
@@ -1168,6 +1185,7 @@
 			<Control ID="chkShowOffscreenRegions">Show offscreen regions</Control>
 			<Control ID="chkDimOffscreenSprites">Dim offscreen sprites (grid)</Control>
 			<Control ID="lblBackground">Background:</Control>
+			<Control ID="lblFilter">Filter:</Control>
 			<Control ID="lblDataSource">Data Source</Control>
 			<Control ID="lblSource">Source:</Control>
 			<Control ID="lblSourceOffset">Offset:</Control>
@@ -1959,6 +1977,8 @@ E
 		<Message ID="btnCancel">Cancel</Message>
 		<Message ID="btnYes">Yes</Message>
 		<Message ID="btnNo">No</Message>
+		
+		<Message ID="None">None</Message>
 
 		<Message ID="ScriptSaveConfirmation">You have unsaved changes for this script - would you like to save them?</Message>
 		
@@ -1971,6 +1991,8 @@ E
 
 		<Message ID="CreatingTraceLogNetworkSocketFailed">Failed to initialize a network connection.</Message>
 		<Message ID="StartingTraceLogNetworkFailed">Failed to start network logging.</Message>
+		
+		<Message ID="RecentShaders">Recent shaders </Message>
 	</Messages>
 	<Enums>
 		<Enum ID="EmulatorShortcut">
@@ -2656,6 +2678,12 @@ E
 			<Value ID="StartWithSaveData">Power on, with save data</Value>
 			<Value ID="CurrentState">Current state</Value>
 		</Enum>
+		<Enum ID="AudioBackendType">
+			<Value ID="Default">Default</Value>
+			<Value ID="Wasapi">WASAPI (default)</Value>
+			<Value ID="DirectSound">DirectSound (legacy)</Value>
+			<Value ID="Sdl2">SDL2 (default)</Value>
+		</Enum>
 		<Enum ID="AudioSampleRate">
 			<Value ID="_11025">11,025 Hz</Value>
 			<Value ID="_22050">22,050 Hz</Value>
@@ -2815,12 +2843,12 @@ E
 			<Value ID="Unspecified">Unspecified</Value>
 			<Value ID="StandardControllers">Standard Controllers</Value>
 			<Value ID="FourScore">Four Score (NES)</Value>
-			<Value ID="FourPlayerAdapter">Four Player Adapter (Famicom)</Value>
+			<Value ID="FourPlayerAdapter">Simple Four Player Adapter (Famicom)</Value>
 			<Value ID="VsSystem">VS System</Value>
 			<Value ID="VsSystemSwapped">VS System - Swap P1/P2</Value>
-			<Value ID="VsSystemSwapAB">VS System - Swap A/B buttons</Value>
+			<Value ID="EightPlayers">Four Score (NES)+Hori Four Player Adapter (Famicom)</Value>
 			<Value ID="VsZapper">VS Zapper</Value>
-			<Value ID="Zapper">Zapper</Value>
+			<Value ID="Zapper1">Zapper ($4017)</Value>
 			<Value ID="TwoZappers">2 Zappers</Value>
 			<Value ID="BandaiHypershot">Bandai Hypershot</Value>
 			<Value ID="PowerPadSideA">Power Pad Side A</Value>
@@ -2853,7 +2881,7 @@ E
 			<Value ID="SuborKeyboard">Subor Keyboard</Value>
 			<Value ID="SuborKeyboardMouse1">Subor Keyboard+Macro Winners Mouse</Value>
 			<Value ID="SuborKeyboardMouse2">Subor Keyboard+Subor Mouse ($4016)</Value>
-			<Value ID="SnesMouse">SNES Mouse</Value>
+			<Value ID="SnesMouse1">SNES Mouse ($4016)</Value>
 			<Value ID="GenericMulticart">Generic Multicart</Value>
 			<Value ID="SnesControllers">SNES Controllers</Value>
 			<Value ID="RacerMateBicycle">RacerMate Bicycle</Value>
@@ -2872,6 +2900,27 @@ E
 			<Value ID="VenomTVDance">Venom TV Dance Mat</Value>
 			<Value ID="LgTvRemote">LG TV Remote</Value>
 			<Value ID="FcnsController">FCNS Controller</Value>
+			<Value ID="KingFishingController">King Fishing Controller</Value>
+			<Value ID="CroakyKaraokeController">Croaky Karaoke Controller</Value>
+			<Value ID="KingwonKeyboard">Kingwon Keyboard</Value>
+			<Value ID="ZechengKeyboard">Zecheng Keyboard</Value>
+			<Value ID="SuborKeyboardMouse4">Subor Keyboard+L90-rotated PS/2 Mouse ($4017)</Value>
+			<Value ID="Ps2KeyboardMouse">UM6578 PS/2 Keyboard+PS/2 Mouse ($4017)</Value>
+			<Value ID="Ps2Mouse">UM6578 PS/2 Mouse</Value>
+			<Value ID="YuxingMouse">Yuxing Mouse ($4016)</Value>
+			<Value ID="SuborKeyboardMouse5">Subor Keyboard+Yuxing Mouse ($4016)</Value>
+			<Value ID="GiggleTvPump">Giggle TV Pump</Value>
+			<Value ID="BbkKeyboardMouse">BBK Keyboard+R90-rotated PS/2 Mouse ($4017)</Value>
+			<Value ID="MagicalCooking">Magical Cooking</Value>
+			<Value ID="SnesMouse2">SNES Mouse ($4017)</Value>
+			<Value ID="Zapper2">Zapper ($4016)</Value>
+			<Value ID="ArkanoidControllerPrototype">Arkanoid Controller (Prototype)</Value>
+			<Value ID="TvMahjongGame">TV Mahjong Game Controller</Value>
+			<Value ID="MahjongGekitouDensetsu">Mahjong Gekitou Densetsu Controller</Value>
+			<Value ID="SuborKeyboardMouse6">Subor Keyboard+X-inverted PS/2 Mouse ($4017)</Value>
+			<Value ID="IbmKeyboard">IBM PC/XT Keyboard</Value>
+			<Value ID="SuborKeyboardMouse7">Subor Keyboard+Mega Book Mouse</Value>
+			<Value ID="HoriTrack">Hori Track</Value>
 		</Enum>
 
 		<Enum ID="FirmwareType">
@@ -3258,6 +3307,11 @@ E
 		<Enum ID="SpriteViewerSource">
 			<Value ID="SpriteRam">Sprite RAM</Value>
 			<Value ID="CpuMemory">CPU Memory</Value>
+		</Enum>
+		<Enum ID="SpriteViewerFilter">
+			<Value ID="Both">VDC1 + VDC2</Value>
+			<Value ID="DefaultOnly">VDC1 only</Value>
+			<Value ID="ExtendedOnly">VDC2 only</Value>
 		</Enum>
 		<Enum ID="DebugSpritePriority">
 			<Value ID="Undefined">-</Value>
@@ -3739,6 +3793,7 @@ E
 			<Value ID="AspectRatio">Aspect Ratio</Value>
 			<Value ID="Fullscreen">Fullscreen</Value>
 			<Value ID="VideoFilter">Video Filter</Value>
+			<Value ID="Shader">Shader</Value>
 			<Value ID="Region">Region / Model</Value>
 
 			<Value ID="Audio">Audio</Value>
@@ -3873,6 +3928,14 @@ E
 
 			<Value ID="CopyToClipboard">Copy to clipboard</Value>
 			<Value ID="ResetProfilerData">Reset profiler data</Value>
+
+			<Value ID="Shader">Shaders</Value>
+			<Value ID="LoadShader">Load shader...</Value>
+			<Value ID="AllShaders">All shaders</Value>
+			<Value ID="ClearShader">Remove shader</Value>
+			<Value ID="ShaderSettings">Configure shader...</Value>
+			<Value ID="OpenShaderFolder">Open shader folder</Value>
+			<Value ID="NoShadersFound">Shaders (.slangp files) in the "Shaders" folder will be listed here.</Value>
 		</Enum>
 		<Enum ID="TraceLogOutputFormat">
 			<Value ID="Text">Text Lines</Value>

@@ -99,7 +99,7 @@
 										</LinearGradientBrush>
 									</Rectangle.Fill>
 								</Rectangle>
-								<ScrollViewer Classes="menuscroller">
+								<ScrollViewer Theme="{StaticResource FluentMenuScrollViewer}">
 									<ItemsPresenter Name="PART_ItemsPresenter"
 														 ItemsPanel="{TemplateBinding ItemsPanel}"
 														 Margin="{DynamicResource MenuFlyoutScrollerMargin}"
@@ -159,7 +159,7 @@
 											</LinearGradientBrush>
 										</Rectangle.Fill>
 									</Rectangle>
-									<ScrollViewer Classes="menuscroller">
+									<ScrollViewer Theme="{StaticResource FluentMenuScrollViewer}">
 										<ItemsPresenter Name="PART_ItemsPresenter"
 															 ItemsPanel="{TemplateBinding ItemsPanel}"
 															 Margin="{DynamicResource MenuFlyoutScrollerMargin}"

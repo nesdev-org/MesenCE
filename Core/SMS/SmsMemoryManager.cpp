@@ -463,8 +463,7 @@ uint8_t SmsMemoryManager::ReadGameGearPort(uint8_t port)
 			ConsoleRegion region = _console->GetRegion();
 			return (
 				(_controlManager->IsPausePressed() ? 0x00 : 0x80) |
-				(region == ConsoleRegion::NtscJapan ? 0x00 : 0x40) |
-				(region == ConsoleRegion::Pal ? 0x20 : 0x00));
+				(region == ConsoleRegion::NtscJapan ? 0x00 : 0x40));
 		}
 
 		//TODOSMS GG - input/output ext port

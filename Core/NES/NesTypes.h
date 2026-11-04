@@ -341,6 +341,7 @@ struct ApuDmcState
 	uint16_t Period;
 	uint16_t Timer;
 	uint16_t BytesRemaining;
+	uint8_t BitsRemaining;
 
 	uint8_t OutputVolume;
 };
@@ -408,9 +409,9 @@ enum class GameInputType
 	FourPlayerAdapter = 3,
 	VsSystem = 4,
 	VsSystemSwapped = 5,
-	VsSystemSwapAB = 6,
+	EightPlayers = 6,
 	VsZapper = 7,
-	Zapper = 8,
+	Zapper1 = 8,
 	TwoZappers = 9,
 	BandaiHypershot = 0x0A,
 	PowerPadSideA = 0x0B,
@@ -443,10 +444,10 @@ enum class GameInputType
 	SuborKeyboard = 0x26,
 	SuborKeyboardMouse1 = 0x27,
 	SuborKeyboardMouse2 = 0x28,
-	SnesMouse = 0x29,
+	SnesMouse1 = 0x29,
 	GenericMulticart = 0x2A, //not supported yet
 	SnesControllers = 0x2B,
-	RacermateBicycle = 0x2C, //not supported yet
+	RacerMateBicycle = 0x2C, //not supported yet
 	UForce = 0x2D, //not supported yet
 	RobStackUp = 0x2E, //not supported yet
 	CityPatrolmanLightgun = 0x2F, //not supported yet
@@ -462,6 +463,27 @@ enum class GameInputType
 	VenomTVDance = 0x39, //not supported yet
 	LgTvRemote = 0x3A, //not supported yet
 	FcnsController = 0x3B,
+	KingFishingController = 0x3C, //not supported yet
+	CroakyKaraokeController = 0x3D, //not supported yet
+	KingwonKeyboard = 0x3E, //not supported yet
+	ZechengKeyboard = 0x3F, //not supported yet
+	SuborKeyboardMouse4 = 0x40, //not supported yet
+	Ps2KeyboardMouse = 0x41, //not supported yet
+	Ps2Mouse = 0x42, //not supported yet
+	YuxingMouse = 0x43, //not supported yet
+	SuborKeyboardMouse5 = 0x44, //not supported yet
+	GiggleTvPump = 0x45, //not supported yet
+	BbkKeyboardMouse = 0x46, //not supported yet
+	MagicalCooking = 0x47, //not supported yet
+	SnesMouse2 = 0x48,
+	Zapper2 = 0x49,
+	ArkanoidControllerPrototype = 0x4A, //not supported yet
+	TvMahjongGame = 0x4B, //not supported yet
+	MahjongGekitouDensetsu = 0x4C, //not supported yet
+	SuborKeyboardMouse6 = 0x4D, //not supported yet
+	IbmKeyboard = 0x4E, //not supported yet
+	SuborKeyboardMouse7 = 0x4F, //not supported yet
+	HoriTrack = 0x50,
 	LastEntry
 };
 

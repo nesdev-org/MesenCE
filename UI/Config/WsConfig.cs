@@ -1,5 +1,5 @@
-﻿using Mesen.Interop;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Mesen.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,8 +42,6 @@ public partial class WsConfig : BaseConfig<WsConfig>
 		ControllerHorizontal.Type = ControllerType.WsController;
 		ControllerVertical.Type = ControllerType.WsControllerVertical;
 		ControllerPcv2.Type = ControllerType.Pcv2Controller;
-
-		ConfigManager.Config.Video.ApplyConfig();
 
 		ConfigApi.SetWsConfig(new InteropWsConfig() {
 			ControllerHorizontal = ControllerHorizontal.ToInterop(),

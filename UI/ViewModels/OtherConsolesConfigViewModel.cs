@@ -35,7 +35,10 @@ namespace Mesen.ViewModels
 			}
 
 			AddDisposable(CvInput);
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(CvConfig, (s, e) => { CvConfig.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(CvConfig, (s, e) => {
+				CvConfig.ApplyConfig();
+				ConfigManager.Config.Video.ApplyConfig();
+			}));
 		}
 	}
 

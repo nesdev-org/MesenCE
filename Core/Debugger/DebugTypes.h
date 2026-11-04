@@ -265,9 +265,17 @@ enum class SpriteBackground
 	Magenta,
 };
 
+enum class SpriteViewerFilter
+{
+	Both,
+	DefaultOnly,
+	ExtendedOnly,
+};
+
 struct GetSpritePreviewOptions
 {
 	SpriteBackground Background;
+	SpriteViewerFilter Filter;
 };
 
 struct GetPaletteInfoOptions

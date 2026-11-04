@@ -1512,13 +1512,6 @@ void WsCpu::DivUnsigned(T y)
 		_state.Flags.Overflow = _mulOverflow;
 	}
 
-	if(y == 0) {
-		ProcessInvalidDiv();
-		return;
-	}
-
-	Idle<std::is_same<T, uint16_t>::value ? 11 : 3>();
-
 	uint32_t x;
 	if constexpr(std::is_same<T, uint16_t>::value) {
 		x = (_state.DX << 16) | _state.AX;
@@ -1526,11 +1519,30 @@ void WsCpu::DivUnsigned(T y)
 		x = _state.AX;
 	}
 
+	if(y == 0) {
+		if constexpr(std::is_same<T, uint16_t>::value) {
+			_state.Flags.Zero = ((x >> 14) & 0xFFFF) == 0;
+		} else {
+			_state.Flags.Zero = ((x >> 6) & 0xFF) == 0;
+		}
+
+		ProcessInvalidDiv();
+		return;
+	}
+
+	Idle<std::is_same<T, uint16_t>::value ? 11 : 3>();
+
 	uint32_t result = x / y;
 	uint32_t mod = x % y;
 
 	if(result > GetMaxValue<T>()) {
 		//Result too large
+		if constexpr(std::is_same<T, uint16_t>::value) {
+			_state.Flags.Zero = (((x + ((0x10000 - y) << 14)) & 0xFFFFC000) == 0) || (((x + (((0x10000 - y) * 3) << 14)) & 0xFFFFC000) == 0);
+		} else {
+			_state.Flags.Zero = (((x + ((0x100 - y) << 6)) & 0xFFC0) == 0) || (((x + (((0x100 - y) * 3) << 6)) & 0xFFC0) == 0);
+		}
+
 		ProcessInvalidDiv();
 		return;
 	}

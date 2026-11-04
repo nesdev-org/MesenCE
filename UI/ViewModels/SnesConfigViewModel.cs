@@ -35,7 +35,10 @@ namespace Mesen.ViewModels
 			}
 
 			AddDisposable(Input);
-			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => { Config.ApplyConfig(); }));
+			AddDisposable(ReactiveHelper.RegisterRecursiveObserver(Config, (s, e) => {
+				Config.ApplyConfig();
+				ConfigManager.Config.Video.ApplyConfig();
+			}));
 
 			AddDisposable(Config.ObserveProp(nameof(SnesConfig.SpcClockSpeedAdjustment), () => {
 				SpcEffectiveClockSpeed = ResourceHelper.GetMessage("SpcClockSpeedMsg", ((32000 + Config.SpcClockSpeedAdjustment) * 32).ToString());
