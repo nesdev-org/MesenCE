@@ -43,24 +43,23 @@ public:
 		CloseSocket();
 	}
 
-
 	bool OpenSocket(const Settings& selfSettings, const TraceLogOutput::Settings& sharedSettings)
 	{
 		if(_state == State::Uninitialized) {
 			_selfSettings = selfSettings;
 			_sharedSettings = sharedSettings;
 
-			if (!AllocateBuffers()) {
+			if(!AllocateBuffers()) {
 				return false;
 			}
 
-			_state = State::Initialized;	
+			_state = State::Initialized;
 		}
 
-		if (_state == State::Initialized) {
-      	_socket = std::make_unique<Socket>();
+		if(_state == State::Initialized) {
+			_socket = std::make_unique<Socket>();
 
-			if (_socket->ConnectionError()) {
+			if(_socket->ConnectionError()) {
 				_socket.reset(nullptr);
 				CloseSocket();
 				return false;
@@ -68,7 +67,7 @@ public:
 
 			_socket->Bind(_selfSettings.ConnectionPort);
 
-			if (_socket->ConnectionError()) {
+			if(_socket->ConnectionError()) {
 				_socket.reset(nullptr);
 				CloseSocket();
 				return false;
@@ -77,11 +76,10 @@ public:
 			_state = State::SocketCreated;
 		}
 
-		if (_state == State::SocketCreated) {
+		if(_state == State::SocketCreated) {
 			_socket->Listen(10);
 
-			if (_socket->ConnectionError())
-			{
+			if(_socket->ConnectionError()) {
 				CloseSocket();
 				return false;
 			}
@@ -96,17 +94,17 @@ public:
 	{
 		EndConnection();
 
-		if (_state == State::Listening) {
+		if(_state == State::Listening) {
 			_state = State::SocketCreated;
 		}
 
-		if (_state == State::SocketCreated) {
+		if(_state == State::SocketCreated) {
 			_socket->Close();
 			_socket.reset(nullptr);
 			_state = State::Initialized;
 		}
 
-		if (_state == State::Initialized) {
+		if(_state == State::Initialized) {
 			FreeBuffers();
 
 			_loggingQueue = std::queue<WorkItem>();
@@ -118,16 +116,15 @@ public:
 		}
 	}
 
-
 	bool BeginConnection()
 	{
-		if (_state == State::Listening) {
-			if (AcceptConnection()) {
+		if(_state == State::Listening) {
+			if(AcceptConnection()) {
 				_state = State::Connected;
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -135,8 +132,8 @@ public:
 	{
 		StopLogging();
 
-		if (_state == State::Connected) {
-			for (std::unique_ptr<Socket>& socket : _openConnections) {
+		if(_state == State::Connected) {
+			for(std::unique_ptr<Socket>& socket : _openConnections) {
 				socket->Close();
 			}
 
@@ -145,14 +142,13 @@ public:
 		}
 	}
 
-
 	bool StartLogging()
 	{
-		if (_state == State::Connected) {
+		if(_state == State::Connected) {
 			StartThreads();
 			_state = State::Logging;
 		}
-		
+
 		return true;
 	}
 
@@ -164,13 +160,12 @@ public:
 		}
 	}
 
-
 protected:
 	void FlushItemToStream(const WorkItem& item) override
 	{
 		AcceptConnection();
 
-		for (auto it = _openConnections.begin(); it != _openConnections.end(); ) {
+		for(auto it = _openConnections.begin(); it != _openConnections.end();) {
 			std::unique_ptr<Socket>& socket = *it;
 
 			socket->Send((char*)item.Buffer, (int)item.Size, 0u);
@@ -178,7 +173,7 @@ protected:
 			// Erase a connection if it produced a connection error. Probably not much else
 			// we can do here. The "AcceptConnection()" above should hopefully re-establish
 			// the connection if desired.
-			if (socket->ConnectionError()) {
+			if(socket->ConnectionError()) {
 				it = _openConnections.erase(it);
 			} else {
 				++it;
@@ -190,7 +185,7 @@ protected:
 	{
 		unique_ptr<Socket> socket = _socket->Accept();
 
-		if (socket->ConnectionError()) {
+		if(socket->ConnectionError()) {
 			return false;
 		}
 

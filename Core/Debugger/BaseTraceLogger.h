@@ -551,7 +551,7 @@ public:
 						skipRow = false;
 					}
 				}
-				
+
 				if(!skipRow) {
 					switch(logOutput->GetOutputFormat()) {
 						case TraceLogOutput::OutputFormat::Text: {

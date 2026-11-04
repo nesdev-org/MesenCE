@@ -55,7 +55,7 @@ public:
 
 	void StopLogging()
 	{
-		if (!IsEnabled()) {
+		if(!IsEnabled()) {
 			return;
 		}
 
@@ -64,7 +64,7 @@ public:
 
 		_outputFile.close();
 	}
-	
+
 	void FlushItemToStream(const WorkItem& item) override
 	{
 		_outputFile.write((const char*)item.Buffer, item.Size);

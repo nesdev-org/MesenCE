@@ -56,7 +56,7 @@ public:
 	void Run() override;
 	void Step(int32_t stepCount, StepType type) override;
 
-	void ProcessEndOfFrame()  override;
+	void ProcessEndOfFrame() override;
 
 	DebuggerFeatures GetSupportedFeatures() override;
 	void SetProgramCounter(uint32_t addr, bool updateDebuggerOnly = false) override;

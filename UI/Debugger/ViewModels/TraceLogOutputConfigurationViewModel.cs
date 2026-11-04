@@ -16,13 +16,12 @@ namespace Mesen.Debugger.ViewModels
 {
 	public class RestrictToPlatformValueConverter : IMultiValueConverter
 	{
-		 public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+		public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
 		{
-			if (values.Count == 2
+			if(values.Count == 2
 				&& values[0] is object propertyOwner
 				&& values[1] is CpuType cpuType
-				&& parameter is string propertyName)
-			{
+				&& parameter is string propertyName) {
 				if(typeof(bool).IsAssignableTo(targetType) && propertyOwner != null) {
 					return IsPropertyAllowedOnPlatform(propertyOwner, propertyName, cpuType);
 				}
@@ -37,7 +36,7 @@ namespace Mesen.Debugger.ViewModels
 
 			// This here stinks quite a bit. This is only here to silence a warning on GetProperty().
 			// This could be solved differently, but this here feels like the least invasive solution.
-			if (ownerType == typeof(TraceLogOutputCpuDependentConfig)) {
+			if(ownerType == typeof(TraceLogOutputCpuDependentConfig)) {
 				ownerType = typeof(TraceLogOutputCpuDependentConfig);
 			} else if(ownerType == typeof(TraceLogOutputSharedConfig)) {
 				ownerType = typeof(TraceLogOutputSharedConfig);
@@ -59,10 +58,9 @@ namespace Mesen.Debugger.ViewModels
 
 			RestrictToPlatformsAttribute? resrictAttribute = (RestrictToPlatformsAttribute?)Attribute.GetCustomAttribute(propertyInfo, typeof(RestrictToPlatformsAttribute));
 
-			if (resrictAttribute != null)
-			{
+			if(resrictAttribute != null) {
 				foreach(var allowedCpuType in resrictAttribute.SupportedCpuTypes) {
-					if (allowedCpuType == cpuType) {
+					if(allowedCpuType == cpuType) {
 						return true;
 					}
 				}
@@ -71,7 +69,7 @@ namespace Mesen.Debugger.ViewModels
 			}
 
 			return true;
-		}		
+		}
 	}
 
 	public partial class TraceLogOutputConfigurationViewModel : DisposableViewModel
@@ -124,11 +122,11 @@ namespace Mesen.Debugger.ViewModels
 				bool exclude = false;
 
 				foreach(var attribute in attributes) {
-					if (attribute is RestrictToPlatformsAttribute resrictAttribute) {
+					if(attribute is RestrictToPlatformsAttribute resrictAttribute) {
 						exclude = true;
 
 						foreach(var allowedCpuType in resrictAttribute.SupportedCpuTypes) {
-							if (allowedCpuType == cpuType) {
+							if(allowedCpuType == cpuType) {
 								exclude = false;
 								break;
 							}
@@ -136,7 +134,7 @@ namespace Mesen.Debugger.ViewModels
 					}
 				}
 
-				if (!exclude) {
+				if(!exclude) {
 					result.Add(value);
 				}
 			}

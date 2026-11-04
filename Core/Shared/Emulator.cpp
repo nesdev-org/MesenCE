@@ -277,7 +277,7 @@ void Emulator::ProcessEndOfFrame()
 		_console->GetControlManager()->ProcessEndOfFrame();
 	}
 
-	if (_internalDebugger) {
+	if(_internalDebugger) {
 		_internalDebugger->ProcessEndOfFrame();
 	}
 

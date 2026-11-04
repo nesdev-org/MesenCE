@@ -23,9 +23,9 @@ namespace Mesen.Windows
 		private TraceLogOutputConfigurationViewModel _model;
 
 		public TraceLogOutputConfig Config
-    	{
-    	    get => _model.Config;
-    	}
+		{
+			get => _model.Config;
+		}
 
 		[Obsolete("For designer only")]
 		public TraceLogOutputConfigurationWindow() : this(new()) { }
@@ -68,13 +68,13 @@ namespace Mesen.Windows
 		{
 			TraceLogOutputSharedConfig inputSharedConfig = Config.SharedConfig;
 
-			if (!Config.ShowAdvancedSettings) {
+			if(!Config.ShowAdvancedSettings) {
 				inputSharedConfig = new();
 			}
 
 			InteropTraceLogOutputSharedConfig sharedConfig = new(inputSharedConfig, MainWindowViewModel.Instance.RomInfo.ConsoleType.GetMainCpuType());
 
-			switch (Config.OutputTarget) {
+			switch(Config.OutputTarget) {
 				case TraceLogOutputTarget.File:
 					InteropTraceLogOutputFileConfig fileConfig = new(Config.FileConfig);
 					DebugApi.StartLogTraceToFile(fileConfig, sharedConfig);
@@ -88,7 +88,7 @@ namespace Mesen.Windows
 						TraceNetworkSocketWaitForConnectionWindow wnd = new TraceNetworkSocketWaitForConnectionWindow();
 						TraceNetworkSocketWaitForConnectionWindowResult result = await wnd.ShowCenteredDialog<TraceNetworkSocketWaitForConnectionWindowResult>(this.GetWindow());
 
-						if (result == TraceNetworkSocketWaitForConnectionWindowResult.Cancelled) {
+						if(result == TraceNetworkSocketWaitForConnectionWindowResult.Cancelled) {
 							DebugApi.CloseNetworkLogSocket();
 							return;
 						}
@@ -120,7 +120,7 @@ namespace Mesen.Windows
 			}
 
 			string? filename = await FileDialogHelper.SaveFile(inputDirectory, inputFilename, this, FileDialogHelper.TraceExt);
-			
+
 			if(filename != null) {
 				Config.FileConfig.FileName = filename;
 			}

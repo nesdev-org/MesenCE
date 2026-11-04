@@ -38,7 +38,6 @@ public:
 		OutputFormat Format;
 	};
 
-
 	bool GetUniqueRowsOnly() const
 	{
 		return _sharedSettings.UniqueRowsOnly;
@@ -54,7 +53,6 @@ public:
 		return _sharedSettings.Format;
 	}
 
-
 	__forceinline bool IsEnabled() { return _threadsRunning; }
 
 	void Log(const uint8_t* data, int length)
@@ -66,8 +64,8 @@ public:
 			return;
 		}
 
-		if (_currentLogItem.Size + length > _currentLogItem.Capacity) {
-			if (_currentLogItem.Size == 0u) {
+		if(_currentLogItem.Size + length > _currentLogItem.Capacity) {
+			if(_currentLogItem.Size == 0u) {
 				// If this log entry does not fit into our current buffer,
 				// yet the current buffer's size is still at 0, it means the
 				// log entry is larger than our full buffer size. There is
@@ -102,21 +100,20 @@ public:
 
 	void FlushOldBuffers()
 	{
-		if (_threadsRunning) {
+		if(_threadsRunning) {
 			return;
 		}
 
-		if (_currentLogItem.Size == 0u) {
+		if(_currentLogItem.Size == 0u) {
 			return;
 		}
 
 		uint64_t currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-		if (currentTime - _lastLogTime >= 5000u) {
+		if(currentTime - _lastLogTime >= 5000u) {
 			FlushCurrentWorkItem();
 		}
 	}
-
 
 protected:
 	Settings _sharedSettings;
@@ -179,7 +176,7 @@ protected:
 		// 0:     uint8_t:  Character 'Z' as a flag for compressed data.
 		// 1 - 4: uint32_t: Length of the uncompressed buffer, little-endian.
 		// 5 - 8: uint32_t: Length of the compressed buffer, little-endian.
-		uint8_t data[9u];		
+		uint8_t data[9u];
 	};
 
 	bool AllocateBuffers()
@@ -192,13 +189,13 @@ protected:
 
 		_logMemoryStart = new uint8_t[_sharedSettings.ChunkSize * _sharedSettings.ChunkCount];
 
-		if (_logMemoryStart == nullptr) {
+		if(_logMemoryStart == nullptr) {
 			return false;
 		}
 
 		_compressionMemoryStart = new uint8_t[CompressedChunkSize * _sharedSettings.ChunkCount];
 
-		if (_compressionMemoryStart == nullptr) {
+		if(_compressionMemoryStart == nullptr) {
 			delete _logMemoryStart;
 			return false;
 		}
@@ -254,8 +251,8 @@ protected:
 		_currentLogItem = _loggingQueue.front();
 		_loggingQueue.pop();
 
-		_compressionThread = std::thread([this](){ RunCompression(); });
-		_sendThread = std::thread([this](){ RunSend(); });
+		_compressionThread = std::thread([this]() { RunCompression(); });
+		_sendThread = std::thread([this]() { RunSend(); });
 
 		_lastLogTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
@@ -282,12 +279,9 @@ protected:
 		{
 			std::lock_guard<std::mutex> guard(_compressionInputMutex);
 
-			if (_currentLogItem.Size > 0)
-			{
+			if(_currentLogItem.Size > 0) {
 				_compressionInputQueue.push(_currentLogItem);
-			}
-			else
-			{
+			} else {
 				_loggingQueue.push(_currentLogItem);
 			}
 
@@ -308,29 +302,26 @@ protected:
 			_compressionInputQueue.push(_currentLogItem);
 			_currentLogItem.Buffer = nullptr;
 
-			if (!_loggingQueue.empty())
-			{
+			if(!_loggingQueue.empty()) {
 				_currentLogItem = _loggingQueue.front();
 				_loggingQueue.pop();
 			}
 		}
 
 		// In the unlikely case we ever run out of buffers, sleep until one becomes available.
-		while (_currentLogItem.Buffer == nullptr) {
+		while(_currentLogItem.Buffer == nullptr) {
 			std::this_thread::sleep_for(25ms);
 
 			{
 				std::lock_guard<std::mutex> guard(_compressionInputMutex);
 
-				if (!_loggingQueue.empty()) {
+				if(!_loggingQueue.empty()) {
 					_currentLogItem = _loggingQueue.front();
 					_loggingQueue.pop();
 				}
 			}
 		}
 	}
-	
-
 
 	void RunCompression()
 	{
@@ -347,29 +338,26 @@ protected:
 		WorkItem currentItem;
 		FetchNextCompressionItem(&currentItem);
 
-		while (currentItem.Buffer != nullptr) {
+		while(currentItem.Buffer != nullptr) {
 			WorkItem outputItem;
 			outputItem.Buffer = nullptr;
 
-			while (outputItem.Buffer == nullptr) {
+			while(outputItem.Buffer == nullptr) {
 				{
 					std::lock_guard<std::mutex> guard(_compressionOutputMutex);
 
-					if (!_compressionOutputQueue.empty())
-					{
+					if(!_compressionOutputQueue.empty()) {
 						outputItem = _compressionOutputQueue.front();
 						_compressionOutputQueue.pop();
 					}
 				}
 
-				if (outputItem.Buffer == nullptr)
-				{
+				if(outputItem.Buffer == nullptr) {
 					std::this_thread::sleep_for(25ms);
 				}
 			}
 
-			switch (_sharedSettings.CompressionType)
-			{
+			switch(_sharedSettings.CompressionType) {
 				case CompressionType::None:
 					memcpy(outputItem.Buffer, currentItem.Buffer, currentItem.Size);
 					outputItem.Size = currentItem.Size;
@@ -380,17 +368,16 @@ protected:
 						currentItem.Size = 0u;
 						_loggingQueue.push(currentItem);
 					}
-					
+
 					{
 						std::lock_guard<std::mutex> guard(_compressionOutputMutex);
 
 						_sendQueue.push(outputItem);
 					}
-					
+
 					break;
 
-				case CompressionType::DiztinguishZlib:
-				{
+				case CompressionType::DiztinguishZlib: {
 					DiztinguishZlibCompressionHeader header;
 					header.data[0] = 'Z';
 					header.data[1] = (currentItem.Size >> 0) & 0xFF;
@@ -410,7 +397,7 @@ protected:
 						_loggingQueue.push(currentItem);
 					}
 
-					if (z_result != Z_MEM_ERROR && z_result != Z_BUF_ERROR) {
+					if(z_result != Z_MEM_ERROR && z_result != Z_BUF_ERROR) {
 						outputItem.Size += compressedSize;
 
 						header.data[5] = (compressedSize >> 0) & 0xFF;
@@ -445,10 +432,10 @@ protected:
 	void FetchNextCompressionItem(WorkItem* targetItem)
 	{
 		targetItem->Buffer = nullptr;
-		
+
 		std::lock_guard<std::mutex> guard(_compressionInputMutex);
 
-		if (!_compressionInputQueue.empty()) {
+		if(!_compressionInputQueue.empty()) {
 			*targetItem = _compressionInputQueue.front();
 			_compressionInputQueue.pop();
 		}
@@ -469,7 +456,7 @@ protected:
 		WorkItem currentItem;
 		FetchNextSendItem(&currentItem);
 
-		while (currentItem.Buffer != nullptr) {
+		while(currentItem.Buffer != nullptr) {
 			FlushItemToStream(currentItem);
 
 			{
@@ -486,10 +473,10 @@ protected:
 	void FetchNextSendItem(WorkItem* targetItem)
 	{
 		targetItem->Buffer = nullptr;
-		
+
 		std::lock_guard<std::mutex> guard(_compressionOutputMutex);
 
-		if (!_sendQueue.empty()) {
+		if(!_sendQueue.empty()) {
 			*targetItem = _sendQueue.front();
 			_sendQueue.pop();
 		}

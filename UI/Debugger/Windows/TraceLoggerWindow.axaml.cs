@@ -196,7 +196,7 @@ namespace Mesen.Debugger.Windows
 			TraceLogOutputConfigurationWindow wnd = new TraceLogOutputConfigurationWindow(new TraceLogOutputConfigurationViewModel(MainWindowViewModel.Instance.RomInfo.ConsoleType.GetMainCpuType(), ConfigManager.Config.Debug.TraceLogger.OutputConfig));
 			TraceLogOutputConfigurationWindowResult result = await wnd.ShowCenteredDialog<TraceLogOutputConfigurationWindowResult>(this.GetWindow());
 
-			if (result == TraceLogOutputConfigurationWindowResult.ConnectionEstablished) {
+			if(result == TraceLogOutputConfigurationWindowResult.ConnectionEstablished) {
 				switch(wnd.Config.OutputTarget) {
 					case TraceLogOutputTarget.File:
 						_model.TraceFile = wnd.Config.FileConfig.FileName;
@@ -219,7 +219,7 @@ namespace Mesen.Debugger.Windows
 		}
 
 		private void OnStopLoggingClick(object sender, RoutedEventArgs e)
-		{			
+		{
 			if(!_model.IsLoggingToStream) {
 				return;
 			}

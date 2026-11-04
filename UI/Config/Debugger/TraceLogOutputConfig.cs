@@ -40,7 +40,7 @@ namespace Mesen.Config
 		[ObservableProperty] public partial uint ChunkSize { get; set; } = 1 * 1024 * 1024;
 		[ObservableProperty] public partial uint ChunkCount { get; set; } = 10;
 		[ObservableProperty] public partial bool BatchLogData { get; set; } = true;
-		
+
 		[RestrictToPlatforms(CpuType.Snes, CpuType.Sa1)]
 		[ObservableProperty] public partial bool UniqueRowsOnly { get; set; } = false;
 		[ObservableProperty] public partial bool IncludeImplicitPC { get; set; } = true;

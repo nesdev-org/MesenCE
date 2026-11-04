@@ -69,8 +69,7 @@ bool SnesCpuTraceLogger::IsUniqueRow(SnesCpuState& cpuState, DisassemblyInfo& di
 	rowState.State.PS = cpuState.PS;
 	rowState.State.EmulationMode = cpuState.EmulationMode;
 
-	return (_uniqueRowBankRecords->BankStates[bank] == nullptr
-		|| _uniqueRowBankRecords->BankStates[bank]->RowStates[bankOffset].UniqueCpuStates.find(rowState.PackedState) == _uniqueRowBankRecords->BankStates[bank]->RowStates[bankOffset].UniqueCpuStates.cend());
+	return (_uniqueRowBankRecords->BankStates[bank] == nullptr || _uniqueRowBankRecords->BankStates[bank]->RowStates[bankOffset].UniqueCpuStates.find(rowState.PackedState) == _uniqueRowBankRecords->BankStates[bank]->RowStates[bankOffset].UniqueCpuStates.cend());
 }
 
 void SnesCpuTraceLogger::TrackRowState(SnesCpuState& cpuState, DisassemblyInfo& disassemblyInfo)
@@ -97,15 +96,15 @@ void SnesCpuTraceLogger::TrackRowState(SnesCpuState& cpuState, DisassemblyInfo& 
 void SnesCpuTraceLogger::GetTraceData(vector<uint8_t>* target, SnesCpuState& cpuState, DisassemblyInfo& disassemblyInfo, TraceLogOutput::OutputFormat traceFormat)
 {
 	switch(traceFormat) {
-	case TraceLogOutput::OutputFormat::Text:
-		// Should never be called - handled in BaseTraceLogger.
-		break;
-	case TraceLogOutput::OutputFormat::Diztinguish:
-		target->push_back(0xEF);
-		break;
-	case TraceLogOutput::OutputFormat::DiztinguishAbridged:
-		target->push_back(0xEE);
-		break;
+		case TraceLogOutput::OutputFormat::Text:
+			// Should never be called - handled in BaseTraceLogger.
+			break;
+		case TraceLogOutput::OutputFormat::Diztinguish:
+			target->push_back(0xEF);
+			break;
+		case TraceLogOutput::OutputFormat::DiztinguishAbridged:
+			target->push_back(0xEE);
+			break;
 	}
 
 	uint32_t pc = GetProgramCounter(cpuState);
@@ -126,7 +125,7 @@ void SnesCpuTraceLogger::GetTraceData(vector<uint8_t>* target, SnesCpuState& cpu
 		target->push_back(cpuState.DBR);
 		target->push_back(cpuState.PS);
 
-		if (traceFormat == TraceLogOutput::OutputFormat::Diztinguish) {
+		if(traceFormat == TraceLogOutput::OutputFormat::Diztinguish) {
 			uint8_t* byteCode = disassemblyInfo.GetByteCode();
 			target->push_back(byteCode[0u]);
 			target->push_back(byteCode[1u]);

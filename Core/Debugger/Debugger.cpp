@@ -651,7 +651,7 @@ void Debugger::ProcessEvent(EventType type, std::optional<CpuType> cpuTypeOpt)
 }
 
 void Debugger::ProcessEndOfFrame()
-{	
+{
 	for(int i = 0; i <= (int)DebugUtilities::GetLastCpuType(); i++) {
 		if(_debuggers[i].Debugger) {
 			_debuggers[i].Debugger->ProcessEndOfFrame();

@@ -103,7 +103,7 @@ public:
 	void Step(int32_t stepCount, StepType type) override;
 	StepBackConfig GetStepBackConfig() override;
 
-	void ProcessEndOfFrame()  override;
+	void ProcessEndOfFrame() override;
 
 	void DrawPartialFrame() override;
 
