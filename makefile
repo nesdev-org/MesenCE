@@ -107,7 +107,7 @@ ifneq ($(STATICLINK),false)
 endif
 
 ifeq ($(MESENOS),osx)
-	LINKOPTIONS += -framework Foundation -framework Cocoa -framework GameController -framework CoreHaptics -Wl,-rpath,/opt/local/lib
+	LINKOPTIONS += -framework Foundation -framework Cocoa -framework GameController -framework CoreHaptics -framework IOKit -Wl,-rpath,/opt/local/lib
 endif
 
 CXXFLAGS = -fPIC -Wall --std=c++17 $(MESENFLAGS) -I $(realpath ./) -I $(realpath ./Core) -I $(realpath ./Utilities) -I $(realpath ./Sdl) -I $(realpath ./Linux) -I $(realpath ./MacOS)
