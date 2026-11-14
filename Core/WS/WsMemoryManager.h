@@ -60,11 +60,13 @@ public:
 	void Map(uint32_t start, uint32_t end, MemoryType type, uint32_t offset, bool readonly);
 	void Unmap(uint32_t start, uint32_t end);
 
-	__forceinline void Exec()
+	__forceinline void Exec(uint8_t cycles = 1)
 	{
-		_cpu->IncCycleCount();
-		_ppu->Exec();
-		_apu->Run();
+		while(cycles--) {
+			_cpu->IncCycleCount();
+			_ppu->Exec();
+			_apu->Run();
+		}
 	}
 
 	__forceinline uint8_t InternalRead(uint32_t addr)
@@ -113,7 +115,7 @@ public:
 				uint8_t hi = Read<uint8_t>(seg, offset + 1);
 				return lo | (hi << 8);
 			} else {
-				Exec();
+				Exec(GetWaitStates(addr));
 				uint8_t lo = InternalRead(addr);
 				uint8_t hi = InternalRead(((seg << 4) + (uint16_t)(offset + 1)) & 0xFFFFF);
 				uint16_t value = lo | (hi << 8);
@@ -121,7 +123,7 @@ public:
 				return value;
 			}
 		} else {
-			Exec();
+			Exec(GetWaitStates(addr));
 			uint8_t value = InternalRead(addr);
 			_emu->ProcessMemoryRead<CpuType::Ws, 1>(addr, value, opType);
 			return value;
@@ -138,14 +140,14 @@ public:
 				Write<uint8_t>(seg, offset, (uint8_t)value);
 				Write<uint8_t>(seg, offset + 1, (uint8_t)(value >> 8));
 			} else {
-				Exec();
+				Exec(GetWaitStates(addr));
 				if(_emu->ProcessMemoryWrite<CpuType::Ws, 2>(addr, value, opType)) {
 					InternalWrite(addr, (uint8_t)value);
 					InternalWrite(((seg << 4) + (uint16_t)(offset + 1)) & 0xFFFFF, value >> 8);
 				}
 			}
 		} else {
-			Exec();
+			Exec(GetWaitStates(addr));
 			if(_emu->ProcessMemoryWrite<CpuType::Ws>(addr, value, opType)) {
 				InternalWrite(addr, value);
 			}
