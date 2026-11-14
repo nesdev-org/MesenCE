@@ -152,6 +152,13 @@ void NecDspDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void NecDspDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 DebuggerFeatures NecDspDebugger::GetSupportedFeatures()
 {
 	DebuggerFeatures features = {};

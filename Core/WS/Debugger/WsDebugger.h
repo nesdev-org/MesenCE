@@ -77,6 +77,8 @@ public:
 	void Step(int32_t stepCount, StepType type) override;
 	StepBackConfig GetStepBackConfig() override;
 
+	void ProcessEndOfFrame() override;
+
 	void DrawPartialFrame() override;
 
 	bool SaveRomToDisk(string filename, bool saveAsIps, CdlStripOption stripOption);

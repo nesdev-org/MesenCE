@@ -31,7 +31,7 @@ namespace Mesen.Debugger.ViewModels
 		[ObservableProperty] public partial int ScrollPosition { get; set; } = 0;
 		[ObservableProperty] public partial int MinScrollPosition { get; set; } = 0;
 		[ObservableProperty] public partial int MaxScrollPosition { get; set; } = DebugApi.TraceLogBufferSize;
-		[ObservableProperty] public partial bool IsLoggingToFile { get; set; } = false;
+		[ObservableProperty] public partial bool IsLoggingToStream { get; set; } = false;
 
 		[ObservableProperty] public partial List<TraceLoggerOptionTab> Tabs { get; set; } = new();
 		[ObservableProperty] public partial TraceLoggerOptionTab SelectedTab { get; set; } = null!;
@@ -86,8 +86,8 @@ namespace Mesen.Debugger.ViewModels
 			AddDisposable(this.ObserveProp(nameof(MinScrollPosition), UpdateScrollPosition));
 			AddDisposable(this.ObserveProp(nameof(MaxScrollPosition), UpdateScrollPosition));
 
-			AddDisposable(this.ObserveProp(nameof(IsLoggingToFile), () => {
-				AllowOpenTraceFile = !IsLoggingToFile && TraceFile != null;
+			AddDisposable(this.ObserveProp(nameof(IsLoggingToStream), () => {
+				AllowOpenTraceFile = !IsLoggingToStream && TraceFile != null;
 			}));
 
 			AddDisposable(this.ObserveProp([nameof(SelectionStart), nameof(SelectionEnd), nameof(SelectedRow), nameof(SelectionAnchor)], () => {

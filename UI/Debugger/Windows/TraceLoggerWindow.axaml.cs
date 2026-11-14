@@ -11,6 +11,8 @@ using Mesen.Debugger.Utilities;
 using Mesen.Debugger.ViewModels;
 using Mesen.Interop;
 using Mesen.Utilities;
+using Mesen.ViewModels;
+using Mesen.Windows;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,6 +24,7 @@ namespace Mesen.Debugger.Windows
 	{
 		private TraceLoggerViewModel _model;
 		private CodeViewerSelectionHandler _selectionHandler;
+		private TraceLogOutputTarget _activeLogOutputTarget = TraceLogOutputTarget.File;
 
 		[Obsolete("For designer only")]
 		public TraceLoggerWindow() : this(new()) { }
@@ -190,20 +193,48 @@ namespace Mesen.Debugger.Windows
 
 		private async void OnStartLoggingClick(object sender, RoutedEventArgs e)
 		{
-			string? filename = await FileDialogHelper.SaveFile(ConfigManager.DebuggerFolder, EmuApi.GetRomInfo().GetRomName() + ".txt", this.GetWindow(), FileDialogHelper.TraceExt);
-			if(filename != null) {
-				_model.TraceFile = filename;
-				_model.IsLoggingToFile = true;
-				DebugApi.StartLogTraceToFile(filename);
+			TraceLogOutputConfigurationWindow wnd = new TraceLogOutputConfigurationWindow(new TraceLogOutputConfigurationViewModel(MainWindowViewModel.Instance.RomInfo.ConsoleType.GetMainCpuType(), ConfigManager.Config.Debug.TraceLogger.OutputConfig));
+			TraceLogOutputConfigurationWindowResult result = await wnd.ShowCenteredDialog<TraceLogOutputConfigurationWindowResult>(this.GetWindow());
+
+			if(result == TraceLogOutputConfigurationWindowResult.ConnectionEstablished) {
+				switch(wnd.Config.OutputTarget) {
+					case TraceLogOutputTarget.File:
+						_model.TraceFile = wnd.Config.FileConfig.FileName;
+						_activeLogOutputTarget = TraceLogOutputTarget.File;
+						_model.IsLoggingToStream = true;
+						break;
+
+					case TraceLogOutputTarget.NetworkSocket:
+						if(DebugApi.StartNetworkLogLogging()) {
+							_model.TraceFile = null;
+							_activeLogOutputTarget = TraceLogOutputTarget.NetworkSocket;
+							_model.IsLoggingToStream = true;
+						} else {
+							DebugApi.CloseNetworkLogSocket();
+							await MesenMsgBox.Show(null, "StartingTraceLogNetworkFailed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						}
+						break;
+				}
 			}
 		}
 
 		private void OnStopLoggingClick(object sender, RoutedEventArgs e)
 		{
-			if(_model.IsLoggingToFile) {
-				_model.IsLoggingToFile = false;
-				DebugApi.StopLogTraceToFile();
+			if(!_model.IsLoggingToStream) {
+				return;
 			}
+
+			switch(_activeLogOutputTarget) {
+				case TraceLogOutputTarget.File:
+					DebugApi.StopLogTraceToFile();
+					break;
+
+				case TraceLogOutputTarget.NetworkSocket:
+					DebugApi.CloseNetworkLogSocket();
+					break;
+			}
+
+			_model.IsLoggingToStream = false;
 		}
 
 		private void OnOpenTraceFile(object sender, RoutedEventArgs e)

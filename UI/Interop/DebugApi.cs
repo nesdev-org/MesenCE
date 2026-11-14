@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using ELFSharp.UImage;
 using Mesen.Config;
 using Mesen.Debugger;
 using Mesen.Utilities;
@@ -9,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,8 +26,15 @@ namespace Mesen.Interop
 		[DllImport(DllPath)] public static extern void ResumeExecution();
 		[DllImport(DllPath)] public static extern void Step(CpuType cpuType, Int32 instructionCount, StepType type = StepType.Step);
 
-		[DllImport(DllPath)] public static extern void StartLogTraceToFile([MarshalAs(UnmanagedType.LPUTF8Str)] string filename);
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool StartLogTraceToFile(InteropTraceLogOutputFileConfig selfSettings, InteropTraceLogOutputSharedConfig sharedSettings);
 		[DllImport(DllPath)] public static extern void StopLogTraceToFile();
+
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool OpenNetworkLogSocket(InteropTraceLogOutputNetworkSocketConfig selfSettings, InteropTraceLogOutputSharedConfig sharedSettings);
+		[DllImport(DllPath)] public static extern void CloseNetworkLogSocket();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool BeginNetworkLogConnection();
+		[DllImport(DllPath)] public static extern void EndNetworkLogConnection();
+		[DllImport(DllPath)][return: MarshalAs(UnmanagedType.I1)] public static extern bool StartNetworkLogLogging();
+		[DllImport(DllPath)] public static extern void StopNetworkLogLogging();
 
 		[DllImport(DllPath)] public static extern void SetTraceOptions(CpuType cpuType, InteropTraceLoggerOptions options);
 
@@ -1470,6 +1479,57 @@ namespace Mesen.Interop
 		[MarshalAs(UnmanagedType.ByValArray, SizeConst = 1000)]
 		public byte[] Format;
 	}
+
+	[Serializable]
+	public struct InteropTraceLogOutputSharedConfig
+	{
+		public uint ChunkSize;
+		public uint ChunkCount;
+		[MarshalAs(UnmanagedType.I1)] public bool BatchLogData;
+		[MarshalAs(UnmanagedType.I1)] public bool UniqueRowsOnly;
+		[MarshalAs(UnmanagedType.I1)] public bool IncludeImplicitPC;
+
+		public TraceLogOutputCompressionType CompressionType;
+		public TraceLogOutputFormat Format;
+
+		public InteropTraceLogOutputSharedConfig(TraceLogOutputSharedConfig config, CpuType cpuType)
+		{
+			TraceLogOutputCpuDependentConfig cpuConfig = config.GetCpuConfig(cpuType);
+
+			ChunkSize = config.ChunkSize;
+			ChunkCount = config.ChunkCount;
+			BatchLogData = config.BatchLogData;
+			UniqueRowsOnly = config.UniqueRowsOnly;
+			IncludeImplicitPC = config.IncludeImplicitPC;
+
+			CompressionType = cpuConfig.CompressionType;
+			Format = cpuConfig.Format;
+		}
+	};
+
+	[Serializable]
+	public struct InteropTraceLogOutputFileConfig
+	{
+		[MarshalAs(UnmanagedType.LPUTF8Str)] public string FileName;
+		[MarshalAs(UnmanagedType.I1)] public bool NativeNewLines;
+
+		public InteropTraceLogOutputFileConfig(TraceLogOutputFileConfig config)
+		{
+			FileName = config.FileName;
+			NativeNewLines = config.NativeNewLines;
+		}
+	};
+
+	[Serializable]
+	public struct InteropTraceLogOutputNetworkSocketConfig
+	{
+		public ushort ConnectionPort;
+
+		public InteropTraceLogOutputNetworkSocketConfig(TraceLogOutputNetworkSocketConfig config)
+		{
+			ConnectionPort = config.ConnectionPort;
+		}
+	};
 
 	public enum VectorType
 	{

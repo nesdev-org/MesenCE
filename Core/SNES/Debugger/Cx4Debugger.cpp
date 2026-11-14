@@ -167,6 +167,13 @@ void Cx4Debugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void Cx4Debugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 void Cx4Debugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly)
 {
 	Cx4State& state = _cx4->GetState();

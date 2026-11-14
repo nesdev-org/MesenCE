@@ -35,6 +35,8 @@ namespace Mesen.Config
 		[ObservableProperty] public partial TraceLoggerCpuConfig GbaConfig { get; set; } = new();
 		[ObservableProperty] public partial TraceLoggerCpuConfig WsConfig { get; set; } = new();
 
+		[ObservableProperty] public partial TraceLogOutputConfig OutputConfig { get; set; } = new();
+
 		public TraceLoggerConfig()
 		{
 		}

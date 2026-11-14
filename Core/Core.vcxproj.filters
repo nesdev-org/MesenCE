@@ -163,7 +163,13 @@
     <ClInclude Include="Debugger\ScriptManager.h">
       <Filter>Debugger</Filter>
     </ClInclude>
-    <ClInclude Include="Debugger\TraceLogFileSaver.h">
+    <ClInclude Include="Debugger\TraceLogOutput.h">
+      <Filter>Debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugger\TraceLogOutputFile.h">
+      <Filter>Debugger</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugger\TraceLogOutputNetworkSocket.h">
       <Filter>Debugger</Filter>
     </ClInclude>
     <ClCompile Include="Gameboy\Gameboy.cpp">
@@ -3020,6 +3026,9 @@
     </ClInclude>
     <ClInclude Include="Shared\Video\DrawPixelsCommand.h">
       <Filter>Shared\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\TraceFormat.h">
+      <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

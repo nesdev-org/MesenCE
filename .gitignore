@@ -190,3 +190,7 @@ packages/*
 
 TestHelper/*
 UI/Dependencies.zip
+
+# Visual Studio Code local files
+.vscodecsdt/Runners/
+.vscode

@@ -250,6 +250,13 @@ void GbaDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void GbaDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 StepBackConfig GbaDebugger::GetStepBackConfig()
 {
 	return {

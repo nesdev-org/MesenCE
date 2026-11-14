@@ -185,6 +185,13 @@ void St018Debugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void St018Debugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 void St018Debugger::ProcessCallStackUpdates(AddressInfo& destAddr, uint32_t destPc)
 {
 	if(GbaDisUtils::IsJumpToSub(_prevOpCode, _prevFlags) && destPc != _prevProgramCounter + GbaDisUtils::GetOpSize(_prevOpCode, _prevFlags)) {

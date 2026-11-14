@@ -283,6 +283,13 @@ void NesDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void NesDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 StepBackConfig NesDebugger::GetStepBackConfig()
 {
 	return {

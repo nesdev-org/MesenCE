@@ -12,7 +12,8 @@
 #include "Debugger/DebugBreakHelper.h"
 #include "Debugger/ITraceLogger.h"
 #include "Debugger/ExpressionEvaluator.h"
-#include "Debugger/TraceLogFileSaver.h"
+#include "Debugger/TraceLogOutputFile.h"
+#include "Debugger/TraceLogOutputNetworkSocket.h"
 #include "Utilities/HexUtilities.h"
 #include "Shared/Emulator.h"
 #include "Shared/EmuSettings.h"
@@ -150,6 +151,7 @@ protected:
 	LabelManager* _labelManager;
 	MemoryDumper* _memoryDumper;
 	Debugger* _debugger;
+	bool _rowStateInitialized = false;
 
 	CpuType _cpuType = CpuType::Snes;
 	MemoryType _cpuMemoryType = MemoryType::SnesMemory;
@@ -169,6 +171,11 @@ protected:
 
 	unique_ptr<ExpressionEvaluator> _expEvaluator;
 	ExpressionData _conditionData;
+
+	bool _anyLoggingActive;
+	std::queue<DisassemblyInfo> _disassemblyInfoQueuedForLogging;
+	std::queue<CpuStateType> _cpuStateQueuedForLogging;
+	std::queue<TraceLogPpuState> _ppuStateQueuedForLogging;
 
 	void WriteByteCode(DisassemblyInfo& info, RowPart& rowPart, string& output)
 	{
@@ -297,22 +304,13 @@ protected:
 		_rowIds[_currentPos] = ITraceLogger::NextRowId;
 		ITraceLogger::NextRowId++;
 
-		_pendingLog = false;
-
-		if(_debugger->GetTraceLogFileSaver()->IsEnabled()) {
-			string row;
-			row.reserve(300);
-
-			//Display PC
-			RowPart rowPart = {};
-			rowPart.DisplayInHex = true;
-			rowPart.MinWidth = DebugUtilities::GetProgramCounterSize(_cpuType);
-			WriteIntValue(row, ((TraceLoggerType*)this)->GetProgramCounter(cpuState), rowPart);
-			row += "  ";
-
-			((TraceLoggerType*)this)->GetTraceRow(row, cpuState, _ppuState[_currentPos], disassemblyInfo);
-			_debugger->GetTraceLogFileSaver()->Log(row);
+		if(_anyLoggingActive) {
+			_disassemblyInfoQueuedForLogging.push(disassemblyInfo);
+			_cpuStateQueuedForLogging.push(cpuState);
+			_ppuStateQueuedForLogging.push(_ppuState[_currentPos]);
 		}
+
+		_pendingLog = false;
 
 		_currentPos = (_currentPos + 1) % ExecutionLogSize;
 	}
@@ -385,6 +383,27 @@ protected:
 	}
 
 	virtual RowDataType GetFormatTagType(string& tag) = 0;
+
+	virtual void StartRowStateTracking()
+	{
+	}
+
+	virtual void StopRowStateTracking()
+	{
+	}
+
+	virtual bool IsUniqueRow(CpuStateType& cpuState, DisassemblyInfo& disassemblyInfo)
+	{
+		return true;
+	}
+
+	virtual void TrackRowState(CpuStateType& cpuState, DisassemblyInfo& disassemblyInfo)
+	{
+	}
+
+	virtual void GetTraceData(vector<uint8_t>* target, CpuStateType& cpuState, DisassemblyInfo& disassemblyInfo, TraceLogOutput::OutputFormat traceFormat)
+	{
+	}
 
 	void ProcessSharedTag(RowPart& rowPart, string& output, CpuStateType& cpuState, TraceLogPpuState& ppuState, DisassemblyInfo& disassemblyInfo)
 	{
@@ -475,6 +494,110 @@ public:
 				_lastState = cpuState;
 				_lastDisassemblyInfo = disassemblyInfo;
 			}
+		}
+	}
+
+	void ProcessEndOfFrame()
+	{
+		TraceLoggerType* selfDerived = ((TraceLoggerType*)this);
+		TraceLogOutput* logOutput = nullptr;
+
+		{
+			TraceLogOutputFile* fileLogger = _debugger->GetTraceLogOutputFile();
+			TraceLogOutputNetworkSocket* networkLogger = _debugger->GetTraceLogOutputNetworkSocket();
+
+			if(fileLogger->IsEnabled()) {
+				logOutput = fileLogger;
+			} else if(networkLogger->IsEnabled()) {
+				logOutput = networkLogger;
+			}
+		}
+
+		if(logOutput != nullptr) {
+			_anyLoggingActive = true;
+
+			bool needsToTrackRowState = logOutput->GetUniqueRowsOnly();
+
+			if(needsToTrackRowState && !_rowStateInitialized) {
+				StartRowStateTracking();
+				_rowStateInitialized = true;
+			}
+
+			if(!_cpuStateQueuedForLogging.empty()) {
+				logOutput->UpdateLastLogTimestamp();
+			} else {
+				logOutput->FlushOldBuffers();
+				return;
+			}
+
+			string rowText;
+			rowText.reserve(300);
+
+			vector<uint8_t> rowData;
+			rowData.reserve(50);
+
+			while(!_cpuStateQueuedForLogging.empty()) {
+				DisassemblyInfo disassemblyInfo = _disassemblyInfoQueuedForLogging.front();
+				CpuStateType cpuState = _cpuStateQueuedForLogging.front();
+				TraceLogPpuState ppuState = _ppuStateQueuedForLogging.front();
+				_disassemblyInfoQueuedForLogging.pop();
+				_cpuStateQueuedForLogging.pop();
+				_ppuStateQueuedForLogging.pop();
+
+				bool skipRow = needsToTrackRowState;
+				if(needsToTrackRowState) {
+					if(IsUniqueRow(cpuState, disassemblyInfo)) {
+						TrackRowState(cpuState, disassemblyInfo);
+						skipRow = false;
+					}
+				}
+
+				if(!skipRow) {
+					switch(logOutput->GetOutputFormat()) {
+						case TraceLogOutput::OutputFormat::Text: {
+							rowText.clear();
+
+							if(logOutput->GetIncludeImplictPC()) {
+								RowPart rowPart = {};
+								rowPart.DisplayInHex = true;
+								rowPart.MinWidth = DebugUtilities::GetProgramCounterSize(_cpuType);
+								WriteIntValue(rowText, selfDerived->GetProgramCounter(cpuState), rowPart);
+								rowText += "  ";
+							}
+
+							selfDerived->GetTraceRow(rowText, cpuState, ppuState, disassemblyInfo);
+							rowText += '\n';
+							logOutput->Log((const uint8_t*)rowText.c_str(), (int)rowText.length());
+							break;
+						}
+
+						case TraceLogOutput::OutputFormat::Diztinguish:
+						case TraceLogOutput::OutputFormat::DiztinguishAbridged: {
+							rowData.clear();
+							GetTraceData(&rowData, cpuState, disassemblyInfo, logOutput->GetOutputFormat());
+
+							if(!rowData.empty()) {
+								logOutput->Log(&rowData.front(), (int)rowData.size());
+							}
+							break;
+						}
+					}
+				}
+			}
+		} else {
+			// These should always have the same size, so just the first check should be good enough.
+			if(_cpuStateQueuedForLogging.size() > 0 /*|| _ppuStateQueuedForLogging.size() > 0 || _disassemblyInfoQueuedForLogging.size() > 0*/) {
+				_disassemblyInfoQueuedForLogging = std::queue<DisassemblyInfo>();
+				_cpuStateQueuedForLogging = std::queue<CpuStateType>();
+				_ppuStateQueuedForLogging = std::queue<TraceLogPpuState>();
+			}
+
+			if(_rowStateInitialized) {
+				StopRowStateTracking();
+				_rowStateInitialized = false;
+			}
+
+			_anyLoggingActive = false;
 		}
 	}
 
