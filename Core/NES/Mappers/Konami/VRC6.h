@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "NES/BaseMapper.h"
+#include "NES/NesConstants.h"
 #include "NES/Mappers/Konami/VrcIrq.h"
 #include "NES/Mappers/Audio/Vrc6Audio.h"
 
@@ -15,6 +16,10 @@ private:
 	VRCVariant _model = {};
 	uint8_t _bankingMode = 0;
 	uint8_t _chrRegisters[8] = {};
+
+	//Only used for RegisterViewer
+	uint8_t _prg16k;
+	uint8_t _prg8k;
 
 	void UpdatePrgRamAccess()
 	{
@@ -238,6 +243,7 @@ protected:
 			case 0x8001:
 			case 0x8002:
 			case 0x8003:
+				_prg16k = (value & 0x0F) << 1;
 				SelectPrgPage2x(0, (value & 0x0F) << 1);
 				break;
 
@@ -263,6 +269,7 @@ protected:
 			case 0xC001:
 			case 0xC002:
 			case 0xC003:
+				_prg8k = value & 0x1F;
 				SelectPrgPage(2, value & 0x1F);
 				break;
 
@@ -299,5 +306,33 @@ protected:
 public:
 	VRC6(VRCVariant model) : _model(model)
 	{
+	}
+
+	vector<MapperStateEntry> GetMapperStateEntries() override
+	{
+		vector<MapperStateEntry> entries;
+
+		entries.push_back(MapperStateEntry("$8000-$8003", "16k PRG", _prg16k, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("$C000-$C003", "8k PRG", _prg8k, MapperStateValueType::Number8));
+
+		entries.push_back(MapperStateEntry("$B003.0-1", "PPU Banking mode", _bankingMode & 3, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("$B003.2-3", "Mirroring", (_bankingMode & 0x0C) >> 2, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("$B003.4", "Nametables from CHR ROM", _bankingMode & 0x10, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("$B003.7", "PRG RAM Enable", _bankingMode & 0x80, MapperStateValueType::Bool));
+
+		entries.push_back(MapperStateEntry("$D000-3/$E000-3", "CHR Banks"));
+		entries.push_back(MapperStateEntry("--", "R0", _chrRegisters[0], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "R1", _chrRegisters[1], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "R2", _chrRegisters[2], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "R3", _chrRegisters[3], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "R4", _chrRegisters[4], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "R5", _chrRegisters[5], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "R6", _chrRegisters[6], MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "R7", _chrRegisters[7], MapperStateValueType::Number8));
+
+		_irq->GetMapperStateEntries(entries, _model == VRCVariant::VRC6b);
+		_audio->GetMapperStateEntries(entries, (double)NesConstants::GetClockRate(NesApu::GetApuRegion(_console)));
+
+		return entries;
 	}
 };

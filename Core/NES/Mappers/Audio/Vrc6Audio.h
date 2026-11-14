@@ -89,4 +89,19 @@ public:
 				break;
 		}
 	}
+
+	void GetMapperStateEntries(vector<MapperStateEntry>& entries, double clockRate)
+	{
+		entries.push_back(MapperStateEntry("--", "VRC6 Audio"));
+		entries.push_back(MapperStateEntry("$9003.0", "Halt Audio", _haltAudio, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry("--", "Output", _lastOutput, MapperStateValueType::Number32));
+		entries.push_back(MapperStateEntry("$9000-$9002", "Pulse 1"));
+		_pulse1.GetMapperStateEntries(entries, "$900", clockRate);
+
+		entries.push_back(MapperStateEntry("$A000-$A002", "Pulse 2"));
+		_pulse2.GetMapperStateEntries(entries, "$A00", clockRate);
+
+		entries.push_back(MapperStateEntry("$B000-$B002", "Sawtooth"));
+		_saw.GetMapperStateEntries(entries, clockRate);
+	}
 };
