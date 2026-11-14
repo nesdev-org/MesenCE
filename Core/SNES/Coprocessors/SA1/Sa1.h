@@ -63,6 +63,8 @@ private:
 	void WriteInternalRam(uint32_t addr, uint8_t value);
 	void WriteBwRam(uint32_t addr, uint8_t value);
 
+	bool IsUnmappedSa1Access(IMemoryHandler* handler, uint32_t addr);
+
 public:
 	Sa1(SnesConsole* console);
 	virtual ~Sa1();

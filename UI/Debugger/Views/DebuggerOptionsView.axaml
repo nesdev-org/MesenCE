@@ -127,6 +127,12 @@
 					Content="{l:Translate chkBreakOnReadDuringAutoJoy}"
 				/>
 			</StackPanel>
+			<StackPanel IsVisible="{Binding IsSa1}">
+				<CheckBox
+					IsChecked="{Binding Config.Snes.Sa1BreakOnUnmappedAccess}"
+					Content="{l:Translate chkSa1BreakOnUnmappedAccess}"
+				/>
+			</StackPanel>
 			<StackPanel IsVisible="{Binding IsSpc}">
 				<CheckBox
 					IsChecked="{Binding Config.Snes.SpcBreakOnBrk}"

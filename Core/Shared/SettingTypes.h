@@ -897,6 +897,7 @@ struct DebugConfig
 	bool SnesBreakOnReadDuringAutoJoy = false;
 	bool SnesUseAltSpcOpNames = false;
 	bool SnesIgnoreDspReadWrites = false;
+	bool Sa1BreakOnUnmappedAccess = false;
 
 	bool SpcBreakOnBrk = false;
 	bool SpcBreakOnStpSleep = false;

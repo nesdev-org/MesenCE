@@ -838,6 +838,7 @@ bool Debugger::IsBreakOptionEnabled(BreakSource src)
 		case BreakSource::GbaUnalignedMemoryAccess: return cfg.GbaBreakOnUnalignedMemAccess;
 		case BreakSource::SnesInvalidPpuAccess: return cfg.SnesBreakOnInvalidPpuAccess;
 		case BreakSource::SnesReadDuringAutoJoy: return cfg.SnesBreakOnReadDuringAutoJoy;
+		case BreakSource::Sa1UnmappedMemoryAccess: return cfg.Sa1BreakOnUnmappedAccess;
 	}
 	return true;
 }

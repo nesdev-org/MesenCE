@@ -365,6 +365,7 @@ enum class BreakSource
 
 	SnesInvalidPpuAccess,
 	SnesReadDuringAutoJoy,
+	Sa1UnmappedMemoryAccess,
 
 	BreakOnUndefinedOpCode
 };

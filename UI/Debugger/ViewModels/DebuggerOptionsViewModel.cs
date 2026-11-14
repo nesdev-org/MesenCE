@@ -9,6 +9,7 @@ namespace Mesen.Debugger.ViewModels
 		public DebuggerConfig Config { get; }
 
 		public bool IsSnes { get; }
+		public bool IsSa1 { get; }
 		public bool IsSpc { get; }
 		public bool IsNes { get; }
 		public bool IsGameboy { get; }
@@ -25,6 +26,7 @@ namespace Mesen.Debugger.ViewModels
 		{
 			Config = config;
 			IsSnes = cpuType == CpuType.Snes;
+			IsSa1 = cpuType == CpuType.Sa1;
 			IsSpc = cpuType == CpuType.Spc;
 			IsNes = cpuType == CpuType.Nes;
 			IsGameboy = cpuType == CpuType.Gameboy;
@@ -33,7 +35,7 @@ namespace Mesen.Debugger.ViewModels
 			IsGba = cpuType == CpuType.Gba;
 			IsWs = cpuType == CpuType.Ws;
 
-			HasSpecificBreakOptions = IsSnes || IsSpc || IsNes || IsGameboy || IsPce || IsSms || IsGba || IsWs;
+			HasSpecificBreakOptions = IsSnes || IsSa1 || IsSpc || IsNes || IsGameboy || IsPce || IsSms || IsGba || IsWs;
 		}
 	}
 }
