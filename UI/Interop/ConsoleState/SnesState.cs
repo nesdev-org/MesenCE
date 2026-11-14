@@ -188,8 +188,14 @@ public struct Mode7Config
 	[MarshalAs(UnmanagedType.I1)] public bool HorizontalMirroring;
 	[MarshalAs(UnmanagedType.I1)] public bool VerticalMirroring;
 
+	[MarshalAs(UnmanagedType.I1)] public bool HScrollLatchLoaded;
+	[MarshalAs(UnmanagedType.I1)] public bool VScrollLatchLoaded;
+	[MarshalAs(UnmanagedType.I1)] public bool CenterXLatchLoaded;
+	[MarshalAs(UnmanagedType.I1)] public bool CenterYLatchLoaded;
 	public Int16 HScrollLatch;
 	public Int16 VScrollLatch;
+	public Int16 CenterXLatch;
+	public Int16 CenterYLatch;
 }
 
 public enum WindowMaskLogic
