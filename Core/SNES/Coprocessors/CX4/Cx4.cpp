@@ -64,6 +64,13 @@ void Cx4::Run()
 {
 	uint64_t targetCycle = (uint64_t)(_memoryManager->GetMasterClock() * _clockRatio);
 
+	if(_state.Dma.Enabled && _state.Dma.Pos >= _state.Dma.Length) {
+		ProcessDma(targetCycle);
+	}
+	if(_state.Cache.Enabled && _state.Cache.Pos >= 256) {
+		ProcessCache(targetCycle);
+	}
+
 	while(_state.CycleCount < targetCycle) {
 		if(_state.Locked) {
 			Step(1);
@@ -202,7 +209,7 @@ bool Cx4::ProcessCache(uint64_t targetCycle)
 		}
 	}
 
-	if(_state.Cache.Pos >= 256) {
+	if(_state.Cache.Pos >= 256 && _state.CycleCount <= targetCycle) {
 		_state.Cache.Address[_state.Cache.Page] = address;
 		_state.Cache.Pos = 0;
 		_state.Cache.Enabled = false;
@@ -242,7 +249,7 @@ void Cx4::ProcessDma(uint64_t targetCycle)
 		}
 	}
 
-	if(_state.Dma.Pos >= _state.Dma.Length) {
+	if(_state.Dma.Pos >= _state.Dma.Length && _state.CycleCount <= targetCycle) {
 		_state.Dma.Pos = 0;
 		_state.Dma.Enabled = false;
 	}
@@ -259,7 +266,7 @@ uint8_t Cx4::GetAccessDelay(uint32_t addr)
 		}
 	}
 
-	return 1;
+	return 0;
 }
 
 uint8_t Cx4::ReadCx4(uint32_t addr)
