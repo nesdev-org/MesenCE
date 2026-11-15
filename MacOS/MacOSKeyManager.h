@@ -1,6 +1,10 @@
 #pragma once
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
+#include <string>
+#include <mutex>
+#import <IOKit/hid/IOHIDLib.h>
 #include "Shared/Interfaces/IKeyManager.h"
 #include "Shared/KeyDefinitions.h"
 
@@ -12,6 +16,13 @@ class MacOSKeyManager : public IKeyManager
 private:
 	Emulator* _emu;
 	std::vector<shared_ptr<MacOSGameController>> _controllers;
+	std::vector<std::string> _gcProductNames;
+	std::unordered_set<IOHIDDeviceRef> _ignoredHidDevices;
+	std::mutex _ctrlMutex;
+	IOHIDManagerRef _hidManager = nullptr;
+	uint32_t _hidScanCounter = 0;
+
+	void PollHidControllers(bool scanNewDevices);
 
 	vector<KeyDefinition> _keyDefinitions;
 	bool _keyState[0x205];

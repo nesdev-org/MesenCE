@@ -89,8 +89,9 @@ MacOSKeyManager::MacOSKeyManager(Emulator* emu)
 	_disconnectObserver = [[NSNotificationCenter defaultCenter] addObserverForName:GCControllerDidDisconnectNotification object:nil queue:nil usingBlock:^ void (NSNotification* notification) {
 		GCController* controller = (GCController*) [notification object];
 
+		std::lock_guard<std::mutex> lock(_ctrlMutex);
 		int indexToRemove = -1;
-		for(int i = 0; i < _controllers.size(); i++) {
+		for(int i = 0; i < (int)_controllers.size(); i++) {
 			if(_controllers[i]->IsGameController(controller)) {
 				indexToRemove = i;
 				break;
@@ -102,6 +103,39 @@ MacOSKeyManager::MacOSKeyManager(Emulator* emu)
 			MessageManager::Log("[Input Device] Disconnected");
 		}
 	}];
+
+	_hidManager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+	if(_hidManager) {
+		const uint32_t usages[3] = {
+			kHIDUsage_GD_Joystick,
+			kHIDUsage_GD_GamePad,
+			kHIDUsage_GD_MultiAxisController
+		};
+		uint32_t page = kHIDPage_GenericDesktop;
+		CFStringRef keys[2] = { CFSTR(kIOHIDDeviceUsagePageKey), CFSTR(kIOHIDDeviceUsageKey) };
+		CFNumberRef pageNum = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &page);
+		CFDictionaryRef dicts[3] = {};
+		for(int i = 0; i < 3; i++) {
+			CFNumberRef usageNum = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usages[i]);
+			CFTypeRef vals[2] = { pageNum, usageNum };
+			dicts[i] = CFDictionaryCreate(kCFAllocatorDefault, (const void**)keys, vals, 2, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+			CFRelease(usageNum);
+		}
+		CFRelease(pageNum);
+		CFArrayRef matching = CFArrayCreate(kCFAllocatorDefault, (const void**)dicts, 3, &kCFTypeArrayCallBacks);
+		for(int i = 0; i < 3; i++) {
+			CFRelease(dicts[i]);
+		}
+		IOHIDManagerSetDeviceMatchingMultiple(_hidManager, matching);
+		CFRelease(matching);
+
+		if(IOHIDManagerOpen(_hidManager, kIOHIDOptionsTypeNone) == kIOReturnSuccess) {
+			PollHidControllers(true);
+		} else {
+			CFRelease(_hidManager);
+			_hidManager = nullptr;
+		}
+	}
 }
 
 MacOSKeyManager::~MacOSKeyManager()
@@ -109,6 +143,91 @@ MacOSKeyManager::~MacOSKeyManager()
 	[NSEvent removeMonitor:(id) _eventMonitor];
 	[[NSNotificationCenter defaultCenter] removeObserver:(id) _connectObserver];
 	[[NSNotificationCenter defaultCenter] removeObserver:(id) _disconnectObserver];
+	if(_hidManager) {
+		std::lock_guard<std::mutex> lock(_ctrlMutex);
+		_controllers.clear();
+		_ignoredHidDevices.clear();
+		IOHIDManagerClose(_hidManager, kIOHIDOptionsTypeNone);
+		CFRelease(_hidManager);
+		_hidManager = nullptr;
+	}
+}
+
+void MacOSKeyManager::PollHidControllers(bool scanNewDevices)
+{
+	if(!_hidManager) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock(_ctrlMutex);
+	for(int i = (int)_controllers.size() - 1; i >= 0; i--) {
+		if(_controllers[i]->IsHidController() && !_controllers[i]->PollHid()) {
+			_controllers.erase(_controllers.begin() + i);
+			MessageManager::Log("[Input Device] USB HID Joystick Disconnected");
+		}
+	}
+
+	if(!scanNewDevices) {
+		return;
+	}
+
+	CFSetRef deviceSet = IOHIDManagerCopyDevices(_hidManager);
+	if(!deviceSet) {
+		return;
+	}
+
+	CFIndex count = CFSetGetCount(deviceSet);
+	if(count > 0) {
+		std::vector<IOHIDDeviceRef> devices(count);
+		CFSetGetValues(deviceSet, (const void**)devices.data());
+
+		for(IOHIDDeviceRef dev : devices) {
+			if(_ignoredHidDevices.count(dev)) {
+				continue;
+			}
+
+			bool alreadyOpen = false;
+			for(auto& c : _controllers) {
+				if(c->IsHidDevice(dev)) {
+					alreadyOpen = true;
+					break;
+				}
+			}
+			if(alreadyOpen) {
+				continue;
+			}
+
+			// Skip devices already handled by Apple GCController (using main-thread cached names)
+			std::string prodName = "Unknown";
+			CFTypeRef prodProp = IOHIDDeviceGetProperty(dev, CFSTR(kIOHIDProductKey));
+			if(prodProp && CFGetTypeID(prodProp) == CFStringGetTypeID()) {
+				char buf[256] = {};
+				if(CFStringGetCString((CFStringRef)prodProp, buf, sizeof(buf), kCFStringEncodingUTF8)) {
+					prodName = buf;
+				}
+			}
+
+			bool handledByGc = false;
+			for(const std::string& gcName : _gcProductNames) {
+				if(gcName == prodName) {
+					handledByGc = true;
+					break;
+				}
+			}
+			if(handledByGc) {
+				_ignoredHidDevices.insert(dev);
+				continue;
+			}
+
+			if(IOHIDDeviceOpen(dev, kIOHIDOptionsTypeNone) == kIOReturnSuccess) {
+				_controllers.push_back(std::shared_ptr<MacOSGameController>(new MacOSGameController(_emu, dev)));
+				MessageManager::Log("[Input Connected] USB HID Joystick: " + prodName);
+			} else {
+				_ignoredHidDevices.insert(dev);
+			}
+		}
+	}
+	CFRelease(deviceSet);
 }
 
 void MacOSKeyManager::AddController(void* cont)
@@ -117,6 +236,10 @@ void MacOSKeyManager::AddController(void* cont)
 	if([controller extendedGamepad] == nil) {
 		MessageManager::Log(std::string("[Input] Device ignored (Does not support extended gamepad) - Name: ") + [[controller vendorName] UTF8String]);
 	} else {
+		std::lock_guard<std::mutex> lock(_ctrlMutex);
+		if([controller vendorName]) {
+			_gcProductNames.push_back([[controller vendorName] UTF8String]);
+		}
 		_controllers.push_back(std::shared_ptr<MacOSGameController>(new MacOSGameController(_emu, controller)));
 		MessageManager::Log(std::string("[Input Connected] Name: ") + [[controller vendorName] UTF8String]);
 	}
@@ -136,8 +259,8 @@ void MacOSKeyManager::HandleModifiers(uint32_t flags)
 
 void MacOSKeyManager::RefreshState()
 {
-	//TODO: NOT IMPLEMENTED YET
-	//Only needed to detect poll controller input
+	bool scanNew = (++_hidScanCounter % 120) == 0;
+	PollHidControllers(scanNew);
 }
 
 bool MacOSKeyManager::IsKeyPressed(uint16_t key)
@@ -149,6 +272,7 @@ bool MacOSKeyManager::IsKeyPressed(uint16_t key)
 	if(key >= MacOSKeyManager::BaseGamepadIndex) {
 		uint8_t gamepadPort = (key - MacOSKeyManager::BaseGamepadIndex) / 0x100;
 		uint8_t gamepadButton = (key - MacOSKeyManager::BaseGamepadIndex) % 0x100;
+		std::lock_guard<std::mutex> lock(_ctrlMutex);
 		if(_controllers.size() > gamepadPort) {
 			return _controllers[gamepadPort]->IsButtonPressed(gamepadButton);
 		}
@@ -163,6 +287,7 @@ optional<int16_t> MacOSKeyManager::GetAxisPosition(uint16_t key)
 	if(key >= MacOSKeyManager::BaseGamepadIndex) {
 		uint8_t port = (key - MacOSKeyManager::BaseGamepadIndex) / 0x100;
 		uint8_t button = (key - MacOSKeyManager::BaseGamepadIndex) % 0x100;
+		std::lock_guard<std::mutex> lock(_ctrlMutex);
 		if(_controllers.size() > port) {
 			return _controllers[port]->GetAxisPosition(button);
 		}
@@ -177,11 +302,16 @@ bool MacOSKeyManager::IsMouseButtonPressed(MouseButton button)
 
 vector<uint16_t> MacOSKeyManager::GetPressedKeys()
 {
+	PollHidControllers(true);
+
 	vector<uint16_t> pressedKeys;
-	for(size_t i = 0; i < _controllers.size(); i++) {
-		for(int j = 0; j < 24; j++) {
-			if(_controllers[i]->IsButtonPressed(j)) {
-				pressedKeys.push_back(MacOSKeyManager::BaseGamepadIndex + i * 0x100 + j);
+	{
+		std::lock_guard<std::mutex> lock(_ctrlMutex);
+		for(size_t i = 0; i < _controllers.size(); i++) {
+			for(int j = 0; j < 24; j++) {
+				if(_controllers[i]->IsButtonPressed(j)) {
+					pressedKeys.push_back(MacOSKeyManager::BaseGamepadIndex + i * 0x100 + j);
+				}
 			}
 		}
 	}
@@ -214,8 +344,8 @@ uint16_t MacOSKeyManager::GetKeyCode(string keyName)
 
 void MacOSKeyManager::UpdateDevices()
 {
-	//TODO: NOT IMPLEMENTED YET
-	//Only needed to detect newly plugged in devices
+	_ignoredHidDevices.clear();
+	PollHidControllers(true);
 }
 
 bool MacOSKeyManager::SetKeyState(uint16_t scanCode, bool state)
