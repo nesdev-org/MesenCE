@@ -26,6 +26,7 @@ private:
 	uint16_t _irqCounter = 0;
 	bool _irqEnabled = false;
 	bool _irqRepeatEnabled = false;
+	bool _timerIrqPending = false;
 
 	bool _diskRegEnabled = true;
 	bool _soundRegEnabled = true;
@@ -81,6 +82,12 @@ private:
 	bool _gameStarted = false;
 	bool _needSave = false;
 
+	bool _watchdogIrqEnabled = false;
+	bool _watchdogIrqPending = false;
+	bool _dramAccessed = false;
+	uint8_t _dramRow = 0; // 7 bits
+	uint16_t _watchdogTimer = 4095; // 12 bits
+
 protected:
 	uint16_t GetPrgPageSize() override { return 0x2000; }
 	uint16_t GetChrPageSize() override { return 0x2000; }
@@ -104,6 +111,7 @@ protected:
 	void ProcessAutoDiskInsert();
 
 	void ClockIrq();
+	void UpdateIrqState();
 
 	void ProcessCpuClock() override;
 	void UpdateCrc(uint8_t value);
@@ -112,6 +120,7 @@ protected:
 	uint8_t ReadRegister(uint16_t addr) override;
 
 	uint8_t ReadRam(uint16_t addr) override;
+	void WriteRam(uint16_t addr, uint8_t value) override;
 
 	void Serialize(Serializer& s) override;
 	vector<MapperStateEntry> GetMapperStateEntries() override;
