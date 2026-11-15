@@ -65,6 +65,7 @@ namespace Mesen.Config
 				SnesBreakOnReadDuringAutoJoy = Debugger.Snes.BreakOnReadDuringAutoJoy,
 				SnesUseAltSpcOpNames = Debugger.Snes.UseAltSpcOpNames,
 				SnesIgnoreDspReadWrites = Debugger.Snes.IgnoreDspReadWrites,
+				Sa1BreakOnUnmappedAccess = Debugger.Snes.Sa1BreakOnUnmappedAccess,
 
 				SpcBreakOnBrk = Debugger.Snes.SpcBreakOnBrk,
 				SpcBreakOnStpSleep = Debugger.Snes.SpcBreakOnStpSleep,
@@ -137,6 +138,7 @@ namespace Mesen.Config
 		[MarshalAs(UnmanagedType.I1)] public bool SnesBreakOnReadDuringAutoJoy;
 		[MarshalAs(UnmanagedType.I1)] public bool SnesUseAltSpcOpNames;
 		[MarshalAs(UnmanagedType.I1)] public bool SnesIgnoreDspReadWrites;
+		[MarshalAs(UnmanagedType.I1)] public bool Sa1BreakOnUnmappedAccess;
 
 		[MarshalAs(UnmanagedType.I1)] public bool SpcBreakOnBrk;
 		[MarshalAs(UnmanagedType.I1)] public bool SpcBreakOnStpSleep;

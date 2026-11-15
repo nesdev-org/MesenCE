@@ -18,6 +18,7 @@
 #include "Utilities/HexUtilities.h"
 #include "Utilities/Serializer.h"
 #include "Shared/MemoryOperationType.h"
+#include "Debugger/DebugTypes.h"
 
 Sa1::Sa1(SnesConsole* console)
 {
@@ -517,6 +518,17 @@ void Sa1::ProcessInterrupts()
 	}
 }
 
+bool Sa1::IsUnmappedSa1Access(IMemoryHandler* handler, uint32_t addr)
+{
+	if(!handler) {
+		return true;
+	}
+
+	//The SA-1's $2000-$2FFF handler only has registers at $2200-$23FF, the rest of the range (e.g. the S-PPU's $21xx registers) isn't connected
+	uint16_t regAddr = addr & 0xFFFF;
+	return handler == this && (regAddr < 0x2200 || regAddr > 0x23FF);
+}
+
 void Sa1::WriteSa1(uint32_t addr, uint8_t value, MemoryOperationType type)
 {
 	if(_emu->ProcessMemoryWrite<CpuType::Sa1>(addr, value, type)) {
@@ -527,6 +539,10 @@ void Sa1::WriteSa1(uint32_t addr, uint8_t value, MemoryOperationType type)
 			handler->Write(addr, value);
 		} else {
 			LogDebug("[Debug] Write SA1 - missing handler: $" + HexUtilities::ToHex(addr));
+		}
+
+		if(type != MemoryOperationType::DummyWrite && IsUnmappedSa1Access(handler, addr)) {
+			_emu->BreakIfDebugging(CpuType::Sa1, BreakSource::Sa1UnmappedMemoryAccess);
 		}
 	}
 }
@@ -544,6 +560,9 @@ uint8_t Sa1::ReadSa1(uint32_t addr, MemoryOperationType type)
 		LogDebug("[Debug] Read SA1 - missing handler: $" + HexUtilities::ToHex(addr));
 	}
 	_emu->ProcessMemoryRead<CpuType::Sa1>(addr, value, type);
+	if(type != MemoryOperationType::DummyRead && IsUnmappedSa1Access(handler, addr)) {
+		_emu->BreakIfDebugging(CpuType::Sa1, BreakSource::Sa1UnmappedMemoryAccess);
+	}
 	return value;
 }
 

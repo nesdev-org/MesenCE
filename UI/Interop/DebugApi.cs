@@ -1620,6 +1620,7 @@ namespace Mesen.Interop
 
 		SnesInvalidPpuAccess,
 		SnesReadDuringAutoJoy,
+		Sa1UnmappedMemoryAccess,
 
 		BreakOnUndefinedOpCode
 	}

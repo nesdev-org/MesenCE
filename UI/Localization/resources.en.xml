@@ -1407,6 +1407,7 @@
 			<Control ID="chkBreakOnStp">STP</Control>
 			<Control ID="chkBreakOnInvalidPpuAccess">Invalid PPU memory access</Control>
 			<Control ID="chkBreakOnReadDuringAutoJoy">Controller read during auto-read</Control>
+			<Control ID="chkSa1BreakOnUnmappedAccess">Unmapped memory access (e.g. S-CPU registers)</Control>
 			
 			<Control ID="chkSpcBreakOnStpSleep">STOP / SLEEP</Control>
 			
@@ -3113,6 +3114,7 @@ E
 
 			<Value ID="SnesReadDuringAutoJoy">Controller read during auto-read</Value>
 			<Value ID="SnesInvalidPpuAccess">Invalid PPU memory access</Value>
+			<Value ID="Sa1UnmappedMemoryAccess">SA-1 unmapped memory access</Value>
 
 			<Value ID="BreakOnUndefinedOpCode">Undefined OP</Value>
 		</Enum>

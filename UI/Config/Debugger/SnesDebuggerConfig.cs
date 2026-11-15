@@ -12,6 +12,8 @@ namespace Mesen.Config
 		[ObservableProperty] public partial bool BreakOnInvalidPpuAccess { get; set; } = false;
 		[ObservableProperty] public partial bool BreakOnReadDuringAutoJoy { get; set; } = false;
 
+		[ObservableProperty] public partial bool Sa1BreakOnUnmappedAccess { get; set; } = false;
+
 		[ObservableProperty] public partial bool SpcBreakOnBrk { get; set; } = false;
 		[ObservableProperty] public partial bool SpcBreakOnStpSleep { get; set; } = false;
 
