@@ -1707,7 +1707,7 @@ void WsCpu::Out(uint16_t port, T data)
 template<typename T, bool isDxPort>
 void WsCpu::InStoreAx(uint16_t port)
 {
-	Idle<isDxPort ? 4 : 5>();
+	Idle<isDxPort ? 3 : 5>();
 	if constexpr(std::is_same<T, uint16_t>::value) {
 		_state.AX = ReadPort<uint16_t>(port);
 	} else {
@@ -1715,10 +1715,10 @@ void WsCpu::InStoreAx(uint16_t port)
 	}
 
 	//TODOWS
-	//The gdma_timing test seems to imply that IN instruciton might potentially
-	//be reading the port a cycle early and then spends an extra cycle
-	//on something else (e.g potentially updating AX?), but this needs more
-	//research/testing. This allows the gdma_timing test to pass.
+	//The gdma_timing and inout_timing tests seem to imply that IN instruciton
+	//might potentially be reading the port a cycle early and then spends an
+	//extra cycle on something else, but this needs more research/testing.
+	//This allows the two tests to pass.
 	Idle();
 }
 
@@ -1809,7 +1809,7 @@ void WsCpu::OUTS()
 		}
 
 		T value = ReadMemory<T>(GetSegment(WsSegment::DS), _state.SI);
-		Out<T, 0>(_state.DX, value);
+		WritePort<T>(_state.DX, value);
 		ProcessStringOperation<T>(true, false);
 	}
 }
