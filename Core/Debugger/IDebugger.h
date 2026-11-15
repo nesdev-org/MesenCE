@@ -52,6 +52,8 @@ public:
 	virtual void Reset() = 0;
 	virtual void Run() = 0;
 
+	virtual void ProcessEndOfFrame() {}
+
 	virtual void Init() {}
 	virtual void ProcessConfigChange() {}
 

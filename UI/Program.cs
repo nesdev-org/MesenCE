@@ -39,11 +39,9 @@ namespace Mesen
 		[STAThread]
 		public static int Main(string[] args)
 		{
-			if(!System.Diagnostics.Debugger.IsAttached) {
-				NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
-				NativeLibrary.SetDllImportResolver(typeof(SkiaSharp.SKGraphics).Assembly, DllImportResolver);
-				NativeLibrary.SetDllImportResolver(typeof(HarfBuzzSharp.Blob).Assembly, DllImportResolver);
-			}
+			NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), DllImportResolver);
+			NativeLibrary.SetDllImportResolver(typeof(SkiaSharp.SKGraphics).Assembly, DllImportResolver);
+			NativeLibrary.SetDllImportResolver(typeof(HarfBuzzSharp.Blob).Assembly, DllImportResolver);
 
 			if(args.Length >= 4 && args[0] == "--update") {
 				UpdateHelper.AttemptUpdate(args[1], args[2], args[3], args.Contains("admin"));

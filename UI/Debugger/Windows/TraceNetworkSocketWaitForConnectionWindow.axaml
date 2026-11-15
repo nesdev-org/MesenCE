@@ -1,0 +1,42 @@
+<Window
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:vm="using:Mesen.ViewModels"
+	xmlns:v="using:Mesen.Views"
+	xmlns:l="using:Mesen.Localization"
+	xmlns:c="using:Mesen.Controls"
+	xmlns:cfg="using:Mesen.Config"
+	xmlns:w="using:Mesen.Windows"
+	mc:Ignorable="d"
+	VerticalAlignment="Stretch"
+	HorizontalAlignment="Stretch"
+	x:Class="Mesen.Windows.TraceNetworkSocketWaitForConnectionWindow"
+	Name="root"
+	Width="250"
+	Height="100"
+	Title="{l:Translate Title}"
+>
+	<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Margin="3" Padding="3">
+		<DockPanel>
+			<Grid RowDefinitions="*,Auto,*,Auto">
+				<Grid Grid.Row="1" ColumnDefinitions="Auto" HorizontalAlignment="Center" Margin="0 0 0 5">
+					<TextBlock
+						Grid.Column="0"
+						HorizontalAlignment="Center"
+						Text="{l:Translate Message}"
+					/>
+				</Grid>
+
+				<Grid Grid.Row="3" ColumnDefinitions="Auto" HorizontalAlignment="Center">
+					<Button
+						Grid.Column="0"
+						Content="{l:Translate btnCancel}"
+						Click="OnCancel"
+					/>
+				</Grid>
+			</Grid>
+		</DockPanel>
+	</Border>
+</Window>

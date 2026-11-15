@@ -34,7 +34,8 @@ class BaseEventManager;
 class IAssembler;
 class IDebugger;
 class ITraceLogger;
-class TraceLogFileSaver;
+class TraceLogOutputFile;
+class TraceLogOutputNetworkSocket;
 class FrozenAddressManager;
 class ISerializable;
 
@@ -74,7 +75,8 @@ private:
 	unique_ptr<LabelManager> _labelManager;
 	unique_ptr<CdlManager> _cdlManager;
 
-	unique_ptr<TraceLogFileSaver> _traceLogSaver;
+	unique_ptr<TraceLogOutputFile> _traceLogOutputFile;
+	unique_ptr<TraceLogOutputNetworkSocket> _traceLogOutputNetworkSocket;
 
 	SimpleLock _logLock;
 	std::list<string> _debuggerLog;
@@ -125,6 +127,7 @@ public:
 	void InternalProcessInterrupt(CpuType cpuType, IDebugger& dbg, StepRequest& stepRequest, AddressInfo& src, uint32_t srcAddr, AddressInfo& dest, uint32_t destAddr, AddressInfo& ret, uint32_t retAddr, uint32_t retSp, bool forNmi);
 
 	void ProcessEvent(EventType type, std::optional<CpuType> cpuType);
+	void ProcessEndOfFrame();
 
 	void ProcessConfigChange();
 
@@ -187,7 +190,8 @@ public:
 	IDebugger* GetCpuDebugger(CpuType cpuType);
 	IDebugger* GetMainDebugger();
 
-	TraceLogFileSaver* GetTraceLogFileSaver() { return _traceLogSaver.get(); }
+	TraceLogOutputFile* GetTraceLogOutputFile() { return _traceLogOutputFile.get(); }
+	TraceLogOutputNetworkSocket* GetTraceLogOutputNetworkSocket() { return _traceLogOutputNetworkSocket.get(); }
 	MemoryDumper* GetMemoryDumper() { return _memoryDumper.get(); }
 	MemoryAccessCounter* GetMemoryAccessCounter() { return _memoryAccessCounter.get(); }
 	Disassembler* GetDisassembler() { return _disassembler.get(); }

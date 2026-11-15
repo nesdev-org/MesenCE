@@ -248,6 +248,13 @@ void SmsDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void SmsDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 StepBackConfig SmsDebugger::GetStepBackConfig()
 {
 	return {

@@ -1,0 +1,237 @@
+<Window
+	xmlns="https://github.com/avaloniaui"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:vm="using:Mesen.Debugger.ViewModels"
+	xmlns:l="using:Mesen.Localization"
+	xmlns:c="using:Mesen.Controls"
+	VerticalAlignment="Stretch"
+	HorizontalAlignment="Stretch"
+	x:Class="Mesen.Windows.TraceLogOutputConfigurationWindow"
+	Name="root"
+	Width="400"
+	SizeToContent="Height"
+	x:DataType="vm:TraceLogOutputConfigurationViewModel"
+	Title="{l:Translate Title}"
+>
+	<Design.DataContext>
+		<vm:TraceLogOutputConfigurationViewModel />
+	</Design.DataContext>
+
+	<Window.Resources>
+		<vm:RestrictToPlatformValueConverter x:Key="restrictToPlatformConverter"/>
+	</Window.Resources>
+	
+	<Border BorderBrush="{StaticResource MesenGrayBorderColor}" BorderThickness="1" Margin="3" Padding="3">
+		<DockPanel>
+			<TabControl DockPanel.Dock="Top" SelectedIndex="{Binding Config.OutputTarget}" Padding="30 0 30 0" Margin="0 0 0 10" Height="80">
+				<TabItem Header="{l:Translate LogToFile}">
+					<StackPanel>
+						<Grid ColumnDefinitions="*,Auto" Margin="0 0 0 5">
+							<TextBox
+								Grid.Column="0"
+								Text="{Binding Config.FileConfig.FileName}"
+								ToolTip.Tip="{l:Translate FileNameTooltip}"
+								ToolTip.Placement="Right"
+								ToolTip.ShowDelay="500"
+							/>
+							<Button
+								Grid.Column="1"
+								Content="{l:Translate btnFileSelect}"
+								Click="OnFileSelect"
+							/>
+						</Grid>
+						<StackPanel Orientation="Horizontal" Margin="0 0 0 8" IsEnabled="{Binding IsUsingTextFormat}">
+							<CheckBox
+								IsChecked="{Binding Config.FileConfig.NativeNewLines}"
+							/>
+							<TextBlock
+								VerticalAlignment="Center"
+								Text="{l:Translate NativeNewLines}"
+								Margin="0 0 15 0"
+								ToolTip.Tip="{l:Translate NativeNewLinesTooltip}"
+								ToolTip.Placement="Right"
+								ToolTip.ShowDelay="500"
+							/>
+						</StackPanel>
+					</StackPanel>
+				</TabItem>
+				<TabItem Header="{l:Translate LogToNetworkSocket}">
+					<StackPanel>
+						<StackPanel Orientation="Horizontal">
+							<TextBlock
+								Grid.Column="0"
+								VerticalAlignment="Center"
+								Text="{l:Translate ConnectionPort}"
+								Margin="0 0 5 0"
+							/>
+							<NumericUpDown
+								Grid.Column="1"
+								Minimum="0"
+								Maximum="65535"
+								MinWidth="50"
+								Value="{Binding Config.SocketConfig.ConnectionPort}"
+								Margin="0 0 15 0"
+								ToolTip.Tip="{l:Translate ConnectionPortTooltip}"
+								ToolTip.Placement="Right"
+								ToolTip.ShowDelay="500"
+							/>
+						</StackPanel>
+					</StackPanel>
+				</TabItem>
+  			</TabControl>
+
+			<StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0 0 0 8">
+				<CheckBox
+					IsChecked="{Binding Config.ShowAdvancedSettings}"
+				/>
+				<TextBlock
+					VerticalAlignment="Center"
+					Text="{l:Translate ShowAdvancedSettings}"
+					Margin="0 0 15 0"
+				/>
+			</StackPanel>
+
+			<StackPanel DockPanel.Dock="Top" IsVisible="{Binding Config.ShowAdvancedSettings}">
+				<Grid ColumnDefinitions="Auto,*" Margin="0 0 0 5">
+					<TextBlock
+						Grid.Column="0"
+						VerticalAlignment="Center"
+						Text="{l:Translate Format}"
+						Margin="0 0 5 0"
+						MinWidth="90"
+					/>
+					<c:EnumComboBox
+						Grid.Column="1"
+						SelectedItem="{Binding Config.SharedConfig.CpuDependentConfig.Format}"
+						AvailableValues="{Binding AvailableFormats}"
+						ToolTip.Tip="{l:Translate FormatTooltip}"
+						ToolTip.Placement="Right"
+						ToolTip.ShowDelay="500"
+					/>
+				</Grid>
+				<Grid ColumnDefinitions="Auto,*" Margin="0 0 0 5">
+					<TextBlock
+						Grid.Column="0"
+						VerticalAlignment="Center"
+						Text="{l:Translate CompressionType}"
+						Margin="0 0 5 0"
+						MinWidth="90"
+					/>
+					<c:EnumComboBox
+						Grid.Column="1"
+						SelectedItem="{Binding Config.SharedConfig.CpuDependentConfig.CompressionType}"
+						AvailableValues="{Binding AvailableCompressionTypes}"
+						ToolTip.Tip="{l:Translate CompressionTypeTooltip}"
+						ToolTip.Placement="Right"
+						ToolTip.ShowDelay="500"
+					/>
+				</Grid>					
+				<StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+					<TextBlock
+						Grid.Column="0"
+						VerticalAlignment="Center"
+						Text="{l:Translate ChunkCount}"
+						Margin="0 0 5 0"
+					/>
+					<NumericUpDown
+						Grid.Column="1"
+						Minimum="0"
+						Maximum="65535"
+						MinWidth="60"
+						Value="{Binding Config.SharedConfig.ChunkCount}"
+						Margin="0 0 15 0"
+						ToolTip.Tip="{l:Translate ChunkCountTooltip}"
+						ToolTip.Placement="Right"
+						ToolTip.ShowDelay="500"
+					/>
+					<TextBlock
+						Grid.Column="0"
+						VerticalAlignment="Center"
+						Text="{l:Translate ChunkSize}"
+						Margin="0 0 5 0"
+					/>
+					<NumericUpDown
+						Grid.Column="1"
+						Minimum="0"
+						Maximum="1073741824"
+						MinWidth="100"
+						Value="{Binding Config.SharedConfig.ChunkSize}"
+						Margin="0 0 15 0"
+						ToolTip.Tip="{l:Translate ChunkSizeTooltip}"
+						ToolTip.Placement="Right"
+						ToolTip.ShowDelay="500"
+					/>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal" Margin="0 8 0 8">
+					<CheckBox
+						IsChecked="{Binding Config.SharedConfig.BatchLogData}"
+					/>
+					<TextBlock
+						VerticalAlignment="Center"
+						Text="{l:Translate BatchLogData}"
+						Margin="0 0 15 0"
+						ToolTip.Tip="{l:Translate BatchLogDataTooltip}"
+						ToolTip.Placement="Right"
+						ToolTip.ShowDelay="500"
+					/>
+					<CheckBox
+						IsChecked="{Binding Config.SharedConfig.IncludeImplicitPC}"
+						IsEnabled="{Binding IsUsingTextFormat}"
+					/>
+					<TextBlock
+						VerticalAlignment="Center"
+						Text="{l:Translate IncludeImplicitPC}"
+						Margin="0 0 15 0"
+						IsEnabled="{Binding IsUsingTextFormat}"
+						ToolTip.Tip="{l:Translate IncludeImplicitPCTooltip}"
+						ToolTip.Placement="Right"
+						ToolTip.ShowDelay="500"
+					/>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal" Margin="0 0 0 8">
+					<StackPanel.IsVisible>
+						<MultiBinding Converter="{StaticResource restrictToPlatformConverter}" ConverterParameter="UniqueRowsOnly">
+							<Binding Path="Config.SharedConfig" />
+							<Binding Path="Config.SharedConfig.LastUsedCpuType" />
+						</MultiBinding>
+					</StackPanel.IsVisible>
+					<CheckBox
+						IsChecked="{Binding Config.SharedConfig.UniqueRowsOnly}"
+					/>
+					<TextBlock
+						VerticalAlignment="Center"
+						Text="{l:Translate UniqueRowsOnly}"
+						Margin="0 0 15 0"
+						ToolTip.Tip="{l:Translate UniqueRowsOnlyTooltip}"
+						ToolTip.Placement="Right"
+						ToolTip.ShowDelay="500"
+					/>
+				</StackPanel>
+			</StackPanel>
+			
+			<Grid DockPanel.Dock="Bottom" Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
+				<Button
+					Grid.Column="0"
+					Content="{l:Translate btnCancel}"
+					Click="OnCancel"
+				/>
+
+				<Panel
+					Grid.Column="1"
+					MinWidth="25"
+				/>
+
+				<Button
+					Grid.Column="2"
+					Content="{l:Translate btnStart}"
+					Click="OnStartLogging"
+				/>
+			</Grid>
+
+			<Panel
+				DockPanel.Dock="Bottom"
+				MinHeight="5"
+			/>
+		</DockPanel>
+	</Border>
+</Window>

@@ -30,6 +30,7 @@
     <ClInclude Include="NES\Mappers\Unlicensed\Mapper487.h" />
     <ClInclude Include="NES\OpnInterface.h" />
     <ClInclude Include="Shared\Movies\BizHawkMovie.h" />
+    <ClInclude Include="Shared\TraceFormat.h" />
     <ClInclude Include="Shared\Utilities\S3511ARtc.h" />
     <ClInclude Include="Shared\Video\BlendFilter.h" />
     <ClInclude Include="Shared\Video\DrawPixelsCommand.h" />
@@ -451,7 +452,9 @@
     <ClInclude Include="Debugger\BaseTraceLogger.h" />
     <ClInclude Include="Debugger\DebuggerFeatures.h" />
     <ClInclude Include="Debugger\ITraceLogger.h" />
-    <ClInclude Include="Debugger\TraceLogFileSaver.h" />
+    <ClInclude Include="Debugger\TraceLogOutput.h" />
+    <ClInclude Include="Debugger\TraceLogOutputFile.h" />
+    <ClInclude Include="Debugger\TraceLogOutputNetworkSocket.h" />
     <ClInclude Include="Gameboy\Carts\GbsCart.h" />
     <ClInclude Include="Gameboy\Debugger\DummyGbCpu.h" />
     <ClInclude Include="Gameboy\Debugger\GbTraceLogger.h" />

@@ -238,3 +238,4 @@ clean:
 	rm -r -f $(MACOSOBJ)
 	rm -r -f $(DLLOBJ)
 	rm -r -f $(OUTFOLDER)
+	cd UI && dotnet clean

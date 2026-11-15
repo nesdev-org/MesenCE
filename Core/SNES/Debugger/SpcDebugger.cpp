@@ -212,6 +212,13 @@ void SpcDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void SpcDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 DebuggerFeatures SpcDebugger::GetSupportedFeatures()
 {
 	DebuggerFeatures features = {};

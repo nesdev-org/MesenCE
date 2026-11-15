@@ -1307,7 +1307,7 @@
 			<Control ID="mnuSearch">_Search</Control>
 
 			<Control ID="btnOpenTraceFile">Open trace file</Control>
-			<Control ID="btnStart">Log to file...</Control>
+			<Control ID="btnStart">Log to stream...</Control>
 			<Control ID="btnStop">Stop logging</Control>
 			<Control ID="btnClear">Clear log</Control>
 		</Form>
@@ -1779,6 +1779,107 @@
 			<Control ID="btnSelect">Select...</Control>
 			<Control ID="btnDelete">Delete file</Control>
 		</Form>
+		
+		<Form ID="TraceLogOutputConfigurationWindow">
+			<Control ID="Title">Configure log output</Control>
+			<Control ID="ShowAdvancedSettings">Advanced settings</Control>
+			<Control ID="LogToFile">Log to File</Control>
+			<Control ID="LogToNetworkSocket">Log to Network Socket</Control>
+			<Control ID="ConnectionPort">Port:</Control>
+			<Control ID="ConnectionPortTooltip">The port of the socket to open.
+
+Mesen will open a socket on this port and will wait for
+clients to connect. Other applications and/or systems
+can connect to this socket via TCP and Mesen will then
+start sending the log data as packets over the
+connection in the specified format.</Control>
+			<Control ID="FileNameTooltip">The target file path.</Control>
+			<Control ID="NativeNewLines">Native line endings</Control>
+			<Control ID="NativeNewLinesTooltip">Only applicable when using text-based output formats.
+
+When checked, the format of line endings in the target
+file will depend on the operating system you're running
+Mesen on. The native format for file endings on that
+platform will be used (CR+LF on Windows, LF on Linux).
+
+When unchecked, a universal format will be used for 
+line endings (LF, regardless of platform).</Control>
+			<Control ID="Format">Format:</Control>
+			<Control ID="FormatTooltip">Determines the output format of logged data.
+Available formats depend on the current system and its
+architecture being emulated.
+
+Text Lines: Outputs lines of text as defined by the
+format specifier string in the log window.
+
+DiztinGUIsh Binary: Outputs a binary data format that
+can be read by the SNES disassembly tool DiztinGUIsh.
+
+DiztinGUIsh Binary (Compact): Same as the other
+DiztinGUIsh Binary setting, but reduces the amount of
+information that is output to the bare minimum in
+order to improve performance.</Control>
+			<Control ID="CompressionType">Compression:</Control>
+			<Control ID="CompressionTypeTooltip">Compression method used for logged data.
+Available methods depend on the current system and its
+architecture being emulated.
+
+None: Disable compression of logged data.
+
+DiztinGUIsh Zlib: Compress logged data with Zlib and
+prepend a size header as required by DiztinGUIsh.</Control>
+			<Control ID="ChunkSize">Buffer size:</Control>
+			<Control ID="ChunkSizeTooltip">The size of memory buffers to use for logging.
+Bigger values mean higher memory consumption, but can
+lead to better performance. Size needs to be large
+enough to contain at least a single formatted log
+entry, otherwise no data will be logged at all.
+			</Control>
+			<Control ID="ChunkCount">Buffer count:</Control>
+			<Control ID="ChunkCountTooltip">The number of memory buffers to use for logging.
+Bigger values mean higher memory consumption, but can
+lead to better performance.</Control>
+			<Control ID="BatchLogData">Flush &amp; compress in batches</Control>
+			<Control ID="BatchLogDataTooltip">When enabled, logged data will only be sent to the
+configured output once a buffer has run full. This
+greatly improves performance.
+
+When disabled, logged data will be sent immediately.
+This is usually a bad idea that leads to prohibitvly
+bad performance, but might be useful in some rare
+scenarios where you absolutely need data to be sent
+immediately after executing an instruction. When doing
+this, using a larger buffer count and a smaller buffer
+size might improve performance.</Control>
+			<Control ID="IncludeImplicitPC">Prefix with PC</Control>
+			<Control ID="IncludeImplicitPCTooltip">Only applicable when using text-based output formats.
+			
+When enabled, logged text lines are automatically
+prefixed with the PC. The PC can also be logged via
+the [PC] format specifier, which is useful when
+disabling this setting.</Control>
+			<Control ID="UniqueRowsOnly">Skip rows without new state info</Control>
+			<Control ID="UniqueRowsOnlyTooltip">When enabled, Mesen keeps a record of every unique
+CPU state permutation an instruction has ever been
+executed with. When an instruction is executed with
+a state permutation that has already been encountered,
+logging is skipped. This can be useful for disassembling
+ROMs as it greatly reduces the size of the target log
+and also improves performance while logging.
+
+Availability of this feature depends on the current
+system being emulated and also on the CPU being logged.
+When the feature isn't supported for a specific system
+or CPU, every instruction will be logged instead.</Control>
+			<Control ID="btnCancel">Cancel</Control>
+			<Control ID="btnStart">Start</Control>
+			<Control ID="btnFileSelect">...</Control>
+		</Form>
+		
+		<Form ID="TraceNetworkSocketWaitForConnectionWindow">
+			<Control ID="Message">Waiting for a client to connect...</Control>
+			<Control ID="btnCancel">Cancel</Control>
+		</Form>
 	</Forms>
 	<Messages>
 		<Message ID="LastSession">Last Session</Message>
@@ -1888,6 +1989,9 @@ E
 		<Message ID="AddressOutOfRange">The address is out of range.</Message>
 		<Message ID="AddressHasOtherLabel">Another label exists for this address: {0}</Message>
 
+		<Message ID="CreatingTraceLogNetworkSocketFailed">Failed to initialize a network connection.</Message>
+		<Message ID="StartingTraceLogNetworkFailed">Failed to start network logging.</Message>
+		
 		<Message ID="RecentShaders">Recent shaders </Message>
 	</Messages>
 	<Enums>
@@ -3832,6 +3936,19 @@ E
 			<Value ID="ShaderSettings">Configure shader...</Value>
 			<Value ID="OpenShaderFolder">Open shader folder</Value>
 			<Value ID="NoShadersFound">Shaders (.slangp files) in the "Shaders" folder will be listed here.</Value>
+		</Enum>
+		<Enum ID="TraceLogOutputFormat">
+			<Value ID="Text">Text Lines</Value>
+			<Value ID="Diztinguish">DiztinGUIsh Binary</Value>
+			<Value ID="DiztinguishAbridged">DiztinGUIsh Binary (Compact)</Value>
+		</Enum>
+		<Enum ID="TraceLogOutputCompressionType">
+			<Value ID="None">None</Value>
+			<Value ID="DiztinguishZlib">DiztinGUIsh Zlib</Value>
+		</Enum>
+		<Enum ID="TraceLogOutputTarget">
+			<Value ID="File">File</Value>
+			<Value ID="NetworkSocket">Network Socket</Value>
 		</Enum>
 	</Enums>
 </Resources>

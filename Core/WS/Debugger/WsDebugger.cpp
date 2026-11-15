@@ -279,6 +279,13 @@ void WsDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void WsDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 StepBackConfig WsDebugger::GetStepBackConfig()
 {
 	return {

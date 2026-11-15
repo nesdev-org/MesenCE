@@ -354,6 +354,13 @@ void SnesDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void SnesDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 StepBackConfig SnesDebugger::GetStepBackConfig()
 {
 	if(_cpuType == CpuType::Snes) {

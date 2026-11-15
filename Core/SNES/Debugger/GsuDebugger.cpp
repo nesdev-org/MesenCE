@@ -143,6 +143,13 @@ void GsuDebugger::Step(int32_t stepCount, StepType type)
 	_step.reset(new StepRequest(step));
 }
 
+void GsuDebugger::ProcessEndOfFrame()
+{
+	if(_traceLogger->IsEnabled()) {
+		_traceLogger->ProcessEndOfFrame();
+	}
+}
+
 void GsuDebugger::SetProgramCounter(uint32_t addr, bool updateDebuggerOnly)
 {
 	if(!updateDebuggerOnly) {
