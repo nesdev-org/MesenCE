@@ -92,4 +92,20 @@ public:
 		_irqEnabled = _irqEnabledAfterAck;
 		_console->GetCpu()->ClearIrqSource(IRQSource::External);
 	}
+
+	void GetMapperStateEntries(vector<MapperStateEntry>& entries, bool swapBottomAddressBits = false)
+	{
+		entries.push_back(MapperStateEntry("$F000-$F002", "VRC IRQ"));
+
+		std::string base = swapBottomAddressBits ? "$F001" : "$F002";
+
+		entries.push_back(MapperStateEntry("$F000", "IRQ Reload", _irqReloadValue, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry(base + ".0", "IRQ Enabled After Ack", _irqEnabledAfterAck, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry(base + ".1", "IRQ Enabled", _irqEnabled, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry(base + ".2", "IRQ Cycle Mode", _irqCycleMode, MapperStateValueType::Bool));
+
+		entries.push_back(MapperStateEntry("--", "IRQ Prescaler Counter", _irqPrescalerCounter, MapperStateValueType::Number16));
+
+		entries.push_back(MapperStateEntry("--", "IRQ Counter", _irqCounter, MapperStateValueType::Number8));
+	}
 };

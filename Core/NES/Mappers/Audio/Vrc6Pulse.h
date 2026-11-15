@@ -77,4 +77,16 @@ public:
 			return _step <= _dutyCycle ? _volume : 0;
 		}
 	}
+
+	void GetMapperStateEntries(vector<MapperStateEntry>& entries, std::string base, double clockRate)
+	{
+		double frequency = clockRate / (16 * (_frequency + 1));
+		entries.push_back(MapperStateEntry(base + "2.7", "Enabled", _enabled, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry(base + "0.7", "Ignore Duty", _ignoreDuty, MapperStateValueType::Bool));
+		entries.push_back(MapperStateEntry(base + "0.4-6", "Duty Cycle", _dutyCycle, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry(base + "0.0-3", "Volume", _volume, MapperStateValueType::Number8));
+		entries.push_back(MapperStateEntry("--", "Timer", _timer, MapperStateValueType::Number32));
+		entries.push_back(MapperStateEntry(base + "1/" + base + "2.0-3", "Frequency", std::to_string(frequency) + " Hz"));
+		entries.push_back(MapperStateEntry("$9003", "Frequency Shift", _frequencyShift, MapperStateValueType::Number8));
+	}
 };
