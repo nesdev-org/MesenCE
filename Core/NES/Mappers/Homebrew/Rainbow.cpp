@@ -501,7 +501,8 @@ void Rainbow::DetectScanlineStart(uint16_t addr)
 			_ntReadCounter++;
 
 			if(_ntReadCounter >= 2) {
-				//After 3 identical NT reads, trigger IRQ when the following attribute byte is read
+				//The third consecutive read from the same NT address starts the scanline
+				//and counts as PPU read 1 for scanline IRQ timing
 				if(!_inFrame) {
 					_inFrame = true;
 					_scanlineCounter = 0;
@@ -512,7 +513,7 @@ void Rainbow::DetectScanlineStart(uint16_t addr)
 				ProcessSpriteEval();
 
 				_ntFetchCounter = 0;
-				_ppuReadCounter = 0;
+				_ppuReadCounter = 1;
 				_ntReadCounter = 0;
 				_inHBlank = false;
 			}
