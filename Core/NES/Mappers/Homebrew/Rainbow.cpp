@@ -642,7 +642,7 @@ void Rainbow::WriteRegister(uint16_t addr, uint8_t value)
 			_windowControl.BgExtMode = value & 0x02;
 			_windowControl.FpgaRamSrc = (value & 0x0C) >> 2;
 			_windowControl.FillMode = value & 0x20;
-			_windowControl.Source = (value & 0xC0) >> 6; //todo this is writeable/readable but ignored?
+			_windowControl.Source = 0b10; // Forced to FPGA-RAM
 			break;
 
 		case 0x4150: _slIrqScanline = value; break;
