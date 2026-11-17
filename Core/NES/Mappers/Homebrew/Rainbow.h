@@ -116,7 +116,7 @@ private:
 	bool _espEnabled = false;
 	bool _wifiIrqEnabled = false;
 	bool _wifiIrqPending = false;
-	bool _dataSent = false;
+	bool _dataSent = true;
 	bool _dataReceived = false;
 	bool _dataReady = false;
 	uint8_t _sendSrcAddr = 0;

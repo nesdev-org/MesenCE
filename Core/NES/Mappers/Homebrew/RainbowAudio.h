@@ -68,6 +68,13 @@ public:
 		return _lastOutput;
 	}
 
+	uint8_t GetLastOutput4011(uint8_t openBus)
+	{
+		return _outputTo4011
+			? static_cast<uint8_t>(_lastOutput << 1)
+			: openBus;
+	}
+
 	void WriteRegister(uint16_t addr, uint8_t value)
 	{
 		addr &= 0x0F;
