@@ -86,10 +86,12 @@ protected:
 			addr &= ~0x10;
 		}
 
+		uint8_t prgMask = _prgSize > 0x80000 ? 0xFF : 0x3F;
+
 		switch(addr & 0xF038) {
-			case 0x8000: SelectPrgPage(0, value & 0x3F); break;
-			case 0x8008: SelectPrgPage(1, value & 0x3F); break;
-			case 0x9000: SelectPrgPage(2, value & 0x3F); break;
+			case 0x8000: SelectPrgPage(0, value & prgMask); break;
+			case 0x8008: SelectPrgPage(1, value & prgMask); break;
+			case 0x9000: SelectPrgPage(2, value & prgMask); break;
 
 			case 0x9010:
 			case 0x9030: _audio->WriteReg(addr, value); break;
