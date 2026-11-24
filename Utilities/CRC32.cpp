@@ -18,7 +18,9 @@ extern const uint32_t Crc32Lookup[MaxSlice][256];
 // define endianess and some integer data types
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__aarch64__)
 // Windows always little endian
-	#define __BYTE_ORDER __LITTLE_ENDIAN
+	#ifndef __BYTE_ORDER
+		#define __BYTE_ORDER __LITTLE_ENDIAN
+	#endif
 #else
 // defines __BYTE_ORDER as __LITTLE_ENDIAN or __BIG_ENDIAN
 	#if defined(__APPLE__) || defined(HAVE_LIBNX)
@@ -30,7 +32,7 @@ extern const uint32_t Crc32Lookup[MaxSlice][256];
 	#endif
 #endif
 
-#if !defined(__BYTE_ORDER)
+#ifndef __BYTE_ORDER
 	//Default to little endian when the symbol is not defined
 	#define __BYTE_ORDER __LITTLE_ENDIAN
 #endif
